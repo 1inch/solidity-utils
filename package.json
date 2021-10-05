@@ -1,0 +1,44 @@
+{
+  "name": "1inch-solidity-utils",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:1inch/1inch-solidity-utils.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.1"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
+    "@nomiclabs/hardhat-truffle5": "^2.0.0",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/test-helpers": "^0.5.13",
+    "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-standard": "^5.0.0",
+    "hardhat": "^2.6.2",
+    "hardhat-deploy": "^0.9.1",
+    "hardhat-gas-reporter": "^1.0.4",
+    "rimraf": "^3.0.2",
+    "solc": "^0.8.7-fixed",
+    "solhint": "^3.3.6",
+    "solidity-coverage": "^0.7.17"
+  },
+  "scripts": {
+    "coverage": "hardhat coverage",
+    "lint": "yarn run lint:js && yarn run lint:sol",
+    "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix",
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix",
+    "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
+    "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
+    "test": "hardhat test"
+  }
+}
