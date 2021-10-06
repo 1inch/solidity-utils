@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.1"
+    "@openzeppelin/contracts": "3.4.2-solc-0.7"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
@@ -27,7 +27,7 @@
     "hardhat-deploy": "^0.9.1",
     "hardhat-gas-reporter": "^1.0.4",
     "rimraf": "^3.0.2",
-    "solc": "^0.8.7-fixed",
+    "solc": "^0.7.6",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17"
   },
