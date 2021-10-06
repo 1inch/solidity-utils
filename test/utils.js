@@ -1,6 +1,15 @@
 const { expect } = require('chai');
-const { time, BN } = require('@openzeppelin/test-helpers');
-const { timeIncreaseTo, fixSignature, signMessage } = require('../js/utils.js');
+const { time, ether, BN } = require('@openzeppelin/test-helpers');
+const {
+    timeIncreaseTo,
+    fixSignature,
+    signMessage,
+    trackReceivedTokenAndTx,
+    trackReceivedToken,
+    countInstructions,
+} = require('../js/utils.js');
+
+const TokenMock = artifacts.require('TokenMock');
 
 describe('timeIncreaseTo', async function () {
     const precision = 2;
@@ -53,7 +62,20 @@ describe('fixSignature', async function () {
     });
 });
 
-contract('', function ([wallet1]) {
+contract('', function ([wallet1, wallet2]) {
+    before(async function () {
+        this.USDT = await TokenMock.new('USDT', 'USDT');
+        this.USDC = await TokenMock.new('USDC', 'USDC');
+    });
+
+    beforeEach(async function () {
+        for (const addr of [wallet1, wallet2]) {
+            for (const token of [this.USDT, this.USDC]) {
+                await token.mint(addr, ether('1000'));
+            }
+        }
+    });
+
     describe('signMessage', async function () {
         it('should be signed test1', async function () {
             expect(await web3.eth.sign('0x', wallet1)).equal(await signMessage(wallet1));
@@ -67,6 +89,78 @@ contract('', function ([wallet1]) {
         it('should be signed test3', async function () {
             const message = web3.utils.toHex('Test message'); ;
             expect(await web3.eth.sign(message, wallet1)).equal(await signMessage(wallet1, message));
+        });
+    });
+
+    describe('trackReceivedTokenAndTx', async function () {
+        it('should be tracked ERC20 Transfer', async function () {
+            const [received, tx] = await trackReceivedTokenAndTx(
+                this.USDT,
+                wallet2,
+                () => this.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
+            );
+            expect(received).to.be.bignumber.equal(ether('1'));
+            expect(tx.tx.length).equal(66);
+            expect(tx.receipt.from).equal(wallet1.toLowerCase());
+            expect(tx.receipt.to).equal(this.USDT.address.toLowerCase());
+            expect(tx.logs.length).equal(1);
+            expect(tx.logs[0].event).equal('Transfer');
+        });
+
+        it('should be tracked ERC20 Approve', async function () {
+            const [received, tx] = await trackReceivedTokenAndTx(
+                this.USDT,
+                wallet2,
+                () => this.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
+            );
+            expect(received).to.be.bignumber.equal('0');
+            expect(tx.tx.length).equal(66);
+            expect(tx.receipt.from).equal(wallet1.toLowerCase());
+            expect(tx.receipt.to).equal(this.USDT.address.toLowerCase());
+            expect(tx.logs.length).equal(1);
+            expect(tx.logs[0].event).equal('Approval');
+        });
+    });
+
+    describe('trackReceivedToken', async function () {
+        it('should be tracked ERC20 Transfer', async function () {
+            const received = await trackReceivedToken(
+                this.USDT,
+                wallet2,
+                () => this.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
+            );
+            expect(received).to.be.bignumber.equal(ether('1'));
+        });
+
+        it('should be tracked ERC20 Approve', async function () {
+            const received = await trackReceivedToken(
+                this.USDT,
+                wallet2,
+                () => this.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
+            );
+            expect(received).to.be.bignumber.equal('0');
+        });
+    });
+
+    describe('countInstructions', async function () {
+        it('should be counted ERC20 Transfer', async function () {
+            const [, tx] = await trackReceivedTokenAndTx(
+                this.USDT,
+                wallet2,
+                () => this.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
+            );
+            expect(await countInstructions(tx.receipt.transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD']))
+                .to.be.deep.equal([0, 0, 2, 2]);
+        });
+
+        it('should be counted ERC20 Approve', async function () {
+            const [, tx] = await trackReceivedTokenAndTx(
+                this.USDT,
+                wallet2,
+                () => this.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
+            );
+            expect(await countInstructions(tx.receipt.transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD']))
+                .to.be.deep.equal([0, 0, 1, 0]);
         });
     });
 });
