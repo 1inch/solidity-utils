@@ -3,7 +3,7 @@
     "rules": {
         "compiler-version": [
             "error",
-            "^0.7.6"
+            "^0.8.0"
         ],
         "private-vars-leading-underscore": "error",
         "func-visibility": ["error", { "ignoreConstructors": true }]

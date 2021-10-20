@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/contracts": "3.4.2-solc-0.7"
+    "@openzeppelin/contracts": "^4.3.2"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
@@ -23,11 +23,11 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0",
-    "hardhat": "^2.6.2",
-    "hardhat-deploy": "^0.9.1",
+    "hardhat": "^2.6.4",
+    "hardhat-deploy": "^0.9.2",
     "hardhat-gas-reporter": "^1.0.4",
     "rimraf": "^3.0.2",
-    "solc": "^0.7.6",
+    "solc": "^0.8.9",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17"
   },
