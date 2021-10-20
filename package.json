@@ -1,10 +1,10 @@
 {
-  "name": "1inch-solidity-utils",
-  "version": "1.0.0",
+  "name": "@1inch/1inch-solidity-utils",
+  "version": "1.1.0",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:1inch/1inch-solidity-utils.git"
+    "url": "git+ssh://git@github.com/1inch/1inch-solidity-utils.git"
   },
   "license": "MIT",
   "dependencies": {
@@ -16,6 +16,7 @@
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@openzeppelin/test-helpers": "^0.5.13",
     "chai": "^4.3.4",
+    "cross-spawn": "^7.0.3",
     "dotenv": "^10.0.0",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
@@ -31,6 +32,9 @@
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17"
   },
+  "bin": {
+    "solidity-utils-docify": "utils/docify.utils.js"
+  },
   "scripts": {
     "coverage": "hardhat coverage",
     "lint": "yarn run lint:js && yarn run lint:sol",
@@ -40,5 +44,14 @@
     "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/1inch/1inch-solidity-utils/issues"
+  },
+  "homepage": "https://github.com/1inch/1inch-solidity-utils#readme",
+  "directories": {
+    "test": "test"
+  },
+  "author": "1inch",
+  "description": ""
 }
