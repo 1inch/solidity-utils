@@ -1,12 +1,27 @@
 {
-  "name": "1inch-solidity-utils",
+  "name": "@1inch/1inch-solidity-utils",
   "version": "1.0.0",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:1inch/1inch-solidity-utils.git"
+    "url": "ssh://git@github.com:1inch/1inch-solidity-utils.git",
+    "directory": "@1inch/1inch-solidity-utils"
+  },
+  "bin": {
+    "1inch-solidity-utils": "./cli-util.js"
   },
   "license": "MIT",
+  "scripts": {
+    "coverage": "hardhat coverage",
+    "lint": "yarn run lint:js && yarn run lint:sol",
+    "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix",
+    "lint:js": "eslint .",
+    "lint:js:fix": "eslint . --fix",
+    "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
+    "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
+    "test": "hardhat test",
+    "build": "rimraf ./dist && mkdir dist && cp -R js/* ./dist && cp package.json ./dist"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.2"
   },
@@ -30,15 +45,5 @@
     "solc": "^0.8.9",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17"
-  },
-  "scripts": {
-    "coverage": "hardhat coverage",
-    "lint": "yarn run lint:js && yarn run lint:sol",
-    "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix",
-    "lint:js": "eslint .",
-    "lint:js:fix": "eslint . --fix",
-    "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
-    "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
-    "test": "hardhat test"
   }
 }
