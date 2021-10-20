@@ -28,6 +28,7 @@
     "hardhat-deploy": "^0.9.2",
     "hardhat-gas-reporter": "^1.0.4",
     "rimraf": "^3.0.2",
+    "shx": "^0.3.3",
     "solc": "^0.8.9",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17"
@@ -36,6 +37,7 @@
     "solidity-utils-docify": "utils/docify.utils.js"
   },
   "scripts": {
+    "build": "rimraf ./dist && mkdir dist && shx cp -R js ./dist/js && shx cp -R utils ./dist/utils && shx cp package.json ./dist",
     "coverage": "hardhat coverage",
     "lint": "yarn run lint:js && yarn run lint:sol",
     "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix",
