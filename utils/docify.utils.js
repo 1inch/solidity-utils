@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const SOLC_NPM_NAME = 'solc';
 const BASE_DIR = 'docgen';
 const SCRIPT_DIR = __dirname;
