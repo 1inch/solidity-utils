@@ -78,7 +78,7 @@ function getSummary(targetPath) {
     }
 
     function generateContent(summaryTree) {
-        const lines = summaryTree.map(x => `${' '.repeat(x.indentation)}* [${x.name}](${x.path})`).join('\n');
+        const lines = summaryTree.map(x => `${'\t'.repeat(x.indentation)}* [${x.name}](${x.path})`).join('\n');
         return `# Table of contents\n\n${lines}`;
     }
 
