@@ -30,7 +30,8 @@ function {{name}}(
 | Name                           | Type          | Description                                                                  |
 | :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
 {{#natspec.returns}}
-|`{{param}}`| {{#lookup ../args.types @index}}{{/lookup}} | {{{removeNewlines description}}}{{/natspec.returns}}{{/if}}
+|`{{param}}`| {{#lookup ../outputs.types @index}}{{/lookup}} | {{{removeNewlines description}}}
+{{/natspec.returns}}{{/if}}
 {{/ownFunctions}}
 {{#if ownEvents}}
 ## Events
