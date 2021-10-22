@@ -4,6 +4,9 @@
 
 # Utils library for contracts and tests
 
+[![Build Status](https://github.com/1inch/solidity-utils/workflows/CI/badge.svg)](https://github.com/1inch/solidity-utils/actions)
+[![Coverage Status](https://coveralls.io/repos/github/1inch/solidity-utils/badge.svg?branch=master)](https://coveralls.io/github/1inch/solidity-utils?branch=master)
+
 ### About
 
 This repository contains frequently used smart contracts, libraries and interfaces. Also it contains utils which are used in tests.
