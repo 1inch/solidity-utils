@@ -50,7 +50,6 @@ library RevertReasonParser {
             }
             return string(abi.encodePacked(prefix, "Panic(", _toHex(code), ")"));
         }
-
         return string(abi.encodePacked(prefix, "Unknown(", _toHex(data), ")"));
     }
 
