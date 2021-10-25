@@ -27,6 +27,10 @@ contract RevertReasonParserTest {
         revert("Very long text to test for reverts that return string of more than 32 bytes length");
     }
 
+    function withoutAssertion() external pure {
+        assert(true);
+    }
+
     function testEmptyRevert() external view {
         _test(this.emptyRevert, "Unknown(0x)");
     }
@@ -47,7 +51,7 @@ contract RevertReasonParserTest {
         _test(this.longStringRevert, "Error(Very long text to test for reverts that return string of more than 32 bytes length)");
     }
 
-    function testWithThrow() external view {
+    function testParseWithThrow() external view {
         try this.nonEmptyRevert() { // solhint-disable-line no-empty-blocks
         } catch (bytes memory reason) {
             bytes32 invalidReasonPart1;
@@ -81,6 +85,10 @@ contract RevertReasonParserTest {
                 string(abi.encodePacked("Expected { revertReasonParserCost < revertReasonParserExpensiveCost }, but got { ", revertReasonParserCost, " < ", revertReasonParserExpensiveCost, "}"))
             );
         }
+    }
+
+    function testWithThrow() external view {
+        _test(this.withoutAssertion, "Error(reason)");
     }
 
     function _test(function() external pure testFunction, string memory expectedReason) private pure {

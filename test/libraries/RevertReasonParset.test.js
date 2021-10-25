@@ -10,7 +10,7 @@ contract('RevertReasonParser', function ([wallet1, wallet2]) {
     describe('parse', async function () {
         it('should be reverted with Invalid revert reason', async function () {
             await expectRevert(
-                this.RevertReasonParserTest.testWithThrow(),
+                this.RevertReasonParserTest.testParseWithThrow(),
                 'Invalid revert reason',
             );
         });
@@ -37,6 +37,13 @@ contract('RevertReasonParser', function ([wallet1, wallet2]) {
 
         it('should be cheaper than expensive version', async function () {
             await this.RevertReasonParserTest.testGasCost();
+        });
+
+        it('should be reverted in _test()', async function () {
+            await expectRevert(
+                this.RevertReasonParserTest.testWithThrow(),
+                'testFunctions without throw',
+            );
         });
     });
 });
