@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 
 import "../libraries/RevertReasonParser.sol";
 import "../mocks/libraries/RevertReasonParserExpensive.sol";
-// import "hardhat/console.sol";
 
 contract RevertReasonParserTest {
     function emptyRevert() external pure  {
@@ -65,19 +64,17 @@ contract RevertReasonParserTest {
     }
 
     function testGasCost() external payable {
-        try this.longStringRevert() { // solhint-disable-line no-empty-blocks
+        try this.assertion() { // solhint-disable-line no-empty-blocks
         } catch (bytes memory reason) {
             uint gasLeftBeforeParse = gasleft();
             RevertReasonParser.parse(reason, "");
             uint gasLeftAfterParse = gasleft();
             uint revertReasonParserCost = gasLeftBeforeParse - gasLeftAfterParse;
-            // console.log(gasLeftBeforeParse, gasLeftAfterParse, revertReasonParserCost);
             
             gasLeftBeforeParse = gasleft();
             RevertReasonParserExpensive.parse(reason, "");
             gasLeftAfterParse = gasleft();
             uint revertReasonParserExpensiveCost = gasLeftBeforeParse - gasLeftAfterParse;
-            // console.log(gasLeftBeforeParse, gasLeftAfterParse, revertReasonParserExpensiveCost);
             
             require(
                 revertReasonParserCost < revertReasonParserExpensiveCost,
