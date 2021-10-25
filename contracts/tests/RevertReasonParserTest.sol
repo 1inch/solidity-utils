@@ -67,6 +67,10 @@ contract RevertReasonParserTest {
         }
     }
 
+    function testWithThrow() external view {
+        _test(this.withoutAssertion, "Error(reason)");
+    }
+
     function testGasCost() external payable {
         try this.assertion() { // solhint-disable-line no-empty-blocks
         } catch (bytes memory reason) {
@@ -87,8 +91,12 @@ contract RevertReasonParserTest {
         }
     }
 
-    function testWithThrow() external view {
-        _test(this.withoutAssertion, "Error(reason)");
+    function testGasParse() external view {
+        _testGas(this.assertion, RevertReasonParser.parse, 3336);
+    }
+
+    function testGasExpensiveParse() external view {
+        _testGas(this.assertion, RevertReasonParserExpensive.parse, 26212);
     }
 
     function _test(function() external pure testFunction, string memory expectedReason) private pure {
@@ -100,6 +108,23 @@ contract RevertReasonParserTest {
                 keccak256(abi.encodePacked(expectedReason)) == keccak256(abi.encodePacked(parsedReason)),
                 string(abi.encodePacked("Expected { ", expectedReason, " }, but got { ", parsedReason, " }"))
             );
+        }
+    }
+
+    function _testGas(
+        function() external pure assertFunction,
+        function(bytes memory, string memory) internal pure returns (string memory) testFunction, 
+        uint256 gasAmount
+    ) private view {
+        try assertFunction() { // solhint-disable-line no-empty-blocks
+        } catch (bytes memory reason) {
+            uint256 gasLeftBeforeParse = gasleft();
+            testFunction(reason, "");
+            uint256 gasLeftAfterParse = gasleft();
+            require(
+                gasLeftBeforeParse - gasLeftAfterParse == gasAmount,
+                string(abi.encodePacked("Expected { ", gasAmount, " }, but got { ", gasLeftBeforeParse - gasLeftAfterParse, " }"))
+            );   
         }
     }
 }
