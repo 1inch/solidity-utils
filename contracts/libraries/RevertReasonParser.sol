@@ -50,7 +50,6 @@ library RevertReasonParser {
             }
             return string(abi.encodePacked(prefix, "Panic(", _toHex(code), ")"));
         }
-
         return string(abi.encodePacked(prefix, "Unknown(", _toHex(data), ")"));
     }
 
@@ -58,46 +57,64 @@ library RevertReasonParser {
         return _toHex(abi.encodePacked(value));
     }
 
-    function _toHex16(bytes16 data) private pure returns (bytes32 result) {
-        result = bytes32(data) & 0xFFFFFFFFFFFFFFFF000000000000000000000000000000000000000000000000 |
-              (bytes32(data) & 0x0000000000000000FFFFFFFFFFFFFFFF00000000000000000000000000000000) >> 64;
-        result = result & 0xFFFFFFFF000000000000000000000000FFFFFFFF000000000000000000000000 |
-              (result & 0x00000000FFFFFFFF000000000000000000000000FFFFFFFF0000000000000000) >> 32;
-        result = result & 0xFFFF000000000000FFFF000000000000FFFF000000000000FFFF000000000000 |
-              (result & 0x0000FFFF000000000000FFFF000000000000FFFF000000000000FFFF00000000) >> 16;
-        result = result & 0xFF000000FF000000FF000000FF000000FF000000FF000000FF000000FF000000 |
-              (result & 0x00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000) >> 8;
-        result = (result & 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000) >> 4 |
-              (result & 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00) >> 8;
-        result = bytes32(0x3030303030303030303030303030303030303030303030303030303030303030 +
-               uint256(result) +
-               (uint256(result) + 0x0606060606060606060606060606060606060606060606060606060606060606 >> 4 &
-               0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F) * 7); // Change 7 to 39 for lower case output
-    }
-
-    function _toHex(bytes memory data) private pure returns (string memory) {
-        uint length = data.length;
-        string memory result = new string(length << 1); // Ignore overflow here
-        uint fromPtr;
-        uint endPtr;
-        uint toPtr;
+    function _toHex(bytes memory data) private pure returns (string memory result) {
         assembly {
-            fromPtr := add(data, 0x20)
-            endPtr := add(fromPtr, length)
-            toPtr := add(result, 0x20)
-        }
-        while (fromPtr < endPtr) {
-            bytes16 rawData;
-            assembly {
-                rawData := mload(fromPtr)
+            function _toHex16(input) -> output {
+                output := or(
+                    and(input, 0xFFFFFFFFFFFFFFFF000000000000000000000000000000000000000000000000),
+                    shr(64, and(input, 0x0000000000000000FFFFFFFFFFFFFFFF00000000000000000000000000000000))
+                )
+                output := or(
+                    and(output, 0xFFFFFFFF000000000000000000000000FFFFFFFF000000000000000000000000),
+                    shr(32, and(output, 0x00000000FFFFFFFF000000000000000000000000FFFFFFFF0000000000000000))
+                )
+                output := or(
+                    and(output, 0xFFFF000000000000FFFF000000000000FFFF000000000000FFFF000000000000),
+                    shr(16, and(output, 0x0000FFFF000000000000FFFF000000000000FFFF000000000000FFFF00000000))
+                )
+                output := or(
+                    and(output, 0xFF000000FF000000FF000000FF000000FF000000FF000000FF000000FF000000),
+                    shr(8, and(output, 0x00FF000000FF000000FF000000FF000000FF000000FF000000FF000000FF0000))
+                )
+                output := or(
+                    shr(4, and(output, 0xF000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000)),
+                    shr(8, and(output, 0x0F000F000F000F000F000F000F000F000F000F000F000F000F000F000F000F00))
+                )
+                output := add(
+                    add(0x3030303030303030303030303030303030303030303030303030303030303030, output),
+                    mul(
+                        and(
+                            shr(4, add(output, 0x0606060606060606060606060606060606060606060606060606060606060606)),
+                            0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F
+                        ),
+                        7
+                    )
+                )
             }
-            bytes32 hexData = _toHex16(rawData);
-            assembly {
-                mstore(toPtr, hexData) // May write beyond the array into unallocated memory
+
+            result := mload(0x40)
+            let length := mload(data)
+            let resultLength := add(mul(length, 2), 2)
+            let toPtr := add(result, 0x20)
+            mstore(0x40, add(toPtr, resultLength))  // move free memory pointer
+            mstore(result, resultLength)
+            mstore(toPtr, 0x3078000000000000000000000000000000000000000000000000000000000000)  // set 0x as first two bytes
+            toPtr := add(toPtr, 0x02)
+
+            for { 
+                let fromPtr := add(data, 0x20)
+                let endPtr := add(fromPtr, length)
+            } lt(fromPtr, endPtr) { 
+                fromPtr := add(fromPtr, 0x20)
+            } {
+                let rawData := mload(fromPtr)
+                let hexData := _toHex16(rawData)
+                mstore(toPtr, hexData)
+                toPtr := add(toPtr, 0x20)
+                hexData := _toHex16(shl(128, rawData))
+                mstore(toPtr, hexData)
+                toPtr := add(toPtr, 0x20)
             }
-            fromPtr += 16;
-            toPtr += 32;
         }
-        return string(abi.encodePacked("0x", result));
     }
 }
