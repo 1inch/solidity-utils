@@ -1,8 +1,20 @@
 # {{{name}}}
 
+
 {{{natspec.title}}}
 {{{natspec.userdoc}}}
 {{{natspec.devdoc}}}
+
+{{#if (withoutFirstElement inheritance)}}
+## Derives
+{{/if}}
+{{#each (withoutFirstElement inheritance)}}
+{{#if (getRelativeDocPath name source.contractsDir source.solcOutput.sources)}}
+- [{{name}}]({{getRelativeDocPath name source.contractsDir source.solcOutput.sources}})
+{{else}}
+- {{name}}
+{{/if}}
+{{/each}}
 
 {{#if ownFunctions}}
 ## Functions

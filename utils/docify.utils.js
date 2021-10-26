@@ -98,6 +98,13 @@ function generateGitbookFiles () {
     generateSummary(OUTPUT_DIR, summary);
 }
 
+function removeUnwantedDocs () {
+    const unwantedDirs = ['mocks', 'tests'];
+    for (const unwantedDir of unwantedDirs) {
+        fs.rmSync(path.join(OUTPUT_DIR, unwantedDir), { force: true, recursive: true });
+    }
+}
+
 const solidityDocgenArgs = [
     'solidity-docgen',
     '-i',
@@ -117,3 +124,4 @@ const solidityDocgenArgs = [
 fs.rmSync(OUTPUT_DIR, { force: true, recursive: true });
 runProcess('npx', solidityDocgenArgs);
 generateGitbookFiles();
+removeUnwantedDocs();
