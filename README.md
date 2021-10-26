@@ -6,7 +6,7 @@
 
 [![Build Status](https://github.com/1inch/solidity-utils/workflows/CI/badge.svg)](https://github.com/1inch/solidity-utils/actions)
 [![Coverage Status](https://coveralls.io/repos/github/1inch/solidity-utils/badge.svg?branch=master)](https://coveralls.io/github/1inch/solidity-utils?branch=master)
-[![NPM Package](https://img.shields.io/npm/v/@1inch/1inch-solidity-utils.svg)](https://www.npmjs.org/package/@1inch/1inch-solidity-utils)
+[![NPM Package](https://img.shields.io/npm/v/@1inch/solidity-utils.svg)](https://www.npmjs.org/package/@1inch/solidity-utils)
 
 ### About
 
