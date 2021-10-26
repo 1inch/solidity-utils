@@ -87,7 +87,7 @@ library RevertReasonParser {
                             shr(4, add(output, 0x0606060606060606060606060606060606060606060606060606060606060606)),
                             0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F
                         ),
-                        7
+                        7   // Change 7 to 39 for lower case output
                     )
                 )
             }
