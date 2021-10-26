@@ -96,7 +96,7 @@ contract RevertReasonParserTest {
     }
 
     function testGasExpensiveParse() external view {
-        _testGas(this.assertion, RevertReasonParserExpensive.parse, 26212);
+        _testGas(this.assertion, RevertReasonParserExpensive.parse, 15077);
     }
 
     function _test(function() external pure testFunction, string memory expectedReason) private pure {

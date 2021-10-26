@@ -52,15 +52,18 @@ library RevertReasonParserExpensive {
         return _toHex(abi.encodePacked(value));
     }
 
+    bytes16 private constant _ALPHABET = 0x30313233343536373839616263646566;
+
     function _toHex(bytes memory data) private pure returns(string memory) {
-        bytes16 alphabet = 0x30313233343536373839616263646566;
-        bytes memory str = new bytes(2 + data.length * 2);
-        str[0] = "0";
-        str[1] = "x";
-        for (uint256 i = 0; i < data.length; i++) {
-            str[2 * i + 2] = alphabet[uint8(data[i] >> 4)];
-            str[2 * i + 3] = alphabet[uint8(data[i] & 0x0f)];
+        unchecked {            
+            bytes memory str = new bytes(2 + data.length * 2);
+            str[0] = "0";
+            str[1] = "x";
+            for (uint256 i = 0; i < data.length; i++) {
+                str[2 * i + 2] = _ALPHABET[uint8(data[i] >> 4)];
+                str[2 * i + 3] = _ALPHABET[uint8(data[i] & 0x0f)];
+            }
+            return string(str);
         }
-        return string(str);
     }
 }
