@@ -92,7 +92,7 @@ contract RevertReasonParserTest {
     }
 
     function testGasParse() external view {
-        _testGas(this.assertion, RevertReasonParser.parse, 3336);
+        _testGas(this.assertion, RevertReasonParser.parse, 1816);
     }
 
     function testGasExpensiveParse() external view {
