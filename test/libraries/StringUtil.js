@@ -2,20 +2,28 @@ const { BN } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 
 const StringUtilsMock = artifacts.require('StringUtilsMock');
+const GasEstimator = artifacts.require('GasEstimator');
 
-describe('StringUtil', function () {
+describe.only('StringUtil', function () {
     before(async () => {
         this.stringUtilsMock = await StringUtilsMock.new();
+        this.gasEstimator = await GasEstimator.new();
     });
 
     it('Uint 256', () => test(new BN(0).notn(256), 
         '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'));
     it('Uint 128', () => test(new BN(0).notn(128), 
         '0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'));
-    it('Very long byte array', () => 
+    it.only('Very long byte array', () => 
         testBytes('0xffffffffffffffafafafbcbcbcbcbdeded' + 'aa'.repeat(50)));
-    it('Extremely long byte array', () => 
+    it.only('Very long byte array', () => 
+        testBytes('0xffffffffffffffafafafbcbcbcbcbdeded' + 'aa'.repeat(500)));
+    it.only('Extremely long byte array', () => 
         testBytes('0x' + '0f'.repeat(1000)));
+    it.only('Extremely long byte array', () => 
+        testBytes('0x' + '0f'.repeat(100)));
+    it.only('Extremely long byte array', () => 
+        testBytes('0x' + '0f'.repeat(10000)));
 
     it('Very long byte array gas @skip-on-coverage', () =>
         testGas('0xffffffffffffffafafafbcbcbcbcbdeded' + 'aa'.repeat(50), 25692));
@@ -46,7 +54,9 @@ describe('StringUtil', function () {
         expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
         expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
         expect(tx.receipt.gasUsed).to.be.lte(txNaive.receipt.gasUsed);
-        console.log(`${result}: ${tx.receipt.gasUsed}-${txNaive.receipt.gasUsed}`);
+        const gasResult = await this.gasEstimator.gasCost(this.stringUtilsMock.address, this.stringUtilsMock.contract.methods.toHexBytes(value).encodeABI());
+        console.log(`${0}: ${tx.receipt.gasUsed}-${txNaive.receipt.gasUsed}`);
+        console.log(`${gasResult.gasUsed.toString()} (diff ${new BN(tx.receipt.gasUsed).sub(gasResult.gasUsed)})`);
     };
 
     const testGas = async (value, expectedGas) => {
