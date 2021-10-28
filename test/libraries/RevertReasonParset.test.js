@@ -46,11 +46,11 @@ contract('RevertReasonParser', function ([wallet1, wallet2]) {
             await this.RevertReasonParserTest.testGasCost();
         });
 
-        it('should be gas price for parse() @skip-on-coverage', async function () {
+        it('should match gas cost for parse @skip-on-coverage', async function () {
             await this.RevertReasonParserTest.testGasParse();
         });
 
-        it('should be gas price for expensive parse() @skip-on-coverage', async function () {
+        it('should match gas cost for expensive parse @skip-on-coverage', async function () {
             await this.RevertReasonParserTest.testGasExpensiveParse();
         });
     });
