@@ -3,7 +3,6 @@
 pragma solidity ^0.8.0;
 
 import "../libraries/RevertReasonParser.sol";
-import "../mocks/libraries/RevertReasonParserExpensive.sol";
 
 contract RevertReasonParserTest {
     function emptyRevert() external pure  {
@@ -71,34 +70,6 @@ contract RevertReasonParserTest {
         _test(this.withoutAssertion, "Error(reason)");
     }
 
-    function testGasCost() external payable {
-        try this.assertion() { // solhint-disable-line no-empty-blocks
-        } catch (bytes memory reason) {
-            uint gasLeftBeforeParse = gasleft();
-            RevertReasonParser.parse(reason, "");
-            uint gasLeftAfterParse = gasleft();
-            uint revertReasonParserCost = gasLeftBeforeParse - gasLeftAfterParse;
-            
-            gasLeftBeforeParse = gasleft();
-            RevertReasonParserExpensive.parse(reason, "");
-            gasLeftAfterParse = gasleft();
-            uint revertReasonParserExpensiveCost = gasLeftBeforeParse - gasLeftAfterParse;
-            
-            require(
-                revertReasonParserCost < revertReasonParserExpensiveCost,
-                string(abi.encodePacked("Expected { revertReasonParserCost < revertReasonParserExpensiveCost }, but got { ", revertReasonParserCost, " < ", revertReasonParserExpensiveCost, "}"))
-            );
-        }
-    }
-
-    function testGasParse() external view {
-        _testGas(this.assertion, RevertReasonParser.parse, 1816);
-    }
-
-    function testGasExpensiveParse() external view {
-        _testGas(this.assertion, RevertReasonParserExpensive.parse, 15077);
-    }
-
     function _test(function() external pure testFunction, string memory expectedReason) private pure {
         try testFunction() {
             revert("testFunctions without throw");
@@ -108,23 +79,6 @@ contract RevertReasonParserTest {
                 keccak256(abi.encodePacked(expectedReason)) == keccak256(abi.encodePacked(parsedReason)),
                 string(abi.encodePacked("Expected { ", expectedReason, " }, but got { ", parsedReason, " }"))
             );
-        }
-    }
-
-    function _testGas(
-        function() external pure assertFunction,
-        function(bytes memory, string memory) internal pure returns (string memory) testFunction, 
-        uint256 gasAmount
-    ) private view {
-        try assertFunction() { // solhint-disable-line no-empty-blocks
-        } catch (bytes memory reason) {
-            uint256 gasLeftBeforeParse = gasleft();
-            testFunction(reason, "");
-            uint256 gasLeftAfterParse = gasleft();
-            require(
-                gasLeftBeforeParse - gasLeftAfterParse == gasAmount,
-                string(abi.encodePacked("Expected { ", gasAmount, " }, but got { ", gasLeftBeforeParse - gasLeftAfterParse, " }"))
-            );   
         }
     }
 }

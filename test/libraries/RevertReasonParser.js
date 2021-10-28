@@ -41,17 +41,5 @@ contract('RevertReasonParser', function ([wallet1, wallet2]) {
                 'testFunctions without throw',
             );
         });
-
-        it('should be cheaper than expensive version', async function () {
-            await this.RevertReasonParserTest.testGasCost();
-        });
-
-        it('should be gas price for parse() @skip-on-coverage', async function () {
-            await this.RevertReasonParserTest.testGasParse();
-        });
-
-        it('should be gas price for expensive parse() @skip-on-coverage', async function () {
-            await this.RevertReasonParserTest.testGasExpensiveParse();
-        });
     });
 });
