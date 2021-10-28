@@ -1,5 +1,4 @@
-const {BN} = require('@openzeppelin/test-helpers');
-const {expect} = require('chai');
+const { expect } = require('chai');
 
 const StringUtilsMock = artifacts.require('StringUtilTest');
 
