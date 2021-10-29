@@ -2,7 +2,7 @@ const { expectRevert } = require('@openzeppelin/test-helpers');
 
 const RevertReasonParserTest = artifacts.require('RevertReasonParserTest');
 
-contract('RevertReasonParser', function ([wallet1, wallet2]) {
+describe('RevertReasonParser', async () => {
     before(async function () {
         this.RevertReasonParserTest = await RevertReasonParserTest.new();
     });

@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const StringUtilsMock = artifacts.require('StringUtilTest');
+const StringUtilTest = artifacts.require('StringUtilTest');
 
 describe('StringUtil', async () => {
     const uint256TestValue = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
@@ -11,7 +11,7 @@ describe('StringUtil', async () => {
     const singleByte = '0xaf';
 
     before(async () => {
-        this.stringUtilsMock = await StringUtilsMock.new();
+        this.stringUtilTest = await StringUtilTest.new();
     });
 
     describe('Validity', async () => {
@@ -28,15 +28,15 @@ describe('StringUtil', async () => {
         it('Single byte', () => testBytes(singleByte));
 
         const test = async (value) => {
-            const result = await this.stringUtilsMock.toHex(value, 0);
-            const naiveResult = await this.stringUtilsMock.toHexNaive(value, 0);
+            const result = await this.stringUtilTest.toHex(value, 0);
+            const naiveResult = await this.stringUtilTest.toHexNaive(value, 0);
             expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
             expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
         };
 
         const testBytes = async (value) => {
-            const result = await this.stringUtilsMock.toHexBytes(value, 0);
-            const naiveResult = await this.stringUtilsMock.toHexNaiveBytes(value, 0);
+            const result = await this.stringUtilTest.toHexBytes(value, 0);
+            const naiveResult = await this.stringUtilTest.toHexNaiveBytes(value, 0);
             expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
             expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
         };
@@ -72,19 +72,19 @@ describe('StringUtil', async () => {
         it('Single byte naive', () => testGasNaiveBytes(singleByte, 832));
 
         const testGasUint256 = async (value, expectedGas) => {
-            await this.stringUtilsMock.toHex(value, expectedGas);
+            await this.stringUtilTest.toHex(value, expectedGas);
         };
 
         const testGasBytes = async (value, expectedGas) => {
-            await this.stringUtilsMock.toHexBytes(value, expectedGas);
+            await this.stringUtilTest.toHexBytes(value, expectedGas);
         };
 
         const testGasNaiveUint256 = async (value, expectedGas) => {
-            await this.stringUtilsMock.toHexNaive(value, expectedGas);
+            await this.stringUtilTest.toHexNaive(value, expectedGas);
         };
 
         const testGasNaiveBytes = async (value, expectedGas) => {
-            await this.stringUtilsMock.toHexNaiveBytes(value, expectedGas);
+            await this.stringUtilTest.toHexNaiveBytes(value, expectedGas);
         };
     });
 });
