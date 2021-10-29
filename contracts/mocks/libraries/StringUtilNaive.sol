@@ -5,13 +5,13 @@ pragma abicoder v1;
 
 library StringUtilNaive {
     bytes16 private constant _ALPHABET = 0x30313233343536373839616263646566;
-    
+
     function toHex(uint256 value) internal pure returns(string memory) {
         return toHex(abi.encodePacked(value));
     }
 
     function toHex(bytes memory data) internal pure returns(string memory) {
-        unchecked {            
+        unchecked {
             bytes memory str = new bytes(2 + data.length * 2);
             str[0] = "0";
             str[1] = "x";

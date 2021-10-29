@@ -7,6 +7,8 @@ describe('StringUtil', async () => {
     const uint128TestValue = '0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
     const veryLongArray = '0xffffffffffffffafafafbcbcbcbcbdeded' + 'aa'.repeat(50);
     const extremelyLongArray = '0x' + '0f'.repeat(1000);
+    const emptyBytes = '0x';
+    const singleByte = '0xaf';
 
     before(async () => {
         this.stringUtilsMock = await StringUtilsMock.new();
@@ -14,9 +16,16 @@ describe('StringUtil', async () => {
 
     describe('Validity', async () => {
         it('Uint 256', () => test(uint256TestValue));
+
         it('Uint 128', () => test(uint128TestValue));
+
         it('Very long byte array', () => testBytes(veryLongArray));
+
         it('Extremely long byte array', () => testBytes(extremelyLongArray));
+
+        it('Empty bytes', () => testBytes(emptyBytes));
+
+        it('Single byte', () => testBytes(singleByte));
 
         const test = async (value) => {
             const result = await this.stringUtilsMock.toHex(value, 0);
@@ -34,35 +43,33 @@ describe('StringUtil', async () => {
     });
 
     describe('Gas usage @skip-on-coverage', async () => {
-        it('Uint 256', () =>
-            testGasUint256(uint256TestValue, 917));
+        it('Uint 256', () => testGasUint256(uint256TestValue, 917));
 
-        it('Uint 256 naive', () =>
-            testGasNaiveUint256(uint256TestValue, 14175));
+        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 14175));
 
-        it('Uint 256 as bytes', () =>
-            testGasBytes(uint256TestValue, 792));
+        it('Uint 256 as bytes', () => testGasBytes(uint256TestValue, 792));
 
-        it('Uint 256 as bytes naive', () =>
-            testGasNaiveBytes(uint256TestValue, 14050));
+        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 14050));
 
-        it('Uint 128', () =>
-            testGasUint256(uint128TestValue, 917));
+        it('Uint 128', () => testGasUint256(uint128TestValue, 917));
 
-        it('Uint 127 naive', () =>
-            testGasNaiveUint256(uint128TestValue, 14175));
+        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 14175));
 
-        it('Very long byte array gas', () =>
-            testGasBytes(veryLongArray, 1974));
+        it('Very long byte array gas', () => testGasBytes(veryLongArray, 1974));
 
-        it('Very long byte array gas naive', () =>
-            testGasNaiveBytes(veryLongArray, 28972));
+        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 28972));
 
-        it('Extremely long byte array gas', () =>
-            testGasBytes(extremelyLongArray, 19131));
+        it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray, 19131));
 
-        it('Extremely long byte array gas naive', () =>
-            testGasNaiveBytes(extremelyLongArray, 426795));
+        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 426795));
+
+        it('Empty bytes', () => testGasBytes(emptyBytes, 201));
+
+        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 406));
+
+        it('Single byte', () => testGasBytes(singleByte, 792));
+
+        it('Single byte naive', () => testGasNaiveBytes(singleByte, 832));
 
         const testGasUint256 = async (value, expectedGas) => {
             await this.stringUtilsMock.toHex(value, expectedGas);
