@@ -2,7 +2,7 @@ const { expectRevert } = require('@openzeppelin/test-helpers');
 
 const RevertReasonParserTest = artifacts.require('RevertReasonParserTest');
 
-contract('RevertReasonParser', function ([wallet1, wallet2]) {
+describe('RevertReasonParser', async () => {
     before(async function () {
         this.RevertReasonParserTest = await RevertReasonParserTest.new();
     });
@@ -40,18 +40,6 @@ contract('RevertReasonParser', function ([wallet1, wallet2]) {
                 this.RevertReasonParserTest.testWithThrow(),
                 'testFunctions without throw',
             );
-        });
-
-        it('should be cheaper than expensive version', async function () {
-            await this.RevertReasonParserTest.testGasCost();
-        });
-
-        it('should match gas cost for parse @skip-on-coverage', async function () {
-            await this.RevertReasonParserTest.testGasParse();
-        });
-
-        it('should match gas cost for expensive parse @skip-on-coverage', async function () {
-            await this.RevertReasonParserTest.testGasExpensiveParse();
         });
     });
 });
