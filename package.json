@@ -8,7 +8,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.2"
+    "@openzeppelin/contracts": "^4.3.2",
+    "ethereumjs-wallet": "^1.0.2"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
