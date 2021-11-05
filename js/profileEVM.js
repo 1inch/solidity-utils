@@ -77,7 +77,7 @@ async function profileEVM (txHash, instruction) {
     });
 
     const ops = trace.result.structLogs;
-    for (let i = 0; i < ops.length(); i++) {
+    for (let i = 0; i < ops.length; i++) {
         _normalizeOp(ops, i);
     }
 
