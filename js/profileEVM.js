@@ -1,27 +1,74 @@
+const { BN } = require('@openzeppelin/test-helpers');
 const { promisify } = require('util');
 const fs = require('fs').promises;
 
-function _normalizeOp (op) {
-    if (op.op === 'STATICCALL') {
-        if (op.stack.length > 8 && op.stack[op.stack.length - 8] === '0000000000000000000000000000000000000000000000000000000000000001') {
-            op.gasCost = 700 + 3000;
-            op.op = 'STATICCALL-ECRECOVER';
-        } else if (op.stack.length > 8 && op.stack[op.stack.length - 8] <= '00000000000000000000000000000000000000000000000000000000000000FF') {
-            op.gasCost = 700;
-            op.op = 'STATICCALL-' + op.stack[op.stack.length - 8].substr(62, 2);
+function toBN (a, hex) {
+    return new BN(a, hex);
+}
+
+function _normalizeOp (ops, i) {
+    if (ops[i].op === 'STATICCALL') {
+        ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
+
+        if (ops[i].stack.length > 8 && ops[i].stack[ops[i].stack.length - 8] === '0000000000000000000000000000000000000000000000000000000000000001') {
+            ops[i].op = 'STATICCALL-ECRECOVER';
+        } else if (ops[i].stack.length > 8 && ops[i].stack[ops[i].stack.length - 8] <= '00000000000000000000000000000000000000000000000000000000000000FF') {
+            ops[i].op = 'STATICCALL-' + ops[i].stack[ops[i].stack.length - 8].substr(62, 2);
         } else {
-            op.gasCost = 700;
+            ops[i].args = [
+                '0x' + ops[i].stack[ops[i].stack.length - 2].substr(24),
+                '0x' + (ops[i].memory || []).join('').substr(
+                    2 * toBN(ops[i].stack[ops[i].stack.length - 3], 16).toNumber(),
+                    2 * toBN(ops[i].stack[ops[i].stack.length - 4], 16).toNumber(),
+                ),
+            ];
+            if (ops[i].gasCost === 100) {
+                ops[i].op += '_R';
+            }
         }
     }
-    if (['CALL', 'DELEGATECALL', 'CALLCODE'].indexOf(op.op) !== -1) {
-        op.gasCost = 700;
+    if (['CALL', 'DELEGATECALL', 'CALLCODE'].indexOf(ops[i].op) !== -1) {
+        ops[i].args = [
+            '0x' + ops[i].stack[ops[i].stack.length - 2].substr(24),
+            '0x' + (ops[i].memory || []).join('').substr(
+                2 * toBN(ops[i].stack[ops[i].stack.length - 4], 16).toNumber(),
+                2 * toBN(ops[i].stack[ops[i].stack.length - 5], 16).toNumber(),
+            ),
+        ];
+        ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
+        ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+
+        if (ops[i].gasCost === 100) {
+            ops[i].op += '_R';
+        }
     }
-    if (['RETURN', 'REVERT', 'INVALID'].indexOf(op.op) !== -1) {
-        op.gasCost = 3;
+    if (['RETURN', 'REVERT', 'INVALID'].indexOf(ops[i].op) !== -1) {
+        ops[i].gasCost = 3;
+    }
+    if (['SSTORE', 'SLOAD'].indexOf(ops[i].op) !== -1) {
+        ops[i].args = [
+            '0x' + ops[i].stack[ops[i].stack.length - 1],
+        ];
+        if (ops[i].op === 'SSTORE') {
+            ops[i].args.push('0x' + ops[i].stack[ops[i].stack.length - 2]);
+        }
+        if (ops[i].gasCost === 100) {
+            ops[i].op += '_R';
+        }
+        if (ops[i].gasCost === 20000) {
+            ops[i].op += '_I';
+        }
+        ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+    }
+    if (ops[i].op === 'EXTCODESIZE') {
+        ops[i].args = [
+            '0x' + ops[i].stack[ops[i].stack.length - 1].substr(24),
+        ];
+        ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
     }
 }
 
-async function profileEVM (txHash, instruction, optionalTraceFile) {
+async function profileEVM (txHash, instruction) {
     const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
@@ -29,11 +76,14 @@ async function profileEVM (txHash, instruction, optionalTraceFile) {
         id: new Date().getTime(),
     });
 
-    const str = JSON.stringify(trace);
-
-    if (optionalTraceFile) {
-        await fs.writeFile(optionalTraceFile, str);
+    const ops = trace.result.structLogs;
+    for (let i = 0; i < ops.length(); i++) {
+        _normalizeOp(ops, i);
     }
+
+    const str = JSON.stringify(ops);
+
+    // await fs.writeFile("./trace.json", str);
 
     if (Array.isArray(instruction)) {
         return instruction.map(instr => {
@@ -44,7 +94,7 @@ async function profileEVM (txHash, instruction, optionalTraceFile) {
     return str.split('"' + instruction.toUpperCase() + '"').length - 1;
 }
 
-async function gasspectEVM (txHash, optionalTraceFile) {
+async function gasspectEVM (txHash) {
     const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
@@ -54,28 +104,29 @@ async function gasspectEVM (txHash, optionalTraceFile) {
 
     const ops = trace.result.structLogs;
 
-    const traceAddress = [0, -1];
-    for (const op of ops) {
+    const traceAddress = [-1];
+    for (const [i, op] of ops.entries()) {
         op.traceAddress = traceAddress.slice(0, traceAddress.length - 1);
-        _normalizeOp(op);
+        _normalizeOp(ops, i);
 
-        if (op.depth + 2 > traceAddress.length) {
+        if (op.depth + 1 > traceAddress.length) {
             traceAddress[traceAddress.length - 1] += 1;
             traceAddress.push(-1);
         }
 
-        if (op.depth + 2 < traceAddress.length) {
+        if (op.depth + 1 < traceAddress.length) {
             traceAddress.pop();
         }
     }
 
-    const result = ops.filter(op => op.gasCost > 300).map(op => op.traceAddress.join('-') + '-' + op.op + ' = ' + op.gasCost);
+    console.log(
+        ops.filter(op => op.gasCost >= 100)
+            .map(op => op.traceAddress.join('-') + '-' + op.op +
+                '(' + (op.args || []).join(',') + ')' + (op.res ? ':0x' + op.res : '') + ' = ' + op.gasCost)
+            .join('\n'),
+    );
 
-    if (optionalTraceFile) {
-        await fs.writeFile(optionalTraceFile, JSON.stringify(result));
-    }
-
-    return result;
+    // await fs.writeFile('./trace-1.json', JSON.stringify(ops));
 }
 
 module.exports = {
