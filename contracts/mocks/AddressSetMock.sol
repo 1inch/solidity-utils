@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.9;
 
-import "../../contracts/libraries/AddressSet.sol";
+import "../libraries/AddressSet.sol";
 
 
 contract AddressSetMock {

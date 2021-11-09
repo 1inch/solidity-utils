@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.9;
 
-import "../../contracts/libraries/AddressArray.sol";
+import "../libraries/AddressArray.sol";
 
 
 contract AddressArrayMock {
