@@ -1,6 +1,6 @@
 const { BN } = require('@openzeppelin/test-helpers');
 const { promisify } = require('util');
-const fs = require('fs').promises;
+// const fs = require('fs').promises;
 
 function toBN (a, hex) {
     return new BN(a, hex);
