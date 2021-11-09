@@ -2,10 +2,10 @@
 
 pragma solidity 0.8.9;
 
-import "../libraries/AddressSet.sol";
+import "../../contracts/libraries/AddressSet.sol";
 
 
-contract AddressSetTest {
+contract AddressSetMock {
     using AddressSet for AddressSet.Data;
 
     AddressSet.Data private _self;
