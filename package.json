@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
     "solidity-utils-docify": "utils/docify.utils.js"
   },
   "scripts": {
-    "build": "rimraf ./dist && mkdir dist && shx cp -R js ./dist/js && shx cp -R utils ./dist/utils && shx cp package.json ./dist",
+    "build": "rimraf ./dist && mkdir dist && shx cp -R js ./dist/js && shx cp -R utils ./dist/utils && shx cp package.json ./dist && cp -R ./contracts ./dist/contracts",
     "coverage": "hardhat coverage",
     "lint": "yarn run lint:js && yarn run lint:sol",
     "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix",
