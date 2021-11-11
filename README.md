@@ -18,12 +18,14 @@ This repository contains frequently used smart contracts, libraries and interfac
 |--|--|--|
 |contracts|`EthReceiver`||
 |contracts|`Permitable`||
-|contracts/interfaces|`IDaiLikePermit`||
+|contracts|`GasChecker`||
+|contracts/interfaces|`IDaiLikePermit`|Interface of token which has `permit` method like DAI token|
 |contracts/interfaces|`IWETH`|WETH token interface|
-|contracts/libraries|`ECDSA`||
-|contracts/libraries|`RevertReasonParser`||
+|contracts/libraries|`AddressArray`|library for work with array of addresses|
+|contracts/libraries|`AddressSet`|library for work with set of addresses|
+|contracts/libraries|`RevertReasonParser`|library parse the message from reverted method to readble format|
+|contracts/libraries|`StringUtil`|optimized methods to convert data to hex|
 |contracts/libraries|`UniERC20`||
-|contracts/mocks|`TokenMock`|Mocked ERC20 token|
 
 ### JS
 
@@ -40,3 +42,6 @@ This repository contains frequently used smart contracts, libraries and interfac
 |profileEVM|`profileEVM(txHash, instruction, optionalTraceFile)`|the same as the `countInstructions()` with option of writing all trace to `optionalTraceFile`|
 |profileEVM|`gasspectEVM(txHash, optionalTraceFile)`|returns all used operations in `txHash` transaction and their costs with option of writing all trace to `optionalTraceFile`|
 
+### UTILS
+
+...
