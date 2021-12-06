@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -56,5 +56,5 @@
     "test": "test"
   },
   "author": "1inch",
-  "description": ""
+  "description": "Solidity and JS utils"
 }

@@ -44,7 +44,7 @@ async function profileEVM (txHash, instruction, optionalTraceFile) {
     return str.split('"' + instruction.toUpperCase() + '"').length - 1;
 }
 
-async function gasspectEVM (txHash, optionalTraceFile) {
+async function gasspectEVM (txHash, options = {}, optionalTraceFile) {
     const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
@@ -69,7 +69,11 @@ async function gasspectEVM (txHash, optionalTraceFile) {
         }
     }
 
-    const result = ops.filter(op => op.gasCost > 300).map(op => op.traceAddress.join('-') + '-' + op.op + ' = ' + op.gasCost);
+    const minOpGasCost = options.minOpGasCost ? options.minOpGasCost : 300;
+    const result = ops.filter(op => op.gasCost > minOpGasCost).map(op => op.traceAddress.join('-') + '-' + op.op +
+                        (options.args ? '(' + (op.args || []).join(',') + ')' : '') +
+                        (options.res ? (op.res ? ':0x' + op.res : '') : '') +
+                        ' = ' + op.gasCost);
 
     if (optionalTraceFile) {
         await fs.writeFile(optionalTraceFile, JSON.stringify(result));

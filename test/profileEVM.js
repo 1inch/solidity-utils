@@ -41,5 +41,17 @@ contract('', function ([wallet1, wallet2]) {
             expect(await gasspectEVM(receipt.tx))
                 .to.be.deep.equal(['0-0-SSTORE = 2200', '0-0-LOG3 = 1756']);
         });
+
+        it('should be counted ERC20 Transfer with minOpGasCost = 2000', async function () {
+            const receipt = await this.USDT.transfer(wallet2, ether('1'), { from: wallet1 });
+            expect(await gasspectEVM(receipt.tx, { minOpGasCost: 2000 }))
+                .to.be.deep.equal(['0-0-SLOAD = 2100', '0-0-SSTORE = 2900', '0-0-SLOAD = 2100', '0-0-SSTORE = 2900']);
+        });
+
+        it('should be counted ERC20 Transfer with args', async function () {
+            const receipt = await this.USDT.transfer(wallet2, ether('1'), { from: wallet1 });
+            expect(await gasspectEVM(receipt.tx, { args: true }))
+                .to.be.deep.equal(['0-0-SLOAD() = 2100', '0-0-SSTORE() = 2900', '0-0-SLOAD() = 2100', '0-0-SSTORE() = 2900', '0-0-LOG3() = 1756']);
+        });
     });
 });
