@@ -53,7 +53,10 @@ function _normalizeOp (ops, i) {
         if (ops[i].gasCost === 20000) {
             ops[i].op += '_I';
         }
-        ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+
+        if (ops[i].op.startsWith('SLOAD')) {
+            ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+        }
     }
     if (ops[i].op === 'EXTCODESIZE') {
         ops[i].args = [

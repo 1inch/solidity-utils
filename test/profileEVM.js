@@ -62,8 +62,14 @@ contract('', function ([wallet1, wallet2]) {
 
         it('should be counted ERC20 Transfer with res', async function () {
             const receipt = await this.USDT.transfer(wallet2, ether('1'), { from: wallet1 });
-            expect((await gasspectEVM(receipt.tx, { res: true }))[0])
-                .to.be.equal('0-0-SLOAD:0x00000000000000000000000000000000000000000000017b4100e59a78d00000 = 2100');
+            expect(await gasspectEVM(receipt.tx, { res: true }))
+                 .to.be.deep.equal([
+                     '0-0-SLOAD:0x00000000000000000000000000000000000000000000017b4100e59a78d00000 = 2100',
+                     '0-0-SSTORE = 2900',
+                     '0-0-SLOAD:0x00000000000000000000000000000000000000000000017bb0069b37b3f00000 = 2100',
+                     '0-0-SSTORE = 2900',
+                     '0-0-LOG3 = 1756',
+                 ]);
         });
     });
 });
