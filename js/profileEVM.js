@@ -1,10 +1,11 @@
-const { BN } = require('@openzeppelin/test-helpers');
 const { promisify } = require('util');
-// const fs = require('fs').promises;
+const fs = require('fs').promises;
 
-function toBN (a, hex) {
-    return new BN(a, hex);
-}
+const gasspectOptionsDefault = {
+    minOpGasCost: 300, // minimal gas cost of returned operations
+    args: false, // return operations arguments
+    res: false, // return operations results
+};
 
 function _normalizeOp (ops, i) {
     if (ops[i].op === 'STATICCALL') {
@@ -18,8 +19,8 @@ function _normalizeOp (ops, i) {
             ops[i].args = [
                 '0x' + ops[i].stack[ops[i].stack.length - 2].substr(24),
                 '0x' + (ops[i].memory || []).join('').substr(
-                    2 * toBN(ops[i].stack[ops[i].stack.length - 3], 16).toNumber(),
-                    2 * toBN(ops[i].stack[ops[i].stack.length - 4], 16).toNumber(),
+                    2 * web3.utils.toBN(ops[i].stack[ops[i].stack.length - 3]).toNumber(),
+                    2 * web3.utils.toBN(ops[i].stack[ops[i].stack.length - 4]).toNumber(),
                 ),
             ];
             if (ops[i].gasCost === 100) {
@@ -31,8 +32,8 @@ function _normalizeOp (ops, i) {
         ops[i].args = [
             '0x' + ops[i].stack[ops[i].stack.length - 2].substr(24),
             '0x' + (ops[i].memory || []).join('').substr(
-                2 * toBN(ops[i].stack[ops[i].stack.length - 4], 16).toNumber(),
-                2 * toBN(ops[i].stack[ops[i].stack.length - 5], 16).toNumber(),
+                2 * web3.utils.toBN(ops[i].stack[ops[i].stack.length - 4]).toNumber(),
+                2 * web3.utils.toBN(ops[i].stack[ops[i].stack.length - 5]).toNumber(),
             ),
         ];
         ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
@@ -58,7 +59,10 @@ function _normalizeOp (ops, i) {
         if (ops[i].gasCost === 20000) {
             ops[i].op += '_I';
         }
-        ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+
+        if (ops[i].op.startsWith('SLOAD')) {
+            ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+        }
     }
     if (ops[i].op === 'EXTCODESIZE') {
         ops[i].args = [
@@ -68,7 +72,7 @@ function _normalizeOp (ops, i) {
     }
 }
 
-async function profileEVM (txHash, instruction) {
+async function profileEVM (txHash, instruction, optionalTraceFile) {
     const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
@@ -76,14 +80,11 @@ async function profileEVM (txHash, instruction) {
         id: new Date().getTime(),
     });
 
-    const ops = trace.result.structLogs;
-    for (let i = 0; i < ops.length; i++) {
-        _normalizeOp(ops, i);
+    const str = JSON.stringify(trace);
+
+    if (optionalTraceFile) {
+        await fs.writeFile(optionalTraceFile, str);
     }
-
-    const str = JSON.stringify(ops);
-
-    // await fs.writeFile("./trace.json", str);
 
     if (Array.isArray(instruction)) {
         return instruction.map(instr => {
@@ -94,7 +95,9 @@ async function profileEVM (txHash, instruction) {
     return str.split('"' + instruction.toUpperCase() + '"').length - 1;
 }
 
-async function gasspectEVM (txHash) {
+async function gasspectEVM (txHash, options = gasspectOptionsDefault, optionalTraceFile) {
+    options = { ...gasspectOptionsDefault, ...options };
+
     const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
@@ -104,29 +107,31 @@ async function gasspectEVM (txHash) {
 
     const ops = trace.result.structLogs;
 
-    const traceAddress = [-1];
+    const traceAddress = [0, -1];
     for (const [i, op] of ops.entries()) {
         op.traceAddress = traceAddress.slice(0, traceAddress.length - 1);
         _normalizeOp(ops, i);
 
-        if (op.depth + 1 > traceAddress.length) {
+        if (op.depth + 2 > traceAddress.length) {
             traceAddress[traceAddress.length - 1] += 1;
             traceAddress.push(-1);
         }
 
-        if (op.depth + 1 < traceAddress.length) {
+        if (op.depth + 2 < traceAddress.length) {
             traceAddress.pop();
         }
     }
 
-    console.log(
-        ops.filter(op => op.gasCost >= 100)
-            .map(op => op.traceAddress.join('-') + '-' + op.op +
-                '(' + (op.args || []).join(',') + ')' + (op.res ? ':0x' + op.res : '') + ' = ' + op.gasCost)
-            .join('\n'),
-    );
+    const result = ops.filter(op => op.gasCost > options.minOpGasCost).map(op => op.traceAddress.join('-') + '-' + op.op +
+                        (options.args ? '(' + (op.args || []).join(',') + ')' : '') +
+                        (options.res ? (op.res ? ':0x' + op.res : '') : '') +
+                        ' = ' + op.gasCost);
 
-    // await fs.writeFile('./trace-1.json', JSON.stringify(ops));
+    if (optionalTraceFile) {
+        await fs.writeFile(optionalTraceFile, JSON.stringify(result));
+    }
+
+    return result;
 }
 
 module.exports = {

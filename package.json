@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "1.1.5",
+  "version": "1.2.6",
   "main": "index.js",
   "repository": {
     "type": "git",
@@ -8,28 +8,29 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.2"
+    "@openzeppelin/contracts": "^4.4.0",
+    "ethereumjs-wallet": "^1.0.2"
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-etherscan": "^2.1.6",
+    "@nomiclabs/hardhat-etherscan": "^2.1.8",
     "@nomiclabs/hardhat-truffle5": "^2.0.0",
     "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@openzeppelin/test-helpers": "^0.5.13",
+    "@openzeppelin/test-helpers": "^0.5.15",
     "chai": "^4.3.4",
     "cross-spawn": "^7.0.3",
     "dotenv": "^10.0.0",
-    "eslint": "^7.32.0",
+    "eslint": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-promise": "^5.1.1",
     "eslint-plugin-standard": "^5.0.0",
-    "hardhat": "^2.6.4",
-    "hardhat-deploy": "^0.9.2",
-    "hardhat-gas-reporter": "^1.0.4",
+    "hardhat": "^2.7.0",
+    "hardhat-deploy": "^0.9.14",
+    "hardhat-gas-reporter": "^1.0.6",
     "rimraf": "^3.0.2",
     "shx": "^0.3.3",
-    "solc": "^0.8.9",
+    "solc": "^0.8.10",
     "solhint": "^3.3.6",
     "solidity-coverage": "^0.7.17"
   },
@@ -37,7 +38,7 @@
     "solidity-utils-docify": "utils/docify.utils.js"
   },
   "scripts": {
-    "build": "rimraf ./dist && mkdir dist && shx cp -R js ./dist/js && shx cp -R utils ./dist/utils && shx cp package.json ./dist",
+    "build": "rimraf ./dist && mkdir dist && shx cp -R js ./dist/js && shx cp -R utils ./dist/utils && shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
     "coverage": "hardhat coverage",
     "lint": "yarn run lint:js && yarn run lint:sol",
     "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix",
@@ -55,5 +56,5 @@
     "test": "test"
   },
   "author": "1inch",
-  "description": ""
+  "description": "Solidity and JS utils"
 }
