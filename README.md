@@ -40,7 +40,7 @@ This repository contains frequently used smart contracts, libraries and interfac
 |utils|`signMessage(signer, messageHex) `|signs `messageHex` with `signer` and patchs ganache's signature to geth's version|
 |utils|`countInstructions(txHash, instruction)`|counts amount of `instruction` in transaction with `txHash` hash|
 |profileEVM|`profileEVM(txHash, instruction, optionalTraceFile)`|the same as the `countInstructions()` with option of writing all trace to `optionalTraceFile`|
-|profileEVM|`gasspectEVM(txHash, optionalTraceFile)`|returns all used operations in `txHash` transaction and their costs with option of writing all trace to `optionalTraceFile`|
+|profileEVM|`gasspectEVM(txHash, options, optionalTraceFile)`|returns all used operations in `txHash` transaction with `options` and their costs with option of writing all trace to `optionalTraceFile`|
 
 ### UTILS
 

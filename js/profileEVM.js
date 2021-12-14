@@ -1,6 +1,12 @@
 const { promisify } = require('util');
 const fs = require('fs').promises;
 
+const gasspectOptionsDefault = {
+    minOpGasCost: 300, // minimal gas cost of returned operations
+    args: false, // return operations arguments
+    res: false, // return operations results
+};
+
 function _normalizeOp (ops, i) {
     if (ops[i].op === 'STATICCALL') {
         ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
@@ -89,7 +95,9 @@ async function profileEVM (txHash, instruction, optionalTraceFile) {
     return str.split('"' + instruction.toUpperCase() + '"').length - 1;
 }
 
-async function gasspectEVM (txHash, options = {}, optionalTraceFile) {
+async function gasspectEVM (txHash, options = gasspectOptionsDefault, optionalTraceFile) {
+    options = { ...gasspectOptionsDefault, ...options };
+
     const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
@@ -114,8 +122,7 @@ async function gasspectEVM (txHash, options = {}, optionalTraceFile) {
         }
     }
 
-    const minOpGasCost = options.minOpGasCost ? options.minOpGasCost : 300;
-    const result = ops.filter(op => op.gasCost > minOpGasCost).map(op => op.traceAddress.join('-') + '-' + op.op +
+    const result = ops.filter(op => op.gasCost > options.minOpGasCost).map(op => op.traceAddress.join('-') + '-' + op.op +
                         (options.args ? '(' + (op.args || []).join(',') + ')' : '') +
                         (options.res ? (op.res ? ':0x' + op.res : '') : '') +
                         ' = ' + op.gasCost);
