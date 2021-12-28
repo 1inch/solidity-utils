@@ -1,9 +1,6 @@
 const { constants } = require('@openzeppelin/test-helpers');
 const ethSigUtil = require('eth-sig-util');
 const { fromRpcSig } = require('ethereumjs-util');
-const { artifacts } = require('hardhat');
-const ERC20Permit = artifacts.require('@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol:ERC20Permit');
-const ERC20PermitLikeDai = artifacts.require('DaiLikePermitMock');
 
 const defaultDeadline = constants.MAX_UINT256;
 
@@ -69,22 +66,26 @@ function buildDataLikeDai (name, version, chainId, verifyingContract, holder, sp
     };
 }
 
-async function getPermit (owner, ownerPrivateKey, token, tokenVersion, chainId, spender, value, deadline = defaultDeadline) {
-    const permitContract = await ERC20Permit.at(token.address);
+/*
+ * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
+ */
+async function getPermit (owner, ownerPrivateKey, permitContract, tokenVersion, chainId, spender, value, deadline = defaultDeadline) {
     const nonce = await permitContract.nonces(owner);
     const name = await permitContract.name();
-    const data = buildData(name, tokenVersion, chainId, token.address, owner, spender, value, nonce, deadline);
+    const data = buildData(name, tokenVersion, chainId, permitContract.address, owner, spender, value, nonce, deadline);
     const signature = ethSigUtil.signTypedMessage(Buffer.from(trim0x(ownerPrivateKey), 'hex'), { data });
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(owner, spender, value, deadline, v, r, s).encodeABI();
     return cutSelector(permitCall);
 }
 
-async function getPermitLikeDai (holder, holderPrivateKey, token, tokenVersion, chainId, spender, allowed, expiry = defaultDeadline) {
-    const permitContract = await ERC20PermitLikeDai.at(token.address);
+/*
+ * @param permitContract The contract object with ERC20PermitLikeDai type and token address for which the permit creating.
+ */
+async function getPermitLikeDai (holder, holderPrivateKey, permitContract, tokenVersion, chainId, spender, allowed, expiry = defaultDeadline) {
     const nonce = await permitContract.nonces(holder);
     const name = await permitContract.name();
-    const data = buildDataLikeDai(name, tokenVersion, chainId, token.address, holder, spender, nonce, allowed, expiry);
+    const data = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce, allowed, expiry);
     const signature = ethSigUtil.signTypedMessage(Buffer.from(trim0x(holderPrivateKey), 'hex'), { data });
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(holder, spender, nonce, expiry, allowed, v, r, s).encodeABI();
