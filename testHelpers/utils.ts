@@ -1,8 +1,8 @@
-import { web3 } from "hardhat";
-import types from "../typechain-types";
+import { web3 } from 'hardhat';
 import { toBN } from 'web3-utils';
-const { constants, time } = require('@openzeppelin/test-helpers');
 import { promisify } from 'util';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { constants, time } = require('@openzeppelin/test-helpers');
 
 export async function timeIncreaseTo (seconds: number) {
     const delay = 1000 - new Date().getMilliseconds();
@@ -17,7 +17,11 @@ export interface Token extends Truffle.ContractInstance {
       ): Promise<BN>;
 }
 
-export async function trackReceivedTokenAndTx<T extends unknown[]>(token: Token, wallet: string, txPromise: (...args: T) => any, ...args: T) {
+export async function trackReceivedTokenAndTx<T extends unknown[], U extends Truffle.AnyEvent> (
+    token: Token,
+    wallet: string,
+    txPromise: (...args: T) => Promise<Truffle.TransactionResponse<U>>,
+    ...args: T) {
     const isETH = token.address === constants.ZERO_ADDRESS || token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
     const preBalance = isETH ? toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
     const txResult = await txPromise(...args);
@@ -25,7 +29,7 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(token: Token,
         ? web3.utils.toBN(txResult.receipt.gasUsed).mul(web3.utils.toBN(txResult.receipt.effectiveGasPrice))
         : web3.utils.toBN('0');
     const postBalance = isETH ? web3.utils.toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
-    return [postBalance.sub(preBalance).add(txFees), txResult];
+    return [postBalance.sub(preBalance).add(txFees), txResult] as const;
 }
 
 export function fixSignature (signature: string) {
@@ -45,11 +49,11 @@ export async function signMessage (signer: string, messageHex = '0x') {
     return fixSignature(await web3.eth.sign(messageHex, signer));
 }
 
-export async function countInstructions(txHash: string, instructions: string[]){
-    if (!web3.currentProvider) {
-        throw new Error("Provider not set");
+export async function countInstructions (txHash: string, instructions: string[]){
+    if (!web3.currentProvider || typeof web3.currentProvider === 'string' || !web3.currentProvider.send) {
+        throw new Error('Unsupported provider');
     }
-    const trace = await promisify((web3.currentProvider as {send: any}).send.bind(web3.currentProvider))({
+    const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
         params: [txHash, {}],

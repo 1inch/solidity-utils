@@ -18,7 +18,7 @@ describe('Methods', async () => {
         const daiLikeToken = await DaiLikePermitMock.new('DaiLikeToken', 'DLT', wallet.address, '1');
         const chainId = await web3.eth.getChainId();
         return { account, wallet, token, daiLikeToken, chainId };
-    }
+    };
 
     let context: Awaited<ReturnType<typeof initContext>> = undefined!;
 

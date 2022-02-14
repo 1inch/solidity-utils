@@ -1,4 +1,4 @@
-import '@typechain/hardhat'
+import '@typechain/hardhat';
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-truffle5';
 import 'hardhat-deploy';

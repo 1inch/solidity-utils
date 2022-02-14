@@ -1,11 +1,12 @@
 import { expect } from 'chai';
-const { expectRevert } = require('@openzeppelin/test-helpers');
 import { fromRpcSig } from 'ethereumjs-util';
 import { defaultDeadline, trim0x, buildData, buildDataLikeDai, getPermit, getPermitLikeDai } from '../testHelpers/permit';
 import { web3 } from 'hardhat';
-import types from "../typechain-types";
+import types from '../typechain-types';
 import ethSigUtil from 'eth-sig-util';
 import { toBN } from 'web3-utils';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { expectRevert } = require('@openzeppelin/test-helpers');
 
 const ERC20PermitMock = artifacts.require('ERC20PermitMock');
 const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');
@@ -28,16 +29,12 @@ contract('Permitable', function ([wallet1, wallet2]) {
         const erc20PermitMock: types.ERC20PermitMockInstance = undefined!;
         const daiLikePermitMock: types.DaiLikePermitMockInstance = undefined!;
         return { permittableMock, chainId, wallet, owner, holder, erc20PermitMock, daiLikePermitMock };
-    }
+    };
 
     let context: Awaited<ReturnType<typeof initContext>> = undefined!;
 
     before(async () => {
         context = await initContext();
-    });
-
-    before(async function () {
-
     });
 
     beforeEach(async function () {
@@ -54,7 +51,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
 
     it('should not be permitted for IERC20Permit', async function () {
         const data = buildData(await context.erc20PermitMock.name(), '1', context.chainId, context.erc20PermitMock.address, context.owner, wallet2, value.toString(), nonce);
-        const signature = (ethSigUtil as any).signTypedMessage(Buffer.from(trim0x(context.wallet.privateKey), 'hex'), { data });
+        const signature = ethSigUtil.signTypedData(Buffer.from(trim0x(context.wallet.privateKey), 'hex'), { data });
         const { v, r, s } = fromRpcSig(signature);
 
         const permit = web3.eth.abi.encodeParameter(
@@ -79,7 +76,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
 
     it('should not be permitted for IDaiLikePermit', async function () {
         const data = buildDataLikeDai(await context.daiLikePermitMock.name(), '1', context.chainId, context.daiLikePermitMock.address, context.holder, wallet2, nonce, true);
-        const signature = (ethSigUtil as any).signTypedMessage(Buffer.from(trim0x(context.wallet.privateKey), 'hex'), { data });
+        const signature = ethSigUtil.signTypedData(Buffer.from(trim0x(context.wallet.privateKey), 'hex'), { data });
         const { v, r, s } = fromRpcSig(signature);
 
         const payload = web3.eth.abi.encodeParameter(
@@ -95,7 +92,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
 
     it('should be wrong permit length', async function () {
         const data = buildData(await context.erc20PermitMock.name(), '1', context.chainId, context.erc20PermitMock.address, context.owner, wallet2, value.toString(), nonce);
-        const signature = (ethSigUtil as any).signTypedMessage(Buffer.from(trim0x(context.wallet.privateKey), 'hex'), { data });
+        const signature = ethSigUtil.signTypedData(Buffer.from(trim0x(context.wallet.privateKey), 'hex'), { data });
         const { v, r, s } = fromRpcSig(signature);
 
         const permit = web3.eth.abi.encodeParameter(

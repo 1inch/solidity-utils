@@ -1,10 +1,12 @@
 {
+    "root": true,
     "extends" : [
-      "standard",
-      "plugin:promise/recommended"
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended"
     ],
+    "parser": "@typescript-eslint/parser",
     "plugins": [
-      "promise"
+      "@typescript-eslint"
     ],
     "env": {
       "browser" : true,
@@ -19,6 +21,8 @@
       "web3": false
     },
     "rules": {
+      // TS
+      "@typescript-eslint/no-non-null-assertion": "off",
 
       // Strict mode
       "strict": [2, "global"],
@@ -42,7 +46,6 @@
       "no-dupe-args": 2,
       "no-dupe-keys": 2,
       "no-debugger": 0,
-      "no-undef": 2,
       "object-curly-spacing": [2, "always"],
       "max-len": [2, 200, 2],
       "generator-star-spacing": ["error", "before"],

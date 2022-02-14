@@ -1,7 +1,8 @@
-const { constants } = require('@openzeppelin/test-helpers');
 import ethSigUtil from 'eth-sig-util';
 import { fromRpcSig } from 'ethereumjs-util';
 import { Token } from './utils';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { constants } = require('@openzeppelin/test-helpers');
 
 export const defaultDeadline: string = constants.MAX_UINT256;
 
@@ -49,7 +50,16 @@ export function domainSeparator (name: string, version: string, chainId: string,
     ).toString('hex');
 }
 
-export function buildData (name: string, version: string, chainId: number, verifyingContract: string, owner: string, spender: string, value: string, nonce: string, deadline: string = defaultDeadline) {
+export function buildData (
+    name: string,
+    version: string,
+    chainId: number,
+    verifyingContract: string,
+    owner: string,
+    spender: string,
+    value: string,
+    nonce: string,
+    deadline: string = defaultDeadline) {
     return {
         primaryType: 'Permit',
         types: { EIP712Domain, Permit },
@@ -58,7 +68,15 @@ export function buildData (name: string, version: string, chainId: number, verif
     };
 }
 
-export function buildDataLikeDai (name: string, version: string, chainId: number, verifyingContract: string, holder: string, spender: string, nonce: string, allowed: boolean, expiry: string = defaultDeadline) {
+export function buildDataLikeDai (name: string,
+    version: string,
+    chainId: number,
+    verifyingContract: string,
+    holder: string,
+    spender: string,
+    nonce: string,
+    allowed: boolean,
+    expiry: string = defaultDeadline) {
     return {
         primaryType: 'Permit',
         types: { EIP712Domain, Permit: DaiLikePermit },
@@ -75,11 +93,19 @@ export interface PermittableToken extends Token {
 /*
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
  */
-export async function getPermit (owner: string, ownerPrivateKey: string, permitContract: PermittableToken, tokenVersion: string, chainId: number, spender: string, value: string, deadline = defaultDeadline) {
+export async function getPermit (
+    owner: string,
+    ownerPrivateKey: string,
+    permitContract: PermittableToken,
+    tokenVersion: string,
+    chainId: number,
+    spender: string,
+    value: string,
+    deadline = defaultDeadline) {
     const nonce = await permitContract.nonces(owner);
     const name = await permitContract.name();
     const data = buildData(name, tokenVersion, chainId, permitContract.address, owner, spender, value, nonce.toString(), deadline);
-    const signature = (ethSigUtil as any).signTypedMessage(Buffer.from(trim0x(ownerPrivateKey), 'hex'), { data });
+    const signature = ethSigUtil.signTypedData(Buffer.from(trim0x(ownerPrivateKey), 'hex'), { data });
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(owner, spender, value, deadline, v, r, s).encodeABI();
     return cutSelector(permitCall);
@@ -88,11 +114,18 @@ export async function getPermit (owner: string, ownerPrivateKey: string, permitC
 /*
  * @param permitContract The contract object with ERC20PermitLikeDai type and token address for which the permit creating.
  */
-export async function getPermitLikeDai (holder: string, holderPrivateKey: string, permitContract: PermittableToken, tokenVersion: string, chainId: number, spender: string, allowed: boolean, expiry = defaultDeadline) {
+export async function getPermitLikeDai (
+    holder: string,
+    holderPrivateKey: string,
+    permitContract: PermittableToken,
+    tokenVersion: string,
+    chainId: number,
+    spender: string,
+    allowed: boolean, expiry = defaultDeadline) {
     const nonce = await permitContract.nonces(holder);
     const name = await permitContract.name();
     const data = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce.toString(), allowed, expiry);
-    const signature = (ethSigUtil as any).signTypedMessage(Buffer.from(trim0x(holderPrivateKey), 'hex'), { data });
+    const signature = ethSigUtil.signTypedData(Buffer.from(trim0x(holderPrivateKey), 'hex'), { data });
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(holder, spender, nonce, expiry, allowed, v, r, s).encodeABI();
     return cutSelector(permitCall);

@@ -8,11 +8,11 @@ export const gasspectOptionsDefault = {
 };
 
 type Op = {
-    traceAddress: number[], 
-    depth: number, 
-    gasCost: number, 
-    args?: unknown[], 
-    res: unknown, 
+    traceAddress: number[],
+    depth: number,
+    gasCost: number,
+    args?: unknown[],
+    res: unknown,
     op: string,
     gas: number
     stack: string[],
@@ -85,11 +85,11 @@ function _normalizeOp (ops: Op[], i: number) {
 }
 
 export async function profileEVM (txHash: string, instruction: string[], optionalTraceFile?: PathLike | fs.FileHandle) {
-    if (!web3.currentProvider) {
-        throw new Error("Provider not set");
+    if (!web3.currentProvider || typeof web3.currentProvider === 'string' || !web3.currentProvider.send) {
+        throw new Error('Unsupported provider');
     }
 
-    const trace = await promisify((web3.currentProvider as {send: any}).send.bind(web3.currentProvider))({
+    const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
         params: [txHash, {}],
@@ -107,21 +107,25 @@ export async function profileEVM (txHash: string, instruction: string[], optiona
     });
 }
 
-export async function gasspectEVM (txHash: string, gasspectOptions: Object = {}, optionalTraceFile?: PathLike | fs.FileHandle) {
+export async function gasspectEVM (txHash: string, gasspectOptions: Record<string, unknown> = {}, optionalTraceFile?: PathLike | fs.FileHandle) {
     const options = { ...gasspectOptionsDefault, ...gasspectOptions };
 
     if (!web3.currentProvider) {
-        throw new Error("Provider not set");
+        throw new Error('Provider not set');
     }
 
-    const trace = await promisify((web3.currentProvider as {send: any}).send.bind(web3.currentProvider))({
+    if (!web3.currentProvider || typeof web3.currentProvider === 'string' || !web3.currentProvider.send) {
+        throw new Error('Unsupported provider');
+    }
+
+    const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
         params: [txHash, {}],
         id: new Date().getTime(),
     });
 
-    const ops: Op[] = trace.result.structLogs;
+    const ops: Op[] = trace?.result.structLogs;
 
     const traceAddress = [0, -1];
     for (const [i, op] of ops.entries()) {
