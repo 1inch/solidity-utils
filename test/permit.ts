@@ -1,22 +1,29 @@
-const { expect } = require('chai');
-const { web3 } = require('hardhat');
-const { defaultDeadline, EIP712Domain, Permit, DaiLikePermit } = require('../testHelpers/permit.js');
-const { trim0x, buildData, buildDataLikeDai, withTarget } = require('../testHelpers/permit.js');
+import { expect } from 'chai';
+import { web3 } from 'hardhat';
+import { defaultDeadline, EIP712Domain, Permit, DaiLikePermit } from '../testHelpers/permit';
+import { trim0x, buildData, buildDataLikeDai, withTarget } from '../testHelpers/permit';
 
 const ERC20PermitMock = artifacts.require('ERC20PermitMock');
 const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');
 
 describe('Methods', async () => {
-    before(async () => {
+    const initContext = async () => {
         const account = await web3.eth.accounts.create();
-        this.wallet = {
+        const wallet = {
             address: account.address,
             privateKey: account.privateKey,
         };
 
-        this.token = await ERC20PermitMock.new('Token', 'TKN', this.wallet.address, '1');
-        this.daiLikeToken = await DaiLikePermitMock.new('DaiLikeToken', 'DLT', this.wallet.address, '1');
-        this.chainId = await web3.eth.getChainId();
+        const token = await ERC20PermitMock.new('Token', 'TKN', wallet.address, '1');
+        const daiLikeToken = await DaiLikePermitMock.new('DaiLikeToken', 'DLT', wallet.address, '1');
+        const chainId = await web3.eth.getChainId();
+        return { account, wallet, token, daiLikeToken, chainId };
+    }
+
+    let context: Awaited<ReturnType<typeof initContext>> = undefined!;
+
+    before(async () => {
+        context = await initContext();
     });
 
     it('should be trimmed', async () => {
@@ -28,7 +35,7 @@ describe('Methods', async () => {
     });
 
     it('should correctly build data for permit', async () => {
-        const data = buildData(await this.token.name(), '1', this.chainId, this.token.address, this.wallet.address, this.wallet.address, '1', '1');
+        const data = buildData(await context.token.name(), '1', context.chainId, context.token.address, context.wallet.address, context.wallet.address, '1', '1');
         expect(data).to.be.deep.equal({
             primaryType: 'Permit',
             types: {
@@ -36,14 +43,14 @@ describe('Methods', async () => {
                 Permit: Permit,
             },
             domain: {
-                name: await this.token.name(),
+                name: await context.token.name(),
                 version: '1',
                 chainId: 31337,
-                verifyingContract: this.token.address,
+                verifyingContract: context.token.address,
             },
             message: {
-                owner: this.wallet.address,
-                spender: this.wallet.address,
+                owner: context.wallet.address,
+                spender: context.wallet.address,
                 value: '1',
                 nonce: '1',
                 deadline: defaultDeadline,
@@ -52,7 +59,7 @@ describe('Methods', async () => {
     });
 
     it('should correctly build data for dai-like permit', async () => {
-        const data = buildDataLikeDai(await this.daiLikeToken.name(), '1', this.chainId, this.daiLikeToken.address, this.wallet.address, this.wallet.address, '1', true);
+        const data = buildDataLikeDai(await context.daiLikeToken.name(), '1', context.chainId, context.daiLikeToken.address, context.wallet.address, context.wallet.address, '1', true);
         expect(data).to.be.deep.equal({
             primaryType: 'Permit',
             types: {
@@ -60,14 +67,14 @@ describe('Methods', async () => {
                 Permit: DaiLikePermit,
             },
             domain: {
-                name: await this.daiLikeToken.name(),
+                name: await context.daiLikeToken.name(),
                 version: '1',
                 chainId: 31337,
-                verifyingContract: this.daiLikeToken.address,
+                verifyingContract: context.daiLikeToken.address,
             },
             message: {
-                holder: this.wallet.address,
-                spender: this.wallet.address,
+                holder: context.wallet.address,
+                spender: context.wallet.address,
                 nonce: '1',
                 allowed: true,
                 expiry: defaultDeadline,

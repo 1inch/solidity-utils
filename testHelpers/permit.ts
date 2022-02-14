@@ -1,17 +1,18 @@
 const { constants } = require('@openzeppelin/test-helpers');
-const ethSigUtil = require('eth-sig-util');
-const { fromRpcSig } = require('ethereumjs-util');
+import ethSigUtil from 'eth-sig-util';
+import { fromRpcSig } from 'ethereumjs-util';
+import { Token } from './utils';
 
-const defaultDeadline = constants.MAX_UINT256;
+export const defaultDeadline: string = constants.MAX_UINT256;
 
-const EIP712Domain = [
+export const EIP712Domain = [
     { name: 'name', type: 'string' },
     { name: 'version', type: 'string' },
     { name: 'chainId', type: 'uint256' },
     { name: 'verifyingContract', type: 'address' },
 ];
 
-const Permit = [
+export const Permit = [
     { name: 'owner', type: 'address' },
     { name: 'spender', type: 'address' },
     { name: 'value', type: 'uint256' },
@@ -19,7 +20,7 @@ const Permit = [
     { name: 'deadline', type: 'uint256' },
 ];
 
-const DaiLikePermit = [
+export const DaiLikePermit = [
     { name: 'holder', type: 'address' },
     { name: 'spender', type: 'address' },
     { name: 'nonce', type: 'uint256' },
@@ -27,7 +28,7 @@ const DaiLikePermit = [
     { name: 'allowed', type: 'bool' },
 ];
 
-function trim0x (bigNumber) {
+export function trim0x (bigNumber: BN | string) {
     const s = bigNumber.toString();
     if (s.startsWith('0x')) {
         return s.substring(2);
@@ -35,12 +36,12 @@ function trim0x (bigNumber) {
     return s;
 }
 
-function cutSelector (data) {
+export function cutSelector (data: string) {
     const hexPrefix = '0x';
     return hexPrefix + data.substr(hexPrefix.length + 8);
 }
 
-function domainSeparator (name, version, chainId, verifyingContract) {
+export function domainSeparator (name: string, version: string, chainId: string, verifyingContract: string) {
     return '0x' + ethSigUtil.TypedDataUtils.hashStruct(
         'EIP712Domain',
         { name, version, chainId, verifyingContract },
@@ -48,7 +49,7 @@ function domainSeparator (name, version, chainId, verifyingContract) {
     ).toString('hex');
 }
 
-function buildData (name, version, chainId, verifyingContract, owner, spender, value, nonce, deadline = defaultDeadline) {
+export function buildData (name: string, version: string, chainId: number, verifyingContract: string, owner: string, spender: string, value: string, nonce: string, deadline: string = defaultDeadline) {
     return {
         primaryType: 'Permit',
         types: { EIP712Domain, Permit },
@@ -57,7 +58,7 @@ function buildData (name, version, chainId, verifyingContract, owner, spender, v
     };
 }
 
-function buildDataLikeDai (name, version, chainId, verifyingContract, holder, spender, nonce, allowed, expiry = defaultDeadline) {
+export function buildDataLikeDai (name: string, version: string, chainId: number, verifyingContract: string, holder: string, spender: string, nonce: string, allowed: boolean, expiry: string = defaultDeadline) {
     return {
         primaryType: 'Permit',
         types: { EIP712Domain, Permit: DaiLikePermit },
@@ -66,14 +67,19 @@ function buildDataLikeDai (name, version, chainId, verifyingContract, holder, sp
     };
 }
 
+export interface PermittableToken extends Token {
+    nonces(owner: string, txDetails?: Truffle.TransactionDetails): Promise<BN>;
+    name(txDetails?: Truffle.TransactionDetails): Promise<string>;
+}
+
 /*
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
  */
-async function getPermit (owner, ownerPrivateKey, permitContract, tokenVersion, chainId, spender, value, deadline = defaultDeadline) {
+export async function getPermit (owner: string, ownerPrivateKey: string, permitContract: PermittableToken, tokenVersion: string, chainId: number, spender: string, value: string, deadline = defaultDeadline) {
     const nonce = await permitContract.nonces(owner);
     const name = await permitContract.name();
-    const data = buildData(name, tokenVersion, chainId, permitContract.address, owner, spender, value, nonce, deadline);
-    const signature = ethSigUtil.signTypedMessage(Buffer.from(trim0x(ownerPrivateKey), 'hex'), { data });
+    const data = buildData(name, tokenVersion, chainId, permitContract.address, owner, spender, value, nonce.toString(), deadline);
+    const signature = (ethSigUtil as any).signTypedMessage(Buffer.from(trim0x(ownerPrivateKey), 'hex'), { data });
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(owner, spender, value, deadline, v, r, s).encodeABI();
     return cutSelector(permitCall);
@@ -82,30 +88,16 @@ async function getPermit (owner, ownerPrivateKey, permitContract, tokenVersion, 
 /*
  * @param permitContract The contract object with ERC20PermitLikeDai type and token address for which the permit creating.
  */
-async function getPermitLikeDai (holder, holderPrivateKey, permitContract, tokenVersion, chainId, spender, allowed, expiry = defaultDeadline) {
+export async function getPermitLikeDai (holder: string, holderPrivateKey: string, permitContract: PermittableToken, tokenVersion: string, chainId: number, spender: string, allowed: boolean, expiry = defaultDeadline) {
     const nonce = await permitContract.nonces(holder);
     const name = await permitContract.name();
-    const data = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce, allowed, expiry);
-    const signature = ethSigUtil.signTypedMessage(Buffer.from(trim0x(holderPrivateKey), 'hex'), { data });
+    const data = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce.toString(), allowed, expiry);
+    const signature = (ethSigUtil as any).signTypedMessage(Buffer.from(trim0x(holderPrivateKey), 'hex'), { data });
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(holder, spender, nonce, expiry, allowed, v, r, s).encodeABI();
     return cutSelector(permitCall);
 }
 
-function withTarget (target, data) {
+export function withTarget (target: BN | string, data: BN | string) {
     return target.toString() + trim0x(data);
 }
-
-module.exports = {
-    defaultDeadline,
-    EIP712Domain,
-    Permit,
-    DaiLikePermit,
-    trim0x,
-    domainSeparator,
-    buildData,
-    buildDataLikeDai,
-    getPermit,
-    getPermitLikeDai,
-    withTarget,
-};
