@@ -1,13 +1,25 @@
-const { promisify } = require('util');
-const fs = require('fs').promises;
+import { promisify } from 'util';
+import { PathLike, promises as fs } from 'fs';
 
-const gasspectOptionsDefault = {
+export const gasspectOptionsDefault = {
     minOpGasCost: 300, // minimal gas cost of returned operations
     args: false, // return operations arguments
     res: false, // return operations results
 };
 
-function _normalizeOp (ops, i) {
+type Op = {
+    traceAddress: number[], 
+    depth: number, 
+    gasCost: number, 
+    args?: unknown[], 
+    res: unknown, 
+    op: string,
+    gas: number
+    stack: string[],
+    memory: string[]
+};
+
+function _normalizeOp (ops: Op[], i: number) {
     if (ops[i].op === 'STATICCALL') {
         ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
 
@@ -51,7 +63,7 @@ function _normalizeOp (ops, i) {
             '0x' + ops[i].stack[ops[i].stack.length - 1],
         ];
         if (ops[i].op === 'SSTORE') {
-            ops[i].args.push('0x' + ops[i].stack[ops[i].stack.length - 2]);
+            ops[i].args!.push('0x' + ops[i].stack[ops[i].stack.length - 2]);
         }
         if (ops[i].gasCost === 100) {
             ops[i].op += '_R';
@@ -72,8 +84,12 @@ function _normalizeOp (ops, i) {
     }
 }
 
-async function profileEVM (txHash, instruction, optionalTraceFile) {
-    const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
+export async function profileEVM (txHash: string, instruction: string[], optionalTraceFile?: PathLike | fs.FileHandle) {
+    if (!web3.currentProvider) {
+        throw new Error("Provider not set");
+    }
+
+    const trace = await promisify((web3.currentProvider as {send: any}).send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
         params: [txHash, {}],
@@ -86,26 +102,26 @@ async function profileEVM (txHash, instruction, optionalTraceFile) {
         await fs.writeFile(optionalTraceFile, str);
     }
 
-    if (Array.isArray(instruction)) {
-        return instruction.map(instr => {
-            return str.split('"' + instr.toUpperCase() + '"').length - 1;
-        });
-    }
-
-    return str.split('"' + instruction.toUpperCase() + '"').length - 1;
+    return instruction.map(instr => {
+        return str.split('"' + instr.toUpperCase() + '"').length - 1;
+    });
 }
 
-async function gasspectEVM (txHash, options = gasspectOptionsDefault, optionalTraceFile) {
-    options = { ...gasspectOptionsDefault, ...options };
+export async function gasspectEVM (txHash: string, gasspectOptions: Object = {}, optionalTraceFile?: PathLike | fs.FileHandle) {
+    const options = { ...gasspectOptionsDefault, ...gasspectOptions };
 
-    const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
+    if (!web3.currentProvider) {
+        throw new Error("Provider not set");
+    }
+
+    const trace = await promisify((web3.currentProvider as {send: any}).send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
         params: [txHash, {}],
         id: new Date().getTime(),
     });
 
-    const ops = trace.result.structLogs;
+    const ops: Op[] = trace.result.structLogs;
 
     const traceAddress = [0, -1];
     for (const [i, op] of ops.entries()) {
@@ -133,8 +149,3 @@ async function gasspectEVM (txHash, options = gasspectOptionsDefault, optionalTr
 
     return result;
 }
-
-module.exports = {
-    profileEVM,
-    gasspectEVM,
-};
