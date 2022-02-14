@@ -1,9 +1,7 @@
-import chai, { expect } from 'chai';
-import 'chai-bn';
+import { expect } from 'chai';
 import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../testHelpers/utils';
 import { toBN } from 'web3-utils';
-import chaiAsPromised from 'chai-as-promised';
-chai.use(chaiAsPromised);
+import '../testHelpers/prelude';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { time, ether } = require('@openzeppelin/test-helpers');
 
