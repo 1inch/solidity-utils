@@ -3,7 +3,7 @@ import { toBN } from 'web3-utils';
 import { promisify } from 'util';
 import { constants, time } from './prelude';
 
-export async function timeIncreaseTo (seconds: number) {
+export async function timeIncreaseTo (seconds: number | string | BN) {
     const delay = 1000 - new Date().getMilliseconds();
     await new Promise(resolve => setTimeout(resolve, delay));
     await time.increaseTo(seconds);
