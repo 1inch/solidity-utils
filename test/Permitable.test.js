@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { expectRevert } = require('@openzeppelin/test-helpers');
 const { fromRpcSig } = require('ethereumjs-util');
-const { defaultDeadline, trim0x, buildData, buildDataLikeDai, getPermit, getPermitLikeDai } = require('../js/permit.js');
+const { defaultDeadline, trim0x, buildData, buildDataLikeDai, getPermit, getPermitLikeDai } = require('../testHelpers/permit.js');
 const { web3 } = require('hardhat');
 
 const ethSigUtil = require('eth-sig-util');

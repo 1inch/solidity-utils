@@ -1,17 +1,7 @@
-const { expect } = require('chai');
+import { expect } from 'chai';
 const { BN } = require('@openzeppelin/test-helpers');
 
-async function assertThrowsAsync (action, msg) {
-    try {
-        await action();
-    } catch (e) {
-        expect(e.message).to.contain(msg);
-        return;
-    }
-    throw new Error('Should have thrown an error but didn\'t');
-}
-
-function assertRoughlyEqualValues (expected, actual, relativeDiff) {
+export function assertRoughlyEqualValues (expected: string | number, actual: string | number, relativeDiff: number) {
     const expectedBN = new BN(expected);
     const actualBN = new BN(actual);
 
@@ -27,8 +17,3 @@ function assertRoughlyEqualValues (expected, actual, relativeDiff) {
         expect(actualBN).to.be.bignumber.equal(expectedBN, `${actualBN} != ${expectedBN} with ${relativeDiff} precision`);
     }
 }
-
-module.exports = {
-    assertThrowsAsync,
-    assertRoughlyEqualValues,
-};

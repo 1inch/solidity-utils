@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { profileEVM, gasspectEVM } = require('../js/profileEVM.js');
+const { profileEVM, gasspectEVM } = require('../testHelpers/profileEVM.js');
 const { ether } = require('@openzeppelin/test-helpers');
 
 const TokenMock = artifacts.require('TokenMock');

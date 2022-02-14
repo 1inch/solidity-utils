@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { web3 } = require('hardhat');
-const { defaultDeadline, EIP712Domain, Permit, DaiLikePermit } = require('../js/permit.js');
-const { trim0x, buildData, buildDataLikeDai, withTarget } = require('../js/permit.js');
+const { defaultDeadline, EIP712Domain, Permit, DaiLikePermit } = require('../testHelpers/permit.js');
+const { trim0x, buildData, buildDataLikeDai, withTarget } = require('../testHelpers/permit.js');
 
 const ERC20PermitMock = artifacts.require('ERC20PermitMock');
 const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');

@@ -1,28 +1,34 @@
+import { web3 } from "hardhat";
+import types from "../typechain-types";
+import { toBN } from 'web3-utils';
 const { constants, time } = require('@openzeppelin/test-helpers');
-const { promisify } = require('util');
+import { promisify } from 'util';
 
-async function timeIncreaseTo (seconds) {
+export async function timeIncreaseTo (seconds: number) {
     const delay = 1000 - new Date().getMilliseconds();
     await new Promise(resolve => setTimeout(resolve, delay));
     await time.increaseTo(seconds);
 }
 
-async function trackReceivedToken (token, wallet, txPromise, ...args) {
-    return (await trackReceivedTokenAndTx(token, wallet, txPromise, ...args))[0];
+export interface Token extends Truffle.ContractInstance {
+    balanceOf(
+        account: string,
+        txDetails?: Truffle.TransactionDetails
+      ): Promise<BN>;
 }
 
-async function trackReceivedTokenAndTx (token, wallet, txPromise, ...args) {
+export async function trackReceivedTokenAndTx<T extends unknown[]>(token: Token, wallet: string, txPromise: (...args: T) => any, ...args: T) {
     const isETH = token.address === constants.ZERO_ADDRESS || token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-    const preBalance = web3.utils.toBN(isETH ? await web3.eth.getBalance(wallet) : await token.balanceOf(wallet));
+    const preBalance = isETH ? toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
     const txResult = await txPromise(...args);
     const txFees = (wallet.toLowerCase() === txResult.receipt.from.toLowerCase() && isETH)
         ? web3.utils.toBN(txResult.receipt.gasUsed).mul(web3.utils.toBN(txResult.receipt.effectiveGasPrice))
         : web3.utils.toBN('0');
-    const postBalance = web3.utils.toBN(isETH ? await web3.eth.getBalance(wallet) : await token.balanceOf(wallet));
+    const postBalance = isETH ? web3.utils.toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
     return [postBalance.sub(preBalance).add(txFees), txResult];
 }
 
-function fixSignature (signature) {
+export function fixSignature (signature: string) {
     // in geth its always 27/28, in ganache its 0/1. Change to 27/28 to prevent
     // signature malleability if version is 0/1
     // see https://github.com/ethereum/go-ethereum/blob/v1.8.23/internal/ethapi/api.go#L465
@@ -35,12 +41,15 @@ function fixSignature (signature) {
 }
 
 // signs message in node (ganache auto-applies "Ethereum Signed Message" prefix)
-async function signMessage (signer, messageHex = '0x') {
+export async function signMessage (signer: string, messageHex = '0x') {
     return fixSignature(await web3.eth.sign(messageHex, signer));
 }
 
-async function countInstructions (txHash, instruction) {
-    const trace = await promisify(web3.currentProvider.send.bind(web3.currentProvider))({
+export async function countInstructions(txHash: string, instructions: string[]){
+    if (!web3.currentProvider) {
+        throw new Error("Provider not set");
+    }
+    const trace = await promisify((web3.currentProvider as {send: any}).send.bind(web3.currentProvider))({
         jsonrpc: '2.0',
         method: 'debug_traceTransaction',
         params: [txHash, {}],
@@ -49,20 +58,8 @@ async function countInstructions (txHash, instruction) {
 
     const str = JSON.stringify(trace);
 
-    if (Array.isArray(instruction)) {
-        return instruction.map(instr => {
-            return str.split('"' + instr.toUpperCase() + '"').length - 1;
-        });
-    }
-
-    return str.split('"' + instruction.toUpperCase() + '"').length - 1;
+    return instructions.map(instr => {
+        return str.split('"' + instr.toUpperCase() + '"').length - 1;
+    });
 }
 
-module.exports = {
-    timeIncreaseTo,
-    trackReceivedToken,
-    trackReceivedTokenAndTx,
-    fixSignature,
-    signMessage,
-    countInstructions,
-};
