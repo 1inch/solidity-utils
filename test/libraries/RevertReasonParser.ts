@@ -1,4 +1,5 @@
-const { expectRevert } = require('@openzeppelin/test-helpers');
+
+import { expect } from '../../testHelpers/prelude'
 
 const RevertReasonParserTest = artifacts.require('RevertReasonParserTest');
 
@@ -16,10 +17,8 @@ describe('RevertReasonParser', async () => {
 
     describe('parse', async function () {
         it('should be reverted with Invalid revert reason', async function () {
-            await expectRevert(
-                context.revertReasonParserTest.testParseWithThrow(),
-                'Invalid revert reason',
-            );
+            expect(context.revertReasonParserTest.testParseWithThrow())
+                .to.eventually.be.rejectedWith('Invalid revert reason');
         });
 
         it('should be parsed as empty Error', async function () {
@@ -43,10 +42,8 @@ describe('RevertReasonParser', async () => {
         });
 
         it('should be reverted in _test()', async function () {
-            await expectRevert(
-                context.revertReasonParserTest.testWithThrow(),
-                'testFunctions without throw',
-            );
+            expect(context.revertReasonParserTest.testWithThrow())
+                .to.eventually.be.rejectedWith('testFunctions without throw');
         });
     });
 });

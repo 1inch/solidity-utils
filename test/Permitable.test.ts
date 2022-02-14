@@ -5,8 +5,6 @@ import { web3 } from 'hardhat';
 import types from '../typechain-types';
 import ethSigUtil from 'eth-sig-util';
 import { toBN } from 'web3-utils';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { expectRevert } = require('@openzeppelin/test-helpers');
 
 const ERC20PermitMock = artifacts.require('ERC20PermitMock');
 const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');
@@ -58,11 +56,8 @@ contract('Permitable', function ([wallet1, wallet2]) {
             'tuple(address,address,uint256,uint256,uint8,bytes32,bytes32)',
             [context.owner, wallet1, value, defaultDeadline, v, r, s],
         );
-        
-        await expectRevert(
-            context.permittableMock.__permit(context.erc20PermitMock.address, permit),
-            'Permit failed: Error(ERC20Permit: invalid signature)',
-        );
+        expect(context.permittableMock.__permit(context.erc20PermitMock.address, permit))
+            .to.eventually.be.rejectedWith('Permit failed: Error(ERC20Permit: invalid signature)');
     });
 
     it('should be permitted for IDaiLikePermit', async function () {
@@ -83,11 +78,9 @@ contract('Permitable', function ([wallet1, wallet2]) {
             'tuple(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)',
             [context.holder, wallet1, nonce, defaultDeadline, true, v, r, s],
         );
-            
-        await expectRevert(
-            context.permittableMock.__permit(context.daiLikePermitMock.address, payload),
-            'Permit failed: Error(Dai/invalid-permit)',
-        );
+           
+        expect(context.permittableMock.__permit(context.daiLikePermitMock.address, payload))
+            .to.eventually.be.rejectedWith('Permit failed: Error(Dai/invalid-permit)');
     });
 
     it('should be wrong permit length', async function () {
@@ -99,9 +92,8 @@ contract('Permitable', function ([wallet1, wallet2]) {
             'tuple(address,uint256,uint256,uint8,bytes32,bytes32)',
             [wallet2, value, defaultDeadline, v, r, s],
         );
-        await expectRevert(
-            context.permittableMock.__permit(context.erc20PermitMock.address, permit),
-            'Wrong permit length',
-        );
+
+        expect(context.permittableMock.__permit(context.erc20PermitMock.address, permit))
+            .to.eventually.be.rejectedWith( 'Wrong permit length');
     });
 });
