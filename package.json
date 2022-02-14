@@ -54,7 +54,7 @@
     "solidity-utils-docify": "utils/docify.utils.js"
   },
   "scripts": {
-    "build": "rimraf ./dist && mkdir dist && shx cp -R helpers ./dist/helpers && shx cp -R utils ./dist/utils && shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
+    "build": "rimraf ./dist && mkdir dist && shx cp -R helpers ./dist/helpers && shx cp -R utils ./dist/utils && shx cp -R typechain-types ./dist/typechain-types && shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
     "coverage": "hardhat coverage",
     "lint": "yarn run lint:helpers && yarn run lint:sol",
     "lint:fix": "yarn run lint:helpers:fix && yarn run lint:sol:fix",
