@@ -1,10 +1,5 @@
-import { expect } from 'chai';
-import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../testHelpers/utils';
-import { toBN } from 'web3-utils';
-import '../testHelpers/prelude';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { time, ether } = require('@openzeppelin/test-helpers');
-
+import { expect, time, ether, toBN } from '../helpers/prelude';
+import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../helpers/utils';
 
 const TokenMock = artifacts.require('TokenMock');
 

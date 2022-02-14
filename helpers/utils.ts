@@ -1,8 +1,7 @@
 import { web3 } from 'hardhat';
 import { toBN } from 'web3-utils';
 import { promisify } from 'util';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { constants, time } = require('@openzeppelin/test-helpers');
+import { constants, time } from './prelude';
 
 export async function timeIncreaseTo (seconds: number) {
     const delay = 1000 - new Date().getMilliseconds();

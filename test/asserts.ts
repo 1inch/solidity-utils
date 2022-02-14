@@ -1,5 +1,5 @@
-import { expect } from 'chai';
-import { assertRoughlyEqualValues } from '../testHelpers/asserts';
+import { expect } from '../helpers/prelude';
+import { assertRoughlyEqualValues } from '../helpers/asserts';
 
 describe('assertRoughlyEqualValues', async function () {
     it('should be work with expected = actual, any relativeDiff', async function () {

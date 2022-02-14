@@ -1,10 +1,9 @@
-import { expect } from 'chai';
+import { expect, toBN } from '../helpers/prelude';
 import { fromRpcSig } from 'ethereumjs-util';
-import { defaultDeadline, trim0x, buildData, buildDataLikeDai, getPermit, getPermitLikeDai } from '../testHelpers/permit';
+import { defaultDeadline, trim0x, buildData, buildDataLikeDai, getPermit, getPermitLikeDai } from '../helpers/permit';
 import { web3 } from 'hardhat';
 import types from '../typechain-types';
 import ethSigUtil from 'eth-sig-util';
-import { toBN } from 'web3-utils';
 
 const ERC20PermitMock = artifacts.require('ERC20PermitMock');
 const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');

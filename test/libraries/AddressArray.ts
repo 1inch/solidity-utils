@@ -1,6 +1,5 @@
-import { expect } from 'chai';
+import { expect, constants } from '../../helpers/prelude';
 import types from '../../typechain-types';
-const { constants } = require('@openzeppelin/test-helpers');
 
 const AddressArrayMock = artifacts.require('AddressArrayMock');
 

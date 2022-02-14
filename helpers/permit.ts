@@ -1,10 +1,9 @@
 import ethSigUtil from 'eth-sig-util';
 import { fromRpcSig } from 'ethereumjs-util';
 import { Token } from './utils';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { constants } = require('@openzeppelin/test-helpers');
+import { constants } from './prelude';
 
-export const defaultDeadline: string = constants.MAX_UINT256;
+export const defaultDeadline = constants.MAX_UINT256;
 
 export const EIP712Domain = [
     { name: 'name', type: 'string' },

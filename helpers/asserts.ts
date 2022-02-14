@@ -1,5 +1,4 @@
-import { expect } from 'chai';
-import { toBN } from 'web3-utils';
+import { expect, toBN } from './prelude';
 
 export function assertRoughlyEqualValues (expected: string | number, actual: string | number, relativeDiff: number) {
     const expectedBN = toBN(expected);

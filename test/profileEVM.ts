@@ -1,7 +1,5 @@
-import { expect } from 'chai';
+import { expect, ether } from '../testHelpers/prelude';
 import { profileEVM, gasspectEVM } from '../testHelpers/profileEVM';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { ether } = require('@openzeppelin/test-helpers');
 
 const TokenMock = artifacts.require('TokenMock');
 
