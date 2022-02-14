@@ -1,7 +1,7 @@
 {
   "name": "@1inch/solidity-utils",
   "version": "2.0.0",
-  "main": "index.js",
+  "main": "index.helpers",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/1inch/solidity-utils.git"
@@ -18,7 +18,7 @@
     "@openzeppelin/test-helpers": "0.5.15",
     "@typechain/hardhat": "4.0.0",
     "@typechain/truffle-v5": "7.0.0",
-    "@types/bn.js": "^5.1.0",
+    "@types/bn.helpers": "^5.1.0",
     "@types/chai": "4.3.0",
     "@types/chai-as-promised": "^7.1.5",
     "@types/eth-sig-util": "2.1.1",
@@ -54,10 +54,10 @@
     "solidity-utils-docify": "utils/docify.utils.js"
   },
   "scripts": {
-    "build": "rimraf ./dist && mkdir dist && shx cp -R js ./dist/js && shx cp -R utils ./dist/utils && shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
+    "build": "rimraf ./dist && mkdir dist && shx cp -R helpers ./dist/helpers && shx cp -R utils ./dist/utils && shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
     "coverage": "hardhat coverage",
-    "lint": "yarn run lint:js && yarn run lint:sol",
-    "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix",
+    "lint": "yarn run lint:helpers && yarn run lint:sol",
+    "lint:fix": "yarn run lint:helpers:fix && yarn run lint:sol:fix",
     "lint:ts": "eslint . --ext .ts",
     "lint:ts:fix": "eslint . --fix --ext .ts",
     "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
@@ -74,5 +74,5 @@
     "test": "test"
   },
   "author": "1inch",
-  "description": "Solidity and JS utils"
+  "description": "Solidity and TS utils"
 }
