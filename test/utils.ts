@@ -124,7 +124,7 @@ contract('', function ([wallet1, wallet2]) {
 
     describe('trackReceivedToken', async function () {
         it('should be tracked ERC20 Transfer', async function () {
-            const received = await trackReceivedTokenAndTx(
+            const [received] = await trackReceivedTokenAndTx(
                 context.USDT,
                 wallet2,
                 () => context.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
@@ -133,7 +133,7 @@ contract('', function ([wallet1, wallet2]) {
         });
 
         it('should be tracked ERC20 Approve', async function () {
-            const received = await trackReceivedTokenAndTx(
+            const [received] = await trackReceivedTokenAndTx(
                 context.USDT,
                 wallet2,
                 () => context.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
