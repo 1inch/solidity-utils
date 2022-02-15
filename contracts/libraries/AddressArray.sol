@@ -18,14 +18,24 @@ library AddressArray {
 
     function get(Data storage self) internal view returns(address[] memory arr) {
         uint256 lengthAndFirst = self._raw[0];
+        arr = new address[](lengthAndFirst >> 160);
+        _get(self, arr, lengthAndFirst);
+    }
+
+    function get(Data storage self, address[] memory output) internal view returns(address[] memory) {
+        return _get(self, output, self._raw[0]);
+    }
+
+    function _get(Data storage self, address[] memory output, uint256 lengthAndFirst) private view returns(address[] memory) {
         uint256 len = lengthAndFirst >> 160;
-        arr = new address[](len);
+        require(len <= output.length, "AddressArray: too small output");
         if (len > 0) {
-            arr[0] = address(uint160(lengthAndFirst));
+            output[0] = address(uint160(lengthAndFirst));
             for (uint i = 1; i < len; i++) {
-                arr[i] = address(uint160(self._raw[i]));
+                output[i] = address(uint160(self._raw[i]));
             }
         }
+        return output;
     }
 
     function push(Data storage self, address account) internal returns(uint256) {
