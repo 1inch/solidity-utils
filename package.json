@@ -11,6 +11,9 @@
     "@openzeppelin/contracts": "4.4.0",
     "ethereumjs-wallet": "1.0.2"
   },
+  "peerDependencies": {
+    "typescript": ">= 4"
+  },
   "devDependencies": {
     "@nomiclabs/hardhat-etherscan": "3.0.1",
     "@nomiclabs/hardhat-truffle5": "2.0.0",
@@ -18,7 +21,6 @@
     "@openzeppelin/test-helpers": "0.5.15",
     "@typechain/hardhat": "4.0.0",
     "@typechain/truffle-v5": "7.0.0",
-    "@types/bn.helpers": "^5.1.0",
     "@types/chai": "4.3.0",
     "@types/chai-as-promised": "^7.1.5",
     "@types/eth-sig-util": "2.1.1",
@@ -48,7 +50,8 @@
     "solidity-coverage": "0.7.17",
     "ts-node": "10.4.0",
     "typechain": "7.0.0",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "create-ts-index": "1.14.0"
   },
   "bin": {
     "solidity-utils-docify": "utils/docify.utils.js"
@@ -64,7 +67,8 @@
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test",
     "typecheck": "tsc",
-    "typechain": "hardhat typechain"
+    "typechain": "hardhat typechain",
+    "createIndex": "cti src -b ./test"
   },
   "bugs": {
     "url": "https://github.com/1inch/solidity-utils/issues"

@@ -1,5 +1,5 @@
 
-import { expect, constants } from '../../helpers/prelude';
+import { expect } from '../../helpers/prelude';
 
 const RevertReasonParserTest = artifacts.require('RevertReasonParserTest');
 
