@@ -8,5 +8,5 @@ indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{json,csproj,xml,yaml,hs}]
+[*.{json,csproj,xml,yaml,hs,eslintrc}]
 indent_size = 2
