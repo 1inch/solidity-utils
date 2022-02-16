@@ -1,4 +1,4 @@
-import { expect } from '../../helpers/prelude';
+import { expect } from '../../src/prelude';
 
 const StringUtilTest = artifacts.require('StringUtilTest');
 

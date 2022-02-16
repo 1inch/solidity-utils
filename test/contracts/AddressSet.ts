@@ -1,4 +1,4 @@
-import { expect, constants } from '../../helpers/prelude';
+import { expect, constants } from '../../src/prelude';
 import types from '../../typechain-types';
 
 const AddressSetMock = artifacts.require('AddressSetMock');

@@ -1,5 +1,5 @@
-import { expect, time, ether, toBN } from '../helpers/prelude';
-import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../helpers/utils';
+import { expect, time, ether, toBN } from '../src/prelude';
+import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../src/utils';
 
 const TokenMock = artifacts.require('TokenMock');
 

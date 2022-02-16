@@ -12,7 +12,6 @@
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
     "noImplicitReturns": true,
     "noUnusedParameters": true,
     "resolveJsonModule": true,

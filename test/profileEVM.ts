@@ -1,5 +1,5 @@
-import { expect, ether } from '../helpers/prelude';
-import { profileEVM, gasspectEVM } from '../helpers/profileEVM';
+import { expect, ether } from '../src/prelude';
+import { profileEVM, gasspectEVM } from '../src/profileEVM';
 
 const TokenMock = artifacts.require('TokenMock');
 

@@ -1,8 +1,13 @@
-import ethSigUtil from 'eth-sig-util';
+import ethSigUtil, { MessageTypes, SignTypedDataVersion, TypedMessage } from '@metamask/eth-sig-util';
 import { fromRpcSig } from 'ethereumjs-util';
 import { Token } from './utils';
 import { constants } from './prelude';
 
+if (!ethSigUtil) {
+    throw "WTF";
+}
+
+export const TypedDataVersion = SignTypedDataVersion.V3;
 export const defaultDeadline = constants.MAX_UINT256;
 
 export const EIP712Domain = [
@@ -46,6 +51,7 @@ export function domainSeparator (name: string, version: string, chainId: string,
         'EIP712Domain',
         { name, version, chainId, verifyingContract },
         { EIP712Domain },
+        TypedDataVersion
     ).toString('hex');
 }
 
@@ -64,7 +70,7 @@ export function buildData (
         types: { EIP712Domain, Permit },
         domain: { name, version, chainId, verifyingContract },
         message: { owner, spender, value, nonce, deadline },
-    };
+    } as const;
 }
 
 export function buildDataLikeDai (name: string,
@@ -81,12 +87,16 @@ export function buildDataLikeDai (name: string,
         types: { EIP712Domain, Permit: DaiLikePermit },
         domain: { name, version, chainId, verifyingContract },
         message: { holder, spender, nonce, expiry, allowed },
-    };
+    } as const;
 }
 
 export interface PermittableToken extends Token {
     nonces(owner: string, txDetails?: Truffle.TransactionDetails): Promise<BN>;
     name(txDetails?: Truffle.TransactionDetails): Promise<string>;
+}
+
+export function signWithPk<T extends MessageTypes>(privateKey: string, data: TypedMessage<T>) {
+    return ethSigUtil.signTypedData({privateKey: Buffer.from(trim0x(privateKey), 'hex'), data, version: TypedDataVersion });
 }
 
 /*
@@ -104,7 +114,7 @@ export async function getPermit (
     const nonce = await permitContract.nonces(owner);
     const name = await permitContract.name();
     const data = buildData(name, tokenVersion, chainId, permitContract.address, owner, spender, value, nonce.toString(), deadline);
-    const signature = ethSigUtil.signTypedData(Buffer.from(trim0x(ownerPrivateKey), 'hex'), { data });
+    const signature = signWithPk(ownerPrivateKey, data);
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(owner, spender, value, deadline, v, r, s).encodeABI();
     return cutSelector(permitCall);
@@ -123,8 +133,8 @@ export async function getPermitLikeDai (
     allowed: boolean, expiry = defaultDeadline) {
     const nonce = await permitContract.nonces(holder);
     const name = await permitContract.name();
-    const data = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce.toString(), allowed, expiry);
-    const signature = ethSigUtil.signTypedData(Buffer.from(trim0x(holderPrivateKey), 'hex'), { data });
+    const data: any = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce.toString(), allowed, expiry);
+    const signature = signWithPk(holderPrivateKey, data);
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(holder, spender, nonce, expiry, allowed, v, r, s).encodeABI();
     return cutSelector(permitCall);

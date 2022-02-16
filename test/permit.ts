@@ -1,7 +1,7 @@
-import { expect } from '../helpers/prelude';
+import { expect } from '../src/prelude';
 import { web3 } from 'hardhat';
-import { defaultDeadline, EIP712Domain, Permit, DaiLikePermit } from '../helpers/permit';
-import { trim0x, buildData, buildDataLikeDai, withTarget } from '../helpers/permit';
+import { defaultDeadline, EIP712Domain, Permit, DaiLikePermit } from '../src/permit';
+import { trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit';
 
 const ERC20PermitMock = artifacts.require('ERC20PermitMock');
 const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');

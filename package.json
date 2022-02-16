@@ -8,13 +8,12 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "rimraf ./dist && mkdir dist && shx cp -R helpers ./dist/helpers && shx cp -R utils ./dist/utils && shx cp -R typechain-types ./dist/typechain-types && shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
+    "build": "tsc",
+    "postbuild": "echo done",
     "coverage": "hardhat coverage",
     "lint": "yarn run lint:helpers && yarn run lint:sol",
     "lint:fix": "yarn run lint:helpers:fix && ыyarn run lint:sol:fix",
-    "lint:ts": "eslint . --ext .ts",
     "lint:ts:fix": "eslint . --fix --ext .ts",
-    "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test",
     "typecheck": "tsc --noEmit --skipLibCheck",
@@ -26,6 +25,7 @@
     "ethereumjs-wallet": "1.0.2"
   },
   "devDependencies": {
+    "@metamask/eth-sig-util": "^4.0.0",
     "@nomiclabs/hardhat-etherscan": "3.0.1",
     "@nomiclabs/hardhat-truffle5": "2.0.4",
     "@nomiclabs/hardhat-web3": "2.0.0",
@@ -34,7 +34,6 @@
     "@typechain/truffle-v5": "7.0.0",
     "@types/chai": "4.3.0",
     "@types/chai-as-promised": "7.1.5",
-    "@types/eth-sig-util": "2.1.1",
     "@types/mocha": "9.1.0",
     "@types/node": "17.0.18",
     "@typescript-eslint/eslint-plugin": "5.12.0",
