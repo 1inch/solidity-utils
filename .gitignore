@@ -11,3 +11,4 @@ dist
 .idea
 typechain-types
 .DS_Store
+*.log
