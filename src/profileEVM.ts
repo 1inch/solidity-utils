@@ -1,5 +1,6 @@
 import { promisify } from 'util';
 import { PathLike, promises as fs } from 'fs';
+import { toBN } from './prelude';
 
 export const gasspectOptionsDefault = {
     minOpGasCost: 300, // minimal gas cost of returned operations
@@ -31,8 +32,8 @@ function _normalizeOp (ops: Op[], i: number) {
             ops[i].args = [
                 '0x' + ops[i].stack[ops[i].stack.length - 2].substr(24),
                 '0x' + (ops[i].memory || []).join('').substr(
-                    2 * web3.utils.toBN(ops[i].stack[ops[i].stack.length - 3]).toNumber(),
-                    2 * web3.utils.toBN(ops[i].stack[ops[i].stack.length - 4]).toNumber(),
+                    2 * toBN(ops[i].stack[ops[i].stack.length - 3]).toNumber(),
+                    2 * toBN(ops[i].stack[ops[i].stack.length - 4]).toNumber(),
                 ),
             ];
             if (ops[i].gasCost === 100) {
@@ -44,8 +45,8 @@ function _normalizeOp (ops: Op[], i: number) {
         ops[i].args = [
             '0x' + ops[i].stack[ops[i].stack.length - 2].substr(24),
             '0x' + (ops[i].memory || []).join('').substr(
-                2 * web3.utils.toBN(ops[i].stack[ops[i].stack.length - 4]).toNumber(),
-                2 * web3.utils.toBN(ops[i].stack[ops[i].stack.length - 5]).toNumber(),
+                2 * toBN(ops[i].stack[ops[i].stack.length - 4]).toNumber(),
+                2 * toBN(ops[i].stack[ops[i].stack.length - 5]).toNumber(),
             ),
         ];
         ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;

@@ -1,5 +1,6 @@
 import { expect, time, ether, toBN } from '../src/prelude';
 import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../src/utils';
+import { randomHex, toHex } from 'web3-utils';
 
 const TokenMock = artifacts.require('TokenMock');
 
@@ -76,12 +77,12 @@ contract('', function ([wallet1, wallet2]) {
         });
 
         it('should be signed test2', async function () {
-            const message = web3.utils.randomHex(32);
+            const message = randomHex(32);
             expect(await web3.eth.sign(message, wallet1)).equal(await signMessage(wallet1, message));
         });
 
         it('should be signed test3', async function () {
-            const message = web3.utils.toHex('Test message');
+            const message = toHex('Test message');
             expect(await web3.eth.sign(message, wallet1)).equal(await signMessage(wallet1, message));
         });
     });

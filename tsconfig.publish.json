@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig",
-  "exclude": ["./test"]
+  "exclude": ["./test", "./hardhat.*.ts", "./dist"]
 }

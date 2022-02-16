@@ -1,7 +1,5 @@
-import { web3 } from 'hardhat';
-import { toBN } from 'web3-utils';
 import { promisify } from 'util';
-import { constants, time } from './prelude';
+import { constants, time, toBN } from './prelude';
 
 export async function timeIncreaseTo (seconds: number | string | BN) {
     const delay = 1000 - new Date().getMilliseconds();
@@ -25,9 +23,9 @@ export async function trackReceivedTokenAndTx<T extends unknown[], U extends Tru
     const preBalance = isETH ? toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
     const txResult = await txPromise(...args);
     const txFees = (wallet.toLowerCase() === txResult.receipt.from.toLowerCase() && isETH)
-        ? web3.utils.toBN(txResult.receipt.gasUsed).mul(web3.utils.toBN(txResult.receipt.effectiveGasPrice))
-        : web3.utils.toBN('0');
-    const postBalance = isETH ? web3.utils.toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
+        ? toBN(txResult.receipt.gasUsed).mul(toBN(txResult.receipt.effectiveGasPrice))
+        : toBN('0');
+    const postBalance = isETH ? toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
     return [postBalance.sub(preBalance).add(txFees), txResult] as const;
 }
 
