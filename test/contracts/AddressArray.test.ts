@@ -14,7 +14,7 @@ contract('AddressArray', async function ([wallet1, wallet2, wallet3]) {
     before(async () => {
         context = await initContext();
     });
-    
+
     beforeEach(async function () {
         context.addressArrayMock = await AddressArrayMock.new();
     });

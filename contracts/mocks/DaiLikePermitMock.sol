@@ -5,9 +5,9 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
 contract DaiLikePermitMock is ERC20Permit {
-	// bytes32 public constant PERMIT_TYPEHASH = keccak256("Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)");
+    // bytes32 public constant PERMIT_TYPEHASH = keccak256("Permit(address holder,address spender,uint256 nonce,uint256 expiry,bool allowed)");
     bytes32 public constant PERMIT_TYPEHASH = 0xea2aa0a1be11a07ed86d755c93467f4f82362b452371d1ba94d1715123511acb;
-    
+
     constructor(
         string memory name,
         string memory symbol,
@@ -24,11 +24,11 @@ contract DaiLikePermitMock is ERC20Permit {
                 "\x19\x01",
                 this.DOMAIN_SEPARATOR(),
                 keccak256(abi.encode(PERMIT_TYPEHASH,
-                                     holder,
-                                     spender,
-                                     nonce,
-                                     expiry,
-                                     allowed))
+                                    holder,
+                                    spender,
+                                    nonce,
+                                    expiry,
+                                    allowed))
         ));
 
         require(holder != address(0), "Dai/invalid-address-0");

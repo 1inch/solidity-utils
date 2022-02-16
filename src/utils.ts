@@ -11,7 +11,7 @@ export interface Token extends Truffle.ContractInstance {
     balanceOf(
         account: string,
         txDetails?: Truffle.TransactionDetails
-      ): Promise<BN>;
+    ): Promise<BN>;
 }
 
 export async function trackReceivedTokenAndTx<T extends unknown[], U extends Truffle.AnyEvent> (
@@ -63,4 +63,3 @@ export async function countInstructions (txHash: string, instructions: string[])
         return str.split('"' + instr.toUpperCase() + '"').length - 1;
     });
 }
-

@@ -10,3 +10,4 @@ dist
 .env
 .idea
 typechain-types
+.DS_Store

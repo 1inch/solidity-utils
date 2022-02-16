@@ -37,7 +37,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
         context.erc20PermitMock = await ERC20PermitMock.new('USDC', 'USDC', wallet1, toBN(100));
         context.daiLikePermitMock = await DaiLikePermitMock.new('DAI', 'DAI', wallet1, toBN(100));
     });
-    
+
     it('should be permitted for IERC20Permit', async function () {
         const permit = await getPermit(context.owner, context.wallet.privateKey, context.erc20PermitMock, '1', context.chainId, wallet2, value.toString());
         await context.permittableMock.__permit(context.erc20PermitMock.address, permit);
@@ -76,7 +76,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
             'tuple(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)',
             [context.holder, wallet1, nonce, defaultDeadline, true, v, r, s],
         );
-           
+
         expect(context.permittableMock.__permit(context.daiLikePermitMock.address, payload))
             .to.eventually.be.rejectedWith('Permit failed: Error(Dai/invalid-permit)');
     });
