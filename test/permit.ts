@@ -8,7 +8,7 @@ const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');
 
 describe('Methods', async () => {
     const initContext = async () => {
-        const account = await web3.eth.accounts.create();
+        const account = web3.eth.accounts.create();
         const wallet = {
             address: account.address,
             privateKey: account.privateKey,

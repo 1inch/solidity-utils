@@ -3,7 +3,6 @@ import { fromRpcSig } from 'ethereumjs-util';
 import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermitLikeDai, signWithPk } from '../src/permit';
 import { web3 } from 'hardhat';
 import types from '../typechain-types';
-import ethSigUtil, { SignTypedDataVersion } from '@metamask/eth-sig-util';
 
 const ERC20PermitMock = artifacts.require('ERC20PermitMock');
 const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');
@@ -12,7 +11,7 @@ const PermitableMock = artifacts.require('PermitableMock');
 const value = toBN(42);
 const nonce = '0';
 
-contract.only('Permitable', function ([wallet1, wallet2]) {
+contract('Permitable', function ([wallet1, wallet2]) {
     const initContext = async () => {
         const permittableMock = await PermitableMock.new();
         const chainId = await web3.eth.getChainId();

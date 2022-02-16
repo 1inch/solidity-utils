@@ -1,8 +1,15 @@
 import { expect, toBN } from './prelude';
 
-export function assertRoughlyEqualValues (expected: string | number, actual: string | number, relativeDiff: number) {
-    const expectedBN = toBN(expected);
-    const actualBN = toBN(actual);
+export function toBNExtended (value: string | number | BN): BN {
+    if (typeof value === 'string' || typeof value === 'number') {
+        return toBN(value);
+    }
+    return value;
+}
+
+export function assertRoughlyEqualValues (expected: string | number | BN, actual: string | number | BN, relativeDiff: number) {
+    const expectedBN = toBNExtended(expected);
+    const actualBN = toBNExtended(actual);
 
     let multiplerNumerator = relativeDiff;
     let multiplerDenominator = toBN('1');

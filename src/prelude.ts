@@ -1,4 +1,4 @@
-import chai, {Assertion, AssertionError,assert,expect, config,should} from 'chai';
+import chai, { Assertion, AssertionError, assert, expect, config, should } from 'chai';
 import { toWei } from 'web3-utils';
 import 'chai-bn';
 import chaiAsPromised from 'chai-as-promised';
@@ -17,8 +17,8 @@ export const constants = {
 
 // utils
 export {
-    toBN
-}
+    toBN,
+};
 
 //test-helpers
 export type Time = {
@@ -37,7 +37,7 @@ export {
     Assertion,
     AssertionError,
     assert,
-    expect, 
+    expect,
     config,
-    should
-}
+    should,
+};

@@ -1,11 +1,8 @@
-import ethSigUtil, { MessageTypes, SignTypedDataVersion, TypedMessage } from '@metamask/eth-sig-util';
+import { MessageTypes, signTypedData, SignTypedDataVersion, TypedDataUtils, TypedMessage } from '@metamask/eth-sig-util';
 import { fromRpcSig } from 'ethereumjs-util';
 import { Token } from './utils';
 import { constants } from './prelude';
 
-if (!ethSigUtil) {
-    throw "WTF";
-}
 
 export const TypedDataVersion = SignTypedDataVersion.V3;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -47,7 +44,7 @@ export function cutSelector (data: string) {
 }
 
 export function domainSeparator (name: string, version: string, chainId: string, verifyingContract: string) {
-    return '0x' + ethSigUtil.TypedDataUtils.hashStruct(
+    return '0x' + TypedDataUtils.hashStruct(
         'EIP712Domain',
         { name, version, chainId, verifyingContract },
         { EIP712Domain },
@@ -95,8 +92,8 @@ export interface PermittableToken extends Token {
     name(txDetails?: Truffle.TransactionDetails): Promise<string>;
 }
 
-export function signWithPk<T extends MessageTypes>(privateKey: string, data: TypedMessage<T>) {
-    return ethSigUtil.signTypedData({privateKey: Buffer.from(trim0x(privateKey), 'hex'), data, version: TypedDataVersion });
+export function signWithPk<T extends MessageTypes> (privateKey: string, data: TypedMessage<T>) {
+    return signTypedData({ privateKey: Buffer.from(trim0x(privateKey), 'hex'), data, version: TypedDataVersion });
 }
 
 /*
@@ -133,7 +130,7 @@ export async function getPermitLikeDai (
     allowed: boolean, expiry = defaultDeadline) {
     const nonce = await permitContract.nonces(holder);
     const name = await permitContract.name();
-    const data: any = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce.toString(), allowed, expiry);
+    const data = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce.toString(), allowed, expiry);
     const signature = signWithPk(holderPrivateKey, data);
     const { v, r, s } = fromRpcSig(signature);
     const permitCall = permitContract.contract.methods.permit(holder, spender, nonce, expiry, allowed, v, r, s).encodeABI();
