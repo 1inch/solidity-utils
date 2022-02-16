@@ -9,3 +9,4 @@ dist
 .coverage_artifacts
 .env
 .idea
+typechain-types

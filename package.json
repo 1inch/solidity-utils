@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "repository": {
@@ -9,9 +9,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "prebuild": "rimraf ./dist && cti src",
+    "prebuild": "rimraf ./dist && cti src -b",
     "build": "tsc -p tsconfig.publish.json",
-    "postbuild": "shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
+    "postbuild": "echo done",
     "coverage": "hardhat coverage",
     "lint": "yarn run lint:ts && yarn run lint:sol",
     "lint:fix": "yarn run lint:ts:fix && yarn run lint:sol:fix",
@@ -24,15 +24,19 @@
     "typechain": "hardhat typechain"
   },
   "dependencies": {
+    "@metamask/eth-sig-util": "^4.0.0",
     "@openzeppelin/contracts": "4.5.0",
-    "ethereumjs-wallet": "1.0.2"
+    "@openzeppelin/test-helpers": "0.5.15",
+    "chai": "4.3.6",
+    "chai-as-promised": "7.1.1",
+    "ethereumjs-wallet": "1.0.2",
+    "hardhat": "2.8.4",
+    "web3-utils": "1.7.0"
   },
   "devDependencies": {
-    "@metamask/eth-sig-util": "^4.0.0",
     "@nomiclabs/hardhat-etherscan": "3.0.1",
     "@nomiclabs/hardhat-truffle5": "2.0.4",
     "@nomiclabs/hardhat-web3": "2.0.0",
-    "@openzeppelin/test-helpers": "0.5.15",
     "@typechain/hardhat": "4.0.0",
     "@typechain/truffle-v5": "7.0.0",
     "@types/chai": "4.3.0",
@@ -41,8 +45,6 @@
     "@types/node": "17.0.18",
     "@typescript-eslint/eslint-plugin": "5.12.0",
     "@typescript-eslint/parser": "5.12.0",
-    "chai": "4.3.6",
-    "chai-as-promised": "7.1.1",
     "chai-bn": "0.3.1",
     "create-ts-index": "^1.14.0",
     "cross-spawn": "7.0.3",
@@ -54,7 +56,6 @@
     "eslint-plugin-promise": "6.0.0",
     "eslint-plugin-standard": "5.0.0",
     "eslint-plugin-typescript": "0.14.0",
-    "hardhat": "2.8.4",
     "hardhat-deploy": "0.10.5",
     "hardhat-gas-reporter": "1.0.8",
     "rimraf": "3.0.2",
@@ -74,5 +75,12 @@
   },
   "homepage": "https://github.com/1inch/solidity-utils#readme",
   "author": "1inch",
-  "description": "Solidity and TS utils"
+  "description": "Solidity and TS utils",
+  "files": [
+    "./dist",
+    "./*.MD",
+    "contracts/*.sol",
+    "contracts/interfaces",
+    "contracts/libraries"
+  ]
 }

@@ -1,5 +1,5 @@
 Arguments: 
-  /opt/homebrew/Cellar/node/17.2.0/bin/node /opt/homebrew/bin/yarn add --dev devDependencies
+  /opt/homebrew/Cellar/node/17.2.0/bin/node /opt/homebrew/bin/yarn publish
 
 PATH: 
   /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/pzixel/.cargo/bin:/Users/pzixel/.cabal/bin:/Users/pzixel/.ghcup/bin:/Users/pzixel/.cabal/bin:/Users/pzixel/.ghcup/bin
@@ -14,46 +14,50 @@ Platform:
   darwin arm64
 
 Trace: 
-  Error: https://registry.npmjs.org/devDependencies: Not found
-      at Request.params.callback [as _callback] (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:67029:18)
-      at Request.self.callback (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:140883:22)
-      at Request.emit (node:events:390:28)
-      at Request.<anonymous> (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:141855:10)
-      at Request.emit (node:events:390:28)
-      at IncomingMessage.<anonymous> (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:141777:12)
-      at Object.onceWrapper (node:events:509:28)
-      at IncomingMessage.emit (node:events:402:35)
-      at endReadableNT (node:internal/streams/readable:1343:12)
-      at processTicksAndRejections (node:internal/process/task_queues:83:21)
+  Error: canceled
+      at Interface.<anonymous> (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:137143:13)
+      at Interface.emit (node:events:390:28)
+      at Interface.[_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:973:18)
+      at ReadStream.onkeypress (node:internal/readline/interface:240:20)
+      at ReadStream.emit (node:events:390:28)
+      at emitKeys (node:internal/readline/utils:358:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
+      at ReadStream.emit (node:events:390:28)
+      at addChunk (node:internal/streams/readable:324:12)
 
 npm manifest: 
   {
     "name": "@1inch/solidity-utils",
-    "version": "2.0.0",
-    "main": "index.helpers",
+    "version": "2.0.1",
+    "main": "dist/src/index.js",
+    "types": "dist/src/index.d.ts",
     "repository": {
       "type": "git",
       "url": "git+ssh://git@github.com/1inch/solidity-utils.git"
     },
     "license": "MIT",
     "scripts": {
-      "build": "tsc",
+      "prebuild": "rimraf ./dist && cti src",
+      "build": "tsc -p tsconfig.publish.json",
       "postbuild": "echo done",
       "coverage": "hardhat coverage",
-      "lint": "yarn run lint:helpers && yarn run lint:sol",
-      "lint:fix": "yarn run lint:helpers:fix && ыyarn run lint:sol:fix",
+      "lint": "yarn run lint:ts && yarn run lint:sol",
+      "lint:fix": "yarn run lint:ts:fix && yarn run lint:sol:fix",
+      "lint:ts": "eslint . --ext .ts",
       "lint:ts:fix": "eslint . --fix --ext .ts",
+      "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
       "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
       "test": "hardhat test",
       "typecheck": "tsc --noEmit --skipLibCheck",
-      "typechain": "hardhat typechain",
-      "createIndex": "cti src -b ./test"
+      "typechain": "hardhat typechain"
     },
     "dependencies": {
       "@openzeppelin/contracts": "4.5.0",
       "ethereumjs-wallet": "1.0.2"
     },
     "devDependencies": {
+      "@metamask/eth-sig-util": "^4.0.0",
       "@nomiclabs/hardhat-etherscan": "3.0.1",
       "@nomiclabs/hardhat-truffle5": "2.0.4",
       "@nomiclabs/hardhat-web3": "2.0.0",
@@ -62,7 +66,6 @@ npm manifest:
       "@typechain/truffle-v5": "7.0.0",
       "@types/chai": "4.3.0",
       "@types/chai-as-promised": "7.1.5",
-      "@types/eth-sig-util": "2.1.1",
       "@types/mocha": "9.1.0",
       "@types/node": "17.0.18",
       "@typescript-eslint/eslint-plugin": "5.12.0",
@@ -70,7 +73,7 @@ npm manifest:
       "chai": "4.3.6",
       "chai-as-promised": "7.1.1",
       "chai-bn": "0.3.1",
-      "create-ts-index": "1.14.0",
+      "create-ts-index": "^1.14.0",
       "cross-spawn": "7.0.3",
       "dotenv": "16.0.0",
       "eslint": "8.9.0",
@@ -99,11 +102,15 @@ npm manifest:
       "url": "https://github.com/1inch/solidity-utils/issues"
     },
     "homepage": "https://github.com/1inch/solidity-utils#readme",
-    "directories": {
-      "test": "test"
-    },
     "author": "1inch",
-    "description": "Solidity and TS utils"
+    "description": "Solidity and TS utils",
+    "files": [
+      "./dist",
+      "./*.MD",
+      "contracts/*.sol",
+      "contracts/interfaces",
+      "contracts/libraries"
+    ]
   }
 
 yarn manifest: 
@@ -1095,13 +1102,6 @@ Lockfile:
     version "1.6.1"
     resolved "https://registry.yarnpkg.com/@types/concat-stream/-/concat-stream-1.6.1.tgz#24bcfc101ecf68e886aaedce60dfd74b632a1b74"
     integrity sha512-eHE4cQPoj6ngxBZMvVf6Hw7Mh4jMW4U9lpGmS5GBPB9RYxlFg+CHaVN7ErNY4W9XfLIEn20b4VDYaIrbq0q4uA==
-    dependencies:
-      "@types/node" "*"
-  
-  "@types/eth-sig-util@2.1.1":
-    version "2.1.1"
-    resolved "https://registry.yarnpkg.com/@types/eth-sig-util/-/eth-sig-util-2.1.1.tgz#839f784da04c8d2e12add9b37692c3f05a80603a"
-    integrity sha512-vYP1UD19i0532+eQY7vXHfAKCzAQiI6aoLvomqu+ZewzUX/jvDSr41JGl8zQ9dMbfiHPDhMFY26bScCyZ7vzlg==
     dependencies:
       "@types/node" "*"
   
@@ -2478,7 +2478,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/create-require/-/create-require-1.1.1.tgz#c1d7e8f1e5f6cfc9ff65f9cd352d37348756c333"
     integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
   
-  create-ts-index@1.14.0:
+  create-ts-index@^1.14.0:
     version "1.14.0"
     resolved "https://registry.yarnpkg.com/create-ts-index/-/create-ts-index-1.14.0.tgz#afb32548a420b0ffebb111d0f0329a485d7e9ad6"
     integrity sha512-3VuFF5HeZvkbk9qa8IpSAETYLFxI1n0yiymY2ctr2txJgzYxJP68rw6p9nQ68KlGQLuUBUFfCcBGO/Dk5FdfUQ==
