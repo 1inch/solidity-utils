@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.publish.json",
     "postbuild": "echo done",
     "coverage": "hardhat coverage",
     "lint": "yarn run lint:ts && ыyarn run lint:sol",
@@ -72,9 +72,9 @@
     "url": "https://github.com/1inch/solidity-utils/issues"
   },
   "homepage": "https://github.com/1inch/solidity-utils#readme",
-  "directories": {
-    "test": "test"
-  },
+  "files": [
+    "/src"
+],
   "author": "1inch",
   "description": "Solidity and TS utils"
 }
