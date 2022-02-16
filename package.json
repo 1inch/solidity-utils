@@ -8,10 +8,11 @@
   },
   "license": "MIT",
   "scripts": {
+    "prebuild": "rimraf ./dist",
     "build": "tsc -p tsconfig.publish.json",
-    "postbuild": "echo done",
+    "postbuild": "shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
     "coverage": "hardhat coverage",
-    "lint": "yarn run lint:ts && ыyarn run lint:sol",
+    "lint": "yarn run lint:ts && yarn run lint:sol",
     "lint:fix": "yarn run lint:ts:fix && yarn run lint:sol:fix",
     "lint:ts": "eslint . --ext .ts",
     "lint:ts:fix": "eslint . --fix --ext .ts",
@@ -72,9 +73,6 @@
     "url": "https://github.com/1inch/solidity-utils/issues"
   },
   "homepage": "https://github.com/1inch/solidity-utils#readme",
-  "files": [
-    "/src"
-],
   "author": "1inch",
   "description": "Solidity and TS utils"
 }
