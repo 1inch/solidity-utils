@@ -3,6 +3,7 @@ import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-truffle5';
 import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
+require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 import networks from './hardhat.networks';
