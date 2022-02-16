@@ -1,5 +1,5 @@
 import { expect, toBN } from './prelude';
-import BN from "bn.js";
+import BN from 'bn.js';
 
 export function toBNExtended (value: string | number | BN): BN {
     if (typeof value === 'string' || typeof value === 'number') {

@@ -2,7 +2,7 @@ import chai, { Assertion, AssertionError, assert, expect, config, should } from 
 import 'chai-bn';
 import chaiAsPromised from 'chai-as-promised';
 import { toBN, toWei } from 'web3-utils';
-import BN from "bn.js";
+import BN from 'bn.js';
 chai.use(chaiAsPromised);
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { time: timeImpl } = require('@openzeppelin/test-helpers');
