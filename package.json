@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "prebuild": "rimraf ./dist",
+    "prebuild": "rimraf ./dist && cti src",
     "build": "tsc -p tsconfig.publish.json",
     "postbuild": "shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
     "coverage": "hardhat coverage",
@@ -21,8 +21,7 @@
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test",
     "typecheck": "tsc --noEmit --skipLibCheck",
-    "typechain": "hardhat typechain",
-    "createIndex": "cti src -b ./test"
+    "typechain": "hardhat typechain"
   },
   "dependencies": {
     "@openzeppelin/contracts": "4.5.0",
@@ -45,7 +44,7 @@
     "chai": "4.3.6",
     "chai-as-promised": "7.1.1",
     "chai-bn": "0.3.1",
-    "create-ts-index": "1.14.0",
+    "create-ts-index": "^1.14.0",
     "cross-spawn": "7.0.3",
     "dotenv": "16.0.0",
     "eslint": "8.9.0",
