@@ -8,17 +8,7 @@ import { NetworksUserConfig } from 'hardhat/types';
 
 dotenv.config();
 
-if (process.env.MAINNET_RPC_URL == null) {
-    throw new Error('Please specify MAINNET_RPC_URL in .env file');
-}
-
-const networks: NetworksUserConfig = {
-    hardhat: {
-        forking: {
-            url: process.env.MAINNET_RPC_URL,
-        },
-    },
-};
+const networks: NetworksUserConfig = {};
 
 function register (name: string, chainId: number, url?: string, privateKey?: string) {
     if (url && privateKey) {

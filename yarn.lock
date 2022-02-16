@@ -8339,7 +8339,7 @@ web3@1.5.3:
     web3-shh "1.5.3"
     web3-utils "1.5.3"
 
-web3@^1.0.0-beta.34, web3@^1.2.5, web3@^1.7.0:
+web3@^1.0.0-beta.34, web3@^1.2.5:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/web3/-/web3-1.7.0.tgz#5867cd10a2bebb5c33fc218368e3f6f826f6897e"
   integrity sha512-n39O7QQNkpsjhiHMJ/6JY6TaLbdX+2FT5iGs8tb3HbIWOhPm4+a7UDbr5Lkm+gLa9aRKWesZs5D5hWyEvg4aJA==
