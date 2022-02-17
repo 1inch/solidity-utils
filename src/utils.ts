@@ -15,17 +15,20 @@ export interface Token extends Truffle.ContractInstance {
 }
 
 export async function trackReceivedTokenAndTx<T extends unknown[], U extends Truffle.AnyEvent> (
-    token: Token,
+    token: Token | {address: typeof constants.ZERO_ADDRESS} | {address: typeof constants.EEE_ADDRESS},
     wallet: string,
     txPromise: (...args: T) => Promise<Truffle.TransactionResponse<U>>,
     ...args: T) {
-    const isETH = token.address === constants.ZERO_ADDRESS || token.address === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-    const preBalance = isETH ? toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
+    const [balanceFunc, isETH] =
+            'balanceOf' in token
+                ? [() => token.balanceOf(wallet), false]
+                : [async () => toBN(await web3.eth.getBalance(wallet)), true];
+    const preBalance = await balanceFunc();
     const txResult = await txPromise(...args);
     const txFees = (wallet.toLowerCase() === txResult.receipt.from.toLowerCase() && isETH)
         ? toBN(txResult.receipt.gasUsed).mul(toBN(txResult.receipt.effectiveGasPrice))
         : toBN('0');
-    const postBalance = isETH ? toBN(await web3.eth.getBalance(wallet)) : await token.balanceOf(wallet);
+    const postBalance = await balanceFunc();
     return [postBalance.sub(preBalance).add(txFees), txResult] as const;
 }
 

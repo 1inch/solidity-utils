@@ -9,6 +9,7 @@ const { time: timeImpl } = require('@openzeppelin/test-helpers');
 
 export const constants = {
     ZERO_ADDRESS: '0x0000000000000000000000000000000000000000',
+    EEE_ADDRESS: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
     ZERO_BYTES32: '0x0000000000000000000000000000000000000000000000000000000000000000',
     MAX_UINT256: toBN('2').pow(toBN('256')).sub(toBN('1')).toString(),
     MAX_INT256: toBN('2').pow(toBN('255')).sub(toBN('1')).toString(),
