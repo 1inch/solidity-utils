@@ -22,6 +22,14 @@ describe('assertRoughlyEqualValues', async function () {
         assertRoughlyEqualValues(1000000, 1000001, 1);
     });
 
+    it('works on negative', async function () {
+        assertRoughlyEqualValues(-1000001, -1000000, 1.000001);
+    });
+
+    it('different signs throws', async function () {
+        expect(() => assertRoughlyEqualValues(1000001, -1000000, 1.000001)).throws();
+    });
+
     it('should be thrown with expected != actual with relativeDiff = 0', async function () {
         expect(() => assertRoughlyEqualValues(1000000, 1000001, 0)).throws();
     });

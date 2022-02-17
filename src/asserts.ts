@@ -9,8 +9,14 @@ export function toBNExtended (value: string | number | BN): BN {
 }
 
 export function assertRoughlyEqualValues (expected: string | number | BN, actual: string | number | BN, relativeDiff: number) {
-    const expectedBN = toBNExtended(expected);
-    const actualBN = toBNExtended(actual);
+    let expectedBN = toBNExtended(expected);
+    let actualBN = toBNExtended(actual);
+    if (expectedBN.isNeg() !== actualBN.isNeg()) {
+        expect(actualBN).to.be.bignumber.equal(expectedBN, "Values are of different sign");
+    }
+
+    expectedBN = expectedBN.abs();
+    actualBN = actualBN.abs();
 
     let multiplerNumerator = relativeDiff;
     let multiplerDenominator = toBN('1');
@@ -21,6 +27,6 @@ export function assertRoughlyEqualValues (expected: string | number | BN, actual
     const diff = expectedBN.sub(actualBN).abs();
     const treshold = expectedBN.mul(toBN(multiplerNumerator.toString())).div(multiplerDenominator);
     if (!diff.lte(treshold)) {
-        expect(actualBN).to.be.bignumber.equal(expectedBN, `${actualBN} != ${expectedBN} with ${relativeDiff} precision`);
+        expect(actualBN).to.be.bignumber.equal(expectedBN, `${actual} != ${expected} with ${relativeDiff} precision`);
     }
 }
