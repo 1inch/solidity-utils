@@ -12,7 +12,7 @@ export function assertRoughlyEqualValues (expected: string | number | BN, actual
     let expectedBN = toBNExtended(expected);
     let actualBN = toBNExtended(actual);
     if (expectedBN.isNeg() !== actualBN.isNeg()) {
-        expect(actualBN).to.be.bignumber.equal(expectedBN, "Values are of different sign");
+        expect(actualBN).to.be.bignumber.equal(expectedBN, 'Values are of different sign');
     }
 
     expectedBN = expectedBN.abs();
