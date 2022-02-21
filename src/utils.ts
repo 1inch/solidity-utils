@@ -18,7 +18,8 @@ export async function trackReceivedTokenAndTx<T extends unknown[], U extends Tru
     token: Token | {address: typeof constants.ZERO_ADDRESS} | {address: typeof constants.EEE_ADDRESS},
     wallet: string,
     txPromise: (...args: T) => Promise<Truffle.TransactionResponse<U>>,
-    ...args: T) {
+    ...args: T
+) {
     const [balanceFunc, isETH] =
             'balanceOf' in token
                 ? [() => token.balanceOf(wallet), false]
@@ -49,7 +50,7 @@ export async function signMessage (signer: string, messageHex = '0x') {
     return fixSignature(await web3.eth.sign(messageHex, signer));
 }
 
-export async function countInstructions (txHash: string, instructions: string[]){
+export async function countInstructions (txHash: string, instructions: string[]) {
     if (!web3.currentProvider || typeof web3.currentProvider === 'string' || !web3.currentProvider.send) {
         throw new Error('Unsupported provider');
     }

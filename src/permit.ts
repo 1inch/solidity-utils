@@ -61,7 +61,8 @@ export function buildData (
     spender: string,
     value: string,
     nonce: string,
-    deadline: string = defaultDeadline) {
+    deadline: string = defaultDeadline
+) {
     return {
         primaryType: 'Permit',
         types: { EIP712Domain, Permit },
@@ -70,7 +71,8 @@ export function buildData (
     } as const;
 }
 
-export function buildDataLikeDai (name: string,
+export function buildDataLikeDai (
+    name: string,
     version: string,
     chainId: number,
     verifyingContract: string,
@@ -78,7 +80,8 @@ export function buildDataLikeDai (name: string,
     spender: string,
     nonce: string,
     allowed: boolean,
-    expiry: string = defaultDeadline) {
+    expiry: string = defaultDeadline
+) {
     return {
         primaryType: 'Permit',
         types: { EIP712Domain, Permit: DaiLikePermit },
@@ -107,7 +110,8 @@ export async function getPermit (
     chainId: number,
     spender: string,
     value: string,
-    deadline = defaultDeadline) {
+    deadline = defaultDeadline
+) {
     const nonce = await permitContract.nonces(owner);
     const name = await permitContract.name();
     const data = buildData(name, tokenVersion, chainId, permitContract.address, owner, spender, value, nonce.toString(), deadline);
@@ -127,7 +131,9 @@ export async function getPermitLikeDai (
     tokenVersion: string,
     chainId: number,
     spender: string,
-    allowed: boolean, expiry = defaultDeadline) {
+    allowed: boolean,
+    expiry = defaultDeadline
+) {
     const nonce = await permitContract.nonces(holder);
     const name = await permitContract.name();
     const data = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder, spender, nonce.toString(), allowed, expiry);
