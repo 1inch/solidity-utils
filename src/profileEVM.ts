@@ -111,10 +111,6 @@ export async function profileEVM (txHash: string, instruction: string[], optiona
 export async function gasspectEVM (txHash: string, gasspectOptions: Record<string, unknown> = {}, optionalTraceFile?: PathLike | fs.FileHandle) {
     const options = { ...gasspectOptionsDefault, ...gasspectOptions };
 
-    if (!web3.currentProvider) {
-        throw new Error('Provider not set');
-    }
-
     if (!web3.currentProvider || typeof web3.currentProvider === 'string' || !web3.currentProvider.send) {
         throw new Error('Unsupported provider');
     }
