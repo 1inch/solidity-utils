@@ -4,7 +4,7 @@ import { Token } from './utils';
 import { constants } from './prelude';
 
 
-export const TypedDataVersion = SignTypedDataVersion.V3;
+export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
 
 export const EIP712Domain = [
