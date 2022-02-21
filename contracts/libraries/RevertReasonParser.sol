@@ -15,7 +15,7 @@ import "./StringUtil.sol";
 library RevertReasonParser {
     using StringUtil for uint256;
     using StringUtil for bytes;
-    
+
     bytes4 constant private _ERROR_SELECTOR = bytes4(keccak256("Error(string)"));
     bytes4 constant private _PANIC_SELECTOR = bytes4(keccak256("Panic(uint256)"));
 

@@ -54,6 +54,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - run: yarn
+      - run: yarn typechain
       - run: yarn test
 
   coverage:
@@ -78,6 +79,7 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - run: yarn
+      - run: yarn typechain
       - run: yarn coverage
 
       - name: Coveralls

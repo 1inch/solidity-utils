@@ -58,10 +58,10 @@ library StringUtil {
             mstore(toPtr, 0x3078000000000000000000000000000000000000000000000000000000000000)  // set 0x as first two bytes
             toPtr := add(toPtr, 0x02)
 
-            for { 
+            for {
                 let fromPtr := add(data, 0x20)
                 let endPtr := add(fromPtr, length)
-            } lt(fromPtr, endPtr) { 
+            } lt(fromPtr, endPtr) {
                 fromPtr := add(fromPtr, 0x20)
             } {
                 let rawData := mload(fromPtr)

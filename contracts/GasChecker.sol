@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract GasChecker {
     using Strings for uint256;
-    
+
     modifier checkGasCost(uint256 expectedGasCost) {
         uint256 gas = gasleft();
         _;

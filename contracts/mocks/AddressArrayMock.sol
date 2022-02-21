@@ -7,7 +7,7 @@ import "../libraries/AddressArray.sol";
 
 contract AddressArrayMock {
     using AddressArray for AddressArray.Data;
-    
+
     AddressArray.Data private _self;
 
     function length() external view returns(uint256) {

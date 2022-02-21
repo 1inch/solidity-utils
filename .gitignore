@@ -9,3 +9,6 @@ dist
 .coverage_artifacts
 .env
 .idea
+typechain-types
+.DS_Store
+*.log

@@ -1,27 +1,20 @@
-const { expect } = require('chai');
-const { time, ether, BN } = require('@openzeppelin/test-helpers');
-const {
-    timeIncreaseTo,
-    fixSignature,
-    signMessage,
-    trackReceivedTokenAndTx,
-    trackReceivedToken,
-    countInstructions,
-} = require('../js/utils.js');
+import { expect, time, ether, toBN } from '../src/prelude';
+import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../src/utils';
+import { randomHex, toHex } from 'web3-utils';
 
 const TokenMock = artifacts.require('TokenMock');
 
 describe('timeIncreaseTo', async function () {
     const precision = 2;
 
-    async function shouldIncrease (secs) {
+    async function shouldIncrease (secs: number) {
         const timeBefore = await time.latest();
         await timeIncreaseTo(timeBefore.addn(secs));
         const timeAfter = await time.latest();
 
         expect(timeAfter).to.be.bignumber.gt(timeBefore);
-        expect(timeAfter.sub(timeBefore)).to.be.bignumber.lte(new BN(secs).addn(precision));
-        expect(timeAfter.sub(timeBefore)).to.be.bignumber.gte(new BN(secs));
+        expect(timeAfter.sub(timeBefore)).to.be.bignumber.lte(toBN(secs).addn(precision));
+        expect(timeAfter.sub(timeBefore)).to.be.bignumber.gte(toBN(secs));
     }
 
     it('should be increased on 1000 sec', async function () {
@@ -37,14 +30,9 @@ describe('timeIncreaseTo', async function () {
     });
 
     it('should be thrown with increase time to a moment in the past', async function () {
-        try {
-            await shouldIncrease(-1000);
-        } catch (e) {
-            expect(e.message).contains('Cannot increase current time');
-            expect(e.message).contains('to a moment in the past');
-            return;
-        }
-        expect(true).equal(false);
+        await expect(shouldIncrease(-1000)).to.eventually.be.rejectedWith(
+            /Cannot increase current time \(\d+\) to a moment in the past \(\d+\)/
+        );
     });
 });
 
@@ -63,14 +51,21 @@ describe('fixSignature', async function () {
 });
 
 contract('', function ([wallet1, wallet2]) {
-    before(async function () {
-        this.USDT = await TokenMock.new('USDT', 'USDT');
-        this.USDC = await TokenMock.new('USDC', 'USDC');
+    const initContext = async () => {
+        const USDT = await TokenMock.new('USDT', 'USDT');
+        const USDC = await TokenMock.new('USDC', 'USDC');
+        return { USDT, USDC };
+    };
+
+    let context: Awaited<ReturnType<typeof initContext>> = undefined!;
+
+    before(async () => {
+        context = await initContext();
     });
 
     beforeEach(async function () {
         for (const addr of [wallet1, wallet2]) {
-            for (const token of [this.USDT, this.USDC]) {
+            for (const token of [context.USDT, context.USDC]) {
                 await token.mint(addr, ether('1000'));
             }
         }
@@ -82,12 +77,12 @@ contract('', function ([wallet1, wallet2]) {
         });
 
         it('should be signed test2', async function () {
-            const message = web3.utils.randomHex(32);
+            const message = randomHex(32);
             expect(await web3.eth.sign(message, wallet1)).equal(await signMessage(wallet1, message));
         });
 
         it('should be signed test3', async function () {
-            const message = web3.utils.toHex('Test message'); ;
+            const message = toHex('Test message');
             expect(await web3.eth.sign(message, wallet1)).equal(await signMessage(wallet1, message));
         });
     });
@@ -95,28 +90,28 @@ contract('', function ([wallet1, wallet2]) {
     describe('trackReceivedTokenAndTx', async function () {
         it('should be tracked ERC20 Transfer', async function () {
             const [received, tx] = await trackReceivedTokenAndTx(
-                this.USDT,
+                context.USDT,
                 wallet2,
-                () => this.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
+                () => context.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
             );
             expect(received).to.be.bignumber.equal(ether('1'));
             expect(tx.tx.length).equal(66);
             expect(tx.receipt.from).equal(wallet1.toLowerCase());
-            expect(tx.receipt.to).equal(this.USDT.address.toLowerCase());
+            expect(tx.receipt.to).equal(context.USDT.address.toLowerCase());
             expect(tx.logs.length).equal(1);
             expect(tx.logs[0].event).equal('Transfer');
         });
 
         it('should be tracked ERC20 Approve', async function () {
             const [received, tx] = await trackReceivedTokenAndTx(
-                this.USDT,
+                context.USDT,
                 wallet2,
-                () => this.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
+                () => context.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
             );
             expect(received).to.be.bignumber.equal('0');
             expect(tx.tx.length).equal(66);
             expect(tx.receipt.from).equal(wallet1.toLowerCase());
-            expect(tx.receipt.to).equal(this.USDT.address.toLowerCase());
+            expect(tx.receipt.to).equal(context.USDT.address.toLowerCase());
             expect(tx.logs.length).equal(1);
             expect(tx.logs[0].event).equal('Approval');
         });
@@ -124,19 +119,19 @@ contract('', function ([wallet1, wallet2]) {
 
     describe('trackReceivedToken', async function () {
         it('should be tracked ERC20 Transfer', async function () {
-            const received = await trackReceivedToken(
-                this.USDT,
+            const [received] = await trackReceivedTokenAndTx(
+                context.USDT,
                 wallet2,
-                () => this.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
+                () => context.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
             );
             expect(received).to.be.bignumber.equal(ether('1'));
         });
 
         it('should be tracked ERC20 Approve', async function () {
-            const received = await trackReceivedToken(
-                this.USDT,
+            const [received] = await trackReceivedTokenAndTx(
+                context.USDT,
                 wallet2,
-                () => this.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
+                () => context.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
             );
             expect(received).to.be.bignumber.equal('0');
         });
@@ -145,9 +140,9 @@ contract('', function ([wallet1, wallet2]) {
     describe('countInstructions', async function () {
         it('should be counted ERC20 Transfer', async function () {
             const [, tx] = await trackReceivedTokenAndTx(
-                this.USDT,
+                context.USDT,
                 wallet2,
-                () => this.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
+                () => context.USDT.transfer(wallet2, ether('1'), { from: wallet1 }),
             );
             expect(await countInstructions(tx.receipt.transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD']))
                 .to.be.deep.equal([0, 0, 2, 2]);
@@ -155,9 +150,9 @@ contract('', function ([wallet1, wallet2]) {
 
         it('should be counted ERC20 Approve', async function () {
             const [, tx] = await trackReceivedTokenAndTx(
-                this.USDT,
+                context.USDT,
                 wallet2,
-                () => this.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
+                () => context.USDT.approve(wallet2, ether('1'), { from: wallet1 }),
             );
             expect(await countInstructions(tx.receipt.transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD']))
                 .to.be.deep.equal([0, 0, 1, 0]);

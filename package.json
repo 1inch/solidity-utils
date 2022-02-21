@@ -1,60 +1,87 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "1.3.0",
-  "main": "index.js",
+  "version": "2.0.5",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/1inch/solidity-utils.git"
   },
   "license": "MIT",
+  "scripts": {
+    "prebuild": "rimraf ./dist && cti src -b",
+    "build": "tsc -p tsconfig.publish.json",
+    "postbuild": "echo done",
+    "publishPackage": "yarn build && yarn publish",
+    "coverage": "hardhat coverage",
+    "lint": "yarn run lint:ts && yarn run lint:sol",
+    "lint:fix": "yarn run lint:ts:fix && yarn run lint:sol:fix",
+    "lint:ts": "eslint . --ext .ts",
+    "lint:ts:fix": "eslint . --fix --ext .ts",
+    "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
+    "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
+    "test": "hardhat test",
+    "typecheck": "tsc --noEmit --skipLibCheck",
+    "typechain": "hardhat typechain"
+  },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.4.0",
-    "ethereumjs-wallet": "^1.0.2"
+    "@metamask/eth-sig-util": "^4.0.0",
+    "@openzeppelin/contracts": "4.5.0",
+    "@openzeppelin/test-helpers": "0.5.15",
+    "chai": "4.3.6",
+    "chai-as-promised": "7.1.1",
+    "ethereumjs-wallet": "1.0.2",
+    "hardhat": "2.8.4",
+    "web3-utils": "1.7.0"
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-etherscan": "^2.1.8",
-    "@nomiclabs/hardhat-truffle5": "^2.0.0",
-    "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@openzeppelin/test-helpers": "^0.5.15",
-    "chai": "^4.3.4",
-    "cross-spawn": "^7.0.3",
-    "dotenv": "^10.0.0",
-    "eslint": "^8.3.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.1",
-    "eslint-plugin-standard": "^5.0.0",
-    "hardhat": "^2.7.0",
-    "hardhat-deploy": "^0.9.14",
-    "hardhat-gas-reporter": "^1.0.6",
-    "rimraf": "^3.0.2",
-    "shx": "^0.3.3",
-    "solc": "^0.8.10",
-    "solhint": "^3.3.6",
-    "solidity-coverage": "^0.7.17"
+    "@nomiclabs/hardhat-etherscan": "3.0.1",
+    "@nomiclabs/hardhat-truffle5": "2.0.4",
+    "@nomiclabs/hardhat-web3": "2.0.0",
+    "@typechain/hardhat": "4.0.0",
+    "@typechain/truffle-v5": "7.0.0",
+    "@types/chai": "4.3.0",
+    "@types/chai-as-promised": "7.1.5",
+    "@types/mocha": "9.1.0",
+    "@types/node": "17.0.18",
+    "@typescript-eslint/eslint-plugin": "5.12.0",
+    "@typescript-eslint/parser": "5.12.0",
+    "chai-bn": "0.3.1",
+    "create-ts-index": "^1.14.0",
+    "cross-spawn": "7.0.3",
+    "dotenv": "16.0.0",
+    "eslint": "8.9.0",
+    "eslint-config-standard": "16.0.3",
+    "eslint-plugin-import": "2.25.4",
+    "eslint-plugin-node": "11.1.0",
+    "eslint-plugin-promise": "6.0.0",
+    "eslint-plugin-standard": "5.0.0",
+    "eslint-plugin-typescript": "0.14.0",
+    "hardhat-deploy": "0.10.5",
+    "hardhat-gas-reporter": "1.0.8",
+    "rimraf": "3.0.2",
+    "shx": "0.3.4",
+    "solc": "0.8.11",
+    "solhint": "3.3.7",
+    "solidity-coverage": "0.7.20",
+    "ts-node": "10.5.0",
+    "typechain": "7.0.0",
+    "typescript": "4.5.5"
   },
   "bin": {
     "solidity-utils-docify": "utils/docify.utils.js"
-  },
-  "scripts": {
-    "build": "rimraf ./dist && mkdir dist && shx cp -R js ./dist/js && shx cp -R utils ./dist/utils && shx cp package.json ./dist && shx cp README.md ./dist && shx cp -R ./contracts ./dist/contracts && shx rm -rf dist/contracts/mocks dist/contracts/tests",
-    "coverage": "hardhat coverage",
-    "lint": "yarn run lint:js && yarn run lint:sol",
-    "lint:fix": "yarn run lint:js:fix && yarn run lint:sol:fix",
-    "lint:js": "eslint .",
-    "lint:js:fix": "eslint . --fix",
-    "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
-    "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
-    "test": "hardhat test"
   },
   "bugs": {
     "url": "https://github.com/1inch/solidity-utils/issues"
   },
   "homepage": "https://github.com/1inch/solidity-utils#readme",
-  "directories": {
-    "test": "test"
-  },
   "author": "1inch",
-  "description": "Solidity and JS utils"
+  "description": "Solidity and TS utils",
+  "files": [
+    "./dist",
+    "./*.MD",
+    "contracts/*.sol",
+    "contracts/interfaces",
+    "contracts/libraries"
+  ]
 }

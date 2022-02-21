@@ -9,7 +9,7 @@ contract AddressSetMock {
     using AddressSet for AddressSet.Data;
 
     AddressSet.Data private _self;
-    
+
     function length() external view returns(uint) {
         return AddressSet.length(_self);
     }
