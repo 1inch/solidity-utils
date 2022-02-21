@@ -1,8 +1,3 @@
-import '@typechain/hardhat';
-import '@nomiclabs/hardhat-etherscan';
-import '@nomiclabs/hardhat-truffle5';
-import 'hardhat-deploy';
-import 'hardhat-gas-reporter';
 import dotenv from 'dotenv';
 import { NetworksUserConfig } from 'hardhat/types';
 
