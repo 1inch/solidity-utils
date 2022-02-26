@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./RevertReasonParser.sol";
+import "./StringUtil.sol";
 
 library UniERC20 {
     using SafeMath for uint256;
@@ -37,6 +38,30 @@ library UniERC20 {
         }
     }
 
+    function uniTransferFrom(IERC20 token, address payable from, address to, uint256 amount) internal {
+        if (amount > 0) {
+            if (isETH(token)) {
+                require(msg.value >= amount, "UniERC20: not enough value");
+                require(from == msg.sender, "from is not msg.sender");
+                require(to == address(this), "to is not this");
+                if (msg.value > amount) {
+                    // Return remainder if exist
+                    from.transfer(msg.value.sub(amount));
+                }
+            } else {
+                token.safeTransferFrom(from, to, amount);
+            }
+        }
+    }
+
+    function uniSymbol(IERC20 token) internal view returns(string memory) {
+        return _uniDecode(token, "symbol()", "SYBMOL()");
+    }
+
+    function uniName(IERC20 token) internal view returns(string memory) {
+        return _uniDecode(token, "name()", "NAME()");
+    }
+
     function uniApprove(IERC20 token, address to, uint256 amount) internal {
         require(!isETH(token), "Approve called on ETH");
 
@@ -47,6 +72,45 @@ library UniERC20 {
             _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, to, 0));
             _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, to, amount));
         }
+    }
+
+    function _uniDecode(IERC20 token, string memory lowerCaseSignature, string memory upperCaseSignature) private view returns(string memory) {
+        if (isETH(token)) {
+            return "ETH";
+        }
+
+        (bool success, bytes memory data) = address(token).staticcall{ gas: 20000 }(
+            abi.encodeWithSignature(lowerCaseSignature)
+        );
+        if (!success) {
+            (success, data) = address(token).staticcall{ gas: 20000 }(
+                abi.encodeWithSignature(upperCaseSignature)
+            );
+        }
+
+        if (success && data.length >= 96) {
+            (uint256 offset, uint256 len) = abi.decode(data, (uint256, uint256));
+            if (offset == 0x20 && len > 0 && len <= 256) {
+                return string(abi.decode(data, (bytes)));
+            }
+        }
+
+        if (success && data.length == 32) {
+            uint len = 0;
+            while (len < data.length && data[len] >= 0x20 && data[len] <= 0x7E) {
+                len++;
+            }
+
+            if (len > 0) {
+                bytes memory result = new bytes(len);
+                for (uint i = 0; i < len; i++) {
+                    result[i] = data[i];
+                }
+                return string(result);
+            }
+        }
+
+        return StringUtil.toHex(address(token));
     }
 
     function _callOptionalReturn(IERC20 token, bytes memory data) private {
