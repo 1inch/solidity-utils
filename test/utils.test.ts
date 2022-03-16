@@ -30,9 +30,7 @@ describe('timeIncreaseTo', async function () {
     });
 
     it('should be thrown with increase time to a moment in the past', async function () {
-        await expect(shouldIncrease(-1000)).to.eventually.be.rejectedWith(
-            /Cannot increase current time \(\d+\) to a moment in the past \(\d+\)/
-        );
+        await expect(shouldIncrease(-1000)).to.eventually.be.rejectedWith(/Cannot increase current time \(\d+\) to a moment in the past \(\d+\)/);
     });
 });
 
