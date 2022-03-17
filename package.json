@@ -81,6 +81,7 @@
   "files": [
     "./dist",
     "./*.MD",
+    "./utils",
     "contracts/*.sol",
     "contracts/interfaces",
     "contracts/libraries"
