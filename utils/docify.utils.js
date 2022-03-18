@@ -90,7 +90,10 @@ function generateSummary (targetPath, summary) {
 }
 
 function generateGitbookFiles () {
-    fs.copyFileSync(path.join(BASE_DIR, 'README.md'), path.join(OUTPUT_DIR, 'README.md'));
+    if (fs.existsSync(path.join(BASE_DIR, 'README.md'))){
+        fs.copyFileSync(path.join(BASE_DIR, 'README.md'), path.join(OUTPUT_DIR, 'README.md'));
+    }
+    
     const readmesToGenerate = getReadmes(OUTPUT_DIR);
     const summary = getSummary(OUTPUT_DIR);
 
