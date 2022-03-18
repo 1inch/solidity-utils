@@ -45,4 +45,22 @@ This repository contains frequently used smart contracts, libraries and interfac
 
 ### UTILS
 
+#### Docify
+
+Generates documentation in markdown format from natspec docs
+
+##### Usage
+Add to `package.json` file solidity compiler version and shortcut to run command
+
+`devDependencies` section
+
+```
+"solc": "0.8.12",
+```
+
+`scripts` section
+```
+"docify": "npx solidity-utils-docify"
+```
+
 ...
