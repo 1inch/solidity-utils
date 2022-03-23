@@ -4,10 +4,12 @@ pragma solidity ^0.8.0;
 pragma abicoder v1;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
-import "./libraries/RevertReasonParser.sol";
 import "./interfaces/IDaiLikePermit.sol";
 
 contract Permitable {
+    error BadPermitLength();
+    error PermitFailed();
+
     function _permit(address token, bytes calldata permit) internal virtual {
         if (permit.length > 0) {
             bool success;
@@ -19,11 +21,9 @@ contract Permitable {
                 // solhint-disable-next-line avoid-low-level-calls
                 (success, result) = token.call(abi.encodePacked(IDaiLikePermit.permit.selector, permit));
             } else {
-                revert("Wrong permit length");
+                revert BadPermitLength();
             }
-            if (!success) {
-                revert(RevertReasonParser.parse(result, "Permit failed: "));
-            }
+            if (!success) revert PermitFailed();
         }
     }
 }

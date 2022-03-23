@@ -4,6 +4,10 @@ pragma solidity ^0.8.0;
 
 
 library AddressArray {
+    error IndexOutOfBounds();
+    error PopFromEmptyArray();
+    error OutputArrayTooSmall();
+
     struct Data {
         mapping(uint256 => uint256) _raw;
     }
@@ -28,7 +32,7 @@ library AddressArray {
 
     function _get(Data storage self, address[] memory output, uint256 lengthAndFirst) private view returns(address[] memory) {
         uint256 len = lengthAndFirst >> 160;
-        require(len <= output.length, "AddressArray: too small output");
+        if (len > output.length) revert OutputArrayTooSmall();
         if (len > 0) {
             output[0] = address(uint160(lengthAndFirst));
             for (uint i = 1; i < len; i++) {
@@ -54,7 +58,7 @@ library AddressArray {
     function pop(Data storage self) internal {
         uint256 lengthAndFirst = self._raw[0];
         uint256 len = lengthAndFirst >> 160;
-        require(len > 0, "AddressArray: popping from empty");
+        if (len == 0) revert PopFromEmptyArray();
         self._raw[len - 1] = 0;
         if (len > 1) {
             self._raw[0] = lengthAndFirst - (1 << 160);
@@ -63,7 +67,7 @@ library AddressArray {
 
     function set(Data storage self, uint256 index, address account) internal {
         uint256 len = length(self);
-        require(index < len, "AddressArray: index out of range");
+        if (index >= len) revert IndexOutOfBounds();
 
         if (index == 0) {
             self._raw[0] = (len << 160) | uint160(account);
