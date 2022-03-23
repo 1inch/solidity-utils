@@ -8,7 +8,7 @@ import "./libraries/RevertReasonParser.sol";
 import "./interfaces/IDaiLikePermit.sol";
 
 contract Permitable {
-    function _permit(address token, bytes calldata permit) internal {
+    function _permit(address token, bytes calldata permit) internal virtual {
         if (permit.length > 0) {
             bool success;
             bytes memory result;
