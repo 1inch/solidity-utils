@@ -92,7 +92,7 @@ contract('AddressArray', async function ([wallet1, wallet2, wallet3]) {
 
     describe('pop', async function () {
         it('should be thrown when data is empty', async function () {
-            expect(context.addressArrayMock.pop())
+            await expect(context.addressArrayMock.pop())
                 .to.eventually.be.rejectedWith( 'AddressArray: popping from empty');
         });
 
@@ -120,14 +120,14 @@ contract('AddressArray', async function ([wallet1, wallet2, wallet3]) {
         it('should be thrown when pops more than elements', async function () {
             await context.addressArrayMock.push(wallet1);
             await context.addressArrayMock.pop();
-            expect(context.addressArrayMock.pop())
+            await expect(context.addressArrayMock.pop())
                 .to.eventually.be.rejectedWith( 'AddressArray: popping from empty');
         });
     });
 
     describe('set', async function () {
         it('should be thrown when set index less than data length', async function () {
-            expect(context.addressArrayMock.set(0, wallet1))
+            await expect(context.addressArrayMock.set(0, wallet1))
                 .to.eventually.be.rejectedWith('AddressArray: index out of range');
         });
 

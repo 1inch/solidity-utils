@@ -54,7 +54,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
             'tuple(address,address,uint256,uint256,uint8,bytes32,bytes32)',
             [context.owner, wallet1, value, defaultDeadline, v, r, s],
         );
-        expect(context.permittableMock.__permit(context.erc20PermitMock.address, permit))
+        await expect(context.permittableMock.__permit(context.erc20PermitMock.address, permit))
             .to.eventually.be.rejectedWith('Permit failed: Error(ERC20Permit: invalid signature)');
     });
 
@@ -77,7 +77,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
             [context.holder, wallet1, nonce, defaultDeadline, true, v, r, s],
         );
 
-        expect(context.permittableMock.__permit(context.daiLikePermitMock.address, payload))
+        await expect(context.permittableMock.__permit(context.daiLikePermitMock.address, payload))
             .to.eventually.be.rejectedWith('Permit failed: Error(Dai/invalid-permit)');
     });
 
@@ -91,7 +91,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
             [wallet2, value, defaultDeadline, v, r, s],
         );
 
-        expect(context.permittableMock.__permit(context.erc20PermitMock.address, permit))
+        await expect(context.permittableMock.__permit(context.erc20PermitMock.address, permit))
             .to.eventually.be.rejectedWith( 'Wrong permit length');
     });
 });
