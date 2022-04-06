@@ -95,7 +95,7 @@ library UniERC20 {
         if (success && data.length >= 96) {
             (uint256 offset, uint256 len) = abi.decode(data, (uint256, uint256));
             if (offset == 0x20 && len > 0 && len <= 256) {
-                return string(abi.decode(data, (bytes)));
+                return abi.decode(data, (string));
             }
         }
 
