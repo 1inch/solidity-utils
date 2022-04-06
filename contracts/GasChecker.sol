@@ -3,17 +3,13 @@
 pragma solidity ^0.8.0;
 pragma abicoder v1;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
-
 contract GasChecker {
-    using Strings for uint256;
+    error GasCostDiffers(uint256 expected, uint256 actual);
 
-    modifier checkGasCost(uint256 expectedGasCost) {
+    modifier checkGasCost(uint256 expected) {
         uint256 gas = gasleft();
         _;
         gas -= gasleft();
-        if (expectedGasCost > 0) {
-            require (gas == expectedGasCost, string(abi.encodePacked("Gas cost differs: expected ", expectedGasCost.toString(), ", actual: ", gas.toString())));
-        }
+        if (expected > 0 && gas != expected) revert GasCostDiffers(expected, gas);
     }
 }

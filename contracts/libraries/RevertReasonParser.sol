@@ -16,6 +16,8 @@ library RevertReasonParser {
     using StringUtil for uint256;
     using StringUtil for bytes;
 
+    error InvalidRevertReason();
+
     bytes4 constant private _ERROR_SELECTOR = bytes4(keccak256("Error(string)"));
     bytes4 constant private _PANIC_SELECTOR = bytes4(keccak256("Panic(uint256)"));
 
@@ -42,7 +44,7 @@ library RevertReasonParser {
                 because of that we can't check for equality and instead check
                 that string length + extra 68 bytes is less than overall data length
             */
-            require(data.length >= 68 + bytes(reason).length, "Invalid revert reason");
+            if (data.length < 68 + bytes(reason).length) revert InvalidRevertReason();
             return string(abi.encodePacked(prefix, "Error(", reason, ")"));
         }
         // 36 = 4-byte selector + 32 bytes integer
