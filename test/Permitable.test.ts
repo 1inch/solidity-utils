@@ -55,7 +55,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
             [context.owner, wallet1, value, defaultDeadline, v, r, s],
         );
         await expect(context.permittableMock.__permit(context.erc20PermitMock.address, permit))
-            .to.eventually.be.rejectedWith('PermitFailed()');
+            .to.eventually.be.rejectedWith('ERC20Permit: invalid signature');
     });
 
     it('should be permitted for IDaiLikePermit', async function () {
@@ -78,7 +78,7 @@ contract('Permitable', function ([wallet1, wallet2]) {
         );
 
         await expect(context.permittableMock.__permit(context.daiLikePermitMock.address, payload))
-            .to.eventually.be.rejectedWith('PermitFailed()');
+            .to.eventually.be.rejectedWith('Dai/invalid-permit');
     });
 
     it('should be wrong permit length', async function () {

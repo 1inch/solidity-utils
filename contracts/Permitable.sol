@@ -8,7 +8,6 @@ import "./interfaces/IDaiLikePermit.sol";
 
 contract Permitable {
     error BadPermitLength();
-    error PermitFailed();
 
     function _permit(address token, bytes calldata permit) internal virtual {
         if (permit.length > 0) {
@@ -23,7 +22,13 @@ contract Permitable {
             } else {
                 revert BadPermitLength();
             }
-            if (!success) revert PermitFailed();
+            if (!success) {
+                // bubble up revert reason from permit call
+                assembly {  // solhint-disable-line no-inline-assembly
+                    returndatacopy(0, 0, returndatasize())
+                    revert(0, returndatasize())
+                }
+            }
         }
     }
 }
