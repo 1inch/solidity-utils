@@ -55,7 +55,7 @@ jobs:
 
       - run: yarn
       - run: yarn typechain
-      - run: yarn test
+      - run: yarn test:ci
 
   coverage:
     runs-on: ubuntu-latest

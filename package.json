@@ -20,7 +20,8 @@
     "lint:ts:fix": "eslint . --fix --ext .ts",
     "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
-    "test": "hardhat test",
+    "test": "hardhat test --parallel",
+    "test:ci": "hardhat test",
     "typecheck": "tsc --noEmit --skipLibCheck",
     "typechain": "hardhat typechain"
   },
