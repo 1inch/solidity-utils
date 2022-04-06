@@ -107,8 +107,10 @@ library UniERC20 {
 
             if (len > 0) {
                 bytes memory result = new bytes(len);
-                for (uint i = 0; i < len; i++) {
-                    result[i] = data[i];
+                unchecked {
+                    for (uint i = 0; i < len; i++) {
+                        result[i] = data[i];
+                    }
                 }
                 return string(result);
             }

@@ -39,9 +39,11 @@ library AddressSet {
             return false;
         }
         if (index < s.items.length()) {
-            address lastItem = s.items.at(s.items.length() - 1);
-            s.items.set(index - 1, lastItem);
-            s.lookup[lastItem] = index;
+            unchecked {
+                address lastItem = s.items.at(s.items.length() - 1);
+                s.items.set(index - 1, lastItem);
+                s.lookup[lastItem] = index;
+            }
         }
         s.items.pop();
         delete s.lookup[item];
