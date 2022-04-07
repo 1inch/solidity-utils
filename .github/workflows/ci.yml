@@ -114,6 +114,7 @@ jobs:
       - run: yarn
       - run: yarn typechain
       - run: yarn build
+      - run: tree .
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
