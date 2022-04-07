@@ -89,8 +89,6 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
-    steps:
-   runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
