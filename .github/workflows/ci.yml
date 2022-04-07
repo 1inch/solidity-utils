@@ -86,3 +86,15 @@ jobs:
         uses: coverallsapp/github-action@v1.1.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+      - run: npm install
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
