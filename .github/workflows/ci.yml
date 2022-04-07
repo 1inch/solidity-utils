@@ -113,4 +113,3 @@ jobs:
       - run: yarn typechain
       - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       - run: yarn publishPackage
-
