@@ -13,11 +13,15 @@ jobs:
         with:
           node-version: '16.x'
       - run: npm install -g yarn
+      - run: yarn global add semver-compare-cli
+      - run: export PATH="$PATH:$(yarn global bin)"
       - name: Get local package version
         run: echo "::set-output name=CURRENT_PACKAGE_VERISION::$(node -p 'require(`./package.json`).version')"
         id: current-package-version
       - name: Get remote package version
         run: echo "::set-output name=REMOTE_PACKAGE_VERISION::$(npm view @1inch/solidity-utils version)"
         id: remote-package-version
-      - name: Check Version
+      - name: Print Version
         run: echo "Validating ${{ steps.current-package-version.outputs.CURRENT_PACKAGE_VERISION }} against ${{ steps.remote-package-version.outputs.REMOTE_PACKAGE_VERISION }}"
+      - name: Check Version
+        run: semver-compare ${{ steps.current-package-version.outputs.CURRENT_PACKAGE_VERISION }} gt ${{ steps.remote-package-version.outputs.REMOTE_PACKAGE_VERISION }}
