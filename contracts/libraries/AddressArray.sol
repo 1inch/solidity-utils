@@ -35,33 +35,39 @@ library AddressArray {
         if (len > output.length) revert OutputArrayTooSmall();
         if (len > 0) {
             output[0] = address(uint160(lengthAndFirst));
-            for (uint i = 1; i < len; i++) {
-                output[i] = address(uint160(self._raw[i]));
+            unchecked {
+                for (uint i = 1; i < len; i++) {
+                    output[i] = address(uint160(self._raw[i]));
+                }
             }
         }
         return output;
     }
 
     function push(Data storage self, address account) internal returns(uint256) {
-        uint256 lengthAndFirst = self._raw[0];
-        uint256 len = lengthAndFirst >> 160;
-        if (len == 0) {
-            self._raw[0] = (1 << 160) + uint160(account);
+        unchecked {
+            uint256 lengthAndFirst = self._raw[0];
+            uint256 len = lengthAndFirst >> 160;
+            if (len == 0) {
+                self._raw[0] = (1 << 160) + uint160(account);
+            }
+            else {
+                self._raw[0] = lengthAndFirst + (1 << 160);
+                self._raw[len] = uint160(account);
+            }
+            return len + 1;
         }
-        else {
-            self._raw[0] = lengthAndFirst + (1 << 160);
-            self._raw[len] = uint160(account);
-        }
-        return len + 1;
     }
 
     function pop(Data storage self) internal {
-        uint256 lengthAndFirst = self._raw[0];
-        uint256 len = lengthAndFirst >> 160;
-        if (len == 0) revert PopFromEmptyArray();
-        self._raw[len - 1] = 0;
-        if (len > 1) {
-            self._raw[0] = lengthAndFirst - (1 << 160);
+        unchecked {
+            uint256 lengthAndFirst = self._raw[0];
+            uint256 len = lengthAndFirst >> 160;
+            if (len == 0) revert PopFromEmptyArray();
+            self._raw[len - 1] = 0;
+            if (len > 1) {
+                self._raw[0] = lengthAndFirst - (1 << 160);
+            }
         }
     }
 

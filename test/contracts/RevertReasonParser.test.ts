@@ -18,7 +18,7 @@ describe('RevertReasonParser', async () => {
     describe('parse', async function () {
         it('should be reverted with Invalid revert reason', async function () {
             await expect(context.revertReasonParserTest.testParseWithThrow())
-                .to.eventually.be.rejectedWith('Invalid revert reason');
+                .to.eventually.be.rejectedWith('InvalidRevertReason()');
         });
 
         it('should be parsed as empty Error', async function () {

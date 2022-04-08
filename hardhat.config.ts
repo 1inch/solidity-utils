@@ -1,7 +1,5 @@
 import '@typechain/hardhat';
-import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-truffle5';
-import 'hardhat-deploy';
 import 'hardhat-gas-reporter';
 require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
@@ -11,11 +9,8 @@ import networks from './hardhat.networks';
 dotenv.config();
 
 const config: HardhatUserConfig = {
-    etherscan: {
-        apiKey: process.env.ETHERSCAN_KEY,
-    },
     solidity: {
-        version: '0.8.10',
+        version: '0.8.13',
         settings: {
             optimizer: {
                 enabled: true,
@@ -24,11 +19,6 @@ const config: HardhatUserConfig = {
         },
     },
     networks,
-    namedAccounts: {
-        deployer: {
-            default: 0,
-        },
-    },
     gasReporter: {
         enabled: true,
         currency: 'USD',

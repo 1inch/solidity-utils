@@ -13,6 +13,10 @@ library UniERC20 {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
+    error NotEnoughValue();
+    error FromIsNotSender();
+    error ToIsNotThis();
+
     IERC20 private constant _ETH_ADDRESS = IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     IERC20 private constant _ZERO_ADDRESS = IERC20(address(0));
 
@@ -41,9 +45,9 @@ library UniERC20 {
     function uniTransferFrom(IERC20 token, address payable from, address to, uint256 amount) internal {
         if (amount > 0) {
             if (isETH(token)) {
-                require(msg.value >= amount, "UniERC20: not enough value");
-                require(from == msg.sender, "from is not msg.sender");
-                require(to == address(this), "to is not this");
+                if (msg.value < amount) revert NotEnoughValue();
+                if (from != msg.sender) revert FromIsNotSender();
+                if (to != address(this)) revert ToIsNotThis();
                 if (msg.value > amount) {
                     // Return remainder if exist
                     from.transfer(msg.value.sub(amount));
@@ -91,7 +95,7 @@ library UniERC20 {
         if (success && data.length >= 96) {
             (uint256 offset, uint256 len) = abi.decode(data, (uint256, uint256));
             if (offset == 0x20 && len > 0 && len <= 256) {
-                return string(abi.decode(data, (bytes)));
+                return abi.decode(data, (string));
             }
         }
 
@@ -103,8 +107,10 @@ library UniERC20 {
 
             if (len > 0) {
                 bytes memory result = new bytes(len);
-                for (uint i = 0; i < len; i++) {
-                    result[i] = data[i];
+                unchecked {
+                    for (uint i = 0; i < len; i++) {
+                        result[i] = data[i];
+                    }
                 }
                 return string(result);
             }
