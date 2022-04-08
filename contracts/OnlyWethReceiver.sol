@@ -7,7 +7,7 @@ abstract contract OnlyWethReceiver {
     error EthDepositRejected();
 
     // solhint-disable-next-line var-name-mixedcase
-    address private immutable _WETH;
+    address internal immutable _WETH;
 
     constructor(address weth) {
         _WETH = weth;
