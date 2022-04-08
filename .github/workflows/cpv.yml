@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  publish:
+  check-package-version:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,7 +21,5 @@ jobs:
       - name: Get remote package version
         run: echo "::set-output name=REMOTE_PACKAGE_VERISION::$(npm view @1inch/solidity-utils version)"
         id: remote-package-version
-      - name: Print Version
-        run: echo "Validating ${{ steps.current-package-version.outputs.CURRENT_PACKAGE_VERISION }} against ${{ steps.remote-package-version.outputs.REMOTE_PACKAGE_VERISION }}"
       - name: Check Version
         run: semver-compare ${{ steps.current-package-version.outputs.CURRENT_PACKAGE_VERISION }} gt ${{ steps.remote-package-version.outputs.REMOTE_PACKAGE_VERISION }}
