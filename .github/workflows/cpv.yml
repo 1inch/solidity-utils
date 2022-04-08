@@ -1,4 +1,4 @@
-name: CHECK_PACKAGE_VERSION
+name: PR
 
 on:
   pull_request:
