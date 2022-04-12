@@ -5,6 +5,7 @@ pragma abicoder v1;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 import "./interfaces/IDaiLikePermit.sol";
+import "./libraries/RevertReasonForwarder.sol";
 
 contract Permitable {
     error BadPermitLength();
@@ -23,11 +24,7 @@ contract Permitable {
                 revert BadPermitLength();
             }
             if (!success) {
-                // bubble up revert reason from permit call
-                assembly {  // solhint-disable-line no-inline-assembly
-                    returndatacopy(0, 0, returndatasize())
-                    revert(0, returndatasize())
-                }
+                RevertReasonForwarder.reRevert();
             }
         }
     }
