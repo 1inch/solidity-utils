@@ -6,16 +6,18 @@ pragma abicoder v1;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "./RevertReasonParser.sol";
+import "./RevertReasonForwarder.sol";
 import "./StringUtil.sol";
 
 library UniERC20 {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
+    error ApproveCalledOnETH();
     error NotEnoughValue();
     error FromIsNotSender();
     error ToIsNotThis();
+    error ERC20OperationFailed();
 
     IERC20 private constant _ETH_ADDRESS = IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     IERC20 private constant _ZERO_ADDRESS = IERC20(address(0));
@@ -67,7 +69,7 @@ library UniERC20 {
     }
 
     function uniApprove(IERC20 token, address to, uint256 amount) internal {
-        require(!isETH(token), "Approve called on ETH");
+        if (isETH(token)) revert ApproveCalledOnETH();
 
         // solhint-disable-next-line avoid-low-level-calls
         (bool success, bytes memory returndata) = address(token).call(abi.encodeWithSelector(token.approve.selector, to, amount));
@@ -123,11 +125,11 @@ library UniERC20 {
         // solhint-disable-next-line avoid-low-level-calls
         (bool success, bytes memory result) = address(token).call(data);
         if (!success) {
-            revert(RevertReasonParser.parse(result, "Low-level call failed: "));
+            RevertReasonForwarder.reRevert();
         }
 
         if (result.length > 0) { // Return data is optional
-            require(abi.decode(result, (bool)), "ERC20 operation did not succeed");
+            if (!abi.decode(result, (bool))) revert ERC20OperationFailed();
         }
     }
 }

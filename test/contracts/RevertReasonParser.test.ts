@@ -43,7 +43,7 @@ describe('RevertReasonParser', async () => {
 
         it('should be reverted in _test()', async function () {
             await expect(context.revertReasonParserTest.testWithThrow())
-                .to.eventually.be.rejectedWith('testFunctions without throw');
+                .to.eventually.be.rejectedWith('TestDidNotThrow()');
         });
     });
 });

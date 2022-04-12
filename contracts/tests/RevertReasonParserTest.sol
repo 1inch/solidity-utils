@@ -6,6 +6,8 @@ pragma abicoder v1;
 import "../libraries/RevertReasonParser.sol";
 
 contract RevertReasonParserTest {
+    error TestDidNotThrow();
+
     function emptyRevert() external pure  {
         revert();  // solhint-disable-line reason-string
     }
@@ -73,7 +75,7 @@ contract RevertReasonParserTest {
 
     function _test(function() external pure testFunction, string memory expectedReason) private pure {
         try testFunction() {
-            revert("testFunctions without throw");
+            revert TestDidNotThrow();
         } catch (bytes memory reason) {
             string memory parsedReason = RevertReasonParser.parse(reason, "");
             require(
