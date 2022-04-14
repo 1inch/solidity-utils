@@ -64,3 +64,96 @@ Add to `package.json` file solidity compiler version and shortcut to run command
 ```
 
 ...
+
+#### Test documentation generator (test-docgen)
+Script generates documentation for tests in markdown format.
+Give descriptions for `describe` and `it` sections and build documentation using these descriptions.
+
+##### Example
+Test described as shown below
+
+```JavaScript
+// Test suite
+describe('My feature', function() {
+    // Nested test suite 
+    describe("My subfeature", function() {
+        /*
+            **Test case 1**
+            Test case should work
+         */
+        it("My case", function() {
+        // code here
+        })
+    })
+})
+```
+will generated the following output
+```Markdown
+
+# My feature
+
+Test suite
+
+## My subfeature
+
+Nested test suite 
+
+### My case
+
+**Test case 1**
+Test case should work
+```
+
+##### Installation
+- Before use install documentation parser
+```
+yarn add acquit --dev
+```
+- Optionally configure script for default usage. Add to `script` section in `package.json` 
+```
+"test:docs": "npx test-docgen"
+```
+- Optionally configure script for generating test list only. Add to `script` section in `package.json` 
+```
+"test:docs": "npx test-docgen -l"
+```
+
+##### Usage
+If script configured
+```
+yarn test:docs
+```
+or
+```
+npx test-docgen
+```
+
+Available parameters
+```
+Options:
+  -i, --input <input>      tests directory (default: "test")
+  -x, --exclude [exclude]  exclude directories and files. omit argument to exclude all subdirectories (default: false)
+  -o, --output <output>    file to write output (default: "TESTS.md")
+  -c, --code               include code (default: false)
+  -l, --list               list tests only, do not include description (default: false)
+  -d, --debug              debug mode (default: false)
+  -h, --help               display help for command
+```
+##### Examples
+Generate docs with default input and output
+```
+npx test-docgen
+```
+
+Generate docs for files in folders `tests/mocks` and `tests/utils`
+```
+npx test-docgen -i "tests/mocks;tests/utils"
+```
+Exclude from docs file `test/mock-exclude.js` and `test/utils folder`
+```
+npx test-docgen -x "tests/mock-exclude.js;tests/utils"
+```
+Generate list of tests only
+```
+npx test-docgen -l
+```
