@@ -85,7 +85,13 @@ library SafestERC20 {
                 mstore(add(data, 0x44), arg3)
             }
             let success := call(gas(), token, 0, data, len, 0x0, 0x20)
-            done := and(success, or(iszero(returndatasize()), eq(mload(0), 1)))
+            done := and(
+                success,
+                or(
+                    iszero(returndatasize()),
+                    and(gt(returndatasize(), 31), eq(mload(0), 1))
+                )
+            )
         }
     }
 }
