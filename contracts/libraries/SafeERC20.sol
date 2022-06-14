@@ -17,24 +17,37 @@ library SafeERC20 {
     error SafePermitNotSucceed();
 
     // Ensures method do not revert or return boolean `true`, admits call to non-smart-contract
-    function safeTransfer(IERC20 token, address to, uint256 value) internal {
-        if (!_makeCall(token, token.transfer.selector, 68, uint160(to), value, 0)) {
-            revert SafeTransferFailed();
+    function safeTransferFrom(IERC20 token, address from, address to, uint256 amount) internal {
+        bytes4 selector = token.transferFrom.selector;
+        bool success;
+        assembly { // solhint-disable-line no-inline-assembly
+            let data := mload(0x40)
+            mstore(0x40, add(data, 100))
+
+            mstore(data, selector)
+            mstore(add(data, 0x04), from)
+            mstore(add(data, 0x24), to)
+            mstore(add(data, 0x44), amount)
+            let status := call(gas(), token, 0, data, 100, 0x0, 0x20)
+            success := and(status, or(iszero(returndatasize()), and(gt(returndatasize(), 31), eq(mload(0), 1))))
+        }
+        if (!success) {
+            revert SafeTransferFromFailed();
         }
     }
 
     // Ensures method do not revert or return boolean `true`, admits call to non-smart-contract
-    function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
-        if (!_makeCall(token, token.transferFrom.selector, 100, uint160(from), uint160(to), value)) {
-            revert SafeTransferFromFailed();
+    function safeTransfer(IERC20 token, address to, uint256 value) internal {
+        if (!_makeCall(token, token.transfer.selector, to, value)) {
+            revert SafeTransferFailed();
         }
     }
 
     // If `approve(from, to, amount)` fails, try to `approve(from, to, 0)` before retry
     function forceApprove(IERC20 token, address spender, uint256 value) internal {
-        if (!_makeCall(token, token.approve.selector, 68, uint160(spender), value, 0)) {
-            if (!_makeCall(token, token.approve.selector, 68, uint160(spender), 0, 0) ||
-                !_makeCall(token, token.approve.selector, 68, uint160(spender), value, 0))
+        if (!_makeCall(token, token.approve.selector, spender, value)) {
+            if (!_makeCall(token, token.approve.selector, spender, 0) ||
+                !_makeCall(token, token.approve.selector, spender, value))
             {
                 revert ForceApproveFailed();
             }
@@ -57,10 +70,10 @@ library SafeERC20 {
         bool success;
         if (permit.length == 32 * 7) {
             // solhint-disable-next-line avoid-low-level-calls
-            (success,) = address(token).call(abi.encodePacked(IERC20Permit.permit.selector, permit));
+            success = _makeCalldataCall(token, IERC20Permit.permit.selector, permit);
         } else if (permit.length == 32 * 8) {
             // solhint-disable-next-line avoid-low-level-calls
-            (success,) = address(token).call(abi.encodePacked(IDaiLikePermit.permit.selector, permit));
+            success = _makeCalldataCall(token, IDaiLikePermit.permit.selector, permit);
         } else {
             revert SafePermitBadLength();
         }
@@ -70,17 +83,33 @@ library SafeERC20 {
         }
     }
 
-    function _makeCall(IERC20 token, bytes4 selector, uint len, uint arg1, uint arg2, uint arg3) private returns(bool done) {
+    function _makeCall(IERC20 token, bytes4 selector, address to, uint256 amount) private returns(bool done) {
         assembly { // solhint-disable-line no-inline-assembly
+            let data := mload(0x40)
+            mstore(0x40, add(data, 68))
+
+            mstore(data, selector)
+            mstore(add(data, 0x04), to)
+            mstore(add(data, 0x24), amount)
+            let success := call(gas(), token, 0, data, 68, 0x0, 0x20)
+            done := and(
+                success,
+                or(
+                    iszero(returndatasize()),
+                    and(gt(returndatasize(), 31), eq(mload(0), 1))
+                )
+            )
+        }
+    }
+
+    function _makeCalldataCall(IERC20 token, bytes4 selector, bytes calldata args) private returns(bool done) {
+        assembly { // solhint-disable-line no-inline-assembly
+            let len := add(4, args.length)
             let data := mload(0x40)
             mstore(0x40, add(data, len))
 
             mstore(data, selector)
-            mstore(add(data, 0x04), arg1)
-            mstore(add(data, 0x24), arg2)
-            if eq(len, 100) {
-                mstore(add(data, 0x44), arg3)
-            }
+            calldatacopy(add(data, 0x04), args.offset, args.length)
             let success := call(gas(), token, 0, data, len, 0x0, 0x20)
             done := and(
                 success,
