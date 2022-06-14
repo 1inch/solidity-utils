@@ -95,8 +95,9 @@ export interface PermittableToken extends Token {
     name(txDetails?: Truffle.TransactionDetails): Promise<string>;
 }
 
-export function signWithPk<T extends MessageTypes> (privateKey: string, data: TypedMessage<T>) {
-    return signTypedData({ privateKey: Buffer.from(trim0x(privateKey), 'hex'), data, version: TypedDataVersion });
+export function signWithPk<T extends MessageTypes> (privateKey: Buffer | string, data: TypedMessage<T>) {
+    const buffer = Buffer.isBuffer(privateKey) ? privateKey : Buffer.from(trim0x(privateKey), 'hex');
+    return signTypedData({ privateKey: buffer, data, version: TypedDataVersion });
 }
 
 /*

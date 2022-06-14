@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "../libraries/SafestERC20.sol";
+import "../libraries/SafeERC20.sol";
 
 contract ERC20ReturnFalseMock is Context {
     uint256 private _allowance;
@@ -143,8 +143,8 @@ contract ERC20PermitNoRevertMock is
     }
 }
 
-contract SafestERC20Wrapper is Context {
-    using SafestERC20 for IERC20;
+contract SafeERC20Wrapper is Context {
+    using SafeERC20 for IERC20;
 
     IERC20 private _token;
 
@@ -161,7 +161,7 @@ contract SafestERC20Wrapper is Context {
     }
 
     function approve(uint256 amount) public {
-        _token.safeApprove(address(0), amount);
+        _token.forceApprove(address(0), amount);
     }
 
     function increaseAllowance(uint256 amount) public {
@@ -173,7 +173,7 @@ contract SafestERC20Wrapper is Context {
     }
 
     function permit(
-        address owner,
+        address /* owner */,
         address /* spender */,
         uint256 /* value */,
         uint256 /* deadline */,
@@ -181,7 +181,7 @@ contract SafestERC20Wrapper is Context {
         bytes32 /* r */,
         bytes32 /* s */
     ) external {
-        _token.safePermit(owner, msg.data[4:]);
+        _token.safePermit(msg.data[4:]);
     }
 
     function setAllowance(uint256 allowance_) public {

@@ -60,7 +60,6 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-promise": "6.0.0",
     "eslint-plugin-standard": "5.0.0",
-    "eth-sig-util": "^3.0.1",
     "ethereumjs-wallet": "^1.0.2",
     "hardhat": "2.9.3",
     "hardhat-gas-reporter": "1.0.8",
