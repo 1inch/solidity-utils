@@ -14,7 +14,6 @@ library SafeERC20 {
     error SafeIncreaseAllowanceFailed();
     error SafeDecreaseAllowanceFailed();
     error SafePermitBadLength();
-    error SafePermitNotSucceed();
 
     // Ensures method do not revert or return boolean `true`, admits call to non-smart-contract
     function safeTransferFrom(IERC20 token, address from, address to, uint256 amount) internal {
