@@ -29,7 +29,7 @@ export type Time = {
 
 export const time: Time = timeImpl;
 
-export function ether (n: string) {
+export function ether (n: string): BN {
     return toBN(toWei(n, 'ether'));
 }
 
