@@ -3,11 +3,12 @@
 pragma solidity ^0.8.0;
 pragma abicoder v1;
 
-import "../Permitable.sol";
+import "../libraries/SafeERC20.sol";
 
-contract PermitableMock is Permitable {
-    // solhint-disable-next-line  private-vars-leading-underscore
-    function __permit(address token, bytes calldata permit) external {
-        _permit(token, permit);
+contract PermitableMock {
+    using SafeERC20 for IERC20;
+
+    function mockPermit(IERC20 token, bytes calldata permit) external {
+        token.safePermit(permit);
     }
 }
