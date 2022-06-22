@@ -3,14 +3,12 @@
 pragma solidity ^0.8.0;
 pragma abicoder v1;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./RevertReasonForwarder.sol";
 import "./StringUtil.sol";
 
 library UniERC20 {
-    using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     error ApproveCalledOnETH();
@@ -52,7 +50,7 @@ library UniERC20 {
                 if (to != address(this)) revert ToIsNotThis();
                 if (msg.value > amount) {
                     // Return remainder if exist
-                    from.transfer(msg.value.sub(amount));
+                    unchecked { from.transfer(msg.value - amount); }
                 }
             } else {
                 token.safeTransferFrom(from, to, amount);
