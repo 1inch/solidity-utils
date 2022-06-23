@@ -1,11 +1,15 @@
 import chai, { Assertion, AssertionError, assert, expect, config, should } from 'chai';
 import 'chai-bn';
 import chaiAsPromised from 'chai-as-promised';
-import { toBN, toWei } from 'web3-utils';
+import { toWei } from 'web3-utils';
 import BN from 'bn.js';
 chai.use(chaiAsPromised);
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { time: timeImpl } = require('@openzeppelin/test-helpers');
+
+export function toBN (num: string | number, base?: number | 'hex'): BN {
+    return new BN(num, base);
+}
 
 export const constants = {
     ZERO_ADDRESS: '0x0000000000000000000000000000000000000000',
@@ -18,7 +22,7 @@ export const constants = {
 
 // utils
 export {
-    toBN,
+    BN
 };
 
 //test-helpers
