@@ -22,7 +22,7 @@ export const constants = {
 
 // utils
 export {
-    BN
+    BN,
 };
 
 //test-helpers
