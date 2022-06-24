@@ -25,6 +25,7 @@ library RevertReasonParser {
         // https://solidity.readthedocs.io/en/latest/control-structures.html#revert
         // We assume that revert reason is abi-encoded as Error(string)
         bytes4 selector;
+        /// @solidity memory-safe-assembly
         assembly {  // solhint-disable-line no-inline-assembly
             selector := mload(add(data, 0x20))
         }
