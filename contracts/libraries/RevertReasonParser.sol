@@ -26,15 +26,15 @@ library RevertReasonParser {
         // We assume that revert reason is abi-encoded as Error(string)
         bytes4 selector;
         /// @solidity memory-safe-assembly
-        assembly {  // solhint-disable-line no-inline-assembly
+        assembly { // solhint-disable-line no-inline-assembly
             selector := mload(add(data, 0x20))
         }
 
         // 68 = 4-byte selector + 32 bytes offset + 32 bytes length
         if (selector == _ERROR_SELECTOR && data.length >= 68) {
             string memory reason;
-            // solhint-disable no-inline-assembly
-            assembly {
+            /// @solidity memory-safe-assembly
+            assembly { // solhint-disable-line no-inline-assembly
                 // 68 = 32 bytes data length + 4-byte selector + 32 bytes offset
                 reason := add(data, 68)
             }
@@ -51,8 +51,8 @@ library RevertReasonParser {
         // 36 = 4-byte selector + 32 bytes integer
         else if (selector == _PANIC_SELECTOR && data.length == 36) {
             uint256 code;
-            // solhint-disable no-inline-assembly
-            assembly {
+            /// @solidity memory-safe-assembly
+            assembly { // solhint-disable-line no-inline-assembly
                 // 36 = 32 bytes data length + 4-byte selector
                 code := mload(add(data, 36))
             }
