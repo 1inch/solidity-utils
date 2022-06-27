@@ -14,7 +14,7 @@ library StringUtil {
     }
 
     function toHex(bytes memory data) internal pure returns (string memory result) {
-        // TODO: set memory-safe-assembly
+        /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             function _toHex16(input) -> output {
                 output := or(
