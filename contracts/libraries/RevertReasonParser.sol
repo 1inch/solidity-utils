@@ -17,19 +17,19 @@ library RevertReasonParser {
     using StringUtil for bytes;
 
     error InvalidRevertReason();
-    error IncorrectDataLenght();
 
     bytes4 constant private _ERROR_SELECTOR = bytes4(keccak256("Error(string)"));
     bytes4 constant private _PANIC_SELECTOR = bytes4(keccak256("Panic(uint256)"));
 
     function parse(bytes memory data, string memory prefix) internal pure returns (string memory) {
-        if (data.length < 4) revert IncorrectDataLenght();
         // https://solidity.readthedocs.io/en/latest/control-structures.html#revert
         // We assume that revert reason is abi-encoded as Error(string)
         bytes4 selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
-            selector := mload(add(data, 0x20))
+        if (data.length >= 4) {
+            /// @solidity memory-safe-assembly
+            assembly { // solhint-disable-line no-inline-assembly
+                selector := mload(add(data, 0x20))
+            }
         }
 
         // 68 = 4-byte selector + 32 bytes offset + 32 bytes length
