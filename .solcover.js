@@ -1,6 +1,6 @@
 module.exports = {
     skipFiles: [
-        'mocks', 'tests'
+        'mocks', 'tests', 'interfaces',
     ],
     mocha: {
         grep: "@skip-on-coverage",
