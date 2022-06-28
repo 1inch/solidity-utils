@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
+pragma abicoder v1;
 
 import "./AddressArray.sol";
-
 
 library AddressSet {
     using AddressArray for AddressArray.Data;
