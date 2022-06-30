@@ -8,6 +8,9 @@ chai.use(chaiAsPromised);
 const { time: timeImpl } = require('@openzeppelin/test-helpers');
 
 export function toBN (num: string | number, base?: number | 'hex'): BN {
+    if (typeof(num) === 'string' && num.startsWith('0x')) {
+        return new BN(num.substring(2), 16);
+    }
     return new BN(num, base);
 }
 
