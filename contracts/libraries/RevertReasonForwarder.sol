@@ -8,8 +8,9 @@ library RevertReasonForwarder {
         // bubble up revert reason from latest external call
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            returndatacopy(0, 0, returndatasize())
-            revert(0, returndatasize())
+            let ptr := mload(0x40)
+            returndatacopy(ptr, 0, returndatasize())
+            revert(ptr, returndatasize())
         }
     }
 }
