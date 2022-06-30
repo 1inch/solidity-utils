@@ -23,7 +23,6 @@ library SafeERC20 {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
-            mstore(0x40, add(data, 100))
 
             mstore(data, selector)
             mstore(add(data, 0x04), from)
@@ -88,7 +87,6 @@ library SafeERC20 {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
-            mstore(0x40, add(data, 68))
 
             mstore(data, selector)
             mstore(add(data, 0x04), to)
@@ -109,7 +107,6 @@ library SafeERC20 {
         assembly { // solhint-disable-line no-inline-assembly
             let len := add(4, args.length)
             let data := mload(0x40)
-            mstore(0x40, add(data, len))
 
             mstore(data, selector)
             calldatacopy(add(data, 0x04), args.offset, args.length)
