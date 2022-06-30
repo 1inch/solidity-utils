@@ -45,10 +45,11 @@ library RevertReasonParser {
                 also sometimes there is extra 32 bytes of zeros padded in the end:
                 https://github.com/ethereum/solidity/issues/10170
                 because of that we can't check for equality and instead check
-                that string length + extra 68 bytes is less than overall data length
+                that string length + extra 68 bytes is equal or greater than overall data length
             */
-            if (data.length < 68 + bytes(reason).length) revert InvalidRevertReason();
-            return string.concat(prefix, "Error(", reason, ")");
+            if (data.length >= 68 + bytes(reason).length) {
+                return string.concat(prefix, "Error(", reason, ")");
+            }
         }
         // 36 = 4-byte selector + 32 bytes integer
         else if (selector == _PANIC_SELECTOR && data.length == 36) {
