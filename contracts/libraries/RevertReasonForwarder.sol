@@ -6,9 +6,11 @@ pragma abicoder v1;
 library RevertReasonForwarder {
     function reRevert() internal pure {
         // bubble up revert reason from latest external call
-        assembly {  // solhint-disable-line no-inline-assembly
-            returndatacopy(0, 0, returndatasize())
-            revert(0, returndatasize())
+        /// @solidity memory-safe-assembly
+        assembly { // solhint-disable-line no-inline-assembly
+            let ptr := mload(0x40)
+            returndatacopy(ptr, 0, returndatasize())
+            revert(ptr, returndatasize())
         }
     }
 }

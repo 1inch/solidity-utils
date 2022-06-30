@@ -59,10 +59,11 @@ contract RevertReasonParserTest {
             bytes32 invalidReasonPart1;
             bytes32 invalidReasonPart2;
             bytes32 invalidReasonPart3;
-            assembly {  // solhint-disable-line no-inline-assembly
+            /// @solidity memory-safe-assembly
+            assembly { // solhint-disable-line no-inline-assembly
                 invalidReasonPart1 := mload(add(reason, 0x20))
                 invalidReasonPart2 := mload(add(reason, 0x40))
-                invalidReasonPart3 := mload(add(reason, 0x40))
+                invalidReasonPart3 := mload(add(reason, 0x40)) // planned mistake for test
             }
             bytes memory invalidReason = abi.encodePacked(invalidReasonPart1, invalidReasonPart2, invalidReasonPart3);
             RevertReasonParser.parse(invalidReason, "");

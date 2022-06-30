@@ -20,9 +20,9 @@ library SafeERC20 {
     function safeTransferFrom(IERC20 token, address from, address to, uint256 amount) internal {
         bytes4 selector = token.transferFrom.selector;
         bool success;
+        /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
-            mstore(0x40, add(data, 100))
 
             mstore(data, selector)
             mstore(add(data, 0x04), from)
@@ -84,9 +84,9 @@ library SafeERC20 {
     }
 
     function _makeCall(IERC20 token, bytes4 selector, address to, uint256 amount) private returns(bool done) {
+        /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
-            mstore(0x40, add(data, 68))
 
             mstore(data, selector)
             mstore(add(data, 0x04), to)
@@ -103,10 +103,10 @@ library SafeERC20 {
     }
 
     function _makeCalldataCall(IERC20 token, bytes4 selector, bytes calldata args) private returns(bool done) {
+        /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let len := add(4, args.length)
             let data := mload(0x40)
-            mstore(0x40, add(data, len))
 
             mstore(data, selector)
             calldatacopy(add(data, 0x04), args.offset, args.length)
