@@ -80,6 +80,13 @@ library ECDSA {
         return isValidSignature(signer, hash, signature);
     }
 
+    function recoverOrIsValidSignature(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns(bool success) {
+        if (recover(hash, v, r, s) == signer) {
+            return true;
+        }
+        return isValidSignature(signer, hash, v, r, s);
+    }
+
     function recoverOrIsValidSignature(address signer, bytes32 hash, bytes32 r, bytes32 vs) internal view returns(bool success) {
         if (recover(hash, r, vs) == signer) {
             return true;
@@ -107,6 +114,26 @@ library ECDSA {
             mstore(add(ptr, 0x24), 0x40)
             mstore(add(ptr, 0x44), signature.length)
             calldatacopy(add(ptr, 0x64), signature.offset, signature.length)
+            mstore(0, 0)
+            if staticcall(gas(), signer, ptr, len, 0, 0x20) {
+                success := eq(selector, mload(0))
+            }
+        }
+    }
+
+    function isValidSignature(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns(bool success) {
+        bytes4 selector = IERC1271.isValidSignature.selector;
+        assembly { // solhint-disable-line no-inline-assembly
+            let ptr := mload(0x40)
+            let len := add(0x64, 65)
+
+            mstore(ptr, selector)
+            mstore(add(ptr, 0x04), hash)
+            mstore(add(ptr, 0x24), 0x40)
+            mstore(add(ptr, 0x44), 65)
+            mstore(add(ptr, 0x64), r)
+            mstore(add(ptr, 0x84), s)
+            mstore8(add(ptr, 0xa4), add(27, v))
             mstore(0, 0)
             if staticcall(gas(), signer, ptr, len, 0, 0x20) {
                 success := eq(selector, mload(0))

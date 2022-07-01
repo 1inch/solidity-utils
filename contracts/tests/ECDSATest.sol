@@ -23,7 +23,13 @@ contract ECDSATest {
         return ECDSA.recoverOrIsValidSignature(signer, hash, signature);
     }
 
-    function recoverOrIsValidSignature(address signer, bytes32 hash, bytes32 r, bytes32 vs) external view returns(bool success) {
+    // solhint-disable-next-line func-name-mixedcase
+    function recoverOrIsValidSignature_v_r_s(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) external view returns(bool success) {
+        return ECDSA.recoverOrIsValidSignature(signer, hash, v, r, s);
+    }
+
+    // solhint-disable-next-line func-name-mixedcase
+    function recoverOrIsValidSignature_r_vs(address signer, bytes32 hash, bytes32 r, bytes32 vs) external view returns(bool success) {
         return ECDSA.recoverOrIsValidSignature(signer, hash, r, vs);
     }
 
@@ -35,7 +41,13 @@ contract ECDSATest {
         return ECDSA.isValidSignature(signer, hash, signature);
     }
 
-    function isValidSignature(address signer, bytes32 hash, bytes32 r, bytes32 vs) external view returns(bool success) {
+    // solhint-disable-next-line func-name-mixedcase
+    function isValidSignature_v_s_r(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) external view returns(bool success) {
+        return ECDSA.isValidSignature(signer, hash, v, r, s);
+    }
+
+    // solhint-disable-next-line func-name-mixedcase
+    function isValidSignature_r_vs(address signer, bytes32 hash, bytes32 r, bytes32 vs) external view returns(bool success) {
         return ECDSA.isValidSignature(signer, hash, r, vs);
     }
 

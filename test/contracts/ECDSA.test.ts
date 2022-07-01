@@ -59,119 +59,278 @@ describe('ECDSA', async () => {
     let account: string;
     let context: Awaited<ReturnType<typeof initContext>> = undefined!;
 
+    const randomAccount: string = web3.eth.accounts.create().address;
+    // eslint-disable-next-line max-len
+    const longSignature = '0x01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789';
+
+    // Signature generated outside ganache with method web3.eth.sign(TEST_MESSAGE, account)
+    const signerV0 = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
+    // eslint-disable-next-line max-len
+    const signatureWithoutVersionV0 = '0x064d3d0f049cc3b971476ba4bdbd5d0ccb5ac0ee7a03c2f063908ac2bdb59f944c7c5bf43804a7ff717f8c0a8749e0e5cb26ef96408313558acd130210604d9c';
+    const signerV1 = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
+    // eslint-disable-next-line max-len
+    const signatureWithoutVersionV1 = '0x7bf43cd41b0fe2edad48ab66d2bc8e78d4aad37d0cf77e9fa4668560e1eac68277c325f777b8ee2f9d522c635c252bfdba6ba261edbf53c46c64d47824f2a009';
+    // eslint-disable-next-line max-len
+    const invalidSignature = '0x332ce75a821c982f9127538858900d87d3ec1f9f737338ad67cad133fa48feff48e6fa0c18abc62e42820f05943e47af3e9fbe306ce74d64094bdf1691ee53e01c';
+
     before(async () => {
         [account] = await web3.eth.getAccounts();
         context = await initContext();
     });
 
-    describe('recover with invalid signature', async () => {
-        it('with short signature', async function () {
-            expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(constants.ZERO_ADDRESS);
+    describe('recover', async () => {
+        describe('with invalid signature', async () => {
+            it('with short signature', async function () {
+                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(constants.ZERO_ADDRESS);
+            });
+
+            it('with long signature', async () => {
+                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, longSignature)).to.be.equals(constants.ZERO_ADDRESS);
+            });
         });
 
-        it('with long signature', async () => {
-            // eslint-disable-next-line max-len
-            const longSignature = '0x01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789';
-            expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, longSignature)).to.be.equals(constants.ZERO_ADDRESS);
+        describe('with valid signature', async () => {
+            describe('using web3.eth.sign', async () => {
+                it('returns signer address with correct signature', async () => {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(account);
+                });
+
+                it('returns signer address with correct signature for arbitrary length message', async () => {
+                    const signature = await web3.eth.sign(NON_HASH_MESSAGE, account);
+                    expect(await context.ecdsa.recover(web3.eth.accounts.hashMessage(NON_HASH_MESSAGE), signature)).to.be.equals(account);
+                });
+
+                it('returns a different address', async () => {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    expect(await context.ecdsa.recover(WRONG_MESSAGE, signature)).to.be.not.equals(account);
+                });
+
+                it('returns zero address with invalid signature', async () => {
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, invalidSignature)).to.be.equals(constants.ZERO_ADDRESS);
+                });
+            });
+
+            describe('with v0 signature', function () {
+                it('returns zero address with 00 as version value', async function () {
+                    const version = '00';
+                    const signature = signatureWithoutVersionV0 + version;
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
+                    expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(constants.ZERO_ADDRESS);
+                });
+
+                it('works with 27 as version value', async function () {
+                    const version = '1b'; // 27 = 1b.
+                    const signature = signatureWithoutVersionV0 + version;
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(signerV0);
+                    expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(signerV0);
+                    expect(await context.ecdsa.recover_r_vs(HASHED_TEST_MESSAGE, ...split(to2098Format(signature)))).to.equal(signerV0);
+                });
+
+                it('returns zero address when wrong version', async function () {
+                    // The last two hex digits are the signature version.
+                    // The only valid values are 0, 1, 27 and 28.
+                    const version = '02';
+                    const signature = signatureWithoutVersionV0 + version;
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
+                    expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(constants.ZERO_ADDRESS);
+                });
+
+                it('works with short EIP2098 format', async function () {
+                    const version = '1b'; // 27 = 1b.
+                    const signature = signatureWithoutVersionV0 + version;
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(signerV0);
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(signerV0);
+                });
+            });
+
+            describe('with v1 signature', function () {
+                it('returns zero address with 01 as version value', async function () {
+                    const version = '01';
+                    const signature = signatureWithoutVersionV1 + version;
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
+                    expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(constants.ZERO_ADDRESS);
+                });
+
+                it('works with 28 as version value', async function () {
+                    const version = '1c'; // 28 = 1c.
+                    const signature = signatureWithoutVersionV1 + version;
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(signerV1);
+                    expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(signerV1);
+                    expect(await context.ecdsa.recover_r_vs(HASHED_TEST_MESSAGE, ...split(to2098Format(signature)))).to.equal(signerV1);
+                });
+
+                it('returns zero address when wrong version', async function () {
+                    // The last two hex digits are the signature version.
+                    // The only valid values are 0, 1, 27 and 28.
+                    const version = '02';
+                    const signature = signatureWithoutVersionV1 + version;
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
+                    expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(constants.ZERO_ADDRESS);
+                });
+
+                it('works with short EIP2098 format', async function () {
+                    const version = '1c'; // 27 = 1b.
+                    const signature = signatureWithoutVersionV1 + version;
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(signerV1);
+                    expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(signerV1);
+                });
+            });
         });
     });
 
-    describe('recover with valid signature', async () => {
-        describe('using web3.eth.sign', async () => {
-            it('returns signer address with correct signature', async () => {
-                const signature = await web3.eth.sign(TEST_MESSAGE, account);
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(account);
+    describe('recoverOrIsValidSignature', async () => {
+        describe('with invalid signature', async () => {
+            it('with short signature', async function () {
+                expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(false);
             });
 
-            it('returns signer address with correct signature for arbitrary length message', async () => {
-                const signature = await web3.eth.sign(NON_HASH_MESSAGE, account);
-                expect(await context.ecdsa.recover(web3.eth.accounts.hashMessage(NON_HASH_MESSAGE), signature)).to.be.equals(account);
-            });
-
-            it('returns a different address', async () => {
-                const signature = await web3.eth.sign(TEST_MESSAGE, account);
-                expect(await context.ecdsa.recover(WRONG_MESSAGE, signature)).to.be.not.equals(account);
-            });
-
-            it('returns zero address with invalid signature', async () => {
-                // eslint-disable-next-line max-len
-                const signature = '0x332ce75a821c982f9127538858900d87d3ec1f9f737338ad67cad133fa48feff48e6fa0c18abc62e42820f05943e47af3e9fbe306ce74d64094bdf1691ee53e01c';
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
+            it('with long signature', async () => {
+                expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, longSignature)).to.be.equals(false);
             });
         });
 
-        describe('with v0 signature', function () {
-            // Signature generated outside ganache with method web3.eth.sign(TEST_MESSAGE, account)
-            const signer = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
-            // eslint-disable-next-line max-len
-            const signatureWithoutVersion = '0x064d3d0f049cc3b971476ba4bdbd5d0ccb5ac0ee7a03c2f063908ac2bdb59f944c7c5bf43804a7ff717f8c0a8749e0e5cb26ef96408313558acd130210604d9c';
+        describe('with valid signature', async () => {
+            describe('using web3.eth.sign', async () => {
+                it('returns true with correct signature and only correct signer', async () => {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, signature)).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(randomAccount, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
+                });
 
-            it('returns zero address with 00 as version value', async function () {
-                const version = '00';
-                const signature = signatureWithoutVersion + version;
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
-                expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(constants.ZERO_ADDRESS);
+                it('returns true with correct signature and only correct signer for arbitrary length message', async () => {
+                    const signature = await web3.eth.sign(NON_HASH_MESSAGE, account);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, web3.eth.accounts.hashMessage(NON_HASH_MESSAGE), signature)).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(randomAccount, web3.eth.accounts.hashMessage(NON_HASH_MESSAGE), signature)).to.be.equals(false);
+                });
+
+                it('returns false with invalid signature', async () => {
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, web3.eth.accounts.hashMessage(NON_HASH_MESSAGE), invalidSignature)).to.be.equals(false);
+                });
             });
 
-            it('works with 27 as version value', async function () {
-                const version = '1b'; // 27 = 1b.
-                const signature = signatureWithoutVersion + version;
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(signer);
-                expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(signer);
-                expect(await context.ecdsa.recover_r_vs(HASHED_TEST_MESSAGE, ...split(to2098Format(signature)))).to.equal(signer);
+            describe('with v0 signature', function () {
+                it('returns false with 00 as version value', async function () {
+                    const version = '00';
+                    const signature = signatureWithoutVersionV0 + version;
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_v_r_s(signerV0, HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(false);
+                });
+
+                it('returns true with 27 as version value, and only for signer', async function () {
+                    const version = '1b'; // 27 = 1b.
+                    const signature = signatureWithoutVersionV0 + version;
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, signature)).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_v_r_s(signerV0, HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_v_r_s(account, HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_r_vs(signerV0, HASHED_TEST_MESSAGE, ...split(to2098Format(signature)))).to.equal(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_r_vs(account, HASHED_TEST_MESSAGE, ...split(to2098Format(signature)))).to.equal(false);
+                });
+
+                it('returns false when wrong version', async function () {
+                    // The last two hex digits are the signature version.
+                    // The only valid values are 0, 1, 27 and 28.
+                    const version = '02';
+                    const signature = signatureWithoutVersionV0 + version;
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_v_r_s(signerV0, HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(false);
+                });
+
+                it('returns true with short EIP2098 format, and only for signer', async function () {
+                    const version = '1b'; // 27 = 1b.
+                    const signature = signatureWithoutVersionV0 + version;
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(false);
+                });
             });
 
-            it('returns zero address when wrong version', async function () {
-                // The last two hex digits are the signature version.
-                // The only valid values are 0, 1, 27 and 28.
-                const version = '02';
-                const signature = signatureWithoutVersion + version;
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
-                expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(constants.ZERO_ADDRESS);
-            });
+            describe('with v1 signature', function () {
+                it('returns false with 01 as version value', async function () {
+                    const version = '01';
+                    const signature = signatureWithoutVersionV1 + version;
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_v_r_s(signerV1, HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(false);
+                });
 
-            it('works with short EIP2098 format', async function () {
-                const version = '1b'; // 27 = 1b.
-                const signature = signatureWithoutVersion + version;
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(signer);
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(signer);
+                it('returns true with 28 as version value, and only for signer', async function () {
+                    const version = '1c'; // 28 = 1c.
+                    const signature = signatureWithoutVersionV1 + version;
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, signature)).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_v_r_s(signerV1, HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_v_r_s(account, HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_r_vs(signerV1, HASHED_TEST_MESSAGE, ...split(to2098Format(signature)))).to.equal(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_r_vs(account, HASHED_TEST_MESSAGE, ...split(to2098Format(signature)))).to.equal(false);
+                });
+
+                it('returns false when wrong version', async function () {
+                    // The last two hex digits are the signature version.
+                    // The only valid values are 0, 1, 27 and 28.
+                    const version = '02';
+                    const signature = signatureWithoutVersionV1 + version;
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature_v_r_s(signerV1, HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(false);
+                });
+
+                it('returns true with short EIP2098 format, and only for signer', async function () {
+                    const version = '1c'; // 27 = 1b.
+                    const signature = signatureWithoutVersionV1 + version;
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(false);
+                });
             });
         });
+    });
 
-        describe('with v1 signature', function () {
-            const signer = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
-            // eslint-disable-next-line max-len
-            const signatureWithoutVersion = '0x7bf43cd41b0fe2edad48ab66d2bc8e78d4aad37d0cf77e9fa4668560e1eac68277c325f777b8ee2f9d522c635c252bfdba6ba261edbf53c46c64d47824f2a009';
-
-            it('returns zero address with 01 as version value', async function () {
-                const version = '01';
-                const signature = signatureWithoutVersion + version;
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
-                expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(constants.ZERO_ADDRESS);
+    describe('gas price', async () => {
+        describe('recover', async () => {
+            it('with signature', async function () {
+                const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                await context.ecdsa.contract.methods.recover(HASHED_TEST_MESSAGE, signature).send({ from: account });
             });
 
-            it('works with 28 as version value', async function () {
+            it('with v0 signature', async () => {
+                const version = '1b'; // 27 = 1b.
+                const signature = signatureWithoutVersionV0 + version;
+                await context.ecdsa.contract.methods.recover(HASHED_TEST_MESSAGE, signature).send({ from: account });
+                await context.ecdsa.contract.methods.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature)).send({ from: account });
+                await context.ecdsa.contract.methods.recover_r_vs(HASHED_TEST_MESSAGE, ...split(to2098Format(signature))).send({ from: account });
+            });
+
+            it('with v1 signature', async () => {
                 const version = '1c'; // 28 = 1c.
-                const signature = signatureWithoutVersion + version;
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(signer);
-                expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(signer);
-                expect(await context.ecdsa.recover_r_vs(HASHED_TEST_MESSAGE, ...split(to2098Format(signature)))).to.equal(signer);
+                const signature = signatureWithoutVersionV1 + version;
+                await context.ecdsa.contract.methods.recover(HASHED_TEST_MESSAGE, signature).send({ from: account });
+                await context.ecdsa.contract.methods.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature)).send({ from: account });
+                await context.ecdsa.contract.methods.recover_r_vs(HASHED_TEST_MESSAGE, ...split(to2098Format(signature))).send({ from: account });
+            });
+        });
+
+        describe('recoverOrIsValidSignature', async () => {
+            it('with signature', async function () {
+                const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, signature).send({ from: account });
             });
 
-            it('returns zero address when wrong version', async function () {
-                // The last two hex digits are the signature version.
-                // The only valid values are 0, 1, 27 and 28.
-                const version = '02';
-                const signature = signatureWithoutVersion + version;
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
-                expect(await context.ecdsa.recover_v_r_s(HASHED_TEST_MESSAGE, ...split(signature))).to.be.equals(constants.ZERO_ADDRESS);
+            it('with v0 signature', async () => {
+                const version = '1b'; // 27 = 1b.
+                const signature = signatureWithoutVersionV0 + version;
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, signature).send({ from: account });
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature_v_r_s(signerV0, HASHED_TEST_MESSAGE, ...split(signature)).send({ from: account });
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature_r_vs(signerV0, HASHED_TEST_MESSAGE, ...split(to2098Format(signature))).send({ from: account });
             });
 
-            it('works with short EIP2098 format', async function () {
-                const version = '1c'; // 27 = 1b.
-                const signature = signatureWithoutVersion + version;
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(signer);
-                expect(await context.ecdsa.recover(HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(signer);
+            it('with v1 signature', async () => {
+                const version = '1b'; // 27 = 1b.
+                const signature = signatureWithoutVersionV0 + version;
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, signature).send({ from: account });
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature_v_r_s(signerV1, HASHED_TEST_MESSAGE, ...split(signature)).send({ from: account });
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature_r_vs(signerV1, HASHED_TEST_MESSAGE, ...split(to2098Format(signature))).send({ from: account });
             });
         });
     });
