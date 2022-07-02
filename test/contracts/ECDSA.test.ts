@@ -422,6 +422,17 @@ describe('ECDSA', async () => {
         });
     });
 
+    describe('toTypedDataHash', async () => {
+        it('correct hash', async function () {
+            const domainSeparator = HASHED_TEST_MESSAGE.substring(2);
+            const structHash = HASHED_TEST_MESSAGE.substring(2);
+            const typedDataHash = web3.utils.sha3(
+                web3.utils.toHex(`\x19\x01`) + domainSeparator + structHash
+            );
+            expect(await context.ecdsa.toTypedDataHash(HASHED_TEST_MESSAGE, HASHED_TEST_MESSAGE)).to.be.equals(typedDataHash);
+        });
+    });
+
     describe('gas price', async () => {
         describe('recover', async () => {
             it('with signature', async function () {
@@ -497,6 +508,10 @@ describe('ECDSA', async () => {
         describe('Additional methods', async () => {
             it('toEthSignedMessageHash', async function () {
                 await context.ecdsa.contract.methods.toEthSignedMessageHash(HASHED_TEST_MESSAGE).send({ from: account });
+            });
+
+            it('toTypedDataHash', async function () {
+                await context.ecdsa.contract.methods.toTypedDataHash(HASHED_TEST_MESSAGE, HASHED_TEST_MESSAGE).send({ from: account });
             });
         });
     });

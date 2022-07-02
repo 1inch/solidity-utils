@@ -196,14 +196,14 @@ library ECDSA {
     }
 
     function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32 res) {
-        return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
-        // /// @solidity memory-safe-assembly
-        // assembly { // solhint-disable-line no-inline-assembly
-        //     let ptr := mload(0x40)
-        //     mstore(ptr, 0x1901000000000000000000000000000000000000000000000000000000000000) // "\x19\x01"
-        //     mstore(add(ptr, 0x02), domainSeparator)
-        //     mstore(add(ptr, 0x22), structHash)
-        //     res := keccak256(ptr, 66)
-        // }
+        // return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
+        /// @solidity memory-safe-assembly
+        assembly { // solhint-disable-line no-inline-assembly
+            let ptr := mload(0x40)
+            mstore(ptr, 0x1901000000000000000000000000000000000000000000000000000000000000) // "\x19\x01"
+            mstore(add(ptr, 0x02), domainSeparator)
+            mstore(add(ptr, 0x22), structHash)
+            res := keccak256(ptr, 66)
+        }
     }
 }
