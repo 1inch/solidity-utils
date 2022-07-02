@@ -19,13 +19,22 @@ describe('ECDSA', async () => {
 
     const split2 = (signature: string): [string, string] => {
         const raw = web3.utils.hexToBytes(signature);
-        if (raw.length !== 64) {
+        switch (raw.length) {
+        case 64:
+            return [
+                web3.utils.bytesToHex(raw.slice(0, 32)), // r
+                web3.utils.bytesToHex(raw.slice(32, 64)), // vs
+            ];
+        case 65:
+            const v = web3.utils.toBN(raw[64]); //.subn(27).shln(255).toString() );
+            const s = web3.utils.toBN(web3.utils.bytesToHex(raw.slice(32, 64)));
+            return [
+                web3.utils.bytesToHex(raw.slice(0, 32)), // r
+                web3.utils.toHex(s.shln(1).shrn(1).or(v.subn(27).shln(255))), // vs
+            ];
+        default:
             expect.fail('Invalid signature length, cannot split');
         }
-        return [
-            web3.utils.bytesToHex(raw.slice(0, 32)), // r
-            web3.utils.bytesToHex(raw.slice(32, 64)), // vs
-        ];
     };
 
     const split3 = (signature: string): [string, string, string] => {
@@ -292,6 +301,24 @@ describe('ECDSA', async () => {
                     expect(await context.ecdsa.isValidSignature(account, HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(false);
                 });
             });
+
+            describe('isValidSignature65', async () => {
+                it('with matching signer and signature', async function () {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    expect(await context.ecdsa.isValidSignature65(context.erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(signature))).to.be.equals(true);
+                });
+
+                it('with invalid signer', async function () {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    expect(await context.ecdsa.isValidSignature65(randomAccount, HASHED_TEST_MESSAGE, ...split2(signature))).to.be.equals(false);
+                });
+
+                it('with invalid signature', async function () {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    const HASHED_WRONG_MESSAGE = web3.eth.accounts.hashMessage(WRONG_MESSAGE);
+                    expect(await context.ecdsa.isValidSignature65(context.erc1271wallet.address, HASHED_WRONG_MESSAGE, ...split2(signature))).to.be.equals(false);
+                });
+            });
         });
     });
 
@@ -423,6 +450,26 @@ describe('ECDSA', async () => {
                     expect(await context.ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, from2098Format(to2098Format(signature)))).to.be.equals(false);
                 });
             });
+
+            describe('recoverOrIsValidSignature65', async () => {
+                it('with matching signer and signature', async function () {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    expect(await context.ecdsa.recoverOrIsValidSignature65(account, HASHED_TEST_MESSAGE, ...split2(signature))).to.be.equals(true);
+                    expect(await context.ecdsa.recoverOrIsValidSignature65(context.erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(signature))).to.be.equals(true);
+                });
+
+                it('with invalid signer', async function () {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    expect(await context.ecdsa.recoverOrIsValidSignature65(randomAccount, HASHED_TEST_MESSAGE, ...split2(signature))).to.be.equals(false);
+                });
+
+                it('with invalid signature', async function () {
+                    const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                    const HASHED_WRONG_MESSAGE = web3.eth.accounts.hashMessage(WRONG_MESSAGE);
+                    expect(await context.ecdsa.recoverOrIsValidSignature65(account, HASHED_WRONG_MESSAGE, ...split2(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.recoverOrIsValidSignature65(context.erc1271wallet.address, HASHED_WRONG_MESSAGE, ...split2(signature))).to.be.equals(false);
+                });
+            });
         });
     });
 
@@ -495,6 +542,12 @@ describe('ECDSA', async () => {
                 await context.ecdsa.contract.methods.recoverOrIsValidSignature_r_vs(signerV1, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature))).send({ from: account });
                 await context.ecdsa.contract.methods.recoverOrIsValidSignature_r_vs(context.erc1271walletV1.address, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature))).send({ from: account });
             });
+
+            it('recoverOrIsValidSignature65', async () => {
+                const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature65(account, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account});
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature65(context.erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account});
+            });
         });
 
         describe('isValidSignature', async () => {
@@ -514,9 +567,14 @@ describe('ECDSA', async () => {
             it('with v1 signature', async () => {
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
-                await context.ecdsa.contract.methods.recoverOrIsValidSignature(context.erc1271walletV1.address, HASHED_TEST_MESSAGE, signature).send({ from: account });
-                await context.ecdsa.contract.methods.recoverOrIsValidSignature_v_r_s(context.erc1271walletV1.address, HASHED_TEST_MESSAGE, ...split3(signature)).send({ from: account });
-                await context.ecdsa.contract.methods.recoverOrIsValidSignature_r_vs(context.erc1271walletV1.address, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature))).send({ from: account });
+                await context.ecdsa.contract.methods.isValidSignature(context.erc1271walletV1.address, HASHED_TEST_MESSAGE, signature).send({ from: account });
+                await context.ecdsa.contract.methods.isValidSignature_v_r_s(context.erc1271walletV1.address, HASHED_TEST_MESSAGE, ...split3(signature)).send({ from: account });
+                await context.ecdsa.contract.methods.isValidSignature_r_vs(context.erc1271walletV1.address, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature))).send({ from: account });
+            });
+
+            it('isValidSignature65', async () => {
+                const signature = await web3.eth.sign(TEST_MESSAGE, account);
+                await context.ecdsa.contract.methods.isValidSignature65(context.erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account});
             });
         });
 
