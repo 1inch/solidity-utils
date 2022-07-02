@@ -54,4 +54,12 @@ contract ECDSATest {
     function isValidSignature65(address signer, bytes32 hash, bytes32 r, bytes32 vs) external view returns(bool success) {
         return ECDSA.isValidSignature65(signer, hash, r, vs);
     }
+
+    function toEthSignedMessageHash(bytes32 hash) external pure returns (bytes32 res) {
+        return ECDSA.toEthSignedMessageHash(hash);
+    }
+
+    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) external pure returns (bytes32 res) {
+        return ECDSA.toTypedDataHash(domainSeparator, structHash);
+    }
 }

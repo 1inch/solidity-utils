@@ -412,6 +412,16 @@ describe('ECDSA', async () => {
         });
     });
 
+    describe('toEthSignedMessageHash', async () => {
+        it('correct hash', async function () {
+            const hashedTestMessageWithoutPrefix = HASHED_TEST_MESSAGE.substring(2);
+            const ethSignedMessage = web3.utils.sha3(
+                web3.utils.toHex(`\u0019Ethereum Signed Message:\n${hashedTestMessageWithoutPrefix.length/2}`) + hashedTestMessageWithoutPrefix
+            );
+            expect(await context.ecdsa.toEthSignedMessageHash(HASHED_TEST_MESSAGE)).to.be.equals(ethSignedMessage);
+        });
+    });
+
     describe('gas price', async () => {
         describe('recover', async () => {
             it('with signature', async function () {
@@ -481,6 +491,12 @@ describe('ECDSA', async () => {
                 await context.ecdsa.contract.methods.recoverOrIsValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, signature).send({ from: account });
                 await context.ecdsa.contract.methods.recoverOrIsValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature)).send({ from: account });
                 await context.ecdsa.contract.methods.recoverOrIsValidSignature_r_vs(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature))).send({ from: account });
+            });
+        });
+
+        describe('Additional methods', async () => {
+            it('toEthSignedMessageHash', async function () {
+                await context.ecdsa.contract.methods.toEthSignedMessageHash(HASHED_TEST_MESSAGE).send({ from: account });
             });
         });
     });

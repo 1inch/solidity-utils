@@ -186,13 +186,13 @@ library ECDSA {
 
     function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32 res) {
         // 32 is the length in bytes of hash, enforced by the type signature above
-        return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
+        // return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
         /// @solidity memory-safe-assembly
-        // assembly { // solhint-disable-line no-inline-assembly
-        //     mstore(0, 0x19457468657265756d205369676e6564204d6573736167653a0a333200000000) // "\x19Ethereum Signed Message:\n32"
-        //     mstore(28, hash)
-        //     res := keccak256(0, 60)
-        // }
+        assembly { // solhint-disable-line no-inline-assembly
+            mstore(0, 0x19457468657265756d205369676e6564204d6573736167653a0a333200000000) // "\x19Ethereum Signed Message:\n32"
+            mstore(28, hash)
+            res := keccak256(0, 60)
+        }
     }
 
     function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32 res) {
