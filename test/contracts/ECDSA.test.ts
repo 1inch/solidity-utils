@@ -415,9 +415,7 @@ describe('ECDSA', async () => {
     describe('toEthSignedMessageHash', async () => {
         it('correct hash', async function () {
             const hashedTestMessageWithoutPrefix = HASHED_TEST_MESSAGE.substring(2);
-            const ethSignedMessage = web3.utils.sha3(
-                web3.utils.toHex(`\u0019Ethereum Signed Message:\n${hashedTestMessageWithoutPrefix.length/2}`) + hashedTestMessageWithoutPrefix
-            );
+            const ethSignedMessage = web3.utils.sha3(web3.utils.toHex(`\u0019Ethereum Signed Message:\n${hashedTestMessageWithoutPrefix.length/2}`) + hashedTestMessageWithoutPrefix);
             expect(await context.ecdsa.toEthSignedMessageHash(HASHED_TEST_MESSAGE)).to.be.equals(ethSignedMessage);
         });
     });
@@ -426,9 +424,7 @@ describe('ECDSA', async () => {
         it('correct hash', async function () {
             const domainSeparator = HASHED_TEST_MESSAGE.substring(2);
             const structHash = HASHED_TEST_MESSAGE.substring(2);
-            const typedDataHash = web3.utils.sha3(
-                web3.utils.toHex(`\x19\x01`) + domainSeparator + structHash
-            );
+            const typedDataHash = web3.utils.sha3(web3.utils.toHex('\x19\x01') + domainSeparator + structHash);
             expect(await context.ecdsa.toTypedDataHash(HASHED_TEST_MESSAGE, HASHED_TEST_MESSAGE)).to.be.equals(typedDataHash);
         });
     });
