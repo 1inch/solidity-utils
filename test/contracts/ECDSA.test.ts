@@ -334,7 +334,7 @@ describe('ECDSA', async () => {
                     const version = '00';
                     const signature = signatureWithoutVersionV0 + version;
                     expect(await context.ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
-                    // expect(await context.ecdsa.isValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.isValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(false);
                 });
 
                 it('returns true with 27 as version value, and only for signer', async function () {
@@ -342,8 +342,8 @@ describe('ECDSA', async () => {
                     const signature = signatureWithoutVersionV0 + version;
                     expect(await context.ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, signature)).to.be.equals(true);
                     expect(await context.ecdsa.isValidSignature(account, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
-                    // expect(await context.ecdsa.isValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(true);
-                    // expect(await context.ecdsa.isValidSignature_v_r_s(account, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.isValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(true);
+                    expect(await context.ecdsa.isValidSignature_v_r_s(account, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(false);
                     expect(await context.ecdsa.isValidSignature_r_vs(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature)))).to.equal(true);
                     expect(await context.ecdsa.isValidSignature_r_vs(account, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature)))).to.equal(false);
                 });
@@ -377,7 +377,7 @@ describe('ECDSA', async () => {
                     const version = '01';
                     const signature = signatureWithoutVersionV1 + version;
                     expect(await context.ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
-                    // expect(await context.ecdsa.isValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.isValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(false);
                 });
 
                 it('returns true with 28 as version value, and only for signer', async function () {
@@ -385,8 +385,8 @@ describe('ECDSA', async () => {
                     const signature = signatureWithoutVersionV1 + version;
                     expect(await context.ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, signature)).to.be.equals(true);
                     expect(await context.ecdsa.isValidSignature(account, HASHED_TEST_MESSAGE, signature)).to.be.equals(false);
-                    // expect(await context.ecdsa.isValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(true);
-                    // expect(await context.ecdsa.isValidSignature_v_r_s(account, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(false);
+                    expect(await context.ecdsa.isValidSignature_v_r_s(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(true);
+                    expect(await context.ecdsa.isValidSignature_v_r_s(account, HASHED_TEST_MESSAGE, ...split3(signature))).to.be.equals(false);
                     expect(await context.ecdsa.isValidSignature_r_vs(erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature)))).to.equal(true);
                     expect(await context.ecdsa.isValidSignature_r_vs(account, HASHED_TEST_MESSAGE, ...split2(to2098Format(signature)))).to.equal(false);
                 });

@@ -138,7 +138,7 @@ library ECDSA {
             mstore(add(ptr, 0x44), 65)
             mstore(add(ptr, 0x64), r)
             mstore(add(ptr, 0x84), s)
-            mstore8(add(ptr, 0xa4), add(27, v))
+            mstore8(add(ptr, 0xa4), v)
             mstore(0, 0)
             if staticcall(gas(), signer, ptr, len, 0, 0x20) {
                 success := eq(selector, mload(0))
