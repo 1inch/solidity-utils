@@ -42,7 +42,7 @@ contract ECDSATest {
     }
 
     // solhint-disable-next-line func-name-mixedcase
-    function isValidSignature_v_s_r(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) external view returns(bool success) {
+    function isValidSignature_v_r_s(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) external view returns(bool success) {
         return ECDSA.isValidSignature(signer, hash, v, r, s);
     }
 
