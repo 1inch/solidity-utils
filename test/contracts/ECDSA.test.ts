@@ -25,13 +25,14 @@ describe('ECDSA', async () => {
                 web3.utils.bytesToHex(raw.slice(0, 32)), // r
                 web3.utils.bytesToHex(raw.slice(32, 64)), // vs
             ];
-        case 65:
-            const v = web3.utils.toBN(raw[64]); //.subn(27).shln(255).toString() );
+        case 65: {
+            const v = web3.utils.toBN(raw[64]);
             const s = web3.utils.toBN(web3.utils.bytesToHex(raw.slice(32, 64)));
             return [
                 web3.utils.bytesToHex(raw.slice(0, 32)), // r
                 web3.utils.toHex(s.shln(1).shrn(1).or(v.subn(27).shln(255))), // vs
             ];
+        }
         default:
             expect.fail('Invalid signature length, cannot split');
         }
@@ -545,8 +546,8 @@ describe('ECDSA', async () => {
 
             it('recoverOrIsValidSignature65', async () => {
                 const signature = await web3.eth.sign(TEST_MESSAGE, account);
-                await context.ecdsa.contract.methods.recoverOrIsValidSignature65(account, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account});
-                await context.ecdsa.contract.methods.recoverOrIsValidSignature65(context.erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account});
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature65(account, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account });
+                await context.ecdsa.contract.methods.recoverOrIsValidSignature65(context.erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account });
             });
         });
 
@@ -574,7 +575,7 @@ describe('ECDSA', async () => {
 
             it('isValidSignature65', async () => {
                 const signature = await web3.eth.sign(TEST_MESSAGE, account);
-                await context.ecdsa.contract.methods.isValidSignature65(context.erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account});
+                await context.ecdsa.contract.methods.isValidSignature65(context.erc1271wallet.address, HASHED_TEST_MESSAGE, ...split2(signature)).send({ from: account });
             });
         });
 
