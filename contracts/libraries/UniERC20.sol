@@ -94,19 +94,16 @@ library UniERC20 {
         }
 
         if (success && data.length == 32) {
-            uint len = 0;
+            uint256 len = 0;
             while (len < data.length && data[len] >= 0x20 && data[len] <= 0x7E) {
                 len++;
             }
 
             if (len > 0) {
-                bytes memory result = new bytes(len);
-                unchecked {
-                    for (uint i = 0; i < len; i++) {
-                        result[i] = data[i];
-                    }
+                assembly { // solhint-disable-line no-inline-assembly
+                    mstore(data, len)
                 }
-                return string(result);
+                return string(data);
             }
         }
 
