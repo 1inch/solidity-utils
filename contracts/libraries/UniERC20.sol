@@ -69,13 +69,7 @@ library UniERC20 {
     function uniApprove(IERC20 token, address to, uint256 amount) internal {
         if (isETH(token)) revert ApproveCalledOnETH();
 
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = address(token).call(abi.encodeWithSelector(token.approve.selector, to, amount));
-
-        if (!success || (returndata.length > 0 && !abi.decode(returndata, (bool)))) {
-            _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, to, 0));
-            _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, to, amount));
-        }
+        token.forceApprove(to, amount);
     }
 
     function _uniDecode(IERC20 token, string memory lowerCaseSignature, string memory upperCaseSignature) private view returns(string memory) {
@@ -117,17 +111,5 @@ library UniERC20 {
         }
 
         return StringUtil.toHex(address(token));
-    }
-
-    function _callOptionalReturn(IERC20 token, bytes memory data) private {
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory result) = address(token).call(data);
-        if (!success) {
-            RevertReasonForwarder.reRevert();
-        }
-
-        if (result.length > 0) { // Return data is optional
-            if (!abi.decode(result, (bool))) revert ERC20OperationFailed();
-        }
     }
 }
