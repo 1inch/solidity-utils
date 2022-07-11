@@ -50,33 +50,33 @@ describe('StringUtil', async () => {
     });
 
     describe('Gas usage @skip-on-coverage', async () => {
-        it('Uint 256', () => testGasUint256(uint256TestValue, 917));
+        it('Uint 256', () => testGasUint256(uint256TestValue, 843));
 
-        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 14175));
+        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 21335));
 
-        it('Uint 256 as bytes', () => testGasBytes(uint256TestValue, 792));
+        it('Uint 256 as bytes', () => testGasBytes(uint256TestValue, 722));
 
-        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 14050));
+        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 21214));
 
-        it('Uint 128', () => testGasUint256(uint128TestValue, 917));
+        it('Uint 128', () => testGasUint256(uint128TestValue, 843));
 
-        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 14175));
+        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 21335));
 
-        it('Very long byte array gas', () => testGasBytes(veryLongArray, 1974));
+        it('Very long byte array gas', () => testGasBytes(veryLongArray, 1772));
 
-        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 28972));
+        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 43766));
 
-        it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray, 19131));
+        it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray, 17015));
 
-        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 426795));
+        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 644983));
 
-        it('Empty bytes', () => testGasBytes(emptyBytes, 201));
+        it('Empty bytes', () => testGasBytes(emptyBytes, 197));
 
-        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 406));
+        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 594));
 
-        it('Single byte', () => testGasBytes(singleByte, 792));
+        it('Single byte', () => testGasBytes(singleByte, 722));
 
-        it('Single byte naive', () => testGasNaiveBytes(singleByte, 832));
+        it('Single byte naive', () => testGasNaiveBytes(singleByte, 988));
 
         const testGasUint256 = async (value: string, expectedGas: number) => {
             await context.stringUtilTest.toHex(value, expectedGas);
