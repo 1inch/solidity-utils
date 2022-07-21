@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 pragma abicoder v1;
 
 import "../libraries/StringUtil.sol";
-import "../mocks/libraries/StringUtilNaive.sol";
+import "./libraries/StringUtilNaive.sol";
 import "../GasChecker.sol";
 
 contract StringUtilTest is GasChecker {
