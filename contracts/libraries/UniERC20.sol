@@ -96,7 +96,9 @@ library UniERC20 {
         if (success && data.length == 32) {
             uint256 len = 0;
             while (len < data.length && data[len] >= 0x20 && data[len] <= 0x7E) {
-                len++;
+                unchecked {
+                    len++;
+                }
             }
 
             if (len > 0) {
