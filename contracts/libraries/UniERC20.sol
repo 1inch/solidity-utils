@@ -59,7 +59,7 @@ library UniERC20 {
     }
 
     function uniSymbol(IERC20 token) internal view returns(string memory) {
-        return _uniDecode(token, "symbol()", "SYBMOL()");
+        return _uniDecode(token, "symbol()", "SYMBOL()");
     }
 
     function uniName(IERC20 token) internal view returns(string memory) {
@@ -96,7 +96,9 @@ library UniERC20 {
         if (success && data.length == 32) {
             uint256 len = 0;
             while (len < data.length && data[len] >= 0x20 && data[len] <= 0x7E) {
-                len++;
+                unchecked {
+                    len++;
+                }
             }
 
             if (len > 0) {
