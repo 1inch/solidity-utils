@@ -6,7 +6,7 @@
 # Utils library for contracts and tests
 
 [![Build Status](https://github.com/1inch/solidity-utils/workflows/CI/badge.svg)](https://github.com/1inch/solidity-utils/actions)
-[![Coverage Status](https://coveralls.io/repos/github/1inch/solidity-utils/badge.svg?branch=master)](https://coveralls.io/github/1inch/solidity-utils?branch=master)
+[![Coverage Status](https://codecov.io/gh/1inch/solidity-utils/branch/master/graph/badge.svg?token=HJWBIVXQQA)](https://codecov.io/gh/1inch/solidity-utils)
 [![NPM Package](https://img.shields.io/npm/v/@1inch/solidity-utils.svg)](https://www.npmjs.org/package/@1inch/solidity-utils)
 
 ### About
@@ -75,7 +75,7 @@ Test described as shown below
 ```JavaScript
 // Test suite
 describe('My feature', function() {
-    // Nested test suite 
+    // Nested test suite
     describe("My subfeature", function() {
         /*
             **Test case 1**
@@ -96,7 +96,7 @@ Test suite
 
 ## My subfeature
 
-Nested test suite 
+Nested test suite
 
 ### My case
 
@@ -109,11 +109,11 @@ Test case should work
 ```
 yarn add acquit --dev
 ```
-- Optionally configure script for default usage. Add to `script` section in `package.json` 
+- Optionally configure script for default usage. Add to `script` section in `package.json`
 ```
 "test:docs": "npx test-docgen"
 ```
-- Optionally configure script for generating test list only. Add to `script` section in `package.json` 
+- Optionally configure script for generating test list only. Add to `script` section in `package.json`
 ```
 "test:docs": "npx test-docgen -l"
 ```
