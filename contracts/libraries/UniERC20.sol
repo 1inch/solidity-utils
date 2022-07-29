@@ -11,6 +11,8 @@ import "./StringUtil.sol";
 library UniERC20 {
     using SafeERC20 for IERC20;
 
+    error InsufficientBalance();
+    error ETHSendFailed();
     error ApproveCalledOnETH();
     error NotEnoughValue();
     error FromIsNotSender();
@@ -35,7 +37,9 @@ library UniERC20 {
     function uniTransfer(IERC20 token, address payable to, uint256 amount) internal {
         if (amount > 0) {
             if (isETH(token)) {
-                to.transfer(amount);
+                if (address(this).balance < amount) revert InsufficientBalance();
+                (bool success, ) = to.call{value: amount}("");
+                if (!success) revert ETHSendFailed();
             } else {
                 token.safeTransfer(to, amount);
             }
@@ -50,7 +54,10 @@ library UniERC20 {
                 if (to != address(this)) revert ToIsNotThis();
                 if (msg.value > amount) {
                     // Return remainder if exist
-                    unchecked { from.transfer(msg.value - amount); }
+                    unchecked {
+                        (bool success, ) = to.call{value: msg.value - amount}("");
+                        if (!success) revert ETHSendFailed();
+                    }
                 }
             } else {
                 token.safeTransferFrom(from, to, amount);
