@@ -4,13 +4,21 @@ pragma solidity ^0.8.0;
 pragma abicoder v1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "./RevertReasonForwarder.sol";
 import "./SafeERC20.sol";
 import "./StringUtil.sol";
 
+interface IERC20MetadataUppercase {
+    function NAME() external view returns (string memory);  // solhint-disable-line func-name-mixedcase
+    function SYMBOL() external view returns (string memory);  // solhint-disable-line func-name-mixedcase
+}
+
 library UniERC20 {
     using SafeERC20 for IERC20;
 
+    error InsufficientBalance();
+    error ETHSendFailed();
     error ApproveCalledOnETH();
     error NotEnoughValue();
     error FromIsNotSender();
@@ -35,7 +43,9 @@ library UniERC20 {
     function uniTransfer(IERC20 token, address payable to, uint256 amount) internal {
         if (amount > 0) {
             if (isETH(token)) {
-                to.transfer(amount);
+                if (address(this).balance < amount) revert InsufficientBalance();
+                (bool success, ) = to.call{value: amount}("");  // solhint-disable-line avoid-low-level-calls
+                if (!success) revert ETHSendFailed();
             } else {
                 token.safeTransfer(to, amount);
             }
@@ -50,7 +60,10 @@ library UniERC20 {
                 if (to != address(this)) revert ToIsNotThis();
                 if (msg.value > amount) {
                     // Return remainder if exist
-                    unchecked { from.transfer(msg.value - amount); }
+                    unchecked {
+                        (bool success, ) = to.call{value: msg.value - amount}("");  // solhint-disable-line avoid-low-level-calls
+                        if (!success) revert ETHSendFailed();
+                    }
                 }
             } else {
                 token.safeTransferFrom(from, to, amount);
@@ -59,11 +72,11 @@ library UniERC20 {
     }
 
     function uniSymbol(IERC20 token) internal view returns(string memory) {
-        return _uniDecode(token, "symbol()", "SYMBOL()");
+        return _uniDecode(token, IERC20Metadata.symbol.selector, IERC20MetadataUppercase.SYMBOL.selector);
     }
 
     function uniName(IERC20 token) internal view returns(string memory) {
-        return _uniDecode(token, "name()", "NAME()");
+        return _uniDecode(token, IERC20Metadata.name.selector, IERC20MetadataUppercase.NAME.selector);
     }
 
     function uniApprove(IERC20 token, address to, uint256 amount) internal {
@@ -72,17 +85,17 @@ library UniERC20 {
         token.forceApprove(to, amount);
     }
 
-    function _uniDecode(IERC20 token, string memory lowerCaseSignature, string memory upperCaseSignature) private view returns(string memory) {
+    function _uniDecode(IERC20 token, bytes4 lowerCaseSelector, bytes4 upperCaseSelector) private view returns(string memory) {
         if (isETH(token)) {
             return "ETH";
         }
 
         (bool success, bytes memory data) = address(token).staticcall{ gas: 20000 }(
-            abi.encodeWithSignature(lowerCaseSignature)
+            abi.encodeWithSelector(lowerCaseSelector)
         );
         if (!success) {
             (success, data) = address(token).staticcall{ gas: 20000 }(
-                abi.encodeWithSignature(upperCaseSignature)
+                abi.encodeWithSelector(upperCaseSelector)
             );
         }
 
