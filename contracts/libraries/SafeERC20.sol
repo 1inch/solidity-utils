@@ -69,10 +69,8 @@ library SafeERC20 {
     function safePermit(IERC20 token, bytes calldata permit) internal {
         bool success;
         if (permit.length == 32 * 7) {
-            // solhint-disable-next-line avoid-low-level-calls
             success = _makeCalldataCall(token, IERC20Permit.permit.selector, permit);
         } else if (permit.length == 32 * 8) {
-            // solhint-disable-next-line avoid-low-level-calls
             success = _makeCalldataCall(token, IDaiLikePermit.permit.selector, permit);
         } else {
             revert SafePermitBadLength();

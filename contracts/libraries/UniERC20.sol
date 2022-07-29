@@ -38,7 +38,7 @@ library UniERC20 {
         if (amount > 0) {
             if (isETH(token)) {
                 if (address(this).balance < amount) revert InsufficientBalance();
-                (bool success, ) = to.call{value: amount}("");
+                (bool success, ) = to.call{value: amount}("");  // solhint-disable-line avoid-low-level-calls
                 if (!success) revert ETHSendFailed();
             } else {
                 token.safeTransfer(to, amount);
@@ -55,7 +55,7 @@ library UniERC20 {
                 if (msg.value > amount) {
                     // Return remainder if exist
                     unchecked {
-                        (bool success, ) = to.call{value: msg.value - amount}("");
+                        (bool success, ) = to.call{value: msg.value - amount}("");  // solhint-disable-line avoid-low-level-calls
                         if (!success) revert ETHSendFailed();
                     }
                 }
