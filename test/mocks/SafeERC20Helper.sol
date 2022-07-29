@@ -2,12 +2,11 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "../../contracts/libraries/SafeERC20.sol";
 
-contract ERC20ReturnFalseMock is Context {
+contract ERC20ReturnFalseMock {
     uint256 private _allowance;
 
     // IERC20's functions are not pure, but these mock implementations are: to prevent Solidity from issuing warnings,
@@ -39,7 +38,7 @@ contract ERC20ReturnFalseMock is Context {
     }
 }
 
-contract ERC20ReturnTrueMock is Context {
+contract ERC20ReturnTrueMock {
     mapping(address => uint256) private _allowances;
 
     // IERC20's functions are not pure, but these mock implementations are: to prevent Solidity from issuing warnings,
@@ -66,7 +65,7 @@ contract ERC20ReturnTrueMock is Context {
     }
 
     function setAllowance(uint256 allowance_) public {
-        _allowances[_msgSender()] = allowance_;
+        _allowances[msg.sender] = allowance_;
     }
 
     function allowance(address owner, address) public view returns (uint256) {
@@ -74,7 +73,7 @@ contract ERC20ReturnTrueMock is Context {
     }
 }
 
-contract ERC20NoReturnMock is Context {
+contract ERC20NoReturnMock {
     mapping(address => uint256) private _allowances;
 
     // IERC20's functions are not pure, but these mock implementations are: to prevent Solidity from issuing warnings,
@@ -98,11 +97,26 @@ contract ERC20NoReturnMock is Context {
     }
 
     function setAllowance(uint256 allowance_) public {
-        _allowances[_msgSender()] = allowance_;
+        _allowances[msg.sender] = allowance_;
     }
 
     function allowance(address owner, address) public view returns (uint256) {
         return _allowances[owner];
+    }
+}
+
+contract ERC20ThroughZeroApprove {
+    error NonZeroToNonZeroApprove();
+
+    mapping(address => mapping(address => uint256)) private _allowances;
+
+    function approve(address to, uint256 amount) public {
+        if (_allowances[msg.sender][to] != 0 && amount != 0) revert NonZeroToNonZeroApprove();
+        _allowances[msg.sender][to] = amount;
+    }
+
+    function allowance(address owner, address spender) public view returns (uint256) {
+        return _allowances[owner][spender];
     }
 }
 
@@ -143,7 +157,7 @@ contract ERC20PermitNoRevertMock is
     }
 }
 
-contract SafeERC20Wrapper is Context {
+contract SafeERC20Wrapper {
     using SafeERC20 for IERC20;
 
     IERC20 private _token;

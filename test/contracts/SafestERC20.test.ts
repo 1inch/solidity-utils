@@ -5,6 +5,7 @@ const ERC20ReturnTrueMock = artifacts.require('ERC20ReturnTrueMock');
 const ERC20NoReturnMock = artifacts.require('ERC20NoReturnMock');
 const ERC20PermitNoRevertMock = artifacts.require('ERC20PermitNoRevertMock');
 const SafeERC20Wrapper = artifacts.require('SafeERC20Wrapper');
+const ERC20ThroughZeroApprove = artifacts.require('ERC20ThroughZeroApprove');
 
 const EIP712Domain = [
     { name: 'name', type: 'string' },
@@ -66,6 +67,27 @@ contract('SafeERC20', function (accounts) {
         });
 
         shouldOnlyRevertOnErrors();
+    });
+
+    describe('non-zero to non-zero approval forbidden', function () {
+        beforeEach(async function () {
+            this.wrapper = await SafeERC20Wrapper.new((await ERC20ThroughZeroApprove.new()).address);
+        });
+
+        it('zero to non-zero approval should pass', async function () {
+            await this.wrapper.approve(100);
+        });
+
+        it('non-zero to non-zero approval should pass', async function () {
+            await this.wrapper.approve(100);
+            await this.wrapper.approve(100);
+        });
+
+        it('non-zero to zero to non-zero approval should pass', async function () {
+            await this.wrapper.approve(100);
+            await this.wrapper.approve(0);
+            await this.wrapper.approve(100);
+        });
     });
 
     describe('with token that doesn\'t revert on invalid permit', function () {
