@@ -3,19 +3,17 @@
 pragma solidity ^0.8.0;
 pragma abicoder v1;
 
-import "./interfaces/IWETH.sol";
+import "./EthReceiver.sol";
 
-abstract contract OnlyWethReceiver {
-    error EthDepositRejected();
+abstract contract OnlyWethReceiver is EthReceiver {
+    address private immutable _WETH;  // solhint-disable-line var-name-mixedcase
 
-    IWETH internal immutable _WETH;  // solhint-disable-line var-name-mixedcase
-
-    constructor(IWETH weth) {
-        _WETH = weth;
+    constructor(address weth) {
+        _WETH = address(weth);
     }
 
-    receive() external payable virtual {
+    receive() external payable virtual override {
         // solhint-disable-next-line avoid-tx-origin
-        if (msg.sender != address(_WETH)) revert EthDepositRejected();
+        if (msg.sender != _WETH) revert EthDepositRejected();
     }
 }
