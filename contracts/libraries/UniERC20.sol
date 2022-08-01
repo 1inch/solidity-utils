@@ -23,7 +23,6 @@ library UniERC20 {
     error NotEnoughValue();
     error FromIsNotSender();
     error ToIsNotThis();
-    error ERC20OperationFailed();
 
     IERC20 private constant _ETH_ADDRESS = IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     IERC20 private constant _ZERO_ADDRESS = IERC20(address(0));
