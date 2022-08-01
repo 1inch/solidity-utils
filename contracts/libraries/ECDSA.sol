@@ -111,7 +111,6 @@ library ECDSA {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
-            let len := add(0x64, signature.length)
 
             mstore(ptr, selector)
             mstore(add(ptr, 0x04), hash)
@@ -119,7 +118,7 @@ library ECDSA {
             mstore(add(ptr, 0x44), signature.length)
             calldatacopy(add(ptr, 0x64), signature.offset, signature.length)
             mstore(0, 0)
-            if staticcall(gas(), signer, ptr, len, 0, 0x20) {
+            if staticcall(gas(), signer, ptr, add(0x64, signature.length), 0, 0x20) {
                 success := eq(selector, mload(0))
             }
         }
@@ -130,7 +129,6 @@ library ECDSA {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
-            let len := add(0x64, 65)
 
             mstore(ptr, selector)
             mstore(add(ptr, 0x04), hash)
@@ -140,7 +138,7 @@ library ECDSA {
             mstore(add(ptr, 0x84), s)
             mstore8(add(ptr, 0xa4), v)
             mstore(0, 0)
-            if staticcall(gas(), signer, ptr, len, 0, 0x20) {
+            if staticcall(gas(), signer, ptr, 0xa5, 0, 0x20) {
                 success := eq(selector, mload(0))
             }
         }
@@ -153,7 +151,6 @@ library ECDSA {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
-            let len := add(0x64, 64)
 
             mstore(ptr, selector)
             mstore(add(ptr, 0x04), hash)
@@ -162,7 +159,7 @@ library ECDSA {
             mstore(add(ptr, 0x64), r)
             mstore(add(ptr, 0x84), vs)
             mstore(0, 0)
-            if staticcall(gas(), signer, ptr, len, 0, 0x20) {
+            if staticcall(gas(), signer, ptr, 0xa5, 0, 0x20) {
                 success := eq(selector, mload(0))
             }
         }
@@ -175,7 +172,6 @@ library ECDSA {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
-            let len := add(0x64, 65)
 
             mstore(ptr, selector)
             mstore(add(ptr, 0x04), hash)
@@ -185,7 +181,7 @@ library ECDSA {
             mstore(add(ptr, 0x84), shr(1, shl(1, vs)))
             mstore8(add(ptr, 0xa4), add(27, shr(255, vs)))
             mstore(0, 0)
-            if staticcall(gas(), signer, ptr, len, 0, 0x20) {
+            if staticcall(gas(), signer, ptr, 0xa5, 0, 0x20) {
                 success := eq(selector, mload(0))
             }
         }
