@@ -5,7 +5,6 @@ pragma abicoder v1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import "./RevertReasonForwarder.sol";
 import "./SafeERC20.sol";
 import "./StringUtil.sol";
 
