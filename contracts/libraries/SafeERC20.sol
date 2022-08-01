@@ -89,7 +89,7 @@ library SafeERC20 {
             mstore(data, selector)
             mstore(add(data, 0x04), to)
             mstore(add(data, 0x24), amount)
-            let success := call(gas(), token, 0, data, 68, 0x0, 0x20)
+            let success := call(gas(), token, 0, data, 0x44, 0x0, 0x20)
             done := and(
                 success,
                 or(
