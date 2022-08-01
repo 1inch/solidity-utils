@@ -6,7 +6,7 @@ pragma abicoder v1;
 abstract contract EthReceiver {
     error EthDepositRejected();
 
-    receive() external payable {
+    receive() external payable virtual {
         // solhint-disable-next-line avoid-tx-origin
         if (msg.sender == tx.origin) revert EthDepositRejected();
     }

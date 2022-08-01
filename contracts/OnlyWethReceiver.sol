@@ -14,7 +14,7 @@ abstract contract OnlyWethReceiver {
         _WETH = weth;
     }
 
-    receive() external payable {
+    receive() external payable virtual {
         // solhint-disable-next-line avoid-tx-origin
         if (msg.sender != address(_WETH)) revert EthDepositRejected();
     }
