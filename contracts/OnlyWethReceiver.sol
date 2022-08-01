@@ -12,8 +12,7 @@ abstract contract OnlyWethReceiver is EthReceiver {
         _WETH = address(weth);
     }
 
-    receive() external payable virtual override {
-        // solhint-disable-next-line avoid-tx-origin
+    function _receive() internal virtual override {
         if (msg.sender != _WETH) revert EthDepositRejected();
     }
 }
