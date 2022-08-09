@@ -28,8 +28,12 @@ library SafeERC20 {
             mstore(add(data, 0x04), from)
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
-            let status := call(gas(), token, 0, data, 100, 0x0, 0x20)
-            success := and(status, or(iszero(returndatasize()), and(gt(returndatasize(), 31), eq(mload(0), 1))))
+            success := call(gas(), token, 0, data, 100, 0x0, 0x20)
+            if success {
+                switch returndatasize()
+                case 0 { success := gt(extcodesize(token), 0) }
+                default { success := and(gt(returndatasize(), 31), eq(mload(0), 1)) }
+            }
         }
         if (!success) {
             revert SafeTransferFromFailed();
@@ -81,7 +85,7 @@ library SafeERC20 {
         }
     }
 
-    function _makeCall(IERC20 token, bytes4 selector, address to, uint256 amount) private returns(bool done) {
+    function _makeCall(IERC20 token, bytes4 selector, address to, uint256 amount) private returns(bool success) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
@@ -89,18 +93,16 @@ library SafeERC20 {
             mstore(data, selector)
             mstore(add(data, 0x04), to)
             mstore(add(data, 0x24), amount)
-            let success := call(gas(), token, 0, data, 0x44, 0x0, 0x20)
-            done := and(
-                success,
-                or(
-                    iszero(returndatasize()),
-                    and(gt(returndatasize(), 31), eq(mload(0), 1))
-                )
-            )
+            success := call(gas(), token, 0, data, 0x44, 0x0, 0x20)
+            if success {
+                switch returndatasize()
+                case 0 { success := gt(extcodesize(token), 0) }
+                default { success := and(gt(returndatasize(), 31), eq(mload(0), 1)) }
+            }
         }
     }
 
-    function _makeCalldataCall(IERC20 token, bytes4 selector, bytes calldata args) private returns(bool done) {
+    function _makeCalldataCall(IERC20 token, bytes4 selector, bytes calldata args) private returns(bool success) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let len := add(4, args.length)
@@ -108,14 +110,12 @@ library SafeERC20 {
 
             mstore(data, selector)
             calldatacopy(add(data, 0x04), args.offset, args.length)
-            let success := call(gas(), token, 0, data, len, 0x0, 0x20)
-            done := and(
-                success,
-                or(
-                    iszero(returndatasize()),
-                    and(gt(returndatasize(), 31), eq(mload(0), 1))
-                )
-            )
+            success := call(gas(), token, 0, data, len, 0x0, 0x20)
+            if success {
+                switch returndatasize()
+                case 0 { success := gt(extcodesize(token), 0) }
+                default { success := and(gt(returndatasize(), 31), eq(mload(0), 1)) }
+            }
         }
     }
 }
