@@ -15,8 +15,9 @@ library ECDSA {
             mstore(add(ptr, 0x20), v)
             mstore(add(ptr, 0x40), r)
             mstore(add(ptr, 0x60), s)
-            if staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20) {
-                signer := mload(0)
+            mstore(0, 0)
+            pop(staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20))
+            signer := mload(0)
             }
         }
     }
@@ -30,8 +31,9 @@ library ECDSA {
             mstore(add(ptr, 0x20), add(27, shr(255, vs)))
             mstore(add(ptr, 0x40), r)
             mstore(add(ptr, 0x60), shr(1, shl(1, vs)))
-            if staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20) {
-                signer := mload(0)
+            mstore(0, 0)
+            pop(staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20))
+            signer := mload(0)
             }
         }
     }
@@ -68,9 +70,9 @@ library ECDSA {
                     // memory[ptr:ptr+0x20] = (hash)
                     mstore(ptr, hash)
 
-                    if staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20) {
-                        signer := mload(0)
-                    }
+                    mstore(0, 0)
+                    pop(staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20))
+                    signer := mload(0)
                 }
             }
         }
