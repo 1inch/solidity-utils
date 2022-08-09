@@ -35,9 +35,7 @@ library SafeERC20 {
                 default { success := and(gt(returndatasize(), 31), eq(mload(0), 1)) }
             }
         }
-        if (!success) {
-            revert SafeTransferFromFailed();
-        }
+        if (!success) revert SafeTransferFromFailed();
     }
 
     // Ensures method do not revert or return boolean `true`, admits call to non-smart-contract
@@ -79,10 +77,7 @@ library SafeERC20 {
         } else {
             revert SafePermitBadLength();
         }
-
-        if (!success) {
-            RevertReasonForwarder.reRevert();
-        }
+        if (!success) RevertReasonForwarder.reRevert();
     }
 
     function _makeCall(IERC20 token, bytes4 selector, address to, uint256 amount) private returns(bool success) {
