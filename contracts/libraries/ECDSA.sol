@@ -6,18 +6,30 @@ pragma abicoder v1;
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
 library ECDSA {
+    // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature
+    // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines
+    // the valid range for s in (301): 0 < s < secp256k1n ÷ 2 + 1, and for v in (302): v ∈ {27, 28}. Most
+    // signatures from current libraries generate a unique signature with an s-value in the lower half order.
+    //
+    // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value
+    // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or
+    // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
+    // these malleable signatures as well.
+    uint256 private constant _S_BOUNDARY = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0 + 1;
+
     function recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns(address signer) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let ptr := mload(0x40)
+            if lt(s, _S_BOUNDARY) {
+                let ptr := mload(0x40)
 
-            mstore(ptr, hash)
-            mstore(add(ptr, 0x20), v)
-            mstore(add(ptr, 0x40), r)
-            mstore(add(ptr, 0x60), s)
-            mstore(0, 0)
-            pop(staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20))
-            signer := mload(0)
+                mstore(ptr, hash)
+                mstore(add(ptr, 0x20), v)
+                mstore(add(ptr, 0x40), r)
+                mstore(add(ptr, 0x60), s)
+                mstore(0, 0)
+                pop(staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20))
+                signer := mload(0)
             }
         }
     }
@@ -25,15 +37,17 @@ library ECDSA {
     function recover(bytes32 hash, bytes32 r, bytes32 vs) internal view returns(address signer) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let ptr := mload(0x40)
+            let s := shr(1, shl(1, vs))
+            if lt(s, _S_BOUNDARY) {
+                let ptr := mload(0x40)
 
-            mstore(ptr, hash)
-            mstore(add(ptr, 0x20), add(27, shr(255, vs)))
-            mstore(add(ptr, 0x40), r)
-            mstore(add(ptr, 0x60), shr(1, shl(1, vs)))
-            mstore(0, 0)
-            pop(staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20))
-            signer := mload(0)
+                mstore(ptr, hash)
+                mstore(add(ptr, 0x20), add(27, shr(255, vs)))
+                mstore(add(ptr, 0x40), r)
+                mstore(add(ptr, 0x60), s)
+                mstore(0, 0)
+                pop(staticcall(gas(), 0x1, ptr, 0x80, 0, 0x20))
+                signer := mload(0)
             }
         }
     }
@@ -62,11 +76,7 @@ library ECDSA {
             }
 
             if ptr {
-                if gt(mload(add(ptr, 0x60)), 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
-                    ptr := 0
-                }
-
-                if ptr {
+                if lt(mload(add(ptr, 0x60)), _S_BOUNDARY) {
                     // memory[ptr:ptr+0x20] = (hash)
                     mstore(ptr, hash)
 
