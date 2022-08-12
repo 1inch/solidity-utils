@@ -51,7 +51,7 @@ library StringUtil {
 
             result := mload(0x40)
             let length := mload(data)
-            let resultLength := add(mul(length, 2), 2)
+            let resultLength := add(shl(1, length), 2)
             let toPtr := add(result, 0x20)
             mstore(0x40, add(toPtr, resultLength))  // move free memory pointer
             mstore(result, resultLength)
