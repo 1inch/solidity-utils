@@ -83,7 +83,7 @@ library UniERC20 {
         token.forceApprove(to, amount);
     }
 
-    function _uniDecode(IERC20 token, bytes4 lowerCaseSelector, bytes4 upperCaseSelector) private view returns(string memory) {
+    function _uniDecode(IERC20 token, bytes4 lowerCaseSelector, bytes4 upperCaseSelector) private view returns(string memory result) {
         if (isETH(token)) {
             return "ETH";
         }
@@ -97,10 +97,14 @@ library UniERC20 {
             );
         }
 
-        if (success && data.length >= 96) {
+        if (success && data.length >= 0x40) {
             (uint256 offset, uint256 len) = abi.decode(data, (uint256, uint256));
-            if (offset == 0x20 && len > 0 && len <= 256) {
-                return abi.decode(data, (string));
+            if (offset == 0x20 && len > 0 && data.length == 0x40 + len) {
+                /// @solidity memory-safe-assembly
+                assembly { // solhint-disable-line no-inline-assembly
+                    result := add(data, 0x20)
+                }
+                return result;
             }
         }
 
@@ -113,6 +117,7 @@ library UniERC20 {
             }
 
             if (len > 0) {
+                /// @solidity memory-safe-assembly
                 assembly { // solhint-disable-line no-inline-assembly
                     mstore(data, len)
                 }

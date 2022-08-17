@@ -51,12 +51,12 @@ library StringUtil {
 
             result := mload(0x40)
             let length := mload(data)
-            let resultLength := add(shl(1, length), 2)
-            let toPtr := add(result, 0x20)
+            let resultLength := shl(1, length)
+            let toPtr := add(result, 0x22)          // 32 bytes for length + 2 bytes for '0x'
             mstore(0x40, add(toPtr, resultLength))  // move free memory pointer
-            mstore(result, resultLength)
-            mstore(toPtr, 0x3078000000000000000000000000000000000000000000000000000000000000)  // set 0x as first two bytes
-            toPtr := add(toPtr, 0x02)
+            mstore(add(result, 2), 0x3078)          // 0x3078 is right aligned so we write to `result + 2`
+                                                    // to store the last 2 bytes in the beginning of the string
+            mstore(result, add(resultLength, 2))    // extra 2 bytes for '0x'
 
             for {
                 let fromPtr := add(data, 0x20)

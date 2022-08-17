@@ -50,31 +50,31 @@ describe('StringUtil', async () => {
     });
 
     describe('Gas usage @skip-on-coverage', async () => {
-        it('Uint 256', () => testGasUint256(uint256TestValue, 915));
+        it('Uint 256', () => testGasUint256(uint256TestValue, 907));
 
         it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 14175));
 
-        it('Uint 256 as bytes', () => testGasBytes(uint256TestValue, 790));
+        it('Uint 256 as bytes', () => testGasBytes(uint256TestValue, 782));
 
         it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 14050));
 
-        it('Uint 128', () => testGasUint256(uint128TestValue, 915));
+        it('Uint 128', () => testGasUint256(uint128TestValue, 907));
 
         it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 14175));
 
-        it('Very long byte array gas', () => testGasBytes(veryLongArray, 1972));
+        it('Very long byte array gas', () => testGasBytes(veryLongArray, 1964));
 
         it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 28972));
 
-        it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray, 19129));
+        it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray, 19121));
 
         it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 426795));
 
-        it('Empty bytes', () => testGasBytes(emptyBytes, 199));
+        it('Empty bytes', () => testGasBytes(emptyBytes, 191));
 
         it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 406));
 
-        it('Single byte', () => testGasBytes(singleByte, 790));
+        it('Single byte', () => testGasBytes(singleByte, 782));
 
         it('Single byte naive', () => testGasNaiveBytes(singleByte, 832));
 
