@@ -17,7 +17,6 @@ library UniERC20 {
     using SafeERC20 for IERC20;
 
     error InsufficientBalance();
-    error ETHSendFailed();
     error ApproveCalledOnETH();
     error NotEnoughValue();
     error FromIsNotSender();
@@ -42,8 +41,8 @@ library UniERC20 {
         if (amount > 0) {
             if (isETH(token)) {
                 if (address(this).balance < amount) revert InsufficientBalance();
-                (bool success, ) = to.call{value: amount}("");  // solhint-disable-line avoid-low-level-calls
-                if (!success) revert ETHSendFailed();
+                // we do not use low-level calls to protect from possible reentrancy
+                to.transfer(amount);
             } else {
                 token.safeTransfer(to, amount);
             }
@@ -58,10 +57,8 @@ library UniERC20 {
                 if (to != address(this)) revert ToIsNotThis();
                 if (msg.value > amount) {
                     // Return remainder if exist
-                    unchecked {
-                        (bool success, ) = to.call{value: msg.value - amount}("");  // solhint-disable-line avoid-low-level-calls
-                        if (!success) revert ETHSendFailed();
-                    }
+                    // we do not use low-level calls to protect from possible reentrancy
+                    unchecked { from.transfer(msg.value - amount); }
                 }
             } else {
                 token.safeTransferFrom(from, to, amount);
