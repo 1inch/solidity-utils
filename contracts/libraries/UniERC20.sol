@@ -5,13 +5,9 @@ pragma abicoder v1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "../interfaces/IERC20MetadataUppercase.sol";
 import "./SafeERC20.sol";
 import "./StringUtil.sol";
-
-interface IERC20MetadataUppercase {
-    function NAME() external view returns (string memory);  // solhint-disable-line func-name-mixedcase
-    function SYMBOL() external view returns (string memory);  // solhint-disable-line func-name-mixedcase
-}
 
 library UniERC20 {
     using SafeERC20 for IERC20;
