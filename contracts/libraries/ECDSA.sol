@@ -160,7 +160,7 @@ library ECDSA {
             mstore(add(ptr, 0x44), 64)
             mstore(add(ptr, 0x64), r)
             mstore(add(ptr, 0x84), vs)
-            if staticcall(gas(), signer, ptr, 0xa5, 0, 0x20) {
+            if staticcall(gas(), signer, ptr, 0xa4, 0, 0x20) {
                 success := and(eq(selector, mload(0)), eq(returndatasize(), 0x20))
             }
         }
