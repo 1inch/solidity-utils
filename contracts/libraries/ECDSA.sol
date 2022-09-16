@@ -77,6 +77,7 @@ library ECDSA {
     }
 
     function recoverOrIsValidSignature(address signer, bytes32 hash, bytes calldata signature) internal view returns(bool success) {
+        if (signer == address(0)) return false;
         if ((signature.length == 64 || signature.length == 65) && recover(hash, signature) == signer) {
             return true;
         }
@@ -84,6 +85,7 @@ library ECDSA {
     }
 
     function recoverOrIsValidSignature(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns(bool success) {
+        if (signer == address(0)) return false;
         if (recover(hash, v, r, s) == signer) {
             return true;
         }
@@ -91,6 +93,7 @@ library ECDSA {
     }
 
     function recoverOrIsValidSignature(address signer, bytes32 hash, bytes32 r, bytes32 vs) internal view returns(bool success) {
+        if (signer == address(0)) return false;
         if (recover(hash, r, vs) == signer) {
             return true;
         }
@@ -98,6 +101,7 @@ library ECDSA {
     }
 
     function recoverOrIsValidSignature65(address signer, bytes32 hash, bytes32 r, bytes32 vs) internal view returns(bool success) {
+        if (signer == address(0)) return false;
         if (recover(hash, r, vs) == signer) {
             return true;
         }
