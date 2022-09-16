@@ -83,6 +83,8 @@ library UniERC20 {
         token.forceApprove(to, amount);
     }
 
+    /// 20K gas is provided to account for possible implementations of name/symbol
+    /// (token implementation might be behind proxy or store the value in storage)
     function _uniDecode(IERC20 token, bytes4 lowerCaseSelector, bytes4 upperCaseSelector) private view returns(string memory) {
         if (isETH(token)) {
             return "ETH";
