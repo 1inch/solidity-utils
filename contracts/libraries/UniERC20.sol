@@ -38,6 +38,7 @@ library UniERC20 {
         }
     }
 
+    /// @dev note that this function does nothing in case of zero amount
     function uniTransfer(IERC20 token, address payable to, uint256 amount) internal {
         if (amount > 0) {
             if (isETH(token)) {
@@ -50,6 +51,7 @@ library UniERC20 {
         }
     }
 
+    /// @dev note that this function does nothing in case of zero amount
     function uniTransferFrom(IERC20 token, address payable from, address to, uint256 amount) internal {
         if (amount > 0) {
             if (isETH(token)) {
