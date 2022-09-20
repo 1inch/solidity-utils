@@ -54,6 +54,13 @@ library ECDSA {
         }
     }
 
+    /// WARNING!!!
+    /// There is a known signature malleability issue with two representations of signatures!
+    /// Even though this function is able to verify both standard 65-byte and compact 64-byte EIP-2098 signatures
+    /// one should never use raw signatures for any kind of invalidation logic in their code.
+    /// As the standard and compact representations are interchangeable any invalidation logic that relies on
+    /// signature uniqueness will get rekt.
+    /// More info: https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h
     function recover(bytes32 hash, bytes calldata signature) internal view returns(address signer) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
