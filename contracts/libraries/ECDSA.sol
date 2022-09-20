@@ -54,30 +54,20 @@ library ECDSA {
         }
     }
 
+    /// @dev only compact signatures are supported see EIP-2098
     function recover(bytes32 hash, bytes calldata signature) internal view returns(address signer) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let ptr := mload(0x40)
-
             // memory[ptr:ptr+0x80] = (hash, v, r, s)
-            switch signature.length
-            case 65 {
-                // memory[ptr+0x20:ptr+0x80] = (v, r, s)
-                mstore(add(ptr, 0x20), byte(0, calldataload(add(signature.offset, 0x40))))
-                calldatacopy(add(ptr, 0x40), signature.offset, 0x40)
-            }
-            case 64 {
+            if eq(signature.length, 64) {
+                let ptr := mload(0x40)
+
                 // memory[ptr+0x20:ptr+0x80] = (v, r, s)
                 let vs := calldataload(add(signature.offset, 0x20))
                 mstore(add(ptr, 0x20), add(27, shr(_COMPACT_V_SHIFT, vs)))
                 calldatacopy(add(ptr, 0x40), signature.offset, 0x20)
                 mstore(add(ptr, 0x60), and(vs, _COMPACT_S_MASK))
-            }
-            default {
-                ptr := 0
-            }
 
-            if ptr {
                 if lt(mload(add(ptr, 0x60)), _S_BOUNDARY) {
                     // memory[ptr:ptr+0x20] = (hash)
                     mstore(ptr, hash)
@@ -92,7 +82,7 @@ library ECDSA {
 
     function recoverOrIsValidSignature(address signer, bytes32 hash, bytes calldata signature) internal view returns(bool success) {
         if (signer == address(0)) return false;
-        if ((signature.length == 64 || signature.length == 65) && recover(hash, signature) == signer) {
+        if (signature.length == 64 && recover(hash, signature) == signer) {
             return true;
         }
         return isValidSignature(signer, hash, signature);
