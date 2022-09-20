@@ -5,13 +5,9 @@ pragma abicoder v1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "../interfaces/IERC20MetadataUppercase.sol";
 import "./SafeERC20.sol";
 import "./StringUtil.sol";
-
-interface IERC20MetadataUppercase {
-    function NAME() external view returns (string memory);  // solhint-disable-line func-name-mixedcase
-    function SYMBOL() external view returns (string memory);  // solhint-disable-line func-name-mixedcase
-}
 
 library UniERC20 {
     using SafeERC20 for IERC20;
@@ -37,6 +33,7 @@ library UniERC20 {
         }
     }
 
+    /// @dev note that this function does nothing in case of zero amount
     function uniTransfer(IERC20 token, address payable to, uint256 amount) internal {
         if (amount > 0) {
             if (isETH(token)) {
@@ -49,6 +46,7 @@ library UniERC20 {
         }
     }
 
+    /// @dev note that this function does nothing in case of zero amount
     function uniTransferFrom(IERC20 token, address payable from, address to, uint256 amount) internal {
         if (amount > 0) {
             if (isETH(token)) {
@@ -80,6 +78,8 @@ library UniERC20 {
         token.forceApprove(to, amount);
     }
 
+    /// 20K gas is provided to account for possible implementations of name/symbol
+    /// (token implementation might be behind proxy or store the value in storage)
     function _uniDecode(IERC20 token, bytes4 lowerCaseSelector, bytes4 upperCaseSelector) private view returns(string memory result) {
         if (isETH(token)) {
             return "ETH";
