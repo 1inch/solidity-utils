@@ -53,17 +53,28 @@ contract('AddressArray', async function ([wallet1, wallet2, wallet3]) {
     describe('get', async function () {
         it('should be get empty data', async function () {
             expect(await context.addressArrayMock.get()).to.eql([]);
+            await context.addressArrayMock.contract.methods.get().send({ from: wallet1 });
         });
 
         it('should be get from data with 1 element', async function () {
             await context.addressArrayMock.push(wallet1);
             expect(await context.addressArrayMock.get()).to.eql([wallet1]);
+            await context.addressArrayMock.contract.methods.get().send({ from: wallet1 });
+        });
+
+        it('should be get from data with 2 elements', async function () {
+            await context.addressArrayMock.push(wallet1);
+            await context.addressArrayMock.push(wallet2);
+            expect(await context.addressArrayMock.get()).to.eql([wallet1, wallet2]);
+            await context.addressArrayMock.contract.methods.get().send({ from: wallet1 });
         });
 
         it('should be get from data with several elements', async function () {
             await context.addressArrayMock.push(wallet1);
             await context.addressArrayMock.push(wallet2);
-            expect(await context.addressArrayMock.get()).to.eql([wallet1, wallet2]);
+            await context.addressArrayMock.push(wallet3);
+            expect(await context.addressArrayMock.get()).to.eql([wallet1, wallet2, wallet3]);
+            await context.addressArrayMock.contract.methods.get().send({ from: wallet1 });
         });
     });
 
