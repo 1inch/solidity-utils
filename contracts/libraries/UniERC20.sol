@@ -40,7 +40,7 @@ library UniERC20 {
         if (amount > 0) {
             if (isETH(token)) {
                 if (address(this).balance < amount) revert InsufficientBalance();
-                // solhint-disable-line avoid-low-level-calls
+                // solhint-disable-next-line avoid-low-level-calls
                 (bool success, ) = to.call{value: amount, gas: _RAW_CALL_GAS_LIMIT}("");
                 if (!success) revert ETHTransferFailed();
             } else {
