@@ -16,6 +16,8 @@ library ECDSA {
     // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept
     // these malleable signatures as well.
     uint256 private constant _S_BOUNDARY = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0 + 1;
+    uint256 private constant _COMPACT_S_MASK = 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+    uint256 private constant _COMPACT_V_SHIFT = 255;
 
     function recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns(address signer) {
         /// @solidity memory-safe-assembly
@@ -37,12 +39,12 @@ library ECDSA {
     function recover(bytes32 hash, bytes32 r, bytes32 vs) internal view returns(address signer) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let s := shr(1, shl(1, vs))
+            let s := and(vs, _COMPACT_S_MASK)
             if lt(s, _S_BOUNDARY) {
                 let ptr := mload(0x40)
 
                 mstore(ptr, hash)
-                mstore(add(ptr, 0x20), add(27, shr(255, vs)))
+                mstore(add(ptr, 0x20), add(27, shr(_COMPACT_V_SHIFT, vs)))
                 mstore(add(ptr, 0x40), r)
                 mstore(add(ptr, 0x60), s)
                 mstore(0, 0)
@@ -67,9 +69,9 @@ library ECDSA {
             case 64 {
                 // memory[ptr+0x20:ptr+0x80] = (v, r, s)
                 let vs := calldataload(add(signature.offset, 0x20))
-                mstore(add(ptr, 0x20), add(27, shr(255, vs)))
+                mstore(add(ptr, 0x20), add(27, shr(_COMPACT_V_SHIFT, vs)))
                 calldatacopy(add(ptr, 0x40), signature.offset, 0x20)
-                mstore(add(ptr, 0x60), shr(1, shl(1, vs)))
+                mstore(add(ptr, 0x60), and(vs, _COMPACT_S_MASK))
             }
             default {
                 ptr := 0
@@ -191,8 +193,8 @@ library ECDSA {
             mstore(add(ptr, 0x24), 0x40)
             mstore(add(ptr, 0x44), 65)
             mstore(add(ptr, 0x64), r)
-            mstore(add(ptr, 0x84), shr(1, shl(1, vs)))
-            mstore8(add(ptr, 0xa4), add(27, shr(255, vs)))
+            mstore(add(ptr, 0x84), and(vs, _COMPACT_S_MASK))
+            mstore8(add(ptr, 0xa4), add(27, shr(_COMPACT_V_SHIFT, vs)))
             if staticcall(gas(), signer, ptr, 0xa5, 0, 0x20) {
                 success := and(eq(selector, mload(0)), eq(returndatasize(), 0x20))
             }
