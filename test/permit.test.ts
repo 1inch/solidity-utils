@@ -1,30 +1,26 @@
 import { expect } from '../src/prelude';
-import { web3 } from 'hardhat';
-import { defaultDeadline, EIP712Domain, Permit, DaiLikePermit } from '../src/permit';
+import { ethers } from 'hardhat';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { defaultDeadline, Permit, DaiLikePermit } from '../src/permit';
 import { trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit';
 
-const ERC20PermitMock = artifacts.require('ERC20PermitMock');
-const DaiLikePermitMock = artifacts.require('DaiLikePermitMock');
+describe('Permit library', async function () {
+    let signer1: SignerWithAddress;
 
-describe('Methods', async () => {
-    const initContext = async () => {
-        const account = web3.eth.accounts.create();
-        const wallet = {
-            address: account.address,
-            privateKey: account.privateKey,
-        };
-
-        const token = await ERC20PermitMock.new('Token', 'TKN', wallet.address, '1');
-        const daiLikeToken = await DaiLikePermitMock.new('DaiLikeToken', 'DLT', wallet.address, '1');
-        const chainId = await web3.eth.getChainId();
-        return { account, wallet, token, daiLikeToken, chainId };
-    };
-
-    let context: Awaited<ReturnType<typeof initContext>> = undefined!;
-
-    before(async () => {
-        context = await initContext();
+    before(async function () {
+        [signer1] = await ethers.getSigners();
     });
+
+    async function deployTokens () {
+        const ERC20PermitMock = await ethers.getContractFactory('ERC20PermitMock');
+        const DaiLikePermitMock = await ethers.getContractFactory('DaiLikePermitMock');
+
+        const chainId = (await ethers.provider.getNetwork()).chainId;
+        const erc20PermitMock = await ERC20PermitMock.deploy('USDC', 'USDC', signer1.address, 100n);
+        const daiLikePermitMock = await DaiLikePermitMock.deploy('DAI', 'DAI', signer1.address, 100n);
+        return { erc20PermitMock, daiLikePermitMock, chainId };
+    }
 
     it('should be trimmed', async () => {
         expect(trim0x('0x123456')).to.be.equal('123456');
@@ -35,22 +31,23 @@ describe('Methods', async () => {
     });
 
     it('should correctly build data for permit', async () => {
-        const data = buildData(await context.token.name(), '1', context.chainId, context.token.address, context.wallet.address, context.wallet.address, '1', '1');
+        const { erc20PermitMock, chainId } = await loadFixture(deployTokens);
+
+        const name = await erc20PermitMock.name();
+        const data = buildData(name, '1', chainId, erc20PermitMock.address, signer1.address, signer1.address, '1', '1');
         expect(data).to.be.deep.equal({
-            primaryType: 'Permit',
             types: {
-                EIP712Domain: EIP712Domain,
                 Permit: Permit,
             },
             domain: {
-                name: await context.token.name(),
+                name,
                 version: '1',
                 chainId: 31337,
-                verifyingContract: context.token.address,
+                verifyingContract: erc20PermitMock.address,
             },
             message: {
-                owner: context.wallet.address,
-                spender: context.wallet.address,
+                owner: signer1.address,
+                spender: signer1.address,
                 value: '1',
                 nonce: '1',
                 deadline: defaultDeadline,
@@ -59,22 +56,23 @@ describe('Methods', async () => {
     });
 
     it('should correctly build data for dai-like permit', async () => {
-        const data = buildDataLikeDai(await context.daiLikeToken.name(), '1', context.chainId, context.daiLikeToken.address, context.wallet.address, context.wallet.address, '1', true);
+        const { daiLikePermitMock, chainId } = await loadFixture(deployTokens);
+
+        const name = await daiLikePermitMock.name();
+        const data = buildDataLikeDai(name, '1', chainId, daiLikePermitMock.address, signer1.address, signer1.address, '1', true);
         expect(data).to.be.deep.equal({
-            primaryType: 'Permit',
             types: {
-                EIP712Domain: EIP712Domain,
                 Permit: DaiLikePermit,
             },
             domain: {
-                name: await context.daiLikeToken.name(),
+                name,
                 version: '1',
                 chainId: 31337,
-                verifyingContract: context.daiLikeToken.address,
+                verifyingContract: daiLikePermitMock.address,
             },
             message: {
-                holder: context.wallet.address,
-                spender: context.wallet.address,
+                holder: signer1.address,
+                spender: signer1.address,
                 nonce: '1',
                 allowed: true,
                 expiry: defaultDeadline,

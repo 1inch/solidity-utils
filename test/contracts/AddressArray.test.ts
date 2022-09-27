@@ -1,165 +1,179 @@
 import { expect, constants } from '../../src/prelude';
-import types from '../../typechain-types';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ethers } from 'hardhat';
 
-const AddressArrayMock = artifacts.require('AddressArrayMock');
+describe('AddressArray', async function () {
+    let signer1: SignerWithAddress;
+    let signer2: SignerWithAddress;
+    let signer3: SignerWithAddress;
 
-contract('AddressArray', async function ([wallet1, wallet2, wallet3]) {
-    const initContext = async () => {
-        const addressArrayMock: types.AddressArrayMockInstance = undefined!;
+    before(async function () {
+        [signer1, signer2, signer3] = await ethers.getSigners();
+    });
+
+    const deployAddressArrayMock = async () => {
+        const AddressArrayMock = await ethers.getContractFactory('AddressArrayMock');
+        const addressArrayMock = await AddressArrayMock.deploy();
         return { addressArrayMock };
     };
 
-    let context: Awaited<ReturnType<typeof initContext>> = undefined!;
-
-    before(async () => {
-        context = await initContext();
-    });
-
-    beforeEach(async function () {
-        context.addressArrayMock = await AddressArrayMock.new();
-    });
-
     describe('length', async function () {
-        it('should be calculate length 0', async function () {
-            expect(await context.addressArrayMock.length()).to.be.bignumber.equal('0');
+        it('should calculate length 0', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            expect(await addressArrayMock.length()).to.be.equal('0');
         });
 
-        it('should be calculate length 1', async function () {
-            await context.addressArrayMock.push(wallet1);
-            expect(await context.addressArrayMock.length()).to.be.bignumber.equal('1');
+        it('should calculate length 1', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            expect(await addressArrayMock.length()).to.be.equal('1');
         });
     });
 
     describe('at', async function () {
-        it('should be get from empty data', async function () {
-            expect(await context.addressArrayMock.at(0)).to.be.equal(constants.ZERO_ADDRESS);
-            expect(await context.addressArrayMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
+        it('should get from empty array', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            expect(await addressArrayMock.at(0)).to.be.equal(constants.ZERO_ADDRESS);
+            expect(await addressArrayMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
         });
 
-        it('should be get from data with 1 element', async function () {
-            await context.addressArrayMock.push(wallet1);
-            expect(await context.addressArrayMock.at(0)).to.be.equal(wallet1);
-            expect(await context.addressArrayMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
+        it('should get from array with 1 element', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            expect(await addressArrayMock.at(0)).to.be.equal(signer1.address);
+            expect(await addressArrayMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
         });
 
-        it('should be get from data with several elements', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.push(wallet2);
-            expect(await context.addressArrayMock.at(0)).to.be.equal(wallet1);
-            expect(await context.addressArrayMock.at(1)).to.be.equal(wallet2);
+        it('should get from array with several elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.push(signer2.address);
+            expect(await addressArrayMock.at(0)).to.be.equal(signer1.address);
+            expect(await addressArrayMock.at(1)).to.be.equal(signer2.address);
         });
     });
 
     describe('get', async function () {
-        it('should be get empty data', async function () {
-            expect(await context.addressArrayMock.get()).to.eql([]);
-            await context.addressArrayMock.contract.methods.get().send({ from: wallet1 });
+        it('should get empty array', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            expect(await addressArrayMock.get()).to.be.deep.equal([]);
         });
 
-        it('should be get from data with 1 element', async function () {
-            await context.addressArrayMock.push(wallet1);
-            expect(await context.addressArrayMock.get()).to.eql([wallet1]);
-            await context.addressArrayMock.contract.methods.get().send({ from: wallet1 });
+        it('should get array with 1 element', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address]);
         });
 
-        it('should be get from data with 2 elements', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.push(wallet2);
-            expect(await context.addressArrayMock.get()).to.eql([wallet1, wallet2]);
-            await context.addressArrayMock.contract.methods.get().send({ from: wallet1 });
+        it('should get array with 2 elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.push(signer2.address);
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address]);
         });
 
-        it('should be get from data with several elements', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.push(wallet2);
-            await context.addressArrayMock.push(wallet3);
-            expect(await context.addressArrayMock.get()).to.eql([wallet1, wallet2, wallet3]);
-            await context.addressArrayMock.contract.methods.get().send({ from: wallet1 });
+        it('should get from array with 3 elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.push(signer2.address);
+            await addressArrayMock.push(signer3.address);
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address, signer3.address]);
         });
     });
 
     describe('push', async function () {
-        it('should be push to empty data', async function () {
-            const pushedIndex = await context.addressArrayMock.push.call(wallet1);
-            await context.addressArrayMock.push(wallet1);
-            expect(await context.addressArrayMock.at(pushedIndex.subn(1))).to.be.equal(wallet1);
+        it('should push to empty array', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            const pushedIndex = await addressArrayMock.callStatic.push(signer1.address);
+            await addressArrayMock.push(signer1.address);
+            expect(await addressArrayMock.at(pushedIndex.toBigInt() - 1n)).to.be.equal(signer1.address);
         });
 
-        it('should be push to data with 1 element', async function () {
-            await context.addressArrayMock.push(wallet1);
-            const pushedIndex = await context.addressArrayMock.push.call(wallet2);
-            await context.addressArrayMock.push(wallet2);
-            expect(await context.addressArrayMock.at(pushedIndex.subn(1))).to.be.equal(wallet2);
+        it('should push to array with 1 element', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            const pushedIndex = await addressArrayMock.callStatic.push(signer2.address);
+            await addressArrayMock.push(signer2.address);
+            expect(await addressArrayMock.at(pushedIndex.toBigInt() - 1n)).to.be.equal(signer2.address);
         });
 
-        it('should be get push to data with several elements', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.push(wallet2);
-            const pushedIndex = await context.addressArrayMock.push.call(wallet3);
-            await context.addressArrayMock.push(wallet3);
-            expect(await context.addressArrayMock.at(pushedIndex.subn(1))).to.be.equal(wallet3);
+        it('should push to array with 2 elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.push(signer2.address);
+            const pushedIndex = await addressArrayMock.callStatic.push(signer3.address);
+            await addressArrayMock.push(signer3.address);
+            expect(await addressArrayMock.at(pushedIndex.toBigInt() - 1n)).to.be.equal(signer3.address);
         });
     });
 
     describe('pop', async function () {
-        it('should be thrown when data is empty', async function () {
-            await expect(context.addressArrayMock.pop())
-                .to.eventually.be.rejectedWith('PopFromEmptyArray()');
+        it('should throw when array is empty', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await expect(addressArrayMock.pop()).to.be.revertedWithCustomError(addressArrayMock, 'PopFromEmptyArray');
         });
 
-        it('should be pop in data with 1 element', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.pop();
-            expect(await context.addressArrayMock.get()).to.eql([]);
+        it('should pop from array with 1 element', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.pop();
+            expect(await addressArrayMock.get()).to.be.deep.equal([]);
         });
 
-        it('should be pop in data with several elements', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.push(wallet2);
-            await context.addressArrayMock.pop();
-            expect(await context.addressArrayMock.get()).to.eql([wallet1]);
+        it('should pop from array with 2 elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.push(signer2.address);
+            await addressArrayMock.pop();
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address]);
         });
 
-        it('should be several pops', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.push(wallet2);
-            await context.addressArrayMock.push(wallet3);
-            await context.addressArrayMock.pop();
-            expect(await context.addressArrayMock.get()).to.eql([wallet1, wallet2]);
+        it('should pop from array with 3 elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.push(signer2.address);
+            await addressArrayMock.push(signer3.address);
+            await addressArrayMock.pop();
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address]);
         });
 
-        it('should be thrown when pops more than elements', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.pop();
-            await expect(context.addressArrayMock.pop())
-                .to.eventually.be.rejectedWith('PopFromEmptyArray()');
+        it('should throw when pops more than there are elements in array', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.pop();
+            await expect(addressArrayMock.pop()).to.be.revertedWithCustomError(addressArrayMock, 'PopFromEmptyArray');
         });
     });
 
     describe('set', async function () {
-        it('should be thrown when set index less than data length', async function () {
-            await expect(context.addressArrayMock.set(0, wallet1))
-                .to.eventually.be.rejectedWith('IndexOutOfBounds()');
+        it('should throw when sets index out of bounds', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await expect(addressArrayMock.set(0, signer1.address))
+                .to.be.revertedWithCustomError(addressArrayMock, 'IndexOutOfBounds');
         });
 
-        it('should be set to index 0 to data with 1 element', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.set(0, wallet2);
-            expect(await context.addressArrayMock.get()).to.eql([wallet2]);
+        it('should set index 0 in array with 1 element', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.set(0, signer2.address);
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer2.address]);
         });
 
-        it('should be set to index 0 to data with several elements', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.push(wallet2);
-            await context.addressArrayMock.set(0, wallet3);
-            expect(await context.addressArrayMock.get()).to.eql([wallet3, wallet2]);
+        it('should set index 0 in array with several elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.push(signer2.address);
+            await addressArrayMock.set(0, signer3.address);
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer3.address, signer2.address]);
         });
 
-        it('should be set to index non-0 to data with several elements', async function () {
-            await context.addressArrayMock.push(wallet1);
-            await context.addressArrayMock.push(wallet2);
-            await context.addressArrayMock.set(1, wallet3);
-            expect(await context.addressArrayMock.get()).to.eql([wallet1, wallet3]);
+        it('should set index 1 in array with several elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1.address);
+            await addressArrayMock.push(signer2.address);
+            await addressArrayMock.set(1, signer3.address);
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer3.address]);
         });
     });
 });

@@ -1,133 +1,148 @@
 import { expect, constants } from '../../src/prelude';
-import types from '../../typechain-types';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ethers } from 'hardhat';
 
-const AddressSetMock = artifacts.require('AddressSetMock');
+describe('AddressSet', async function () {
+    let signer1: SignerWithAddress;
+    let signer2: SignerWithAddress;
+    let signer3: SignerWithAddress;
 
-contract('AddressSet', async function ([wallet1, wallet2, wallet3]) {
-    const initContext = async () => {
-        const addressSetMock: types.AddressSetMockInstance = undefined!;
+    before(async function () {
+        [signer1, signer2, signer3] = await ethers.getSigners();
+    });
+
+    const deployAddressSetMock = async () => {
+        const AddressSetMock = await ethers.getContractFactory('AddressSetMock');
+        const addressSetMock = await AddressSetMock.deploy();
         return { addressSetMock };
     };
 
-    let context: Awaited<ReturnType<typeof initContext>> = undefined!;
-
-    before(async () => {
-        context = await initContext();
-    });
-
-    beforeEach(async () => {
-        context.addressSetMock = await AddressSetMock.new();
-    });
-
     describe('length', async function () {
-        it('should be calculate length 0', async function () {
-            expect(await context.addressSetMock.length()).to.be.bignumber.equal('0');
+        it('should get length 0', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            expect(await addressSetMock.length()).to.be.equal('0');
         });
 
-        it('should be calculate length 1', async function () {
-            await context.addressSetMock.add(wallet1);
-            expect(await context.addressSetMock.length()).to.be.bignumber.equal('1');
+        it('should get length 1', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            expect(await addressSetMock.length()).to.be.equal('1');
         });
     });
 
     describe('at', async function () {
-        it('should be get from empty data', async function () {
-            expect(await context.addressSetMock.at(0)).to.be.equal(constants.ZERO_ADDRESS);
-            expect(await context.addressSetMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
+        it('should get from empty set', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            expect(await addressSetMock.at(0)).to.be.equal(constants.ZERO_ADDRESS);
+            expect(await addressSetMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
         });
 
-        it('should be get from data with 1 element', async function () {
-            await context.addressSetMock.add(wallet1);
-            expect(await context.addressSetMock.at(0)).to.be.equal(wallet1);
-            expect(await context.addressSetMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
+        it('should get from set with 1 element', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            expect(await addressSetMock.at(0)).to.be.equal(signer1.address);
+            expect(await addressSetMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
         });
 
-        it('should be get from data with several elements', async function () {
-            await context.addressSetMock.add(wallet1);
-            await context.addressSetMock.add(wallet2);
-            expect(await context.addressSetMock.at(0)).to.be.equal(wallet1);
-            expect(await context.addressSetMock.at(1)).to.be.equal(wallet2);
+        it('should get from set with several elements', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            await addressSetMock.add(signer2.address);
+            expect(await addressSetMock.at(0)).to.be.equal(signer1.address);
+            expect(await addressSetMock.at(1)).to.be.equal(signer2.address);
         });
     });
 
     describe('contains', async function () {
-        it('should be not contains in empty data', async function () {
-            expect(await context.addressSetMock.contains(wallet1)).to.be.equal(false);
-            expect(await context.addressSetMock.contains(wallet2)).to.be.equal(false);
-            expect(await context.addressSetMock.contains(constants.ZERO_ADDRESS)).to.be.equal(false);
+        it('should not contain in empty set', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            expect(await addressSetMock.contains(signer1.address)).to.be.equal(false);
+            expect(await addressSetMock.contains(signer2.address)).to.be.equal(false);
+            expect(await addressSetMock.contains(constants.ZERO_ADDRESS)).to.be.equal(false);
         });
 
-        it('should be contains address', async function () {
-            await context.addressSetMock.add(wallet1);
-            expect(await context.addressSetMock.contains(wallet1)).to.be.equal(true);
-            expect(await context.addressSetMock.contains(wallet2)).to.be.equal(false);
-            expect(await context.addressSetMock.contains(constants.ZERO_ADDRESS)).to.be.equal(false);
+        it('should contain 1 address', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            expect(await addressSetMock.contains(signer1.address)).to.be.equal(true);
+            expect(await addressSetMock.contains(signer2.address)).to.be.equal(false);
+            expect(await addressSetMock.contains(constants.ZERO_ADDRESS)).to.be.equal(false);
         });
 
-        it('should be contains addresses', async function () {
-            await context.addressSetMock.add(wallet1);
-            await context.addressSetMock.add(wallet2);
-            expect(await context.addressSetMock.contains(wallet1)).to.be.equal(true);
-            expect(await context.addressSetMock.contains(wallet2)).to.be.equal(true);
-            expect(await context.addressSetMock.contains(wallet3)).to.be.equal(false);
-            expect(await context.addressSetMock.contains(constants.ZERO_ADDRESS)).to.be.equal(false);
+        it('should contains several addresses', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            await addressSetMock.add(signer2.address);
+            expect(await addressSetMock.contains(signer1.address)).to.be.equal(true);
+            expect(await addressSetMock.contains(signer2.address)).to.be.equal(true);
+            expect(await addressSetMock.contains(signer3.address)).to.be.equal(false);
+            expect(await addressSetMock.contains(constants.ZERO_ADDRESS)).to.be.equal(false);
         });
     });
 
     describe('add', async function () {
-        it('should be add to empty data', async function () {
-            const isAdded = await context.addressSetMock.add.call(wallet1);
-            await context.addressSetMock.add(wallet1);
-            expect(await context.addressSetMock.contains(wallet1)).to.be.equal(isAdded);
+        it('should add to empty set', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            const isAdded = await addressSetMock.callStatic.add(signer1.address);
+            await addressSetMock.add(signer1.address);
+            expect(await addressSetMock.contains(signer1.address)).to.be.equal(isAdded);
         });
 
-        it('should not be add a double element without another elements in data', async function () {
-            await context.addressSetMock.add(wallet1);
-            expect(await context.addressSetMock.add.call(wallet1)).to.be.equal(false);
+        it('should not add element twice', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            expect(await addressSetMock.callStatic.add(signer1.address)).to.be.equal(false);
         });
 
-        it('should be add to data with 1 element', async function () {
-            await context.addressSetMock.add(wallet1);
-            const isAdded = await context.addressSetMock.add.call(wallet2);
-            await context.addressSetMock.add(wallet2);
-            expect(await context.addressSetMock.contains(wallet2)).to.be.equal(isAdded);
+        it('should add to set with 1 element', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            const isAdded = await addressSetMock.callStatic.add(signer2.address);
+            await addressSetMock.add(signer2.address);
+            expect(await addressSetMock.contains(signer2.address)).to.be.equal(isAdded);
         });
 
-        it('should not be add a double element with another elements in data', async function () {
-            await context.addressSetMock.add(wallet1);
-            await context.addressSetMock.add(wallet2);
-            expect(await context.addressSetMock.add.call(wallet2)).to.be.equal(false);
+        it('should not add element twice to set with 1 element', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            await addressSetMock.add(signer2.address);
+            expect(await addressSetMock.callStatic.add(signer2.address)).to.be.equal(false);
         });
     });
 
     describe('remove', async function () {
-        it('should not be remove from empty data', async function () {
-            const isRemoved = await context.addressSetMock.remove.call(wallet1);
+        it('should not remove from empty set', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            const isRemoved = await addressSetMock.callStatic.remove(signer1.address);
             expect(isRemoved).to.be.equal(false);
         });
 
-        it('should be remove from data', async function () {
-            await context.addressSetMock.add(wallet1);
-            const isRemoved = await context.addressSetMock.remove.call(wallet1);
-            await context.addressSetMock.remove(wallet1);
+        it('should remove from set', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            const isRemoved = await addressSetMock.callStatic.remove(signer1.address);
+            await addressSetMock.remove(signer1.address);
             expect(isRemoved).to.be.equal(true);
-            expect(await context.addressSetMock.contains(wallet1)).to.be.equal(false);
+            expect(await addressSetMock.contains(signer1.address)).to.be.equal(false);
         });
 
-        it('should not be remove element which is not in data', async function () {
-            await context.addressSetMock.add(wallet1);
-            const isRemoved = await context.addressSetMock.remove.call(wallet2);
+        it('should not remove element which is not in set', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            const isRemoved = await addressSetMock.callStatic.remove(signer2.address);
             expect(isRemoved).to.be.equal(false);
         });
 
-        it('should be remove from data and keep the remainder', async function () {
-            await context.addressSetMock.add(wallet1);
-            await context.addressSetMock.add(wallet2);
-            const isRemoved = await context.addressSetMock.remove.call(wallet1);
-            await context.addressSetMock.remove(wallet1);
+        it('should remove from set and keep other elements', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1.address);
+            await addressSetMock.add(signer2.address);
+            const isRemoved = await addressSetMock.callStatic.remove(signer1.address);
+            await addressSetMock.remove(signer1.address);
             expect(isRemoved).to.be.equal(true);
-            expect(await context.addressSetMock.contains(wallet1)).to.be.equal(false);
-            expect(await context.addressSetMock.contains(wallet2)).to.be.equal(true);
+            expect(await addressSetMock.contains(signer1.address)).to.be.equal(false);
+            expect(await addressSetMock.contains(signer2.address)).to.be.equal(true);
         });
     });
 });

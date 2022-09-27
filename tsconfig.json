@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2018",
+    "target": "es2020",
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
@@ -17,6 +17,6 @@
     "resolveJsonModule": true,
     "strictNullChecks": true,
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2018", "dom", "esnext"]
+    "lib": ["es2020", "dom", "esnext"]
   }
 }

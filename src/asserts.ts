@@ -1,32 +1,22 @@
-import { expect, toBN } from './prelude';
-import BN from 'bn.js';
+import { expect } from './prelude';
 
-export function toBNExtended (value: string | number | BN): BN {
-    if (typeof value === 'string' || typeof value === 'number') {
-        return toBN(value);
-    }
-    return value;
-}
+export function assertRoughlyEqualValues (expected: string | number | bigint, actual: string | number | bigint, relativeDiff: number) {
+    let expectedBN = BigInt(expected);
+    let actualBN = BigInt(actual);
+    expect(expectedBN * actualBN).to.be.gte(0, 'Values are of different sign');
 
-export function assertRoughlyEqualValues (expected: string | number | BN, actual: string | number | BN, relativeDiff: number) {
-    let expectedBN = toBNExtended(expected);
-    let actualBN = toBNExtended(actual);
-    if (expectedBN.isNeg() !== actualBN.isNeg()) {
-        expect(actualBN).to.be.bignumber.equal(expectedBN, 'Values are of different sign');
-    }
-
-    expectedBN = expectedBN.abs();
-    actualBN = actualBN.abs();
+    if (expectedBN < 0) expectedBN = -expectedBN;
+    if (actualBN < 0) actualBN = -actualBN;
 
     let multiplerNumerator = relativeDiff;
-    let multiplerDenominator = toBN('1');
+    let multiplerDenominator = 1n;
     while (!Number.isInteger(multiplerNumerator)) {
-        multiplerDenominator = multiplerDenominator.mul(toBN('10'));
+        multiplerDenominator = multiplerDenominator * 10n;
         multiplerNumerator *= 10;
     }
-    const diff = expectedBN.sub(actualBN).abs();
-    const treshold = expectedBN.mul(toBN(multiplerNumerator.toString())).div(multiplerDenominator);
-    if (!diff.lte(treshold)) {
-        expect(actualBN).to.be.bignumber.equal(expectedBN, `${actual} != ${expected} with ${relativeDiff} precision`);
+    const diff = expectedBN > actualBN ? expectedBN - actualBN : actualBN - expectedBN;
+    const treshold = expectedBN * BigInt(multiplerNumerator) / multiplerDenominator;
+    if (diff > treshold) {
+        expect(actualBN).to.be.equal(expectedBN, `${actual} != ${expected} with ${relativeDiff} precision`);
     }
 }

@@ -1,48 +1,50 @@
 
 import { expect } from '../../src/prelude';
-
-const RevertReasonParserTest = artifacts.require('RevertReasonParserTest');
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ethers } from 'hardhat';
 
 describe('RevertReasonParser', async () => {
-    const initContext = async () => {
-        const revertReasonParserTest = await RevertReasonParserTest.new();
+    const deployRevertReasonParserTest = async () => {
+        const RevertReasonParserTest = await ethers.getContractFactory('RevertReasonParserTest');
+        const revertReasonParserTest = await RevertReasonParserTest.deploy();
         return { revertReasonParserTest };
     };
 
-    let context: Awaited<ReturnType<typeof initContext>> = undefined!;
-
-    before(async () => {
-        context = await initContext();
-    });
-
     describe('parse', async function () {
         it('should be parsed as Unknown (Invalid revert reason)', async function () {
-            await context.revertReasonParserTest.testParseWithThrow();
+            const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
+            await revertReasonParserTest.testParseWithThrow();
         });
 
         it('should be parsed as empty Error', async function () {
-            await context.revertReasonParserTest.testEmptyStringRevert();
+            const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
+            await revertReasonParserTest.testEmptyStringRevert();
         });
 
         it('should be parsed as Error', async function () {
-            await context.revertReasonParserTest.testNonEmptyRevert();
+            const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
+            await revertReasonParserTest.testNonEmptyRevert();
         });
 
         it('should be parsed as Unknown', async function () {
-            await context.revertReasonParserTest.testEmptyRevert();
+            const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
+            await revertReasonParserTest.testEmptyRevert();
         });
 
         it('should be parsed as Panic', async function () {
-            await context.revertReasonParserTest.testAssertion();
+            const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
+            await revertReasonParserTest.testAssertion();
         });
 
         it('should be parsed as Error with long string', async function () {
-            await context.revertReasonParserTest.testLongStringRevert();
+            const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
+            await revertReasonParserTest.testLongStringRevert();
         });
 
         it('should be reverted in _test()', async function () {
-            await expect(context.revertReasonParserTest.testWithThrow())
-                .to.eventually.be.rejectedWith('TestDidNotThrow()');
+            const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
+            await expect(revertReasonParserTest.testWithThrow())
+                .to.be.revertedWithCustomError(revertReasonParserTest, 'TestDidNotThrow');
         });
     });
 });
