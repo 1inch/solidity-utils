@@ -14,6 +14,9 @@
     "postbuild": "echo done",
     "publishPackage": "yarn build && yarn publish",
     "coverage": "hardhat coverage",
+    "format": "yarn format-ts && yarn format-sol",
+    "format-ts": "prettier '**/*.ts' --write",
+    "format-sol": "prettier '**/*.sol' --write",
     "lint": "yarn run lint:ts && yarn run lint:sol",
     "lint:fix": "yarn run lint:ts:fix && yarn run lint:sol:fix",
     "lint:ts": "eslint . --ext .ts",
@@ -34,6 +37,8 @@
     "chai-as-promised": "7.1.1",
     "chai-bn": "0.3.1",
     "ethereumjs-util": "7.1.5",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.24",
     "web3-utils": "1.8.0"
   },
   "devDependencies": {
