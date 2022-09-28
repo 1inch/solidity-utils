@@ -1,11 +1,11 @@
-import { constants } from "../../src/prelude";
-import { web3 } from "hardhat";
+import { constants } from '../../src/prelude';
+import { web3 } from 'hardhat';
 
-const EthSenderMock = artifacts.require("EthSenderMock");
-const WethReceiver = artifacts.require("WethReceiverMock");
+const EthSenderMock = artifacts.require('EthSenderMock');
+const WethReceiver = artifacts.require('WethReceiverMock');
 
-contract("WethReceiver", function (accounts) {
-    describe("WethReceiver", async function () {
+contract('WethReceiver', function (accounts) {
+    describe('WethReceiver', async function () {
         const account = accounts[0];
         const account1 = accounts[1];
 
@@ -14,18 +14,16 @@ contract("WethReceiver", function (accounts) {
             this.receiver = await WethReceiver.new(this.sender.address);
         });
 
-        it("contract transfer", async function () {
+        it('contract transfer', async function () {
             await this.sender.transfer(account1, { value: 100 });
         });
 
-        it("normal transfer", async function () {
-            await expect(
-                web3.eth.sendTransaction({
-                    from: account,
-                    to: this.receiver.address,
-                    value: 100,
-                })
-            ).to.eventually.be.rejectedWith("EthDepositRejected");
+        it('normal transfer', async function () {
+            await expect(web3.eth.sendTransaction({
+                from: account,
+                to: this.receiver.address,
+                value: 100,
+            })).to.eventually.be.rejectedWith('EthDepositRejected');
         });
     });
 });

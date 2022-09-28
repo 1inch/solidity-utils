@@ -1,16 +1,16 @@
-import "@typechain/hardhat";
-import "@nomiclabs/hardhat-truffle5";
-import "hardhat-gas-reporter";
-require("solidity-coverage"); // require because no TS typings available
-import dotenv from "dotenv";
-import { HardhatUserConfig } from "hardhat/config";
-import networks from "./hardhat.networks";
+import '@typechain/hardhat';
+import '@nomiclabs/hardhat-truffle5';
+import 'hardhat-gas-reporter';
+require('solidity-coverage'); // require because no TS typings available
+import dotenv from 'dotenv';
+import { HardhatUserConfig } from 'hardhat/config';
+import networks from './hardhat.networks';
 
 dotenv.config();
 
 const config: HardhatUserConfig = {
     solidity: {
-        version: "0.8.15",
+        version: '0.8.15',
         settings: {
             optimizer: {
                 enabled: true,
@@ -21,10 +21,10 @@ const config: HardhatUserConfig = {
     networks,
     gasReporter: {
         enabled: true,
-        currency: "USD",
+        currency: 'USD',
     },
     typechain: {
-        target: "truffle-v5",
+        target: 'truffle-v5',
     },
 };
 
