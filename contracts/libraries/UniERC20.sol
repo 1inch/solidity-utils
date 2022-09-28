@@ -127,8 +127,7 @@ library UniERC20 {
             (uint256 offset, ) = abi.decode(data, (uint256, uint256));
             if (offset == 0x20) {
                 /// @solidity memory-safe-assembly
-                assembly {
-                    // solhint-disable-line no-inline-assembly
+                assembly { // solhint-disable-line no-inline-assembly
                     result := add(data, 0x40)
                 }
                 return result;
@@ -145,8 +144,7 @@ library UniERC20 {
 
             if (len > 0) {
                 /// @solidity memory-safe-assembly
-                assembly {
-                    // solhint-disable-line no-inline-assembly
+                assembly { // solhint-disable-line no-inline-assembly
                     mstore(data, len)
                 }
                 return string(data);

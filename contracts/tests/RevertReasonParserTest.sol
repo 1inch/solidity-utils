@@ -57,12 +57,10 @@ contract RevertReasonParserTest {
     }
 
     function testParseWithThrow() external view {
-        try this.nonEmptyRevert() {
-            // solhint-disable-line no-empty-blocks
+        try this.nonEmptyRevert() { // solhint-disable-line no-empty-blocks
         } catch (bytes memory reason) {
             /// @solidity memory-safe-assembly
-            assembly {
-                // solhint-disable-line no-inline-assembly
+            assembly { // solhint-disable-line no-inline-assembly
                 mstore(reason, sub(mload(reason), 0x20)) // reason = reason[:-32]
             }
             RevertReasonParser.parse(reason, "");

@@ -27,8 +27,7 @@ library SafeERC20 {
         bytes4 selector = token.transferFrom.selector;
         bool success;
         /// @solidity memory-safe-assembly
-        assembly {
-            // solhint-disable-line no-inline-assembly
+        assembly { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
 
             mstore(data, selector)
@@ -118,8 +117,7 @@ library SafeERC20 {
         uint256 amount
     ) private returns (bool success) {
         /// @solidity memory-safe-assembly
-        assembly {
-            // solhint-disable-line no-inline-assembly
+        assembly { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
 
             mstore(data, selector)
@@ -144,8 +142,7 @@ library SafeERC20 {
         bytes calldata args
     ) private returns (bool success) {
         /// @solidity memory-safe-assembly
-        assembly {
-            // solhint-disable-line no-inline-assembly
+        assembly { // solhint-disable-line no-inline-assembly
             let len := add(4, args.length)
             let data := mload(0x40)
 

@@ -1,5 +1,4 @@
-import { constants, ether, toBN } from '../../src/prelude';
-import { web3 } from 'hardhat';
+import { constants, toBN } from '../../src/prelude';
 
 const UniERC20Wrapper = artifacts.require('UniERC20Wrapper');
 const ETHBadReceiver = artifacts.require('ETHBadReceiver');
@@ -86,7 +85,6 @@ contract('UniERC20', function (accounts) {
     describe('ETH', async function () {
         const account = accounts[0];
         const account1 = accounts[1];
-        const account2 = accounts[2];
 
         beforeEach(async function () {
             this.wrapper = await UniERC20Wrapper.new(constants.ZERO_ADDRESS);
@@ -153,9 +151,6 @@ contract('UniERC20', function (accounts) {
     });
 
     describe('ETH with bad ether receiver', async function () {
-        const account = accounts[0];
-        const account1 = accounts[1];
-
         beforeEach(async function () {
             this.wrapper = await UniERC20Wrapper.new(constants.ZERO_ADDRESS);
             this.receiver = await ETHBadReceiver.new(
@@ -178,9 +173,6 @@ contract('UniERC20', function (accounts) {
     });
 
     describe('ETH from special address', async function () {
-        const account = accounts[0];
-        const account1 = accounts[1];
-
         beforeEach(async function () {
             this.wrapper = await UniERC20Wrapper.new('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE');
         });

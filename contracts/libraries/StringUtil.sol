@@ -15,8 +15,7 @@ library StringUtil {
 
     function toHex(bytes memory data) internal pure returns (string memory result) {
         /// @solidity memory-safe-assembly
-        assembly {
-            // solhint-disable-line no-inline-assembly
+        assembly { // solhint-disable-line no-inline-assembly
             function _toHex16(input) -> output {
                 output := or(
                     and(input, 0xFFFFFFFFFFFFFFFF000000000000000000000000000000000000000000000000),

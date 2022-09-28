@@ -1,4 +1,3 @@
-import { constants } from '../../src/prelude';
 import { web3 } from 'hardhat';
 
 const EthSenderMock = artifacts.require('EthSenderMock');
