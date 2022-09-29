@@ -1,6 +1,10 @@
 import { expect } from './prelude';
 
-export function assertRoughlyEqualValues (expected: string | number | bigint, actual: string | number | bigint, relativeDiff: number) {
+export function assertRoughlyEqualValues(
+    expected: string | number | bigint,
+    actual: string | number | bigint,
+    relativeDiff: number,
+) {
     let expectedBN = BigInt(expected);
     let actualBN = BigInt(actual);
     expect(expectedBN * actualBN).to.be.gte(0, 'Values are of different sign');
@@ -15,7 +19,7 @@ export function assertRoughlyEqualValues (expected: string | number | bigint, ac
         multiplerNumerator *= 10;
     }
     const diff = expectedBN > actualBN ? expectedBN - actualBN : actualBN - expectedBN;
-    const treshold = expectedBN * BigInt(multiplerNumerator) / multiplerDenominator;
+    const treshold = (expectedBN * BigInt(multiplerNumerator)) / multiplerDenominator;
     if (diff > treshold) {
         expect(actualBN).to.be.equal(expectedBN, `${actual} != ${expected} with ${relativeDiff} precision`);
     }

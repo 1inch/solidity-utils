@@ -1,4 +1,3 @@
-
 import { expect } from '../../src/prelude';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
@@ -43,8 +42,10 @@ describe('RevertReasonParser', async () => {
 
         it('should be reverted in _test()', async function () {
             const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
-            await expect(revertReasonParserTest.testWithThrow())
-                .to.be.revertedWithCustomError(revertReasonParserTest, 'TestDidNotThrow');
+            await expect(revertReasonParserTest.testWithThrow()).to.be.revertedWithCustomError(
+                revertReasonParserTest,
+                'TestDidNotThrow',
+            );
         });
     });
 });

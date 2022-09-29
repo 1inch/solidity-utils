@@ -35,7 +35,8 @@
     ],
     "quotes": [
       2,
-      "single"
+      "single",
+      {"avoidEscape": true}
     ],
     "semi": [
       "error",
@@ -43,15 +44,11 @@
     ],
     "space-before-function-paren": [
       "error",
-      "always"
+      {"anonymous": "always", "named": "never", "asyncArrow": "always"}
     ],
     "one-var-declaration-per-line": [
       "error",
       "always"
-    ],
-    "function-paren-newline": [
-      "error",
-      "multiline"
     ],
     "object-property-newline": [
       "error",

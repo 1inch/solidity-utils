@@ -17,7 +17,7 @@ describe('Permitable', async function () {
         [signer1, signer2] = await ethers.getSigners();
     });
 
-    async function deployTokens () {
+    async function deployTokens() {
         const PermitableMock = await ethers.getContractFactory('PermitableMock');
         const ERC20PermitMock = await ethers.getContractFactory('ERC20PermitMock');
         const DaiLikePermitMock = await ethers.getContractFactory('DaiLikePermitMock');
@@ -43,13 +43,33 @@ describe('Permitable', async function () {
 
         const name = await erc20PermitMock.name();
         const nonce = await erc20PermitMock.nonces(signer1.address);
-        const data = buildData(name, '1', chainId, erc20PermitMock.address, signer1.address, signer2.address, value.toString(), nonce.toString());
+        const data = buildData(
+            name,
+            '1',
+            chainId,
+            erc20PermitMock.address,
+            signer1.address,
+            signer2.address,
+            value.toString(),
+            nonce.toString(),
+        );
         const signature = await signer1._signTypedData(data.domain, data.types, data.message);
         const { v, r, s } = fromRpcSig(signature);
         // spender is signer1 but in signature spender was signer2
-        const permit = cutSelector(erc20PermitMock.interface.encodeFunctionData('permit', [signer1.address, signer1.address, value, defaultDeadline, v, r, s]));
-        await expect(permitableMock.mockPermit(erc20PermitMock.address, permit))
-            .to.be.revertedWith('ERC20Permit: invalid signature');
+        const permit = cutSelector(
+            erc20PermitMock.interface.encodeFunctionData('permit', [
+                signer1.address,
+                signer1.address,
+                value,
+                defaultDeadline,
+                v,
+                r,
+                s,
+            ]),
+        );
+        await expect(permitableMock.mockPermit(erc20PermitMock.address, permit)).to.be.revertedWith(
+            'ERC20Permit: invalid signature',
+        );
     });
 
     it('should be permitted for IDaiLikePermit', async function () {
@@ -67,18 +87,30 @@ describe('Permitable', async function () {
 
         const name = await daiLikePermitMock.name();
         const nonce = await daiLikePermitMock.nonces(signer1.address);
-        const data = buildDataLikeDai(name, '1', chainId, daiLikePermitMock.address, signer1.address, signer2.address, nonce.toString(), true);
+        const data = buildDataLikeDai(
+            name,
+            '1',
+            chainId,
+            daiLikePermitMock.address,
+            signer1.address,
+            signer2.address,
+            nonce.toString(),
+            true,
+        );
         const signature = await signer1._signTypedData(data.domain, data.types, data.message);
         const { v, r, s } = fromRpcSig(signature);
 
         // spender is signer1 but in signature spender was signer2
-        const permit = cutSelector(daiLikePermitMock.interface.encodeFunctionData(
-            'permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)',
-            [signer1.address, signer1.address, nonce, defaultDeadline.toString(), true, v, r, s]
-        ));
+        const permit = cutSelector(
+            daiLikePermitMock.interface.encodeFunctionData(
+                'permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)',
+                [signer1.address, signer1.address, nonce, defaultDeadline.toString(), true, v, r, s],
+            ),
+        );
 
-        await expect(permitableMock.mockPermit(daiLikePermitMock.address, permit))
-            .to.be.revertedWith('Dai/invalid-permit');
+        await expect(permitableMock.mockPermit(daiLikePermitMock.address, permit)).to.be.revertedWith(
+            'Dai/invalid-permit',
+        );
     });
 
     it('should be wrong permit length', async function () {
@@ -86,13 +118,36 @@ describe('Permitable', async function () {
 
         const name = await erc20PermitMock.name();
         const nonce = await erc20PermitMock.nonces(signer1.address);
-        const data = buildData(name, '1', chainId, erc20PermitMock.address, signer1.address, signer2.address, value.toString(), nonce.toString());
+        const data = buildData(
+            name,
+            '1',
+            chainId,
+            erc20PermitMock.address,
+            signer1.address,
+            signer2.address,
+            value.toString(),
+            nonce.toString(),
+        );
         const signature = await signer1._signTypedData(data.domain, data.types, data.message);
         const { v, r, s } = fromRpcSig(signature);
 
-        const permit = '0x' + cutSelector(erc20PermitMock.interface.encodeFunctionData('permit', [signer1.address, signer1.address, value, defaultDeadline, v, r, s])).substring(64);
+        const permit =
+            '0x' +
+            cutSelector(
+                erc20PermitMock.interface.encodeFunctionData('permit', [
+                    signer1.address,
+                    signer1.address,
+                    value,
+                    defaultDeadline,
+                    v,
+                    r,
+                    s,
+                ]),
+            ).substring(64);
 
-        await expect(permitableMock.mockPermit(erc20PermitMock.address, permit))
-            .to.be.revertedWithCustomError(permitableMock, 'SafePermitBadLength');
+        await expect(permitableMock.mockPermit(erc20PermitMock.address, permit)).to.be.revertedWithCustomError(
+            permitableMock,
+            'SafePermitBadLength',
+        );
     });
 });

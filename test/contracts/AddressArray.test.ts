@@ -149,8 +149,10 @@ describe('AddressArray', async function () {
     describe('set', async function () {
         it('should throw when sets index out of bounds', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
-            await expect(addressArrayMock.set(0, signer1.address))
-                .to.be.revertedWithCustomError(addressArrayMock, 'IndexOutOfBounds');
+            await expect(addressArrayMock.set(0, signer1.address)).to.be.revertedWithCustomError(
+                addressArrayMock,
+                'IndexOutOfBounds',
+            );
         });
 
         it('should set index 0 in array with 1 element', async function () {

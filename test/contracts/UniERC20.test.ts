@@ -160,32 +160,33 @@ contract('UniERC20', function (accounts) {
         });
 
         it('uni approve must fail', async function () {
-            await expect(this.wrapper.approve(account, 100, { from: account1 })).to.be.rejectedWith('ApproveCalledOnETH');
+            await expect(this.wrapper.approve(account, 100, { from: account1 })).to.be.rejectedWith(
+                'ApproveCalledOnETH',
+            );
         });
 
         it('uni transfer from, success', async function () {
             const balBefore = toBN(await this.wrapper.balanceOf(this.wrapper.address));
-            await this.wrapper.transferFrom(
-                account,
-                this.wrapper.address,
-                100,
-                { value: 100 }
-            );
+            await this.wrapper.transferFrom(account, this.wrapper.address, 100, { value: 100 });
             const balAfter = toBN(await this.wrapper.balanceOf(this.wrapper.address));
             expect(balAfter.sub(balBefore)).to.be.bignumber.equal(toBN(100));
         });
 
         it('uni transfer from, fail, not sender', async function () {
-            await expect(this.wrapper.transferFrom(account, this.wrapper.address, 100, {
-                from: account1,
-                value: 100,
-            })).to.be.rejectedWith('FromIsNotSender');
+            await expect(
+                this.wrapper.transferFrom(account, this.wrapper.address, 100, {
+                    from: account1,
+                    value: 100,
+                }),
+            ).to.be.rejectedWith('FromIsNotSender');
         });
 
         it('uni transfer from, fail, receiver is not contract', async function () {
-            await expect(this.wrapper.transferFrom(account, account1, 100, {
-                value: 100,
-            })).to.be.rejectedWith('ToIsNotThis');
+            await expect(
+                this.wrapper.transferFrom(account, account1, 100, {
+                    value: 100,
+                }),
+            ).to.be.rejectedWith('ToIsNotThis');
         });
 
         it('uni name', async function () {
@@ -200,22 +201,23 @@ contract('UniERC20', function (accounts) {
     describe('ETH with bad ether receiver', async function () {
         beforeEach(async function () {
             this.wrapper = await UniERC20Wrapper.new(constants.ZERO_ADDRESS);
-            this.receiver = await ETHBadReceiver.new(
-                constants.ZERO_ADDRESS,
-                this.wrapper.address
-            );
+            this.receiver = await ETHBadReceiver.new(constants.ZERO_ADDRESS, this.wrapper.address);
         });
 
         it('uni failed transfer', async function () {
-            await expect(this.wrapper.transfer(this.receiver.address, 100, {
-                value: 100,
-            })).to.eventually.be.rejectedWith('ETHTransferFailed');
+            await expect(
+                this.wrapper.transfer(this.receiver.address, 100, {
+                    value: 100,
+                }),
+            ).to.eventually.be.rejectedWith('ETHTransferFailed');
         });
 
         it('uni failed transferFrom', async function () {
-            await expect(this.receiver.transfer(this.wrapper.address, 100, {
-                value: 101,
-            })).to.eventually.be.rejectedWith('ETHTransferFailed');
+            await expect(
+                this.receiver.transfer(this.wrapper.address, 100, {
+                    value: 101,
+                }),
+            ).to.eventually.be.rejectedWith('ETHTransferFailed');
         });
     });
 

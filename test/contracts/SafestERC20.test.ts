@@ -46,11 +46,7 @@ contract('SafeERC20', function (accounts) {
             this.wrapper = await SafeERC20Wrapper.new((await ERC20ReturnFalseMock.new()).address);
         });
 
-        shouldRevertOnAllCalls([
-            'SafeTransferFailed()',
-            'SafeTransferFromFailed()',
-            'ForceApproveFailed()',
-        ]);
+        shouldRevertOnAllCalls(['SafeTransferFailed()', 'SafeTransferFromFailed()', 'ForceApproveFailed()']);
     });
 
     describe('with token that returns true on all calls', function () {
@@ -90,7 +86,7 @@ contract('SafeERC20', function (accounts) {
         });
     });
 
-    describe('with token that doesn\'t revert on invalid permit', function () {
+    describe("with token that doesn't revert on invalid permit", function () {
         const wallet = Wallet.generate();
         const owner = wallet.getAddressString();
         const spender = hasNoCode;
@@ -104,8 +100,19 @@ contract('SafeERC20', function (accounts) {
             this.data = {
                 primaryType: 'Permit',
                 types: { EIP712Domain, Permit },
-                domain: { name: 'ERC20PermitNoRevertMock', version: '1', chainId, verifyingContract: this.token.address },
-                message: { owner, spender, value: '42', nonce: '0', deadline: constants.MAX_UINT256 },
+                domain: {
+                    name: 'ERC20PermitNoRevertMock',
+                    version: '1',
+                    chainId,
+                    verifyingContract: this.token.address,
+                },
+                message: {
+                    owner,
+                    spender,
+                    value: '42',
+                    nonce: '0',
+                    deadline: constants.MAX_UINT256,
+                },
             };
             this.signature = fromRpcSig(signWithPk(wallet.getPrivateKey(), this.data));
         });
@@ -198,7 +205,7 @@ contract('SafeERC20', function (accounts) {
     });
 });
 
-function shouldRevertOnAllCalls (reasons: string[]) {
+function shouldRevertOnAllCalls(reasons: string[]) {
     it('reverts on transfer', async function () {
         await expect(this.wrapper.transfer()).to.eventually.be.rejectedWith(reasons[0]);
     });
@@ -222,12 +229,12 @@ function shouldRevertOnAllCalls (reasons: string[]) {
     });
 }
 
-function shouldOnlyRevertOnErrors () {
-    it('doesn\'t revert on transfer', async function () {
+function shouldOnlyRevertOnErrors() {
+    it("doesn't revert on transfer", async function () {
         await this.wrapper.transfer();
     });
 
-    it('doesn\'t revert on transferFrom', async function () {
+    it("doesn't revert on transferFrom", async function () {
         await this.wrapper.transferFrom();
     });
 
@@ -237,21 +244,22 @@ function shouldOnlyRevertOnErrors () {
                 await this.wrapper.setAllowance(0);
             });
 
-            it('doesn\'t revert when approving a non-zero allowance', async function () {
+            it("doesn't revert when approving a non-zero allowance", async function () {
                 await this.wrapper.approve(100);
             });
 
-            it('doesn\'t revert when approving a zero allowance', async function () {
+            it("doesn't revert when approving a zero allowance", async function () {
                 await this.wrapper.approve(0);
             });
 
-            it('doesn\'t revert when increasing the allowance', async function () {
+            it("doesn't revert when increasing the allowance", async function () {
                 await this.wrapper.increaseAllowance(10);
             });
 
             it('reverts when decreasing the allowance', async function () {
-                await expect(this.wrapper.decreaseAllowance(10))
-                    .to.eventually.be.rejectedWith('SafeDecreaseAllowanceFailed()');
+                await expect(this.wrapper.decreaseAllowance(10)).to.eventually.be.rejectedWith(
+                    'SafeDecreaseAllowanceFailed()',
+                );
             });
         });
 
@@ -260,25 +268,26 @@ function shouldOnlyRevertOnErrors () {
                 await this.wrapper.setAllowance(100);
             });
 
-            it('doesn\'t revert when approving a non-zero allowance', async function () {
+            it("doesn't revert when approving a non-zero allowance", async function () {
                 await this.wrapper.approve(20);
             });
 
-            it('doesn\'t revert when approving a zero allowance', async function () {
+            it("doesn't revert when approving a zero allowance", async function () {
                 await this.wrapper.approve(0);
             });
 
-            it('doesn\'t revert when increasing the allowance', async function () {
+            it("doesn't revert when increasing the allowance", async function () {
                 await this.wrapper.increaseAllowance(10);
             });
 
-            it('doesn\'t revert when decreasing the allowance to a positive value', async function () {
+            it("doesn't revert when decreasing the allowance to a positive value", async function () {
                 await this.wrapper.decreaseAllowance(50);
             });
 
             it('reverts when decreasing the allowance to a negative value', async function () {
-                await expect(this.wrapper.decreaseAllowance(200))
-                    .to.eventually.be.rejectedWith('SafeDecreaseAllowanceFailed()');
+                await expect(this.wrapper.decreaseAllowance(200)).to.eventually.be.rejectedWith(
+                    'SafeDecreaseAllowanceFailed()',
+                );
             });
         });
     });

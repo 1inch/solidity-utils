@@ -12,7 +12,7 @@ describe('Permit library', async function () {
         [signer1] = await ethers.getSigners();
     });
 
-    async function deployTokens () {
+    async function deployTokens() {
         const ERC20PermitMock = await ethers.getContractFactory('ERC20PermitMock');
         const DaiLikePermitMock = await ethers.getContractFactory('DaiLikePermitMock');
 
@@ -59,7 +59,16 @@ describe('Permit library', async function () {
         const { daiLikePermitMock, chainId } = await loadFixture(deployTokens);
 
         const name = await daiLikePermitMock.name();
-        const data = buildDataLikeDai(name, '1', chainId, daiLikePermitMock.address, signer1.address, signer1.address, '1', true);
+        const data = buildDataLikeDai(
+            name,
+            '1',
+            chainId,
+            daiLikePermitMock.address,
+            signer1.address,
+            signer1.address,
+            '1',
+            true,
+        );
         expect(data).to.be.deep.equal({
             types: {
                 Permit: DaiLikePermit,

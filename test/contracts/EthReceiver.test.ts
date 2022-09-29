@@ -18,11 +18,13 @@ contract('EthReceiver', function (accounts) {
         });
 
         it('normal transfer', async function () {
-            await expect(web3.eth.sendTransaction({
-                from: account,
-                to: this.receiver.address,
-                value: 100,
-            })).to.eventually.be.rejectedWith('EthDepositRejected');
+            await expect(
+                web3.eth.sendTransaction({
+                    from: account,
+                    to: this.receiver.address,
+                    value: 100,
+                }),
+            ).to.eventually.be.rejectedWith('EthDepositRejected');
         });
     });
 });

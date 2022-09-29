@@ -31,7 +31,7 @@ export const DaiLikePermit = [
     { name: 'allowed', type: 'bool' },
 ];
 
-export function trim0x (bigNumber: bigint | string) {
+export function trim0x(bigNumber: bigint | string) {
     const s = bigNumber.toString();
     if (s.startsWith('0x')) {
         return s.substring(2);
@@ -39,21 +39,24 @@ export function trim0x (bigNumber: bigint | string) {
     return s;
 }
 
-export function cutSelector (data: string) {
+export function cutSelector(data: string) {
     const hexPrefix = '0x';
     return hexPrefix + data.substr(hexPrefix.length + 8);
 }
 
-export function domainSeparator (name: string, version: string, chainId: string, verifyingContract: string) {
-    return '0x' + TypedDataUtils.hashStruct(
-        'EIP712Domain',
-        { name, version, chainId, verifyingContract },
-        { EIP712Domain },
-        TypedDataVersion
-    ).toString('hex');
+export function domainSeparator(name: string, version: string, chainId: string, verifyingContract: string) {
+    return (
+        '0x' +
+        TypedDataUtils.hashStruct(
+            'EIP712Domain',
+            { name, version, chainId, verifyingContract },
+            { EIP712Domain },
+            TypedDataVersion,
+        ).toString('hex')
+    );
 }
 
-export function buildData (
+export function buildData(
     name: string,
     version: string,
     chainId: number,
@@ -62,7 +65,7 @@ export function buildData (
     spender: string,
     value: string,
     nonce: string,
-    deadline: string = defaultDeadline.toString()
+    deadline: string = defaultDeadline.toString(),
 ) {
     return {
         types: { Permit },
@@ -71,7 +74,7 @@ export function buildData (
     } as const;
 }
 
-export function buildDataLikeDai (
+export function buildDataLikeDai(
     name: string,
     version: string,
     chainId: number,
@@ -80,7 +83,7 @@ export function buildDataLikeDai (
     spender: string,
     nonce: string,
     allowed: boolean,
-    expiry: string = defaultDeadline.toString()
+    expiry: string = defaultDeadline.toString(),
 ) {
     return {
         types: { Permit: DaiLikePermit },
@@ -97,45 +100,76 @@ export interface PermittableToken extends Token {
 /*
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
  */
-export async function getPermit (
+export async function getPermit(
     owner: SignerWithAddress,
     permitContract: PermittableToken,
     tokenVersion: string,
     chainId: number,
     spender: string,
     value: string,
-    deadline = defaultDeadline.toString()
+    deadline = defaultDeadline.toString(),
 ) {
     const nonce = await permitContract.nonces(owner.address);
     const name = await permitContract.name();
-    const data = buildData(name, tokenVersion, chainId, permitContract.address, owner.address, spender, value, nonce.toString(), deadline);
+    const data = buildData(
+        name,
+        tokenVersion,
+        chainId,
+        permitContract.address,
+        owner.address,
+        spender,
+        value,
+        nonce.toString(),
+        deadline,
+    );
     const signature = await owner._signTypedData(data.domain, data.types, data.message);
     const { v, r, s } = fromRpcSig(signature);
-    const permitCall = permitContract.interface.encodeFunctionData('permit', [owner.address, spender, value, deadline, v, r, s]);
+    const permitCall = permitContract.interface.encodeFunctionData('permit', [
+        owner.address,
+        spender,
+        value,
+        deadline,
+        v,
+        r,
+        s,
+    ]);
     return cutSelector(permitCall);
 }
 
 /*
  * @param permitContract The contract object with ERC20PermitLikeDai type and token address for which the permit creating.
  */
-export async function getPermitLikeDai (
+export async function getPermitLikeDai(
     holder: SignerWithAddress,
     permitContract: PermittableToken,
     tokenVersion: string,
     chainId: number,
     spender: string,
     allowed: boolean,
-    expiry = defaultDeadline.toString()
+    expiry = defaultDeadline.toString(),
 ) {
     const nonce = await permitContract.nonces(holder.address);
     const name = await permitContract.name();
-    const data = buildDataLikeDai(name, tokenVersion, chainId, permitContract.address, holder.address, spender, nonce.toString(), allowed, expiry);
+    const data = buildDataLikeDai(
+        name,
+        tokenVersion,
+        chainId,
+        permitContract.address,
+        holder.address,
+        spender,
+        nonce.toString(),
+        allowed,
+        expiry,
+    );
     const signature = await holder._signTypedData(data.domain, data.types, data.message);
     const { v, r, s } = fromRpcSig(signature);
-    const permitCall = permitContract.interface.encodeFunctionData('permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)', [holder.address, spender, nonce, expiry, allowed, v, r, s]);
+    const permitCall = permitContract.interface.encodeFunctionData(
+        'permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)',
+        [holder.address, spender, nonce, expiry, allowed, v, r, s],
+    );
     return cutSelector(permitCall);
 }
 
-export function withTarget (target: bigint | string, data: bigint | string) {
+export function withTarget(target: bigint | string, data: bigint | string) {
     return target.toString() + trim0x(data);
 }
