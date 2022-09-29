@@ -28,8 +28,7 @@ describe('StringUtil', async () => {
 
         it('Extremely long byte array', () => testBytes(extremelyLongArray));
 
-        it.skip('Empty bytes. Skipped until resolved: https://github.com/ChainSafe/web3.js/issues/4512', () =>
-            testBytes(emptyBytes));
+        it('Empty bytes', () => testBytes(emptyBytes));
 
         it('Single byte', () => testBytes(singleByte));
 
