@@ -9,6 +9,7 @@ import "../interfaces/IERC20MetadataUppercase.sol";
 import "./SafeERC20.sol";
 import "./StringUtil.sol";
 
+/// @title Library, which allows usage of ETH as ERC20 and ERC20 itself. Uses SafeERC20 library for ERC20 interface.
 library UniERC20 {
     using SafeERC20 for IERC20;
 
@@ -23,10 +24,12 @@ library UniERC20 {
     IERC20 private constant _ETH_ADDRESS = IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     IERC20 private constant _ZERO_ADDRESS = IERC20(address(0));
 
+    /// @dev Returns true if `token` is ETH.
     function isETH(IERC20 token) internal pure returns (bool) {
         return (token == _ZERO_ADDRESS || token == _ETH_ADDRESS);
     }
 
+    /// @dev Returns `account` ERC20 `token` balance.
     function uniBalanceOf(IERC20 token, address account) internal view returns (uint256) {
         if (isETH(token)) {
             return account.balance;
@@ -35,8 +38,13 @@ library UniERC20 {
         }
     }
 
-    /// @dev note that this function does nothing in case of zero amount
-    function uniTransfer(IERC20 token, address payable to, uint256 amount) internal {
+    /// @dev `token` transfer `to` `amount`.
+    /// Note that this function does nothing in case of zero amount.
+    function uniTransfer(
+        IERC20 token,
+        address payable to,
+        uint256 amount
+    ) internal {
         if (amount > 0) {
             if (isETH(token)) {
                 if (address(this).balance < amount) revert InsufficientBalance();
@@ -49,8 +57,14 @@ library UniERC20 {
         }
     }
 
-    /// @dev note that this function does nothing in case of zero amount
-    function uniTransferFrom(IERC20 token, address payable from, address to, uint256 amount) internal {
+    /// @dev `token` transfer `from` `to` `amount`.
+    /// Note that this function does nothing in case of zero amount.
+    function uniTransferFrom(
+        IERC20 token,
+        address payable from,
+        address to,
+        uint256 amount
+    ) internal {
         if (amount > 0) {
             if (isETH(token)) {
                 if (msg.value < amount) revert NotEnoughValue();
@@ -70,47 +84,62 @@ library UniERC20 {
         }
     }
 
-    function uniSymbol(IERC20 token) internal view returns(string memory) {
+    /// @dev Returns `token` symbol from ERC20 metadata.
+    function uniSymbol(IERC20 token) internal view returns (string memory) {
         return _uniDecode(token, IERC20Metadata.symbol.selector, IERC20MetadataUppercase.SYMBOL.selector);
     }
 
-    function uniName(IERC20 token) internal view returns(string memory) {
+    /// @dev Returns `token` name from ERC20 metadata.
+    function uniName(IERC20 token) internal view returns (string memory) {
         return _uniDecode(token, IERC20Metadata.name.selector, IERC20MetadataUppercase.NAME.selector);
     }
 
-    function uniApprove(IERC20 token, address to, uint256 amount) internal {
+    /// @dev Reverts if `token` is ETH, otherwise performs ERC20 forceApprove.
+    function uniApprove(
+        IERC20 token,
+        address to,
+        uint256 amount
+    ) internal {
         if (isETH(token)) revert ApproveCalledOnETH();
 
         token.forceApprove(to, amount);
     }
 
-    /// 20K gas is provided to account for possible implementations of name/symbol
+    /// @dev 20K gas is provided to account for possible implementations of name/symbol
     /// (token implementation might be behind proxy or store the value in storage)
-    function _uniDecode(IERC20 token, bytes4 lowerCaseSelector, bytes4 upperCaseSelector) private view returns(string memory result) {
+    function _uniDecode(
+        IERC20 token,
+        bytes4 lowerCaseSelector,
+        bytes4 upperCaseSelector
+    ) private view returns (string memory result) {
         if (isETH(token)) {
             return "ETH";
         }
 
-        (bool success, bytes memory data) = address(token).staticcall{ gas: 20000 }(
+        (bool success, bytes memory data) = address(token).staticcall{gas: 20000}(
             abi.encodeWithSelector(lowerCaseSelector)
         );
         if (!success) {
-            (success, data) = address(token).staticcall{ gas: 20000 }(
-                abi.encodeWithSelector(upperCaseSelector)
-            );
+            (success, data) = address(token).staticcall{gas: 20000}(abi.encodeWithSelector(upperCaseSelector));
         }
 
         if (success && data.length >= 0x40) {
             (uint256 offset, uint256 len) = abi.decode(data, (uint256, uint256));
-            if (offset == 0x20 && len > 0 && data.length == 0x40 + len) {
+            /*
+                return data is padded up to 32 bytes with ABI encoder also sometimes
+                there is extra 32 bytes of zeros padded in the end:
+                https://github.com/ethereum/solidity/issues/10170
+                because of that we can't check for equality and instead check
+                that overall data length is greater or equal than string length + extra 64 bytes
+            */
+            if (offset == 0x20 && data.length >= 0x40 + len) {
                 /// @solidity memory-safe-assembly
                 assembly { // solhint-disable-line no-inline-assembly
-                    result := add(data, 0x20)
+                    result := add(data, 0x40)
                 }
                 return result;
             }
         }
-
         if (success && data.length == 32) {
             uint256 len = 0;
             while (len < data.length && data[len] >= 0x20 && data[len] <= 0x7E) {

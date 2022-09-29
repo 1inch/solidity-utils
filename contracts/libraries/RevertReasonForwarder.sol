@@ -3,7 +3,9 @@
 pragma solidity ^0.8.0;
 pragma abicoder v1;
 
+/// @title Revert reason forwarder.
 library RevertReasonForwarder {
+    /// @dev Forwards latest externall call revert.
     function reRevert() internal pure {
         // bubble up revert reason from latest external call
         /// @solidity memory-safe-assembly

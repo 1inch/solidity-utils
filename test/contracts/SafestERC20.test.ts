@@ -1,4 +1,4 @@
-import { constants } from '../../src/prelude';
+import { constants, expect } from '../../src/prelude';
 
 const ERC20ReturnFalseMock = artifacts.require('ERC20ReturnFalseMock');
 const ERC20ReturnTrueMock = artifacts.require('ERC20ReturnTrueMock');
