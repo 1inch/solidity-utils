@@ -1,4 +1,5 @@
 import { expect, constants, toBN } from '../../src/prelude';
+import { web3 } from 'hardhat';
 
 const UniERC20Wrapper = artifacts.require('UniERC20Wrapper');
 const ETHBadReceiver = artifacts.require('ETHBadReceiver');
@@ -111,6 +112,20 @@ contract('UniERC20', function (accounts) {
 
         it('uni symbol', async function () {
             expect(await this.wrapper.symbol()).to.equal('TKN');
+        });
+    });
+
+    describe('ERC20 without name/symbol', async function () {
+        beforeEach(async function () {
+            this.wrapper = await UniERC20Wrapper.new(accounts[0]);
+        });
+
+        it('uni name', async function () {
+            expect(web3.utils.toChecksumAddress(await this.wrapper.name())).to.equal(accounts[0]);
+        });
+
+        it('uni symbol', async function () {
+            expect(web3.utils.toChecksumAddress(await this.wrapper.symbol())).to.equal(accounts[0]);
         });
     });
 
