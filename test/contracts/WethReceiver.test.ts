@@ -1,4 +1,5 @@
 import { web3 } from 'hardhat';
+import { expect } from '../../src/prelude';
 
 const EthSenderMock = artifacts.require('EthSenderMock');
 const WethReceiver = artifacts.require('WethReceiverMock');

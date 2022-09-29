@@ -1,4 +1,4 @@
-import { constants, toBN } from '../../src/prelude';
+import { expect, constants, toBN } from '../../src/prelude';
 
 const UniERC20Wrapper = artifacts.require('UniERC20Wrapper');
 const ETHBadReceiver = artifacts.require('ETHBadReceiver');
