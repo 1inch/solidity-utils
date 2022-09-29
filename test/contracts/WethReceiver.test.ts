@@ -15,7 +15,7 @@ contract('WethReceiver', function (accounts) {
         });
 
         it('contract transfer', async function () {
-            await this.sender.transfer(account1, { value: 100 });
+            await this.sender.transfer(this.receiver.address, { value: 100 });
         });
 
         it('normal transfer', async function () {
