@@ -4,6 +4,8 @@ const UniERC20Wrapper = artifacts.require('UniERC20Wrapper');
 const ETHBadReceiver = artifacts.require('ETHBadReceiver');
 const TokenMock = artifacts.require('TokenMock');
 const ERC20Capitals = artifacts.require('ERC20Capitals');
+const ERC20bytes32Capitals = artifacts.require('ERC20bytes32Capitals');
+const ERC20bytes32 = artifacts.require('ERC20bytes32');
 
 contract('UniERC20', function (accounts) {
     describe('ERC20 token', async function () {
@@ -70,6 +72,36 @@ contract('UniERC20', function (accounts) {
     describe('ERC20 NAME/SYMBOL', async function () {
         beforeEach(async function () {
             this.token = await ERC20Capitals.new('Token', 'TKN');
+            this.wrapper = await UniERC20Wrapper.new(this.token.address);
+        });
+
+        it('uni name', async function () {
+            expect(await this.wrapper.name()).to.equal('Token');
+        });
+
+        it('uni symbol', async function () {
+            expect(await this.wrapper.symbol()).to.equal('TKN');
+        });
+    });
+
+    describe('ERC20 NAME/SYMBOL bytes32', async function () {
+        beforeEach(async function () {
+            this.token = await ERC20bytes32Capitals.new('0x546f6b656e', '0x544b4e');
+            this.wrapper = await UniERC20Wrapper.new(this.token.address);
+        });
+
+        it('uni name', async function () {
+            expect(await this.wrapper.name()).to.equal('Token');
+        });
+
+        it('uni symbol', async function () {
+            expect(await this.wrapper.symbol()).to.equal('TKN');
+        });
+    });
+
+    describe('ERC20 name/symbol bytes32', async function () {
+        beforeEach(async function () {
+            this.token = await ERC20bytes32.new('0x546f6b656e', '0x544b4e');
             this.wrapper = await UniERC20Wrapper.new(this.token.address);
         });
 

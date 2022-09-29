@@ -84,3 +84,23 @@ contract ERC20Capitals {
         SYMBOL = symbol;
     }
 }
+
+contract ERC20bytes32Capitals {
+    bytes32 public NAME;
+    bytes32 public SYMBOL;
+
+    constructor(bytes32 name, bytes32 symbol) {
+        NAME = name;
+        SYMBOL = symbol;
+    }
+}
+
+contract ERC20bytes32 {
+    bytes32 public name;
+    bytes32 public symbol;
+
+    constructor(bytes32 name_, bytes32 symbol_) {
+        name = name_;
+        symbol = symbol_;
+    }
+}
