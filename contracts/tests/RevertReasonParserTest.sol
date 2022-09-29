@@ -8,11 +8,11 @@ import "../libraries/RevertReasonParser.sol";
 contract RevertReasonParserTest {
     error TestDidNotThrow();
 
-    function emptyRevert() external pure  {
-        revert();  // solhint-disable-line reason-string
+    function emptyRevert() external pure {
+        revert(); // solhint-disable-line reason-string
     }
 
-    function emptyStringRevert() external pure  {
+    function emptyStringRevert() external pure {
         revert("");
     }
 
@@ -50,7 +50,10 @@ contract RevertReasonParserTest {
     }
 
     function testLongStringRevert() external view {
-        _test(this.longStringRevert, "Error(Very long text to test for reverts that return string of more than 32 bytes length)");
+        _test(
+            this.longStringRevert,
+            "Error(Very long text to test for reverts that return string of more than 32 bytes length)"
+        );
     }
 
     function testParseWithThrow() external view {
@@ -58,7 +61,7 @@ contract RevertReasonParserTest {
         } catch (bytes memory reason) {
             /// @solidity memory-safe-assembly
             assembly { // solhint-disable-line no-inline-assembly
-                mstore(reason, sub(mload(reason), 0x20))  // reason = reason[:-32]
+                mstore(reason, sub(mload(reason), 0x20)) // reason = reason[:-32]
             }
             RevertReasonParser.parse(reason, "");
         }

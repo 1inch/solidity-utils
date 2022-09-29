@@ -13,6 +13,8 @@ library StringUtil {
         return toHex(abi.encodePacked(value));
     }
 
+    /// @dev this is the assembly adaptation of highly optimized toHex16 code from Mikhail Vladimirov
+    /// https://stackoverflow.com/a/69266989
     function toHex(bytes memory data) internal pure returns (string memory result) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
@@ -44,7 +46,7 @@ library StringUtil {
                             shr(4, add(output, 0x0606060606060606060606060606060606060606060606060606060606060606)),
                             0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F
                         ),
-                        7   // Change 7 to 39 for lower case output
+                        7 // Change 7 to 39 for lower case output
                     )
                 )
             }
@@ -52,11 +54,11 @@ library StringUtil {
             result := mload(0x40)
             let length := mload(data)
             let resultLength := shl(1, length)
-            let toPtr := add(result, 0x22)          // 32 bytes for length + 2 bytes for '0x'
-            mstore(0x40, add(toPtr, resultLength))  // move free memory pointer
-            mstore(add(result, 2), 0x3078)          // 0x3078 is right aligned so we write to `result + 2`
-                                                    // to store the last 2 bytes in the beginning of the string
-            mstore(result, add(resultLength, 2))    // extra 2 bytes for '0x'
+            let toPtr := add(result, 0x22) // 32 bytes for length + 2 bytes for '0x'
+            mstore(0x40, add(toPtr, resultLength)) // move free memory pointer
+            mstore(add(result, 2), 0x3078) // 0x3078 is right aligned so we write to `result + 2`
+            // to store the last 2 bytes in the beginning of the string
+            mstore(result, add(resultLength, 2)) // extra 2 bytes for '0x'
 
             for {
                 let fromPtr := add(data, 0x20)

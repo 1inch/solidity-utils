@@ -6,7 +6,7 @@ pragma abicoder v1;
 import "./EthReceiver.sol";
 
 abstract contract OnlyWethReceiver is EthReceiver {
-    address private immutable _WETH;  // solhint-disable-line var-name-mixedcase
+    address private immutable _WETH; // solhint-disable-line var-name-mixedcase
 
     constructor(address weth) {
         _WETH = address(weth);

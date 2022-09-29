@@ -149,9 +149,11 @@ contract ERC20PermitNoRevertMock is
         bytes32 r,
         bytes32 s
     ) public virtual override {
-        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) { // solhint-disable-line no-empty-blocks
+        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {
+            // solhint-disable-line no-empty-blocks
             // do nothing
-        } catch { // solhint-disable-line no-empty-blocks
+        } catch {
+            // solhint-disable-line no-empty-blocks
             // do nothing
         }
     }
@@ -187,12 +189,12 @@ contract SafeERC20Wrapper {
     }
 
     function permit(
-        address /* owner */,
-        address /* spender */,
-        uint256 /* value */,
-        uint256 /* deadline */,
-        uint8 /* v */,
-        bytes32 /* r */,
+        address, /* owner */
+        address, /* spender */
+        uint256, /* value */
+        uint256, /* deadline */
+        uint8, /* v */
+        bytes32, /* r */
         bytes32 /* s */
     ) external {
         _token.safePermit(msg.data[4:]);

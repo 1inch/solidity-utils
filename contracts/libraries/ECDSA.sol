@@ -19,7 +19,12 @@ library ECDSA {
     uint256 private constant _COMPACT_S_MASK = 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
     uint256 private constant _COMPACT_V_SHIFT = 255;
 
-    function recover(bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns(address signer) {
+    function recover(
+        bytes32 hash,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal view returns (address signer) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             if lt(s, _S_BOUNDARY) {
@@ -36,7 +41,11 @@ library ECDSA {
         }
     }
 
-    function recover(bytes32 hash, bytes32 r, bytes32 vs) internal view returns(address signer) {
+    function recover(
+        bytes32 hash,
+        bytes32 r,
+        bytes32 vs
+    ) internal view returns (address signer) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let s := and(vs, _COMPACT_S_MASK)
@@ -54,14 +63,14 @@ library ECDSA {
         }
     }
 
-    /// WARNING!!!
+    /// @dev WARNING!!!
     /// There is a known signature malleability issue with two representations of signatures!
     /// Even though this function is able to verify both standard 65-byte and compact 64-byte EIP-2098 signatures
     /// one should never use raw signatures for any kind of invalidation logic in their code.
     /// As the standard and compact representations are interchangeable any invalidation logic that relies on
     /// signature uniqueness will get rekt.
     /// More info: https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h
-    function recover(bytes32 hash, bytes calldata signature) internal view returns(address signer) {
+    function recover(bytes32 hash, bytes calldata signature) internal view returns (address signer) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
@@ -97,7 +106,11 @@ library ECDSA {
         }
     }
 
-    function recoverOrIsValidSignature(address signer, bytes32 hash, bytes calldata signature) internal view returns(bool success) {
+    function recoverOrIsValidSignature(
+        address signer,
+        bytes32 hash,
+        bytes calldata signature
+    ) internal view returns (bool success) {
         if (signer == address(0)) return false;
         if ((signature.length == 64 || signature.length == 65) && recover(hash, signature) == signer) {
             return true;
@@ -105,7 +118,13 @@ library ECDSA {
         return isValidSignature(signer, hash, signature);
     }
 
-    function recoverOrIsValidSignature(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns(bool success) {
+    function recoverOrIsValidSignature(
+        address signer,
+        bytes32 hash,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal view returns (bool success) {
         if (signer == address(0)) return false;
         if (recover(hash, v, r, s) == signer) {
             return true;
@@ -113,7 +132,12 @@ library ECDSA {
         return isValidSignature(signer, hash, v, r, s);
     }
 
-    function recoverOrIsValidSignature(address signer, bytes32 hash, bytes32 r, bytes32 vs) internal view returns(bool success) {
+    function recoverOrIsValidSignature(
+        address signer,
+        bytes32 hash,
+        bytes32 r,
+        bytes32 vs
+    ) internal view returns (bool success) {
         if (signer == address(0)) return false;
         if (recover(hash, r, vs) == signer) {
             return true;
@@ -121,7 +145,12 @@ library ECDSA {
         return isValidSignature(signer, hash, r, vs);
     }
 
-    function recoverOrIsValidSignature65(address signer, bytes32 hash, bytes32 r, bytes32 vs) internal view returns(bool success) {
+    function recoverOrIsValidSignature65(
+        address signer,
+        bytes32 hash,
+        bytes32 r,
+        bytes32 vs
+    ) internal view returns (bool success) {
         if (signer == address(0)) return false;
         if (recover(hash, r, vs) == signer) {
             return true;
@@ -129,7 +158,11 @@ library ECDSA {
         return isValidSignature65(signer, hash, r, vs);
     }
 
-    function isValidSignature(address signer, bytes32 hash, bytes calldata signature) internal view returns(bool success) {
+    function isValidSignature(
+        address signer,
+        bytes32 hash,
+        bytes calldata signature
+    ) internal view returns (bool success) {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, signature));
         // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
@@ -148,7 +181,13 @@ library ECDSA {
         }
     }
 
-    function isValidSignature(address signer, bytes32 hash, uint8 v, bytes32 r, bytes32 s) internal view returns(bool success) {
+    function isValidSignature(
+        address signer,
+        bytes32 hash,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) internal view returns (bool success) {
         bytes4 selector = IERC1271.isValidSignature.selector;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
@@ -167,7 +206,12 @@ library ECDSA {
         }
     }
 
-    function isValidSignature(address signer, bytes32 hash, bytes32 r, bytes32 vs) internal view returns(bool success) {
+    function isValidSignature(
+        address signer,
+        bytes32 hash,
+        bytes32 r,
+        bytes32 vs
+    ) internal view returns (bool success) {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, abi.encodePacked(r, vs)));
         // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
@@ -187,7 +231,12 @@ library ECDSA {
         }
     }
 
-    function isValidSignature65(address signer, bytes32 hash, bytes32 r, bytes32 vs) internal view returns(bool success) {
+    function isValidSignature65(
+        address signer,
+        bytes32 hash,
+        bytes32 r,
+        bytes32 vs
+    ) internal view returns (bool success) {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, abi.encodePacked(r, vs & ~uint256(1 << 255), uint8(vs >> 255))));
         // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
