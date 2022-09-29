@@ -124,8 +124,15 @@ library UniERC20 {
         }
 
         if (success && data.length >= 0x40) {
-            (uint256 offset, ) = abi.decode(data, (uint256, uint256));
-            if (offset == 0x20) {
+            (uint256 offset, uint256 len) = abi.decode(data, (uint256, uint256));
+            /*
+                return data is padded up to 32 bytes with ABI encoder also sometimes
+                there is extra 32 bytes of zeros padded in the end:
+                https://github.com/ethereum/solidity/issues/10170
+                because of that we can't check for equality and instead check
+                that overall data length is greater or equal than string length + extra 64 bytes
+            */
+            if (offset == 0x20 && data.length >= 0x40 + len) {
                 /// @solidity memory-safe-assembly
                 assembly { // solhint-disable-line no-inline-assembly
                     result := add(data, 0x40)
@@ -133,7 +140,6 @@ library UniERC20 {
                 return result;
             }
         }
-        /// Do we really all code below?
         if (success && data.length == 32) {
             uint256 len = 0;
             while (len < data.length && data[len] >= 0x20 && data[len] <= 0x7E) {
