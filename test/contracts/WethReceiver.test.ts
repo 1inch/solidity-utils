@@ -28,7 +28,7 @@ describe('WethReceiver', async function () {
     it('normal transfer', async function () {
         const { wethReceiverMock } = await loadFixture(deployMocks);
         await expect(
-            signer1.sendTransaction({to: wethReceiverMock.address, value: 100})
+            signer1.sendTransaction({ to: wethReceiverMock.address, value: 100 })
         ).to.be.revertedWithCustomError(wethReceiverMock, 'EthDepositRejected');
     });
 });
