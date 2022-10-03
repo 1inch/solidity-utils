@@ -87,10 +87,7 @@ describe('UniERC20', function () {
     describe('ERC20 NAME/SYMBOL bytes32', async function () {
         const deployMocks = async function () {
             const ERC20bytes32Capitals = await ethers.getContractFactory('ERC20bytes32Capitals');
-            const token = await ERC20bytes32Capitals.deploy(
-                formatBytes32String('Token'),
-                formatBytes32String('TKN'),
-            );
+            const token = await ERC20bytes32Capitals.deploy(formatBytes32String('Token'), formatBytes32String('TKN'));
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(token.address);
             return { token, wrapper };
@@ -110,10 +107,7 @@ describe('UniERC20', function () {
     describe('ERC20 name/symbol bytes32', async function () {
         const deployMocks = async function () {
             const ERC20bytes32 = await ethers.getContractFactory('ERC20bytes32');
-            const token = await ERC20bytes32.deploy(
-                formatBytes32String('Token'),
-                formatBytes32String('TKN'),
-            );
+            const token = await ERC20bytes32.deploy(formatBytes32String('Token'), formatBytes32String('TKN'));
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(token.address);
             return { token, wrapper };
