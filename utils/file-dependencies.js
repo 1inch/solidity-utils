@@ -15,7 +15,7 @@ program
 program.parse(process.argv);
 
 const options = program.opts();
-// process input parameter 
+// process input parameter
 const rootPath = options.input;
 // process alias parameter
 const aliases = {};
@@ -74,7 +74,7 @@ function extractFileImports(file){
             console.log('No source found for import: ', match);
         }
     }
-    
+
     return imports;
 }
 
@@ -105,7 +105,7 @@ function isAlias(dependencyLink){
 
 function resolveProject(parentProject, dependencyLink){
     if (isAlias(dependencyLink)) {
-        let alias = getAliasNameIfExists(dependencyLink);    
+        let alias = getAliasNameIfExists(dependencyLink);
         if (alias){
             return alias;
         }
@@ -120,7 +120,7 @@ function resolveProject(parentProject, dependencyLink){
 
 function resolvePath(parentNode, dependencyLink){
     if (isAlias(dependencyLink)) {
-        let alias = getAliasIfExists(dependencyLink) 
+        let alias = getAliasIfExists(dependencyLink)
         if( alias ){
             return path.join(process.cwd(), alias);
         }
