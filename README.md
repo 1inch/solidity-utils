@@ -65,6 +65,66 @@ Add to `package.json` file solidity compiler version and shortcut to run command
 
 ...
 
+#### Dependencies list (imports-list)
+
+Lists all imports recursively for the given solidity contract file. 
+
+##### Usage
+```
+npx imports-list -i <solidity file> [-a <alias list>]
+```
+
+Available parameters
+```
+Options:
+  -i, --input <input>     file to get dependencies for
+  -a, --alias [alias...]  projects alias list
+  -h, --help              display help for command
+```
+Aliases are used to provide source code for third-party projects. 
+For example, your contract uses imports from your other project and import is defined as
+```
+import "@1inch/otherproject/contracts/dependency.sol";
+```
+and you've got source code for `@1inch/otherproject` locally. Then you provide local path for the project to rip dependencies from `dependency.sol` as well.
+If there are several dependencies they should be provided using space as separator. 
+
+##### Example
+File imports
+```Solidity
+#rootFile.sol
+import '@1inch/otherproject/contracts/dependency.sol'
+
+#@1inch/otherproject/contracts/dependency.sol
+import 'helpers/helper.sol'
+```
+File and folder structure
+```
+rootFolder/
+
+-- mainProject/
+---- contracts/
+------ rootFile.sol
+
+-- dependencyProject/
+---- helpers/
+------ helper.sol
+---- dependency.sol
+```
+Command
+```
+rootFolder/mainProject % npx imports-list -i './contracts/rootFile.sol' -a '@1inch/otherproject' '../dependencyProject'
+```
+Output
+```
+Project => root
+not set
+
+Project => @1inch/otherproject
+../otherproject/contracts/dependency.sol
+../otherproject/contracts/helpers/helper.sol
+```
+
 #### Test documentation generator (test-docgen)
 Script generates documentation for tests in markdown format.
 Give descriptions for `describe` and `it` sections and build documentation using these descriptions.
