@@ -78,7 +78,8 @@
   },
   "bin": {
     "solidity-utils-docify": "utils/docify.utils.js",
-    "test-docgen": "utils/test-docgen.js"
+    "test-docgen": "utils/test-docgen.js",
+    "imports-list": "utils/file-dependencies.js"
   },
   "bugs": {
     "url": "https://github.com/1inch/solidity-utils/issues"
