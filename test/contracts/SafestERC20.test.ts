@@ -2,13 +2,6 @@ import { constants, expect } from '../../src/prelude';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 
-const EIP712Domain = [
-    { name: 'name', type: 'string' },
-    { name: 'version', type: 'string' },
-    { name: 'chainId', type: 'uint256' },
-    { name: 'verifyingContract', type: 'address' },
-];
-
 const Permit = [
     { name: 'owner', type: 'address' },
     { name: 'spender', type: 'address' },
@@ -93,24 +86,23 @@ contract('SafeERC20', function () {
 
             const chainId = await this.token.getChainId();
 
-            this.data = {
-                primaryType: 'Permit',
-                types: { EIP712Domain, Permit },
-                domain: {
-                    name: 'ERC20PermitNoRevertMock',
-                    version: '1',
-                    chainId,
-                    verifyingContract: this.token.address,
-                },
-                message: {
-                    owner: owner.address,
-                    spender: spender.address,
-                    value: '42',
-                    nonce: '0',
-                    deadline: constants.MAX_UINT256,
-                },
+            this.domain = {
+                name: 'ERC20PermitNoRevertMock',
+                version: '1',
+                chainId,
+                verifyingContract: this.token.address,
             };
-            this.signature = await owner.signMessage(this.data);
+            this.data = {
+                owner: owner.address,
+                spender: spender.address,
+                value: '42',
+                nonce: '0',
+                deadline: constants.MAX_UINT256,
+            };
+            //console.log(this.data);
+            this.signature = ethers.utils.splitSignature(
+                await owner._signTypedData(this.domain, { Permit }, this.data),
+            );
         });
 
         it('accepts owner signature', async function () {
@@ -118,27 +110,27 @@ contract('SafeERC20', function () {
             expect(await this.token.allowance(owner.address, spender.address)).to.equal('0');
 
             await this.wrapper.permit(
-                this.data.message.owner,
-                this.data.message.spender,
-                this.data.message.value,
-                this.data.message.deadline,
+                this.data.owner,
+                this.data.spender,
+                this.data.value,
+                this.data.deadline,
                 this.signature.v,
                 this.signature.r,
                 this.signature.s,
             );
 
             expect(await this.token.nonces(owner.address)).to.equal('1');
-            expect(await this.token.allowance(owner.address, spender.address)).to.equal(this.data.message.value);
+            expect(await this.token.allowance(owner.address, spender.address)).to.equal(this.data.value);
         });
 
         it('revert on reused signature', async function () {
             expect(await this.token.nonces(owner.address)).to.equal('0');
             // use valid signature and consume nounce
             await this.wrapper.permit(
-                this.data.message.owner,
-                this.data.message.spender,
-                this.data.message.value,
-                this.data.message.deadline,
+                this.data.owner,
+                this.data.spender,
+                this.data.value,
+                this.data.deadline,
                 this.signature.v,
                 this.signature.r,
                 this.signature.s,
@@ -146,10 +138,10 @@ contract('SafeERC20', function () {
             expect(await this.token.nonces(owner.address)).to.equal('1');
             // invalid call does not revert for this token implementation
             await this.token.permit(
-                this.data.message.owner,
-                this.data.message.spender,
-                this.data.message.value,
-                this.data.message.deadline,
+                this.data.owner,
+                this.data.spender,
+                this.data.value,
+                this.data.deadline,
                 this.signature.v,
                 this.signature.r,
                 this.signature.s,
@@ -157,10 +149,10 @@ contract('SafeERC20', function () {
             expect(await this.token.nonces(owner.address)).to.equal('1');
             // ignore invalid call when called through the SafeERC20 library
             await this.wrapper.permit(
-                this.data.message.owner,
-                this.data.message.spender,
-                this.data.message.value,
-                this.data.message.deadline,
+                this.data.owner,
+                this.data.spender,
+                this.data.value,
+                this.data.deadline,
                 this.signature.v,
                 this.signature.r,
                 this.signature.s,
@@ -178,10 +170,10 @@ contract('SafeERC20', function () {
 
             // invalid call does not revert for this token implementation
             await this.token.permit(
-                this.data.message.owner,
-                this.data.message.spender,
-                this.data.message.value,
-                this.data.message.deadline,
+                this.data.owner,
+                this.data.spender,
+                this.data.value,
+                this.data.deadline,
                 invalidSignature.v,
                 invalidSignature.r,
                 invalidSignature.s,
@@ -189,10 +181,10 @@ contract('SafeERC20', function () {
 
             // ignores call revert when called through the SafeERC20 library
             await this.wrapper.permit(
-                this.data.message.owner,
-                this.data.message.spender,
-                this.data.message.value,
-                this.data.message.deadline,
+                this.data.owner,
+                this.data.spender,
+                this.data.value,
+                this.data.deadline,
                 invalidSignature.v,
                 invalidSignature.r,
                 invalidSignature.s,
