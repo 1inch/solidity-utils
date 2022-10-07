@@ -71,13 +71,14 @@ contract ETHBadReceiver {
     }
 
     receive() external payable {
+        // solhint-disable-next-line reason-string
         revert();
     }
 }
 
 contract ERC20Capitals {
-    string public NAME;
-    string public SYMBOL;
+    string public NAME; // solhint-disable-line var-name-mixedcase
+    string public SYMBOL; // solhint-disable-line var-name-mixedcase
 
     constructor(string memory name, string memory symbol) {
         NAME = name;
@@ -86,8 +87,8 @@ contract ERC20Capitals {
 }
 
 contract ERC20bytes32Capitals {
-    bytes32 public NAME;
-    bytes32 public SYMBOL;
+    bytes32 public NAME; // solhint-disable-line var-name-mixedcase
+    bytes32 public SYMBOL; // solhint-disable-line var-name-mixedcase
 
     constructor(bytes32 name, bytes32 symbol) {
         NAME = name;

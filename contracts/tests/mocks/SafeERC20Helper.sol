@@ -149,13 +149,8 @@ contract ERC20PermitNoRevertMock is
         bytes32 r,
         bytes32 s
     ) public virtual override {
-        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {
-            // solhint-disable-line no-empty-blocks
-            // do nothing
-        } catch {
-            // solhint-disable-line no-empty-blocks
-            // do nothing
-        }
+        // solhint-disable-next-line no-empty-blocks
+        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {} catch {}
     }
 }
 
