@@ -92,11 +92,17 @@ describe('SafeERC20', async () => {
     };
 
     describe('with address that has no contract code', async () => {
-        shouldRevertOnAllCalls(['SafeTransferFailed', 'SafeTransferFromFailed', 'ForceApproveFailed', ''], deployWrapperSimple);
+        shouldRevertOnAllCalls(
+            ['SafeTransferFailed', 'SafeTransferFromFailed', 'ForceApproveFailed', ''],
+            deployWrapperSimple,
+        );
     });
 
     describe('with token that returns false on all calls', async () => {
-        shouldRevertOnAllCalls(['SafeTransferFailed', 'SafeTransferFromFailed', 'ForceApproveFailed'], deployWrapperFalseMock);
+        shouldRevertOnAllCalls(
+            ['SafeTransferFailed', 'SafeTransferFromFailed', 'ForceApproveFailed'],
+            deployWrapperFalseMock,
+        );
     });
 
     describe('with token that returns true on all calls', async () => {
@@ -109,12 +115,12 @@ describe('SafeERC20', async () => {
 
     describe('non-zero to non-zero approval forbidden', async () => {
         it('zero to non-zero approval should pass', async () => {
-            const { wrapper}  = await loadFixture(deployWrapperZeroApprove);
+            const { wrapper } = await loadFixture(deployWrapperZeroApprove);
             await wrapper.approve(100);
         });
 
         it('non-zero to non-zero approval should pass', async () => {
-            const { wrapper}  = await loadFixture(deployWrapperZeroApprove);
+            const { wrapper } = await loadFixture(deployWrapperZeroApprove);
             await wrapper.approve(100);
             await wrapper.approve(100);
         });
@@ -218,7 +224,7 @@ describe('SafeERC20', async () => {
         });
     });
 
-    function shouldRevertOnAllCalls(reasons: string[], fixture: () => Promise<{wrapper: Contract;}>) {
+    function shouldRevertOnAllCalls(reasons: string[], fixture: () => Promise<{ wrapper: Contract }>) {
         it('reverts on transfer', async () => {
             const { wrapper } = await loadFixture(fixture);
             await expect(wrapper.transfer()).to.be.revertedWithCustomError(wrapper, reasons[0]);
@@ -253,7 +259,7 @@ describe('SafeERC20', async () => {
         });
     }
 
-    function shouldOnlyRevertOnErrors(fixture: () => Promise<{wrapper: Contract;}>) {
+    function shouldOnlyRevertOnErrors(fixture: () => Promise<{ wrapper: Contract }>) {
         it("doesn't revert on transfer", async () => {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transfer();
