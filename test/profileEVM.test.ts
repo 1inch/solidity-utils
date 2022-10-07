@@ -18,7 +18,7 @@ describe('trace inspection', async function () {
         await usdt.mint(signer1.address, ether('1000'));
         await usdt.mint(signer2.address, ether('1000'));
         return { usdt };
-    };
+    }
 
     describe('profileEVM', async function () {
         it('should be counted ERC20 Transfer', async function () {

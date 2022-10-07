@@ -16,7 +16,7 @@ describe('AddressArray', async function () {
         const AddressArrayMock = await ethers.getContractFactory('AddressArrayMock');
         const addressArrayMock = await AddressArrayMock.deploy();
         return { addressArrayMock };
-    };
+    }
 
     describe('length', async function () {
         it('should calculate length 0', async function () {

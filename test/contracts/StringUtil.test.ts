@@ -17,7 +17,7 @@ describe('StringUtil', async () => {
         const StringUtilTest = await ethers.getContractFactory('StringUtilTest');
         const stringUtilTest = await StringUtilTest.deploy();
         return { stringUtilTest };
-    };
+    }
 
     describe('Validity', async () => {
         it('Uint 256', () => test(uint256TestValue));

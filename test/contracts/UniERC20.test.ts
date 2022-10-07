@@ -2,7 +2,7 @@ import { expect, constants, ether } from '../../src/prelude';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
-import { formatBytes32String } from 'ethers/lib/utils';
+import { formatBytes32String, getAddress } from 'ethers/lib/utils';
 
 describe('UniERC20', function () {
     let signer1: SignerWithAddress;
@@ -133,12 +133,12 @@ describe('UniERC20', function () {
 
         it('uni name', async function () {
             const { wrapper } = await loadFixture(deployMocks);
-            expect(ethers.utils.getAddress(await wrapper.name())).to.equal(signer1.address);
+            expect(getAddress(await wrapper.name())).to.equal(signer1.address);
         });
 
         it('uni symbol', async function () {
             const { wrapper } = await loadFixture(deployMocks);
-            expect(ethers.utils.getAddress(await wrapper.symbol())).to.equal(signer1.address);
+            expect(getAddress(await wrapper.symbol())).to.equal(signer1.address);
         });
     });
 

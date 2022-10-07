@@ -7,7 +7,7 @@ describe('RevertReasonParser', async () => {
         const RevertReasonParserTest = await ethers.getContractFactory('RevertReasonParserTest');
         const revertReasonParserTest = await RevertReasonParserTest.deploy();
         return { revertReasonParserTest };
-    };
+    }
 
     describe('parse', async function () {
         it('should be parsed as Unknown (Invalid revert reason)', async function () {

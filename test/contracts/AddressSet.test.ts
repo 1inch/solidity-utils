@@ -16,7 +16,7 @@ describe('AddressSet', async function () {
         const AddressSetMock = await ethers.getContractFactory('AddressSetMock');
         const addressSetMock = await AddressSetMock.deploy();
         return { addressSetMock };
-    };
+    }
 
     describe('length', async function () {
         it('should get length 0', async function () {

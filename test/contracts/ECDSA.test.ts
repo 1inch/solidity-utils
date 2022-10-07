@@ -3,7 +3,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { arrayify, concat } from 'ethers/lib/utils';
+import { arrayify, concat, splitSignature, hexConcat, hashMessage, keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 
 describe('ECDSA', async function () {
     let account: SignerWithAddress;
@@ -26,28 +26,28 @@ describe('ECDSA', async function () {
     };
 
     const TEST_MESSAGE = '1inch-ecdsa-asm-library';
-    const HASHED_TEST_MESSAGE = ethers.utils.hashMessage('1inch-ecdsa-asm-library');
-    const WRONG_MESSAGE = ethers.utils.keccak256(ethers.utils.toUtf8Bytes('Nope'));
+    const HASHED_TEST_MESSAGE = hashMessage('1inch-ecdsa-asm-library');
+    const WRONG_MESSAGE = keccak256(toUtf8Bytes('Nope'));
     const NON_HASH_MESSAGE = arrayify('0x' + Buffer.from('abcd').toString('hex'));
 
     const split2 = (signature: string): [string, string] => {
-        const { r, _vs } = ethers.utils.splitSignature(signature);
+        const { r, _vs } = splitSignature(signature);
         return [r, _vs];
     };
 
     const split3 = (signature: string): [string, string, string] => {
-        const { v, r, s } = ethers.utils.splitSignature(signature);
+        const { v, r, s } = splitSignature(signature);
         return [v.toString(), r, s];
     };
 
     const to2098Format = (signature: string): string => {
-        const { compact } = ethers.utils.splitSignature(signature);
+        const { compact } = splitSignature(signature);
         return compact;
     };
 
     const from2098Format = (signature: string): string => {
-        const { v, r, s } = ethers.utils.splitSignature(signature);
-        const ret = ethers.utils.hexConcat([r, s, arrayify(v)]);
+        const { v, r, s } = splitSignature(signature);
+        const ret = hexConcat([r, s, arrayify(v)]);
         return ret;
     };
 
@@ -92,9 +92,7 @@ describe('ECDSA', async function () {
                 it('returns signer address with correct signature for arbitrary length message', async () => {
                     const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
-                    expect(await ecdsa.recover(ethers.utils.hashMessage(NON_HASH_MESSAGE), signature)).to.be.equals(
-                        account.address,
-                    );
+                    expect(await ecdsa.recover(hashMessage(NON_HASH_MESSAGE), signature)).to.be.equals(account.address);
                 });
 
                 it('returns a different address', async () => {
@@ -241,18 +239,10 @@ describe('ECDSA', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(
-                        await ecdsa.isValidSignature(
-                            erc1271wallet.address,
-                            ethers.utils.hashMessage(NON_HASH_MESSAGE),
-                            signature,
-                        ),
+                        await ecdsa.isValidSignature(erc1271wallet.address, hashMessage(NON_HASH_MESSAGE), signature),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.isValidSignature(
-                            randomAccount.address,
-                            ethers.utils.hashMessage(NON_HASH_MESSAGE),
-                            signature,
-                        ),
+                        await ecdsa.isValidSignature(randomAccount.address, hashMessage(NON_HASH_MESSAGE), signature),
                     ).to.be.equals(false);
                 });
 
@@ -261,7 +251,7 @@ describe('ECDSA', async function () {
                     expect(
                         await ecdsa.isValidSignature(
                             erc1271wallet.address,
-                            ethers.utils.hashMessage(NON_HASH_MESSAGE),
+                            hashMessage(NON_HASH_MESSAGE),
                             invalidSignature,
                         ),
                     ).to.be.equals(false);
@@ -494,7 +484,7 @@ describe('ECDSA', async function () {
                 it('with invalid signature', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
-                    const HASHED_WRONG_MESSAGE = ethers.utils.hashMessage(WRONG_MESSAGE);
+                    const HASHED_WRONG_MESSAGE = hashMessage(WRONG_MESSAGE);
                     expect(
                         await ecdsa.isValidSignature65(
                             erc1271wallet.address,
@@ -552,21 +542,21 @@ describe('ECDSA', async function () {
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
                             account.address,
-                            ethers.utils.hashMessage(NON_HASH_MESSAGE),
+                            hashMessage(NON_HASH_MESSAGE),
                             signature,
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
                             randomAccount.address,
-                            ethers.utils.hashMessage(NON_HASH_MESSAGE),
+                            hashMessage(NON_HASH_MESSAGE),
                             signature,
                         ),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
                             erc1271wallet.address,
-                            ethers.utils.hashMessage(NON_HASH_MESSAGE),
+                            hashMessage(NON_HASH_MESSAGE),
                             signature,
                         ),
                     ).to.be.equals(true);
@@ -577,14 +567,14 @@ describe('ECDSA', async function () {
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
                             account.address,
-                            ethers.utils.hashMessage(NON_HASH_MESSAGE),
+                            hashMessage(NON_HASH_MESSAGE),
                             invalidSignature,
                         ),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
                             erc1271wallet.address,
-                            ethers.utils.hashMessage(NON_HASH_MESSAGE),
+                            hashMessage(NON_HASH_MESSAGE),
                             invalidSignature,
                         ),
                     ).to.be.equals(false);
@@ -948,7 +938,7 @@ describe('ECDSA', async function () {
                 it('with invalid signature', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
-                    const HASHED_WRONG_MESSAGE = ethers.utils.hashMessage(WRONG_MESSAGE);
+                    const HASHED_WRONG_MESSAGE = hashMessage(WRONG_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature65(
                             account.address,
@@ -973,13 +963,13 @@ describe('ECDSA', async function () {
             const { ecdsa } = await loadFixture(deployContracts);
             const hashedTestMessageWithoutPrefix = HASHED_TEST_MESSAGE.substring(2);
             const msg = concat([
-                ethers.utils.toUtf8Bytes('\x19Ethereum Signed Message:\n'),
-                ethers.utils.toUtf8Bytes(String(hashedTestMessageWithoutPrefix.length / 2)),
+                toUtf8Bytes('\x19Ethereum Signed Message:\n'),
+                toUtf8Bytes(String(hashedTestMessageWithoutPrefix.length / 2)),
                 arrayify(hashedTestMessageWithoutPrefix, {
                     allowMissingPrefix: true,
                 }),
             ]);
-            const ethSignedMessage = ethers.utils.keccak256(msg);
+            const ethSignedMessage = keccak256(msg);
             expect(await ecdsa.toEthSignedMessageHash(HASHED_TEST_MESSAGE)).to.be.equals(ethSignedMessage);
         });
     });
@@ -989,9 +979,9 @@ describe('ECDSA', async function () {
             const { ecdsa } = await loadFixture(deployContracts);
             const domainSeparator = HASHED_TEST_MESSAGE.substring(2);
             const structHash = HASHED_TEST_MESSAGE.substring(2);
-            const typedDataHash = ethers.utils.keccak256(
+            const typedDataHash = keccak256(
                 concat([
-                    ethers.utils.toUtf8Bytes('\x19\x01'),
+                    toUtf8Bytes('\x19\x01'),
                     arrayify(domainSeparator, { allowMissingPrefix: true }),
                     arrayify(String(structHash), { allowMissingPrefix: true }),
                 ]),

@@ -18,7 +18,7 @@ describe('WethReceiver', async function () {
         const wethReceiverMock = await WethReceiverMock.deploy(ethSenderMock.address);
 
         return { wethReceiverMock, ethSenderMock };
-    };
+    }
 
     it('contract transfer', async function () {
         const { wethReceiverMock, ethSenderMock } = await loadFixture(deployMocks);

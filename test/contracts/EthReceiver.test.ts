@@ -17,7 +17,7 @@ describe('EthReceiver', async function () {
         const EthSenderMock = await ethers.getContractFactory('EthSenderMock');
         const ethSenderMock = await EthSenderMock.deploy();
         return { ethReceiverMock, ethSenderMock };
-    };
+    }
 
     it('contract transfer', async function () {
         const { ethReceiverMock, ethSenderMock } = await loadFixture(deployMocks);

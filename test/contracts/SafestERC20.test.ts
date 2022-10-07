@@ -3,6 +3,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 import { Contract, ContractFactory } from 'ethers';
+import { splitSignature } from 'ethers/lib/utils';
 
 const Permit = [
     { name: 'owner', type: 'address' },
@@ -26,7 +27,7 @@ describe('SafeERC20', async () => {
         const wrapper = await SafeERC20Wrapper.deploy(spender.address);
         await wrapper.deployed();
         return { wrapper };
-    };
+    }
 
     async function deployWrapperFalseMock() {
         const ERC20ReturnFalseMock = await ethers.getContractFactory('ERC20ReturnFalseMock');
@@ -35,7 +36,7 @@ describe('SafeERC20', async () => {
         const wrapper = await SafeERC20Wrapper.deploy(falseMock.address);
         await wrapper.deployed();
         return { wrapper };
-    };
+    }
 
     async function deployWrapperTrueMock() {
         const ERC20ReturnTrueMock = await ethers.getContractFactory('ERC20ReturnTrueMock');
@@ -44,7 +45,7 @@ describe('SafeERC20', async () => {
         const wrapper = await SafeERC20Wrapper.deploy(trueMock.address);
         await wrapper.deployed();
         return { wrapper };
-    };
+    }
 
     async function deployWrapperNoReturnMock() {
         const ERC20NoReturnMock = await ethers.getContractFactory('ERC20NoReturnMock');
@@ -53,7 +54,7 @@ describe('SafeERC20', async () => {
         const wrapper = await SafeERC20Wrapper.deploy(noReturnMock.address);
         await wrapper.deployed();
         return { wrapper };
-    };
+    }
 
     async function deployWrapperZeroApprove() {
         const ERC20ThroughZeroApprove = await ethers.getContractFactory('ERC20ThroughZeroApprove');
@@ -62,7 +63,7 @@ describe('SafeERC20', async () => {
         const wrapper = await SafeERC20Wrapper.deploy(zeroApprove.address);
         await wrapper.deployed();
         return { wrapper };
-    };
+    }
 
     async function deployPermitNoRevertAndSign() {
         const ERC20PermitNoRevertMock = await ethers.getContractFactory('ERC20PermitNoRevertMock');
@@ -87,9 +88,9 @@ describe('SafeERC20', async () => {
             deadline: constants.MAX_UINT256,
         };
         //console.log(data);
-        const signature = ethers.utils.splitSignature(await owner._signTypedData(domain, { Permit }, data));
+        const signature = splitSignature(await owner._signTypedData(domain, { Permit }, data));
         return { token, wrapper, data, signature };
-    };
+    }
 
     describe('with address that has no contract code', async () => {
         shouldRevertOnAllCalls(
