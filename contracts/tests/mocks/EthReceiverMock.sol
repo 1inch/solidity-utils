@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../contracts/EthReceiver.sol";
+import "../../EthReceiver.sol";
 
 contract EthReceiverMock is EthReceiver {
     constructor() EthReceiver() {}

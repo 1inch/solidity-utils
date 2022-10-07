@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../contracts/libraries/RevertReasonForwarder.sol";
+import "../../libraries/RevertReasonForwarder.sol";
 
 contract EthSenderMock {
     function transfer(address payable to) public payable {

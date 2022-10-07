@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../contracts/libraries/AddressArray.sol";
+import "../../libraries/AddressArray.sol";
 
 contract AddressArrayMock {
     using AddressArray for AddressArray.Data;
