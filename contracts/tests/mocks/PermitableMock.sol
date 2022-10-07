@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 pragma abicoder v1;
 
-import "../../contracts/libraries/SafeERC20.sol";
+import "../../libraries/SafeERC20.sol";
 
 contract PermitableMock {
     using SafeERC20 for IERC20;

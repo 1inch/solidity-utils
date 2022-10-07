@@ -1,29 +1,34 @@
-import { web3 } from 'hardhat';
 import { expect } from '../../src/prelude';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ethers } from 'hardhat';
 
-const EthSenderMock = artifacts.require('EthSenderMock');
-const WethReceiver = artifacts.require('WethReceiverMock');
+describe('WethReceiver', async function () {
+    let signer1: SignerWithAddress;
 
-contract('WethReceiver', function (accounts) {
-    describe('WethReceiver', async function () {
-        const account = accounts[0];
-        const account1 = accounts[1];
+    before(async function () {
+        [signer1] = await ethers.getSigners();
+    });
 
-        beforeEach(async function () {
-            this.sender = await EthSenderMock.new();
-            this.receiver = await WethReceiver.new(this.sender.address);
-        });
+    async function deployMocks() {
+        const EthSenderMock = await ethers.getContractFactory('EthSenderMock');
+        const ethSenderMock = await EthSenderMock.deploy();
 
-        it('contract transfer', async function () {
-            await this.sender.transfer(this.receiver.address, { value: 100 });
-        });
+        const WethReceiverMock = await ethers.getContractFactory('WethReceiverMock');
+        const wethReceiverMock = await WethReceiverMock.deploy(ethSenderMock.address);
 
-        it('normal transfer', async function () {
-            await expect(web3.eth.sendTransaction({
-                from: account,
-                to: this.receiver.address,
-                value: 100,
-            })).to.eventually.be.rejectedWith('EthDepositRejected');
-        });
+        return { wethReceiverMock, ethSenderMock };
+    }
+
+    it('contract transfer', async function () {
+        const { wethReceiverMock, ethSenderMock } = await loadFixture(deployMocks);
+        await ethSenderMock.transfer(wethReceiverMock.address, { value: 100 });
+    });
+
+    it('normal transfer', async function () {
+        const { wethReceiverMock } = await loadFixture(deployMocks);
+        await expect(
+            signer1.sendTransaction({ to: wethReceiverMock.address, value: 100 }),
+        ).to.be.revertedWithCustomError(wethReceiverMock, 'EthDepositRejected');
     });
 });

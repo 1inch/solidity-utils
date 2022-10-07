@@ -1,28 +1,34 @@
-import { web3 } from 'hardhat';
 import { expect } from '../../src/prelude';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ethers } from 'hardhat';
 
-const EthSenderMock = artifacts.require('EthSenderMock');
-const EthReceiver = artifacts.require('EthReceiverMock');
+describe('EthReceiver', async function () {
+    let signer1: SignerWithAddress;
 
-contract('EthReceiver', function (accounts) {
-    describe('EthReceiver', async function () {
-        const account = accounts[0];
+    before(async function () {
+        [signer1] = await ethers.getSigners();
+    });
 
-        beforeEach(async function () {
-            this.receiver = await EthReceiver.new();
-            this.sender = await EthSenderMock.new();
-        });
+    async function deployMocks() {
+        const EthReceiverMock = await ethers.getContractFactory('EthReceiverMock');
+        const ethReceiverMock = await EthReceiverMock.deploy();
 
-        it('contract transfer', async function () {
-            await this.sender.transfer(this.receiver.address, { value: 100 });
-        });
+        const EthSenderMock = await ethers.getContractFactory('EthSenderMock');
+        const ethSenderMock = await EthSenderMock.deploy();
+        return { ethReceiverMock, ethSenderMock };
+    }
 
-        it('normal transfer', async function () {
-            await expect(web3.eth.sendTransaction({
-                from: account,
-                to: this.receiver.address,
-                value: 100,
-            })).to.eventually.be.rejectedWith('EthDepositRejected');
-        });
+    it('contract transfer', async function () {
+        const { ethReceiverMock, ethSenderMock } = await loadFixture(deployMocks);
+        await ethSenderMock.transfer(ethReceiverMock.address, { value: 100 });
+    });
+
+    it('normal transfer', async function () {
+        const { ethReceiverMock } = await loadFixture(deployMocks);
+
+        await expect(
+            signer1.sendTransaction({ to: ethReceiverMock.address, value: 100 }),
+        ).to.be.revertedWithCustomError(ethReceiverMock, 'EthDepositRejected');
     });
 });

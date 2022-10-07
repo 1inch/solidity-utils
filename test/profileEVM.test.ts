@@ -1,81 +1,102 @@
 import { expect, ether } from '../src/prelude';
 import { profileEVM, gasspectEVM } from '../src/profileEVM';
+import { ethers } from 'hardhat';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-const TokenMock = artifacts.require('TokenMock');
+describe('trace inspection', async function () {
+    let signer1: SignerWithAddress;
+    let signer2: SignerWithAddress;
 
-contract('', function ([wallet1, wallet2]) {
-    const initContext = async () => {
-        const usdt = await TokenMock.new('USDT', 'USDT');
+    before(async function () {
+        [signer1, signer2] = await ethers.getSigners();
+    });
+
+    async function deployUSDT() {
+        const TokenMock = await ethers.getContractFactory('TokenMock');
+        const usdt = await TokenMock.deploy('USDT', 'USDT');
+        await usdt.mint(signer1.address, ether('1000'));
+        await usdt.mint(signer2.address, ether('1000'));
         return { usdt };
-    };
-
-    let context: Awaited<ReturnType<typeof initContext>> = undefined!;
-
-    before(async () => {
-        context = await initContext();
-    });
-
-    beforeEach(async function () {
-        for (const addr of [wallet1, wallet2]) {
-            await context.usdt.mint(addr, ether('1000'));
-        }
-    });
+    }
 
     describe('profileEVM', async function () {
         it('should be counted ERC20 Transfer', async function () {
-            const receipt = await context.usdt.transfer(wallet2, ether('1'), { from: wallet1 });
-            expect(await profileEVM(receipt.tx, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD']))
-                .to.be.deep.equal([0, 0, 2, 2]);
+            const { usdt } = await loadFixture(deployUSDT);
+
+            const txn = await usdt.transfer(signer2.address, ether('1'));
+            expect(await profileEVM(txn.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                0, 0, 2, 2,
+            ]);
         });
 
         it('should be counted ERC20 Approve', async function () {
-            const receipt = await context.usdt.approve(wallet2, ether('1'), { from: wallet1 });
-            expect(await profileEVM(receipt.tx, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD']))
-                .to.be.deep.equal([0, 0, 1, 0]);
+            const { usdt } = await loadFixture(deployUSDT);
+
+            const txn = await usdt.approve(signer2.address, ether('1'));
+            expect(await profileEVM(txn.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                0, 0, 1, 0,
+            ]);
         });
     });
 
     describe('gasspectEVM', async function () {
         it('should be counted ERC20 Transfer', async function () {
-            const receipt = await context.usdt.transfer(wallet2, ether('1'), { from: wallet1 });
-            expect(await gasspectEVM(receipt.tx))
-                .to.be.deep.equal(['0-0-SLOAD = 2100', '0-0-SSTORE = 2900', '0-0-SLOAD = 2100', '0-0-SSTORE = 2900', '0-0-LOG3 = 1756']);
+            const { usdt } = await loadFixture(deployUSDT);
+
+            const txn = await usdt.transfer(signer2.address, ether('1'));
+            expect(await gasspectEVM(txn.hash)).to.be.deep.equal([
+                '0-0-SLOAD = 2100',
+                '0-0-SSTORE = 2900',
+                '0-0-SLOAD = 2100',
+                '0-0-SSTORE = 2900',
+                '0-0-LOG3 = 1756',
+            ]);
         });
 
         it('should be counted ERC20 Approve', async function () {
-            const receipt = await context.usdt.approve(wallet2, ether('1'), { from: wallet1 });
-            expect(await gasspectEVM(receipt.tx))
-                .to.be.deep.equal(['0-0-SSTORE = 2200', '0-0-LOG3 = 1756']);
+            const { usdt } = await loadFixture(deployUSDT);
+
+            const txn = await usdt.approve(signer2.address, ether('1'));
+            expect(await gasspectEVM(txn.hash)).to.be.deep.equal(['0-0-SSTORE_I = 22100', '0-0-LOG3 = 1756']);
         });
 
         it('should be counted ERC20 Transfer with minOpGasCost = 2000', async function () {
-            const receipt = await context.usdt.transfer(wallet2, ether('1'), { from: wallet1 });
-            expect(await gasspectEVM(receipt.tx, { minOpGasCost: 2000 }))
-                .to.be.deep.equal(['0-0-SLOAD = 2100', '0-0-SSTORE = 2900', '0-0-SLOAD = 2100', '0-0-SSTORE = 2900']);
+            const { usdt } = await loadFixture(deployUSDT);
+
+            const txn = await usdt.transfer(signer2.address, ether('1'));
+            expect(await gasspectEVM(txn.hash, { minOpGasCost: 2000 })).to.be.deep.equal([
+                '0-0-SLOAD = 2100',
+                '0-0-SSTORE = 2900',
+                '0-0-SLOAD = 2100',
+                '0-0-SSTORE = 2900',
+            ]);
         });
 
         it('should be counted ERC20 Transfer with args', async function () {
-            const receipt = await context.usdt.transfer(wallet2, ether('1'), { from: wallet1 });
-            expect(await gasspectEVM(receipt.tx, { args: true }))
-                .to.be.deep.equal([
-                    '0-0-SLOAD(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722) = 2100',
-                    '0-0-SSTORE(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722,0x0000000000000000000000000000000000000000000001450b3737d49a300000) = 2900',
-                    '0-0-SLOAD(0x14e04a66bf74771820a7400ff6cf065175b3d7eb25805a5bd1633b161af5d101) = 2100',
-                    '0-0-SSTORE(0x14e04a66bf74771820a7400ff6cf065175b3d7eb25805a5bd1633b161af5d101,0x0000000000000000000000000000000000000000000001457a3ced71d5500000) = 2900',
-                    '0-0-LOG3() = 1756',
-                ]);
+            const { usdt } = await loadFixture(deployUSDT);
+
+            const txn = await usdt.transfer(signer2.address, ether('1'));
+            expect(await gasspectEVM(txn.hash, { args: true })).to.be.deep.equal([
+                '0-0-SLOAD(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722) = 2100',
+                '0-0-SSTORE(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722,0x00000000000000000000000000000000000000000000003627e8f712373c0000) = 2900',
+                '0-0-SLOAD(0x14e04a66bf74771820a7400ff6cf065175b3d7eb25805a5bd1633b161af5d101) = 2100',
+                '0-0-SSTORE(0x14e04a66bf74771820a7400ff6cf065175b3d7eb25805a5bd1633b161af5d101,0x00000000000000000000000000000000000000000000003643aa647986040000) = 2900',
+                '0-0-LOG3() = 1756',
+            ]);
         });
 
         it('should be counted ERC20 Transfer with res', async function () {
-            const receipt = await context.usdt.transfer(wallet2, ether('1'), { from: wallet1 });
-            expect(await gasspectEVM(receipt.tx, { res: true }))
-                .to.be.deep.equal([
-                    '0-0-SLOAD:0x00000000000000000000000000000000000000000000017b4100e59a78d00000 = 2100',
-                    '0-0-SSTORE = 2900',
-                    '0-0-SLOAD:0x00000000000000000000000000000000000000000000017bb0069b37b3f00000 = 2100',
-                    '0-0-SSTORE = 2900',
-                    '0-0-LOG3 = 1756',
-                ]);
+            const { usdt } = await loadFixture(deployUSDT);
+
+            const txn = await usdt.transfer(signer2.address, ether('1'));
+            expect(await gasspectEVM(txn.hash, { res: true })).to.be.deep.equal([
+                '0-0-SLOAD:0x00000000000000000000000000000000000000000000003635c9adc5dea00000 = 2100',
+                '0-0-SSTORE = 2900',
+                '0-0-SLOAD:0x00000000000000000000000000000000000000000000003635c9adc5dea00000 = 2100',
+                '0-0-SSTORE = 2900',
+                '0-0-LOG3 = 1756',
+            ]);
         });
     });
 });

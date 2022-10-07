@@ -1,5 +1,5 @@
 import '@typechain/hardhat';
-import '@nomiclabs/hardhat-truffle5';
+import '@nomicfoundation/hardhat-chai-matchers';
 import 'hardhat-gas-reporter';
 require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
@@ -24,7 +24,7 @@ const config: HardhatUserConfig = {
         currency: 'USD',
     },
     typechain: {
-        target: 'truffle-v5',
+        target: 'ethers-v5',
     },
 };
 

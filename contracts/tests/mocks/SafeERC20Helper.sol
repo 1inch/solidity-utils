@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "../../contracts/libraries/SafeERC20.sol";
+import "../../libraries/SafeERC20.sol";
 
 contract ERC20ReturnFalseMock {
     uint256 private _allowance;
@@ -149,13 +149,8 @@ contract ERC20PermitNoRevertMock is
         bytes32 r,
         bytes32 s
     ) public virtual override {
-        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {
-            // solhint-disable-line no-empty-blocks
-            // do nothing
-        } catch {
-            // solhint-disable-line no-empty-blocks
-            // do nothing
-        }
+        // solhint-disable-next-line no-empty-blocks
+        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {} catch {}
     }
 }
 
