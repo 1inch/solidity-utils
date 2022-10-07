@@ -1,9 +1,8 @@
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
-import { fromRpcSig } from 'ethereumjs-util';
-import { Token } from './utils';
 import { constants } from './prelude';
-import { CallOverrides, BigNumber } from 'ethers';
+import { Contract } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { splitSignature } from 'ethers/lib/utils';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -92,17 +91,12 @@ export function buildDataLikeDai(
     } as const;
 }
 
-export interface PermittableToken extends Token {
-    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-    name(overrides?: CallOverrides): Promise<string>;
-}
-
 /*
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
  */
 export async function getPermit(
     owner: SignerWithAddress,
-    permitContract: PermittableToken,
+    permitContract: Contract,
     tokenVersion: string,
     chainId: number,
     spender: string,
@@ -123,7 +117,7 @@ export async function getPermit(
         deadline,
     );
     const signature = await owner._signTypedData(data.domain, data.types, data.message);
-    const { v, r, s } = fromRpcSig(signature);
+    const { v, r, s } = splitSignature(signature);
     const permitCall = permitContract.interface.encodeFunctionData('permit', [
         owner.address,
         spender,
@@ -141,7 +135,7 @@ export async function getPermit(
  */
 export async function getPermitLikeDai(
     holder: SignerWithAddress,
-    permitContract: PermittableToken,
+    permitContract: Contract,
     tokenVersion: string,
     chainId: number,
     spender: string,
@@ -162,7 +156,7 @@ export async function getPermitLikeDai(
         expiry,
     );
     const signature = await holder._signTypedData(data.domain, data.types, data.message);
-    const { v, r, s } = fromRpcSig(signature);
+    const { v, r, s } = splitSignature(signature);
     const permitCall = permitContract.interface.encodeFunctionData(
         'permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)',
         [holder.address, spender, nonce, expiry, allowed, v, r, s],

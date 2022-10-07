@@ -1,7 +1,7 @@
 import { constants } from './prelude';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
-import { BaseContract, BigNumber, Bytes, CallOverrides, ContractTransaction } from 'ethers';
+import { Contract, Bytes, ContractTransaction } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 export async function timeIncreaseTo(seconds: number | string) {
@@ -10,12 +10,8 @@ export async function timeIncreaseTo(seconds: number | string) {
     await time.increaseTo(seconds);
 }
 
-export interface Token extends BaseContract {
-    balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
-}
-
 export async function trackReceivedTokenAndTx<T extends unknown[]>(
-    token: Token | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
+    token: Contract | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
     wallet: string,
     txPromise: (...args: T) => Promise<ContractTransaction>,
     ...args: T
