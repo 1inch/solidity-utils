@@ -22,13 +22,13 @@ describe('SafeERC20', async () => {
         SafeERC20Wrapper = await ethers.getContractFactory('SafeERC20Wrapper');
     });
 
-    const deployWrapperSimple = async () => {
+    async function deployWrapperSimple() {
         const wrapper = await SafeERC20Wrapper.deploy(spender.address);
         await wrapper.deployed();
         return { wrapper };
     };
 
-    const deployWrapperFalseMock = async () => {
+    async function deployWrapperFalseMock() {
         const ERC20ReturnFalseMock = await ethers.getContractFactory('ERC20ReturnFalseMock');
         const falseMock = await ERC20ReturnFalseMock.deploy();
         await falseMock.deployed();
@@ -37,7 +37,7 @@ describe('SafeERC20', async () => {
         return { wrapper };
     };
 
-    const deployWrapperTrueMock = async () => {
+    async function deployWrapperTrueMock() {
         const ERC20ReturnTrueMock = await ethers.getContractFactory('ERC20ReturnTrueMock');
         const trueMock = await ERC20ReturnTrueMock.deploy();
         await trueMock.deployed();
@@ -46,7 +46,7 @@ describe('SafeERC20', async () => {
         return { wrapper };
     };
 
-    const deployWrapperNoReturnMock = async () => {
+    async function deployWrapperNoReturnMock() {
         const ERC20NoReturnMock = await ethers.getContractFactory('ERC20NoReturnMock');
         const noReturnMock = await ERC20NoReturnMock.deploy();
         await noReturnMock.deployed();
@@ -55,7 +55,7 @@ describe('SafeERC20', async () => {
         return { wrapper };
     };
 
-    const deployWrapperZeroApprove = async () => {
+    async function deployWrapperZeroApprove() {
         const ERC20ThroughZeroApprove = await ethers.getContractFactory('ERC20ThroughZeroApprove');
         const zeroApprove = await ERC20ThroughZeroApprove.deploy();
         await zeroApprove.deployed();
@@ -64,7 +64,7 @@ describe('SafeERC20', async () => {
         return { wrapper };
     };
 
-    const deployPermitNoRevertAndSign = async () => {
+    async function deployPermitNoRevertAndSign() {
         const ERC20PermitNoRevertMock = await ethers.getContractFactory('ERC20PermitNoRevertMock');
         const token = await ERC20PermitNoRevertMock.deploy();
         await token.deployed();

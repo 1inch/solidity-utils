@@ -12,7 +12,7 @@ describe('AddressSet', async function () {
         [signer1, signer2, signer3] = await ethers.getSigners();
     });
 
-    const deployAddressSetMock = async () => {
+    async function deployAddressSetMock() {
         const AddressSetMock = await ethers.getContractFactory('AddressSetMock');
         const addressSetMock = await AddressSetMock.deploy();
         return { addressSetMock };

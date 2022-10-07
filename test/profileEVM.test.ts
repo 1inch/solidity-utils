@@ -12,7 +12,7 @@ describe('trace inspection', async function () {
         [signer1, signer2] = await ethers.getSigners();
     });
 
-    const deployUSDT = async () => {
+    async function deployUSDT() {
         const TokenMock = await ethers.getContractFactory('TokenMock');
         const usdt = await TokenMock.deploy('USDT', 'USDT');
         await usdt.mint(signer1.address, ether('1000'));

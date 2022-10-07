@@ -13,7 +13,7 @@ describe('StringUtil', async () => {
     const sameBytesShort = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     const sameBytesLong = '0x' + 'aa'.repeat(1000);
 
-    const deployStringUtilTest = async () => {
+    async function deployStringUtilTest() {
         const StringUtilTest = await ethers.getContractFactory('StringUtilTest');
         const stringUtilTest = await StringUtilTest.deploy();
         return { stringUtilTest };

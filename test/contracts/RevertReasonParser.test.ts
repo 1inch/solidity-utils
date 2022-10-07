@@ -3,7 +3,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
 describe('RevertReasonParser', async () => {
-    const deployRevertReasonParserTest = async () => {
+    async function deployRevertReasonParserTest() {
         const RevertReasonParserTest = await ethers.getContractFactory('RevertReasonParserTest');
         const revertReasonParserTest = await RevertReasonParserTest.deploy();
         return { revertReasonParserTest };

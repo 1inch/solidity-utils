@@ -10,7 +10,7 @@ describe('WethReceiver', async function () {
         [signer1] = await ethers.getSigners();
     });
 
-    const deployMocks = async () => {
+    async function deployMocks() {
         const EthSenderMock = await ethers.getContractFactory('EthSenderMock');
         const ethSenderMock = await EthSenderMock.deploy();
 
