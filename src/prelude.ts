@@ -1,5 +1,5 @@
 import { Assertion, AssertionError, assert, expect, config, should } from 'chai';
-import { toWei } from 'web3-utils';
+import { parseUnits } from 'ethers/lib/utils';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 
 export const constants = {
@@ -16,7 +16,7 @@ export const constants = {
 export { time };
 
 export function ether(n: string): bigint {
-    return BigInt(toWei(n, 'ether'));
+    return parseUnits(n).toBigInt();
 }
 
 // chai

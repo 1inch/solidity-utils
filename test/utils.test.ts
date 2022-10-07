@@ -1,10 +1,9 @@
 import { expect, ether, time } from '../src/prelude';
 import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../src/utils';
-import { randomHex, toHex } from 'web3-utils';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { arrayify } from 'ethers/lib/utils';
+import { arrayify, hexlify, toUtf8Bytes, randomBytes } from 'ethers/lib/utils';
 
 describe('timeIncreaseTo', async function () {
     const precision = 2;
@@ -68,17 +67,17 @@ describe('utils', async function () {
         });
 
         it('should be signed test2', async function () {
-            const message = randomHex(32);
-            expect(await signer1.signMessage(arrayify(message))).equal(await signMessage(signer1, arrayify(message)));
+            const message = randomBytes(32);
+            expect(await signer1.signMessage(message)).equal(await signMessage(signer1, message));
         });
 
         it('should be signed test3', async function () {
-            const message = toHex('Test message');
+            const message = hexlify(toUtf8Bytes('Test message'));
             expect(await signer1.signMessage(arrayify(message))).equal(await signMessage(signer1, arrayify(message)));
         });
 
         it('should be signed test4', async function () {
-            const message = toHex('Test message');
+            const message = hexlify(toUtf8Bytes('Test message'));
             expect(await signer1.signMessage(message)).equal(await signMessage(signer1, message));
         });
     });

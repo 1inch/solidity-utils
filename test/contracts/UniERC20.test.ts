@@ -133,12 +133,12 @@ describe('UniERC20', function () {
 
         it('uni name', async function () {
             const { wrapper } = await loadFixture(deployMocks);
-            expect(web3.utils.toChecksumAddress(await wrapper.name())).to.equal(signer1.address);
+            expect(ethers.utils.getAddress(await wrapper.name())).to.equal(signer1.address);
         });
 
         it('uni symbol', async function () {
             const { wrapper } = await loadFixture(deployMocks);
-            expect(web3.utils.toChecksumAddress(await wrapper.symbol())).to.equal(signer1.address);
+            expect(ethers.utils.getAddress(await wrapper.symbol())).to.equal(signer1.address);
         });
     });
 
