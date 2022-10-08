@@ -1,5 +1,6 @@
 import { constants } from './prelude';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
+// @ts-ignore
 import { ethers } from 'hardhat';
 import { Contract, Bytes, ContractTransaction } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';

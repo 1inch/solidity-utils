@@ -1,4 +1,4 @@
 {
   "extends": "./tsconfig",
-  "exclude": ["./test", "./dist"]
+  "exclude": ["./test", "./hardhat.*", "./dist", "./typechain-types"]
 }
