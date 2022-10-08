@@ -1,5 +1,5 @@
+import "@nomiclabs/hardhat-ethers";
 import { PathLike, promises as fs } from 'fs';
-// @ts-ignore
 import { ethers } from 'hardhat';
 
 export const gasspectOptionsDefault = {
