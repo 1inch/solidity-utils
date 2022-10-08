@@ -1,4 +1,4 @@
-import "@nomiclabs/hardhat-ethers";
+import '@nomiclabs/hardhat-ethers';
 import { PathLike, promises as fs } from 'fs';
 import { ethers } from 'hardhat';
 
