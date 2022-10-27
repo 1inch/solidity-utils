@@ -9,7 +9,7 @@ import { splitSignature } from 'ethers/lib/utils';
 
 const value = 42n;
 
-describe('Permitable', async function () {
+describe('Permitable', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;
 

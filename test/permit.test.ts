@@ -5,7 +5,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { defaultDeadline, Permit, DaiLikePermit } from '../src/permit';
 import { trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit';
 
-describe('Permit library', async function () {
+describe('Permit library', function () {
     let signer1: SignerWithAddress;
 
     before(async function () {
@@ -22,15 +22,15 @@ describe('Permit library', async function () {
         return { erc20PermitMock, daiLikePermitMock, chainId };
     }
 
-    it('should be trimmed', async () => {
+    it('should be trimmed', async function () {
         expect(trim0x('0x123456')).to.be.equal('123456');
     });
 
-    it('should not be changed', async () => {
+    it('should not be changed', async function () {
         expect(trim0x('123456')).to.be.equal('123456');
     });
 
-    it('should correctly build data for permit', async () => {
+    it('should correctly build data for permit', async function () {
         const { erc20PermitMock, chainId } = await loadFixture(deployTokens);
 
         const name = await erc20PermitMock.name();
@@ -55,7 +55,7 @@ describe('Permit library', async function () {
         });
     });
 
-    it('should correctly build data for dai-like permit', async () => {
+    it('should correctly build data for dai-like permit', async function () {
         const { daiLikePermitMock, chainId } = await loadFixture(deployTokens);
 
         const name = await daiLikePermitMock.name();
@@ -89,11 +89,11 @@ describe('Permit library', async function () {
         });
     });
 
-    it('should concat target with prefixed data', async () => {
+    it('should concat target with prefixed data', async function () {
         expect(withTarget('0x123456', '0x123456')).to.be.equal('0x123456123456');
     });
 
-    it('should concat target with raw data', async () => {
+    it('should concat target with raw data', async function () {
         expect(withTarget('0x123456', '123456')).to.be.equal('0x123456123456');
     });
 });

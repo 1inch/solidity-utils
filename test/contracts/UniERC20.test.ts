@@ -13,15 +13,15 @@ describe('UniERC20', function () {
         [signer1, signer2, signer3] = await ethers.getSigners();
     });
 
-    describe('ERC20 token', async function () {
-        const deployMocks = async function () {
+    describe('ERC20 token', function () {
+        async function deployMocks() {
             const TokenMock = await ethers.getContractFactory('TokenMock');
             const token = await TokenMock.deploy('Token', 'TKN');
             await token.mint(signer1.address, ether('1000'));
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(token.address);
             return { token, wrapper };
-        };
+        }
 
         it('is ETH', async function () {
             const { wrapper } = await loadFixture(deployMocks);
@@ -51,7 +51,7 @@ describe('UniERC20', function () {
             expect(await wrapper.balanceOf(signer2.address)).to.be.equal(100);
         });
 
-        describe('ERC20 NAME/SYMBOL', async function () {
+        describe('ERC20 NAME/SYMBOL', function () {
             it('uni name', async function () {
                 const { wrapper } = await loadFixture(deployMocks);
                 expect(await wrapper.name()).to.equal('Token');
@@ -64,14 +64,14 @@ describe('UniERC20', function () {
         });
     });
 
-    describe('ERC20 token, empty name/symbol', async function () {
-        const deployMocks = async function () {
+    describe('ERC20 token, empty name/symbol', function () {
+        async function deployMocks() {
             const TokenMock = await ethers.getContractFactory('TokenMock');
             const token = await TokenMock.deploy('', '');
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(token.address);
             return { token, wrapper };
-        };
+        }
 
         it('uni name', async function () {
             const { wrapper } = await loadFixture(deployMocks);
@@ -84,14 +84,14 @@ describe('UniERC20', function () {
         });
     });
 
-    describe('ERC20 NAME/SYMBOL bytes32', async function () {
-        const deployMocks = async function () {
+    describe('ERC20 NAME/SYMBOL bytes32', function () {
+        async function deployMocks() {
             const ERC20bytes32Capitals = await ethers.getContractFactory('ERC20bytes32Capitals');
             const token = await ERC20bytes32Capitals.deploy(formatBytes32String('Token'), formatBytes32String('TKN'));
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(token.address);
             return { token, wrapper };
-        };
+        }
 
         it('uni name', async function () {
             const { wrapper } = await loadFixture(deployMocks);
@@ -104,14 +104,14 @@ describe('UniERC20', function () {
         });
     });
 
-    describe('ERC20 name/symbol bytes32', async function () {
-        const deployMocks = async function () {
+    describe('ERC20 name/symbol bytes32', function () {
+        async function deployMocks() {
             const ERC20bytes32 = await ethers.getContractFactory('ERC20bytes32');
             const token = await ERC20bytes32.deploy(formatBytes32String('Token'), formatBytes32String('TKN'));
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(token.address);
             return { token, wrapper };
-        };
+        }
 
         it('uni name', async function () {
             const { wrapper } = await loadFixture(deployMocks);
@@ -124,12 +124,12 @@ describe('UniERC20', function () {
         });
     });
 
-    describe('ERC20 without name/symbol', async function () {
-        const deployMocks = async function () {
+    describe('ERC20 without name/symbol', function () {
+        async function deployMocks() {
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(signer1.address);
             return { wrapper };
-        };
+        }
 
         it('uni name', async function () {
             const { wrapper } = await loadFixture(deployMocks);
@@ -142,12 +142,12 @@ describe('UniERC20', function () {
         });
     });
 
-    describe('ETH', async function () {
-        const deployMocks = async function () {
+    describe('ETH', function () {
+        async function deployMocks() {
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(constants.ZERO_ADDRESS);
             return { wrapper };
-        };
+        }
 
         it('is ETH', async function () {
             const { wrapper } = await loadFixture(deployMocks);
@@ -219,14 +219,14 @@ describe('UniERC20', function () {
         });
     });
 
-    describe('ETH with bad ether receiver', async function () {
-        const deployMocks = async function () {
+    describe('ETH with bad ether receiver', function () {
+        async function deployMocks() {
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy(constants.ZERO_ADDRESS);
             const ETHBadReceiver = await ethers.getContractFactory('ETHBadReceiver');
             const receiver = await ETHBadReceiver.deploy(constants.ZERO_ADDRESS, wrapper.address);
             return { wrapper, receiver };
-        };
+        }
 
         it('uni failed transfer', async function () {
             const { wrapper, receiver } = await loadFixture(deployMocks);
@@ -247,12 +247,12 @@ describe('UniERC20', function () {
         });
     });
 
-    describe('ETH from special address', async function () {
-        const deployMocks = async function () {
+    describe('ETH from special address', function () {
+        async function deployMocks() {
             const UniERC20Wrapper = await ethers.getContractFactory('UniERC20Wrapper');
             const wrapper = await UniERC20Wrapper.deploy('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE');
             return { wrapper };
-        };
+        }
 
         it('is ETH', async function () {
             const { wrapper } = await loadFixture(deployMocks);

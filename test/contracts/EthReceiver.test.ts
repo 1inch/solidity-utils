@@ -3,7 +3,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
-describe('EthReceiver', async function () {
+describe('EthReceiver', function () {
     let signer1: SignerWithAddress;
 
     before(async function () {

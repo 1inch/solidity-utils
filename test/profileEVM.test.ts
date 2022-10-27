@@ -4,7 +4,7 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
-describe('trace inspection', async function () {
+describe('trace inspection', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;
 
@@ -20,7 +20,7 @@ describe('trace inspection', async function () {
         return { usdt };
     }
 
-    describe('profileEVM', async function () {
+    describe('profileEVM', function () {
         it('should be counted ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
@@ -40,7 +40,7 @@ describe('trace inspection', async function () {
         });
     });
 
-    describe('gasspectEVM', async function () {
+    describe('gasspectEVM', function () {
         it('should be counted ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 

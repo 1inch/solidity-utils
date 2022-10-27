@@ -1,7 +1,7 @@
 import { expect } from '../src/prelude';
 import { assertRoughlyEqualValues } from '../src/asserts';
 
-describe('assertRoughlyEqualValues', async function () {
+describe('assertRoughlyEqualValues', function () {
     it('should be work with expected = actual, any relativeDiff', async function () {
         assertRoughlyEqualValues(1000000, 1000000, 0.000001);
     });

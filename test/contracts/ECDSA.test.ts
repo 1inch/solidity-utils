@@ -5,16 +5,16 @@ import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { arrayify, concat, splitSignature, hexConcat, hashMessage, keccak256, toUtf8Bytes } from 'ethers/lib/utils';
 
-describe('ECDSA', async function () {
+describe('ECDSA', function () {
     let account: SignerWithAddress;
     let randomAccount: Wallet;
 
-    before(async () => {
+    before(async function () {
         [account] = await ethers.getSigners();
         randomAccount = await ethers.Wallet.createRandom();
     });
 
-    const deployContracts = async function () {
+    async function deployContracts() {
         const ECDSATest = await ethers.getContractFactory('ECDSATest');
         const ecdsa = await ECDSATest.deploy();
         const ERC1271WalletMock = await ethers.getContractFactory('ERC1271WalletMock');
@@ -23,33 +23,33 @@ describe('ECDSA', async function () {
         const erc1271walletV1 = await ERC1271WalletMock.deploy(signerV1);
 
         return { ecdsa, erc1271wallet, erc1271walletV0, erc1271walletV1 };
-    };
+    }
 
     const TEST_MESSAGE = '1inch-ecdsa-asm-library';
     const HASHED_TEST_MESSAGE = hashMessage('1inch-ecdsa-asm-library');
     const WRONG_MESSAGE = keccak256(toUtf8Bytes('Nope'));
     const NON_HASH_MESSAGE = arrayify('0x' + Buffer.from('abcd').toString('hex'));
 
-    const split2 = (signature: string): [string, string] => {
+    function split2(signature: string): [string, string] {
         const { r, _vs } = splitSignature(signature);
         return [r, _vs];
-    };
+    }
 
-    const split3 = (signature: string): [string, string, string] => {
+    function split3(signature: string): [string, string, string] {
         const { v, r, s } = splitSignature(signature);
         return [v.toString(), r, s];
-    };
+    }
 
-    const to2098Format = (signature: string): string => {
+    function to2098Format(signature: string): string {
         const { compact } = splitSignature(signature);
         return compact;
-    };
+    }
 
-    const from2098Format = (signature: string): string => {
+    function from2098Format(signature: string): string {
         const { v, r, s } = splitSignature(signature);
         const ret = hexConcat([r, s, arrayify(v)]);
         return ret;
-    };
+    }
 
     // eslint-disable-next-line max-len
     const longSignature =
@@ -68,40 +68,40 @@ describe('ECDSA', async function () {
     const invalidSignature =
         '0x332ce75a821c982f9127538858900d87d3ec1f9f737338ad67cad133fa48feff48e6fa0c18abc62e42820f05943e47af3e9fbe306ce74d64094bdf1691ee53e01c';
 
-    describe('recover', async () => {
-        describe('with invalid signature', async () => {
+    describe('recover', function () {
+        describe('with invalid signature', function () {
             it('with short signature', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 expect(await ecdsa.recover(HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(constants.ZERO_ADDRESS);
             });
 
-            it('with long signature', async () => {
+            it('with long signature', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 expect(await ecdsa.recover(HASHED_TEST_MESSAGE, longSignature)).to.be.equals(constants.ZERO_ADDRESS);
             });
         });
 
-        describe('with valid signature', async () => {
-            describe('using account.signMessage', async () => {
-                it('returns signer address with correct signature', async () => {
+        describe('with valid signature', function () {
+            describe('using account.signMessage', function () {
+                it('returns signer address with correct signature', async function () {
                     const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(account.address);
                 });
 
-                it('returns signer address with correct signature for arbitrary length message', async () => {
+                it('returns signer address with correct signature for arbitrary length message', async function () {
                     const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(await ecdsa.recover(hashMessage(NON_HASH_MESSAGE), signature)).to.be.equals(account.address);
                 });
 
-                it('returns a different address', async () => {
+                it('returns a different address', async function () {
                     const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(await ecdsa.recover(WRONG_MESSAGE, signature)).to.be.not.equals(account.address);
                 });
 
-                it('returns zero address with invalid signature', async () => {
+                it('returns zero address with invalid signature', async function () {
                     const { ecdsa } = await loadFixture(deployContracts);
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, invalidSignature)).to.be.equals(
                         constants.ZERO_ADDRESS,
@@ -205,8 +205,8 @@ describe('ECDSA', async function () {
         });
     });
 
-    describe('isValidSignature', async () => {
-        describe('with invalid signature', async () => {
+    describe('isValidSignature', function () {
+        describe('with invalid signature', function () {
             it('with short signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(await ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(
@@ -214,7 +214,7 @@ describe('ECDSA', async function () {
                 );
             });
 
-            it('with long signature', async () => {
+            it('with long signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
                     await ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, longSignature),
@@ -222,9 +222,9 @@ describe('ECDSA', async function () {
             });
         });
 
-        describe('with valid signature', async () => {
-            describe('using account.signMesage', async () => {
-                it('returns true with correct signature and only correct signer', async () => {
+        describe('with valid signature', function () {
+            describe('using account.signMesage', function () {
+                it('returns true with correct signature and only correct signer', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
@@ -235,7 +235,7 @@ describe('ECDSA', async function () {
                     ).to.be.equals(false);
                 });
 
-                it('returns true with correct signature and only correct signer for arbitrary length message', async () => {
+                it('returns true with correct signature and only correct signer for arbitrary length message', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(
@@ -246,7 +246,7 @@ describe('ECDSA', async function () {
                     ).to.be.equals(false);
                 });
 
-                it('returns false with invalid signature', async () => {
+                it('returns false with invalid signature', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     expect(
                         await ecdsa.isValidSignature(
@@ -456,7 +456,7 @@ describe('ECDSA', async function () {
                 });
             });
 
-            describe('isValidSignature65', async () => {
+            describe('isValidSignature65', function () {
                 it('with matching signer and signature', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
@@ -497,8 +497,8 @@ describe('ECDSA', async function () {
         });
     });
 
-    describe('recoverOrIsValidSignature', async () => {
-        describe('with invalid signature', async () => {
+    describe('recoverOrIsValidSignature', function () {
+        describe('with invalid signature', function () {
             it('with short signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
@@ -509,7 +509,7 @@ describe('ECDSA', async function () {
                 ).to.be.equals(false);
             });
 
-            it('with long signature', async () => {
+            it('with long signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
                     await ecdsa.recoverOrIsValidSignature(account.address, HASHED_TEST_MESSAGE, longSignature),
@@ -520,9 +520,9 @@ describe('ECDSA', async function () {
             });
         });
 
-        describe('with valid signature', async () => {
-            describe('using account.signMessage', async () => {
-                it('returns true with correct signature and only correct signer', async () => {
+        describe('with valid signature', function () {
+            describe('using account.signMessage', function () {
+                it('returns true with correct signature and only correct signer', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
@@ -536,7 +536,7 @@ describe('ECDSA', async function () {
                     ).to.be.equals(true);
                 });
 
-                it('returns true with correct signature and only correct signer for arbitrary length message', async () => {
+                it('returns true with correct signature and only correct signer for arbitrary length message', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(
@@ -562,7 +562,7 @@ describe('ECDSA', async function () {
                     ).to.be.equals(true);
                 });
 
-                it('returns false with invalid signature', async () => {
+                it('returns false with invalid signature', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
@@ -903,7 +903,7 @@ describe('ECDSA', async function () {
                 });
             });
 
-            describe('recoverOrIsValidSignature65', async () => {
+            describe('recoverOrIsValidSignature65', function () {
                 it('with matching signer and signature', async function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
@@ -958,7 +958,7 @@ describe('ECDSA', async function () {
         });
     });
 
-    describe('toEthSignedMessageHash', async () => {
+    describe('toEthSignedMessageHash', function () {
         it('correct hash', async function () {
             const { ecdsa } = await loadFixture(deployContracts);
             const hashedTestMessageWithoutPrefix = HASHED_TEST_MESSAGE.substring(2);
@@ -974,7 +974,7 @@ describe('ECDSA', async function () {
         });
     });
 
-    describe('toTypedDataHash', async () => {
+    describe('toTypedDataHash', function () {
         it('correct hash', async function () {
             const { ecdsa } = await loadFixture(deployContracts);
             const domainSeparator = HASHED_TEST_MESSAGE.substring(2);
@@ -990,15 +990,15 @@ describe('ECDSA', async function () {
         });
     });
 
-    describe('gas price', async () => {
-        describe('recover', async () => {
+    describe('gas price', function () {
+        describe('recover', function () {
             it('with signature', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(await ecdsa.populateTransaction.recover(HASHED_TEST_MESSAGE, signature));
             });
 
-            it('with v0 signature', async () => {
+            it('with v0 signature', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
@@ -1014,7 +1014,7 @@ describe('ECDSA', async function () {
                 );
             });
 
-            it('with v1 signature', async () => {
+            it('with v1 signature', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 const version = '1c'; // 28 = 1c.
                 const signature = signatureWithoutVersionV1 + version;
@@ -1031,7 +1031,7 @@ describe('ECDSA', async function () {
             });
         });
 
-        describe('recoverOrIsValidSignature', async () => {
+        describe('recoverOrIsValidSignature', function () {
             it('with signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
@@ -1051,7 +1051,7 @@ describe('ECDSA', async function () {
                 );
             });
 
-            it('with v0 signature', async () => {
+            it('with v0 signature', async function () {
                 const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
@@ -1095,7 +1095,7 @@ describe('ECDSA', async function () {
                 );
             });
 
-            it('with v1 signature', async () => {
+            it('with v1 signature', async function () {
                 const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
@@ -1139,7 +1139,7 @@ describe('ECDSA', async function () {
                 );
             });
 
-            it('recoverOrIsValidSignature65', async () => {
+            it('recoverOrIsValidSignature65', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
@@ -1159,7 +1159,7 @@ describe('ECDSA', async function () {
             });
         });
 
-        describe('isValidSignature', async () => {
+        describe('isValidSignature', function () {
             it('with signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
@@ -1172,7 +1172,7 @@ describe('ECDSA', async function () {
                 );
             });
 
-            it('with v0 signature', async () => {
+            it('with v0 signature', async function () {
                 const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
@@ -1199,7 +1199,7 @@ describe('ECDSA', async function () {
                 );
             });
 
-            it('with v1 signature', async () => {
+            it('with v1 signature', async function () {
                 const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
@@ -1226,7 +1226,7 @@ describe('ECDSA', async function () {
                 );
             });
 
-            it('isValidSignature65', async () => {
+            it('isValidSignature65', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
@@ -1239,7 +1239,7 @@ describe('ECDSA', async function () {
             });
         });
 
-        describe('Additional methods', async () => {
+        describe('Additional methods', function () {
             it('toEthSignedMessageHash', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 await account.sendTransaction(

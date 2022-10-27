@@ -2,7 +2,7 @@ import { expect } from '../../src/prelude';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
-describe('StringUtil', async () => {
+describe('StringUtil', function () {
     const uint256TestValue = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
     const uint128TestValue = '0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
     const veryLongArray = '0xffffffffffffffafafafbcbcbcbcbdeded' + 'aa'.repeat(50);
@@ -19,7 +19,7 @@ describe('StringUtil', async () => {
         return { stringUtilTest };
     }
 
-    describe('Validity', async () => {
+    describe('Validity', function () {
         it('Uint 256', () => test(uint256TestValue));
 
         it('Uint 128', () => test(uint128TestValue));
@@ -40,32 +40,32 @@ describe('StringUtil', async () => {
 
         it('Single byte naive', () => testIncorrectGas(singleByte, 2000));
 
-        const test = async (value: string) => {
+        async function test(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             const result = await stringUtilTest.toHex(value, 0);
             const naiveResult = await stringUtilTest.toHexNaive(value, 0);
             expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
             expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
-        };
+        }
 
-        const testBytes = async (value: string) => {
+        async function testBytes(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             const result = await stringUtilTest.toHexBytes(value, 0);
             const naiveResult = await stringUtilTest.toHexNaiveBytes(value, 0);
             expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
             expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
-        };
+        }
 
-        const testIncorrectGas = async (value: string, expectedGas: number) => {
+        async function testIncorrectGas(value: string, expectedGas: number) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await expect(stringUtilTest.toHexNaiveBytes(value, expectedGas)).to.be.revertedWithCustomError(
                 stringUtilTest,
                 'GasCostDiffers',
             );
-        };
+        }
     });
 
-    describe('Gas usage @skip-on-coverage', async () => {
+    describe('Gas usage @skip-on-coverage', function () {
         it('Uint 256', () => testGasUint256(uint256TestValue, 907));
 
         it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 14175));
@@ -94,24 +94,24 @@ describe('StringUtil', async () => {
 
         it('Single byte naive', () => testGasNaiveBytes(singleByte, 832));
 
-        const testGasUint256 = async (value: string, expectedGas: number) => {
+        async function testGasUint256(value: string, expectedGas: number) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await stringUtilTest.toHex(value, expectedGas);
-        };
+        }
 
-        const testGasBytes = async (value: string, expectedGas: number) => {
+        async function testGasBytes(value: string, expectedGas: number) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await stringUtilTest.toHexBytes(value, expectedGas);
-        };
+        }
 
-        const testGasNaiveUint256 = async (value: string, expectedGas: number) => {
+        async function testGasNaiveUint256(value: string, expectedGas: number) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await stringUtilTest.toHexNaive(value, expectedGas);
-        };
+        }
 
-        const testGasNaiveBytes = async (value: string, expectedGas: number) => {
+        async function testGasNaiveBytes(value: string, expectedGas: number) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await stringUtilTest.toHexNaiveBytes(value, expectedGas);
-        };
+        }
     });
 });

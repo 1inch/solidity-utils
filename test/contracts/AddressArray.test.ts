@@ -3,7 +3,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
-describe('AddressArray', async function () {
+describe('AddressArray', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;
     let signer3: SignerWithAddress;
@@ -18,7 +18,7 @@ describe('AddressArray', async function () {
         return { addressArrayMock };
     }
 
-    describe('length', async function () {
+    describe('length', function () {
         it('should calculate length 0', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             expect(await addressArrayMock.length()).to.be.equal('0');
@@ -31,7 +31,7 @@ describe('AddressArray', async function () {
         });
     });
 
-    describe('at', async function () {
+    describe('at', function () {
         it('should get from empty array', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             expect(await addressArrayMock.at(0)).to.be.equal(constants.ZERO_ADDRESS);
@@ -54,7 +54,7 @@ describe('AddressArray', async function () {
         });
     });
 
-    describe('get', async function () {
+    describe('get', function () {
         it('should get empty array', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             expect(await addressArrayMock.get()).to.be.deep.equal([]);
@@ -82,7 +82,7 @@ describe('AddressArray', async function () {
         });
     });
 
-    describe('push', async function () {
+    describe('push', function () {
         it('should push to empty array', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             const pushedIndex = await addressArrayMock.callStatic.push(signer1.address);
@@ -108,7 +108,7 @@ describe('AddressArray', async function () {
         });
     });
 
-    describe('pop', async function () {
+    describe('pop', function () {
         it('should throw when array is empty', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await expect(addressArrayMock.pop()).to.be.revertedWithCustomError(addressArrayMock, 'PopFromEmptyArray');
@@ -146,7 +146,7 @@ describe('AddressArray', async function () {
         });
     });
 
-    describe('set', async function () {
+    describe('set', function () {
         it('should throw when sets index out of bounds', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await expect(addressArrayMock.set(0, signer1.address)).to.be.revertedWithCustomError(

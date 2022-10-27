@@ -5,7 +5,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { arrayify, hexlify, toUtf8Bytes, randomBytes } from 'ethers/lib/utils';
 
-describe('timeIncreaseTo', async function () {
+describe('timeIncreaseTo', function () {
     const precision = 2;
 
     async function shouldIncrease(secs: number) {
@@ -37,7 +37,7 @@ describe('timeIncreaseTo', async function () {
     });
 });
 
-describe('fixSignature', async function () {
+describe('fixSignature', function () {
     it('should not be fixed geth sign', async function () {
         const signature =
             '0xb453386b73ba5608314e9b4c7890a4bd12cc24c2c7bdf5f87778960ff85c56a8520dabdbea357fc561120dd2625bd8a904f35bdb4b153cf706b6ff25bb0d898d1c';
@@ -53,7 +53,7 @@ describe('fixSignature', async function () {
     });
 });
 
-describe('utils', async function () {
+describe('utils', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;
 
@@ -61,7 +61,7 @@ describe('utils', async function () {
         [signer1, signer2] = await ethers.getSigners();
     });
 
-    describe('signMessage', async function () {
+    describe('signMessage', function () {
         it('should be signed test1', async function () {
             expect(await signer1.signMessage('0x')).equal(await signMessage(signer1));
         });
@@ -89,7 +89,7 @@ describe('utils', async function () {
         return { usdt };
     }
 
-    describe('trackReceivedTokenAndTx', async function () {
+    describe('trackReceivedTokenAndTx', function () {
         it('should be tracked ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
@@ -121,7 +121,7 @@ describe('utils', async function () {
         });
     });
 
-    describe('trackReceivedToken', async function () {
+    describe('trackReceivedToken', function () {
         it('should be tracked ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
@@ -141,7 +141,7 @@ describe('utils', async function () {
         });
     });
 
-    describe('countInstructions', async function () {
+    describe('countInstructions', function () {
         it('should be counted ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 

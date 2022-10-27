@@ -13,12 +13,12 @@ const Permit = [
     { name: 'deadline', type: 'uint256' },
 ];
 
-describe('SafeERC20', async () => {
+describe('SafeERC20', function () {
     let owner: SignerWithAddress;
     let spender: SignerWithAddress;
     let SafeERC20Wrapper: ContractFactory;
 
-    before(async () => {
+    before(async function () {
         [owner, spender] = await ethers.getSigners();
         SafeERC20Wrapper = await ethers.getContractFactory('SafeERC20Wrapper');
     });
@@ -92,41 +92,41 @@ describe('SafeERC20', async () => {
         return { token, wrapper, data, signature };
     }
 
-    describe('with address that has no contract code', async () => {
+    describe('with address that has no contract code', function () {
         shouldRevertOnAllCalls(
             ['SafeTransferFailed', 'SafeTransferFromFailed', 'ForceApproveFailed', ''],
             deployWrapperSimple,
         );
     });
 
-    describe('with token that returns false on all calls', async () => {
+    describe('with token that returns false on all calls', function () {
         shouldRevertOnAllCalls(
             ['SafeTransferFailed', 'SafeTransferFromFailed', 'ForceApproveFailed'],
             deployWrapperFalseMock,
         );
     });
 
-    describe('with token that returns true on all calls', async () => {
+    describe('with token that returns true on all calls', function () {
         shouldOnlyRevertOnErrors(deployWrapperTrueMock);
     });
 
-    describe('with token that returns no boolean values', async () => {
+    describe('with token that returns no boolean values', function () {
         shouldOnlyRevertOnErrors(deployWrapperNoReturnMock);
     });
 
-    describe('non-zero to non-zero approval forbidden', async () => {
-        it('zero to non-zero approval should pass', async () => {
+    describe('non-zero to non-zero approval forbidden', function () {
+        it('zero to non-zero approval should pass', async function () {
             const { wrapper } = await loadFixture(deployWrapperZeroApprove);
             await wrapper.approve(100);
         });
 
-        it('non-zero to non-zero approval should pass', async () => {
+        it('non-zero to non-zero approval should pass', async function () {
             const { wrapper } = await loadFixture(deployWrapperZeroApprove);
             await wrapper.approve(100);
             await wrapper.approve(100);
         });
 
-        it('non-zero to zero to non-zero approval should pass', async () => {
+        it('non-zero to zero to non-zero approval should pass', async function () {
             const { wrapper } = await loadFixture(deployWrapperZeroApprove);
             await wrapper.approve(100);
             await wrapper.approve(0);
@@ -134,8 +134,8 @@ describe('SafeERC20', async () => {
         });
     });
 
-    describe("with token that doesn't revert on invalid permit", async () => {
-        it('accepts owner signature', async () => {
+    describe("with token that doesn't revert on invalid permit", function () {
+        it('accepts owner signature', async function () {
             const { token, wrapper, data, signature } = await loadFixture(deployPermitNoRevertAndSign);
             expect(await token.nonces(owner.address)).to.equal('0');
             expect(await token.allowance(owner.address, spender.address)).to.equal('0');
@@ -154,7 +154,7 @@ describe('SafeERC20', async () => {
             expect(await token.allowance(owner.address, spender.address)).to.equal(data.value);
         });
 
-        it('revert on reused signature', async () => {
+        it('revert on reused signature', async function () {
             const { token, wrapper, data, signature } = await loadFixture(deployPermitNoRevertAndSign);
             expect(await token.nonces(owner.address)).to.equal('0');
             // use valid signature and consume nounce
@@ -192,7 +192,7 @@ describe('SafeERC20', async () => {
             expect(await token.nonces(owner.address)).to.equal('1');
         });
 
-        it('revert on invalid signature', async () => {
+        it('revert on invalid signature', async function () {
             const { token, wrapper, data } = await loadFixture(deployPermitNoRevertAndSign);
             // signature that is not valid for owner
             const invalidSignature = {
@@ -226,22 +226,22 @@ describe('SafeERC20', async () => {
     });
 
     function shouldRevertOnAllCalls(reasons: string[], fixture: () => Promise<{ wrapper: Contract }>) {
-        it('reverts on transfer', async () => {
+        it('reverts on transfer', async function () {
             const { wrapper } = await loadFixture(fixture);
             await expect(wrapper.transfer()).to.be.revertedWithCustomError(wrapper, reasons[0]);
         });
 
-        it('reverts on transferFrom', async () => {
+        it('reverts on transferFrom', async function () {
             const { wrapper } = await loadFixture(fixture);
             await expect(wrapper.transferFrom()).to.be.revertedWithCustomError(wrapper, reasons[1]);
         });
 
-        it('reverts on approve', async () => {
+        it('reverts on approve', async function () {
             const { wrapper } = await loadFixture(fixture);
             await expect(wrapper.approve(0)).to.be.revertedWithCustomError(wrapper, reasons[2]);
         });
 
-        it('reverts on increaseAllowance', async () => {
+        it('reverts on increaseAllowance', async function () {
             const { wrapper } = await loadFixture(fixture);
             if (reasons.length === 3) {
                 await expect(wrapper.increaseAllowance(0)).to.be.revertedWithCustomError(wrapper, reasons[2]);
@@ -250,7 +250,7 @@ describe('SafeERC20', async () => {
             }
         });
 
-        it('reverts on decreaseAllowance', async () => {
+        it('reverts on decreaseAllowance', async function () {
             const { wrapper } = await loadFixture(fixture);
             if (reasons.length === 3) {
                 await expect(wrapper.decreaseAllowance(0)).to.be.revertedWithCustomError(wrapper, reasons[2]);
@@ -261,34 +261,34 @@ describe('SafeERC20', async () => {
     }
 
     function shouldOnlyRevertOnErrors(fixture: () => Promise<{ wrapper: Contract }>) {
-        it("doesn't revert on transfer", async () => {
+        it("doesn't revert on transfer", async function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transfer();
         });
 
-        it("doesn't revert on transferFrom", async () => {
+        it("doesn't revert on transferFrom", async function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transferFrom();
         });
 
         describe('approvals', function () {
-            describe('with zero allowance', async () => {
-                it("doesn't revert when approving a non-zero allowance", async () => {
+            describe('with zero allowance', function () {
+                it("doesn't revert when approving a non-zero allowance", async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.approve(100);
                 });
 
-                it("doesn't revert when approving a zero allowance", async () => {
+                it("doesn't revert when approving a zero allowance", async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.approve(0);
                 });
 
-                it("doesn't revert when increasing the allowance", async () => {
+                it("doesn't revert when increasing the allowance", async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.increaseAllowance(10);
                 });
 
-                it('reverts when decreasing the allowance', async () => {
+                it('reverts when decreasing the allowance', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await expect(wrapper.decreaseAllowance(10)).to.be.revertedWithCustomError(
                         wrapper,
@@ -297,32 +297,32 @@ describe('SafeERC20', async () => {
                 });
             });
 
-            describe('with non-zero allowance', async () => {
-                it("doesn't revert when approving a non-zero allowance", async () => {
+            describe('with non-zero allowance', function () {
+                it("doesn't revert when approving a non-zero allowance", async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await wrapper.approve(20);
                 });
 
-                it("doesn't revert when approving a zero allowance", async () => {
+                it("doesn't revert when approving a zero allowance", async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await wrapper.approve(0);
                 });
 
-                it("doesn't revert when increasing the allowance", async () => {
+                it("doesn't revert when increasing the allowance", async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await wrapper.increaseAllowance(10);
                 });
 
-                it("doesn't revert when decreasing the allowance to a positive value", async () => {
+                it("doesn't revert when decreasing the allowance to a positive value", async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await wrapper.decreaseAllowance(50);
                 });
 
-                it('reverts when decreasing the allowance to a negative value', async () => {
+                it('reverts when decreasing the allowance to a negative value', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await expect(wrapper.decreaseAllowance(200)).to.be.revertedWithCustomError(

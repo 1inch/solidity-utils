@@ -3,7 +3,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
-describe('AddressSet', async function () {
+describe('AddressSet', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;
     let signer3: SignerWithAddress;
@@ -18,7 +18,7 @@ describe('AddressSet', async function () {
         return { addressSetMock };
     }
 
-    describe('length', async function () {
+    describe('length', function () {
         it('should get length 0', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             expect(await addressSetMock.length()).to.be.equal('0');
@@ -31,7 +31,7 @@ describe('AddressSet', async function () {
         });
     });
 
-    describe('at', async function () {
+    describe('at', function () {
         it('should get from empty set', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             expect(await addressSetMock.at(0)).to.be.equal(constants.ZERO_ADDRESS);
@@ -54,7 +54,7 @@ describe('AddressSet', async function () {
         });
     });
 
-    describe('contains', async function () {
+    describe('contains', function () {
         it('should not contain in empty set', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             expect(await addressSetMock.contains(signer1.address)).to.be.equal(false);
@@ -81,7 +81,7 @@ describe('AddressSet', async function () {
         });
     });
 
-    describe('add', async function () {
+    describe('add', function () {
         it('should add to empty set', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             const isAdded = await addressSetMock.callStatic.add(signer1.address);
@@ -111,7 +111,7 @@ describe('AddressSet', async function () {
         });
     });
 
-    describe('remove', async function () {
+    describe('remove', function () {
         it('should not remove from empty set', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             const isRemoved = await addressSetMock.callStatic.remove(signer1.address);
