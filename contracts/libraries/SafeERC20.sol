@@ -99,15 +99,17 @@ library SafeERC20 {
 
     /// @dev Calls either ERC20 or Dai `permit` for `token`, if unsuccessful forwards revert from external call.
     function safePermit(IERC20 token, bytes calldata permit) internal {
-        bool success;
+        if (!tryPermit(token, permit)) RevertReasonForwarder.reRevert();
+    }
+
+    function tryPermit(IERC20 token, bytes calldata permit) internal returns(bool) {
         if (permit.length == 32 * 7) {
-            success = _makeCalldataCall(token, IERC20Permit.permit.selector, permit);
-        } else if (permit.length == 32 * 8) {
-            success = _makeCalldataCall(token, IDaiLikePermit.permit.selector, permit);
-        } else {
-            revert SafePermitBadLength();
+            return _makeCalldataCall(token, IERC20Permit.permit.selector, permit);
         }
-        if (!success) RevertReasonForwarder.reRevert();
+        if (permit.length == 32 * 8) {
+            return _makeCalldataCall(token, IDaiLikePermit.permit.selector, permit);
+        }
+        revert SafePermitBadLength();
     }
 
     function _makeCall(
