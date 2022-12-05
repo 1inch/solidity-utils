@@ -1,5 +1,5 @@
 import { PathLike, promises as fs } from 'fs';
-import { ethers } from 'ethers';
+import { providers } from 'ethers';
 
 export const gasspectOptionsDefault = {
     minOpGasCost: 300, // minimal gas cost of returned operations
@@ -92,7 +92,7 @@ function _normalizeOp(ops: Op[], i: number) {
     }
 }
 
-export async function profileEVM(txHash: string, instruction: string[], provider: ethers.providers.JsonRpcProvider, optionalTraceFile?: PathLike | fs.FileHandle) {
+export async function profileEVM(provider: providers.JsonRpcProvider, txHash: string, instruction: string[], optionalTraceFile?: PathLike | fs.FileHandle) {
     const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const str = JSON.stringify(trace);
@@ -107,9 +107,9 @@ export async function profileEVM(txHash: string, instruction: string[], provider
 }
 
 export async function gasspectEVM(
+    provider: providers.JsonRpcProvider,
     txHash: string,
     gasspectOptions: Record<string, unknown> = {},
-    provider: ethers.providers.JsonRpcProvider,
     optionalTraceFile?: PathLike | fs.FileHandle
 ) {
 
