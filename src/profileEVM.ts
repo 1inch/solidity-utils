@@ -92,7 +92,7 @@ function _normalizeOp(ops: Op[], i: number) {
     }
 }
 
-export async function profileEVM(txHash: string, provider: providers.JsonRpcProvider, instruction: string[], optionalTraceFile?: PathLike | fs.FileHandle) {
+export async function profileEVM(provider: providers.JsonRpcProvider, txHash: string, instruction: string[], optionalTraceFile?: PathLike | fs.FileHandle) {
     const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const str = JSON.stringify(trace);
@@ -107,8 +107,8 @@ export async function profileEVM(txHash: string, provider: providers.JsonRpcProv
 }
 
 export async function gasspectEVM(
-    txHash: string,
     provider: providers.JsonRpcProvider,
+    txHash: string,
     gasspectOptions: Record<string, unknown> = {},
     optionalTraceFile?: PathLike | fs.FileHandle
 ) {

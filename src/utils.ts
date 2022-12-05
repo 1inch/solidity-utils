@@ -9,8 +9,8 @@ export async function timeIncreaseTo(seconds: number | string) {
 }
 
 export async function trackReceivedTokenAndTx<T extends unknown[]>(
-    token: Contract | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
     provider: providers.JsonRpcProvider,
+    token: Contract | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
     wallet: string,
     txPromise: (...args: T) => Promise<ContractTransaction>,
     ...args: T
@@ -47,8 +47,8 @@ export async function signMessage(signer: Wallet, messageHex: string | Bytes = '
 }
 
 export async function countInstructions(
-    txHash: string,
     provider: providers.JsonRpcProvider,
+    txHash: string,
     instructions: string[]
 ) {
     const trace = await provider.send('debug_traceTransaction', [txHash]);

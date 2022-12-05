@@ -25,7 +25,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.transfer(signer2.address, ether('1'));
-            expect(await profileEVM(txn.hash, ethers.provider, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+            expect(await profileEVM(ethers.provider, txn.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                 0, 0, 2, 2,
             ]);
         });
@@ -34,7 +34,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.approve(signer2.address, ether('1'));
-            expect(await profileEVM(txn.hash, ethers.provider, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+            expect(await profileEVM(ethers.provider, txn.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                 0, 0, 1, 0,
             ]);
         });
@@ -45,7 +45,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.transfer(signer2.address, ether('1'));
-            expect(await gasspectEVM(txn.hash, ethers.provider)).to.be.deep.equal([
+            expect(await gasspectEVM(ethers.provider, txn.hash)).to.be.deep.equal([
                 '0-0-SLOAD = 2100',
                 '0-0-SSTORE = 2900',
                 '0-0-SLOAD = 2100',
@@ -58,14 +58,14 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.approve(signer2.address, ether('1'));
-            expect(await gasspectEVM(txn.hash, ethers.provider)).to.be.deep.equal(['0-0-SSTORE_I = 22100', '0-0-LOG3 = 1756']);
+            expect(await gasspectEVM(ethers.provider, txn.hash)).to.be.deep.equal(['0-0-SSTORE_I = 22100', '0-0-LOG3 = 1756']);
         });
 
         it('should be counted ERC20 Transfer with minOpGasCost = 2000', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.transfer(signer2.address, ether('1'));
-            expect(await gasspectEVM(txn.hash, ethers.provider, { minOpGasCost: 2000 })).to.be.deep.equal([
+            expect(await gasspectEVM(ethers.provider, txn.hash, { minOpGasCost: 2000 })).to.be.deep.equal([
                 '0-0-SLOAD = 2100',
                 '0-0-SSTORE = 2900',
                 '0-0-SLOAD = 2100',
@@ -77,7 +77,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.transfer(signer2.address, ether('1'));
-            expect(await gasspectEVM(txn.hash, ethers.provider, { args: true })).to.be.deep.equal([
+            expect(await gasspectEVM(ethers.provider, txn.hash, { args: true })).to.be.deep.equal([
                 '0-0-SLOAD(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722) = 2100',
                 '0-0-SSTORE(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722,0x00000000000000000000000000000000000000000000003627e8f712373c0000) = 2900',
                 '0-0-SLOAD(0x14e04a66bf74771820a7400ff6cf065175b3d7eb25805a5bd1633b161af5d101) = 2100',
@@ -90,7 +90,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.transfer(signer2.address, ether('1'));
-            expect(await gasspectEVM(txn.hash, ethers.provider, { res: true })).to.be.deep.equal([
+            expect(await gasspectEVM(ethers.provider, txn.hash, { res: true })).to.be.deep.equal([
                 '0-0-SLOAD:0x00000000000000000000000000000000000000000000003635c9adc5dea00000 = 2100',
                 '0-0-SSTORE = 2900',
                 '0-0-SLOAD:0x00000000000000000000000000000000000000000000003635c9adc5dea00000 = 2100',

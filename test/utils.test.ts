@@ -93,7 +93,7 @@ describe('utils', function () {
         it('should be tracked ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const [received, tx] = await trackReceivedTokenAndTx(usdt, ethers.provider, signer2.address, () =>
+            const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2.address, ether('1')),
             );
             expect(received).to.be.equal(ether('1'));
@@ -108,7 +108,7 @@ describe('utils', function () {
         it('should be tracked ERC20 Approve', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const [received, tx] = await trackReceivedTokenAndTx(usdt, ethers.provider, signer2.address, () =>
+            const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2.address, ether('1')),
             );
             expect(received).to.be.equal('0');
@@ -125,7 +125,7 @@ describe('utils', function () {
         it('should be tracked ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const [received] = await trackReceivedTokenAndTx(usdt, ethers.provider, signer2.address, () =>
+            const [received] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2.address, ether('1')),
             );
             expect(received).to.be.equal(ether('1'));
@@ -134,7 +134,7 @@ describe('utils', function () {
         it('should be tracked ERC20 Approve', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const [received] = await trackReceivedTokenAndTx(usdt, ethers.provider, signer2.address, () =>
+            const [received] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2.address, ether('1')),
             );
             expect(received).to.be.equal('0');
@@ -145,10 +145,10 @@ describe('utils', function () {
         it('should be counted ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const [, tx] = await trackReceivedTokenAndTx(usdt, ethers.provider, signer2.address, () =>
+            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2.address, ether('1')),
             );
-            expect(await countInstructions(tx.hash, ethers.provider, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+            expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                 0, 0, 2, 2,
             ]);
         });
@@ -156,10 +156,10 @@ describe('utils', function () {
         it('should be counted ERC20 Approve', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const [, tx] = await trackReceivedTokenAndTx(usdt, ethers.provider, signer2.address, () =>
+            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2.address, ether('1')),
             );
-            expect(await countInstructions(tx.hash, ethers.provider, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+            expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                 0, 0, 1, 0,
             ]);
         });
