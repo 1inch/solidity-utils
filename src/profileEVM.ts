@@ -1,6 +1,5 @@
-import '@nomiclabs/hardhat-ethers';
 import { PathLike, promises as fs } from 'fs';
-import { ethers } from 'hardhat';
+import { ethers } from 'ethers';
 
 export const gasspectOptionsDefault = {
     minOpGasCost: 300, // minimal gas cost of returned operations
@@ -93,8 +92,8 @@ function _normalizeOp(ops: Op[], i: number) {
     }
 }
 
-export async function profileEVM(txHash: string, instruction: string[], optionalTraceFile?: PathLike | fs.FileHandle) {
-    const trace = await ethers.provider.send('debug_traceTransaction', [txHash]);
+export async function profileEVM(txHash: string, instruction: string[], provider: ethers.providers.Provider, optionalTraceFile?: PathLike | fs.FileHandle) {
+    const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const str = JSON.stringify(trace);
 
@@ -110,11 +109,13 @@ export async function profileEVM(txHash: string, instruction: string[], optional
 export async function gasspectEVM(
     txHash: string,
     gasspectOptions: Record<string, unknown> = {},
-    optionalTraceFile?: PathLike | fs.FileHandle,
+    provider: ethers.providers.Provider,
+    optionalTraceFile?: PathLike | fs.FileHandle
 ) {
+
     const options = { ...gasspectOptionsDefault, ...gasspectOptions };
 
-    const trace = await ethers.provider.send('debug_traceTransaction', [txHash]);
+    const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const ops: Op[] = trace.structLogs;
 
