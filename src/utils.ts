@@ -1,9 +1,6 @@
-import '@nomiclabs/hardhat-ethers';
 import { constants } from './prelude';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
-import { Contract, Bytes, ContractTransaction } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { providers, Wallet, Contract, Bytes, ContractTransaction } from 'ethers';
 
 export async function timeIncreaseTo(seconds: number | string) {
     const delay = 1000 - new Date().getMilliseconds();
@@ -13,6 +10,7 @@ export async function timeIncreaseTo(seconds: number | string) {
 
 export async function trackReceivedTokenAndTx<T extends unknown[]>(
     token: Contract | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
+    provider: providers.JsonRpcProvider,
     wallet: string,
     txPromise: (...args: T) => Promise<ContractTransaction>,
     ...args: T
@@ -20,7 +18,7 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
     const [balanceFunc, isETH] =
         'balanceOf' in token
             ? [() => token.balanceOf(wallet), false]
-            : [async () => await ethers.provider.getBalance(wallet), true];
+            : [async () => await provider.getBalance(wallet), true];
     const preBalance = await balanceFunc();
     const txResult = await txPromise(...args);
     const txReceipt = await txResult.wait();
@@ -44,12 +42,16 @@ export function fixSignature(signature: string) {
     return signature.slice(0, 130) + vHex;
 }
 
-export async function signMessage(signer: SignerWithAddress, messageHex: string | Bytes = '0x') {
+export async function signMessage(signer: Wallet, messageHex: string | Bytes = '0x') {
     return fixSignature(await signer.signMessage(messageHex));
 }
 
-export async function countInstructions(txHash: string, instructions: string[]) {
-    const trace = await ethers.provider.send('debug_traceTransaction', [txHash]);
+export async function countInstructions(
+    txHash: string,
+    provider: providers.JsonRpcProvider,
+    instructions: string[]
+) {
+    const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const str = JSON.stringify(trace);
 

@@ -1,7 +1,7 @@
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
 import { constants } from './prelude';
 import { Contract } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { Wallet } from 'ethers';
 import { splitSignature } from 'ethers/lib/utils';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
@@ -95,7 +95,7 @@ export function buildDataLikeDai(
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
  */
 export async function getPermit(
-    owner: SignerWithAddress,
+    owner: Wallet,
     permitContract: Contract,
     tokenVersion: string,
     chainId: number,
@@ -134,7 +134,7 @@ export async function getPermit(
  * @param permitContract The contract object with ERC20PermitLikeDai type and token address for which the permit creating.
  */
 export async function getPermitLikeDai(
-    holder: SignerWithAddress,
+    holder: Wallet,
     permitContract: Contract,
     tokenVersion: string,
     chainId: number,
