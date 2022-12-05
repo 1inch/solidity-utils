@@ -1,5 +1,4 @@
 import { PathLike, promises as fs } from 'fs';
-import { ethers } from 'ethers';
 
 export const gasspectOptionsDefault = {
     minOpGasCost: 300, // minimal gas cost of returned operations
@@ -92,7 +91,8 @@ function _normalizeOp(ops: Op[], i: number) {
     }
 }
 
-export async function profileEVM(txHash: string, instruction: string[], provider: ethers.providers.Provider, optionalTraceFile?: PathLike | fs.FileHandle) {
+// tslint:disable-next-line
+export async function profileEVM(txHash: string, instruction: string[], provider, optionalTraceFile?: PathLike | fs.FileHandle) {
     const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const str = JSON.stringify(trace);
@@ -109,7 +109,7 @@ export async function profileEVM(txHash: string, instruction: string[], provider
 export async function gasspectEVM(
     txHash: string,
     gasspectOptions: Record<string, unknown> = {},
-    provider: ethers.providers.Provider,
+    provider, // tslint:disable-line
     optionalTraceFile?: PathLike | fs.FileHandle
 ) {
 
