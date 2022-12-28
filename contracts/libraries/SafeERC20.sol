@@ -104,10 +104,10 @@ library SafeERC20 {
 
     function tryPermit(IERC20 token, bytes calldata permit) internal returns(bool) {
         if (permit.length == 32 * 7) {
-            return _makeCalldataCall(token, IERC20Permit.permit.selector, permit);
+            return _makePermitCall(token, IERC20Permit.permit.selector, permit);
         }
         if (permit.length == 32 * 8) {
-            return _makeCalldataCall(token, IDaiLikePermit.permit.selector, permit);
+            return _makePermitCall(token, IDaiLikePermit.permit.selector, permit);
         }
         revert SafePermitBadLength();
     }
@@ -138,28 +138,17 @@ library SafeERC20 {
         }
     }
 
-    function _makeCalldataCall(
+    function _makePermitCall(
         IERC20 token,
         bytes4 selector,
         bytes calldata args
     ) private returns (bool success) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let len := add(4, args.length)
             let data := mload(0x40)
-
             mstore(data, selector)
             calldatacopy(add(data, 0x04), args.offset, args.length)
-            success := call(gas(), token, 0, data, len, 0x0, 0x20)
-            if success {
-                switch returndatasize()
-                case 0 {
-                    success := gt(extcodesize(token), 0)
-                }
-                default {
-                    success := and(gt(returndatasize(), 31), eq(mload(0), 1))
-                }
-            }
+            success := call(gas(), token, 0, data, add(4, args.length), 0x0, 0x20)
         }
     }
 }
