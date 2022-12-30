@@ -98,7 +98,7 @@ library SafeERC20 {
     }
 
     function safePermit(IERC20 token, bytes calldata permit) internal {
-        safePermit(token, msg.sender, address(this), permit);
+        if (!tryPermit(token, msg.sender, address(this), permit)) RevertReasonForwarder.reRevert();
     }
 
     function safePermit(IERC20 token, address owner, address spender, bytes calldata permit) internal {
