@@ -38,6 +38,15 @@ describe('Permitable', function () {
         expect(await erc20PermitMock.allowance(signer1.address, signer2.address)).to.be.equal(value);
     });
 
+    it('should be permitted for IERC20Permit (compact)', async function () {
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+
+        const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, signer2.address, value.toString(), constants.MAX_UINT256.toString(), true);
+        await permitableMock.mockPermitCompact(erc20PermitMock.address, signer1.address, signer2.address, permit);
+        expect(await erc20PermitMock.nonces(signer1.address)).to.be.equal('1');
+        expect(await erc20PermitMock.allowance(signer1.address, signer2.address)).to.be.equal(value);
+    });
+
     it('should not be permitted for IERC20Permit', async function () {
         const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
 
@@ -77,6 +86,16 @@ describe('Permitable', function () {
 
         const permit = await getPermitLikeDai(signer1, daiLikePermitMock, '1', chainId, signer2.address, true);
         await permitableMock.mockPermit(daiLikePermitMock.address, permit);
+
+        expect(await daiLikePermitMock.nonces(signer1.address)).to.be.equal('1');
+        expect(await daiLikePermitMock.allowance(signer1.address, signer2.address)).to.be.equal(constants.MAX_UINT128);
+    });
+
+    it('should be permitted for IDaiLikePermit (compact)', async function () {
+        const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
+
+        const permit = await getPermitLikeDai(signer1, daiLikePermitMock, '1', chainId, signer2.address, true, constants.MAX_UINT256.toString(), true);
+        await permitableMock.mockPermitCompact(daiLikePermitMock.address, signer1.address, signer2.address, permit);
 
         expect(await daiLikePermitMock.nonces(signer1.address)).to.be.equal('1');
         expect(await daiLikePermitMock.allowance(signer1.address, signer2.address)).to.be.equal(constants.MAX_UINT128);

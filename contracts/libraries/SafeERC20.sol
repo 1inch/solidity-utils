@@ -112,7 +112,7 @@ library SafeERC20 {
     function tryPermit(IERC20 token, address owner, address spender, bytes calldata permit) internal returns(bool success) {
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
-        bytes4 exception = SafePermitBadLength.selector;
+        bool lengthIsValid;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             switch permit.length
@@ -129,12 +129,13 @@ library SafeERC20 {
                 let vs := calldataload(add(permit.offset, 0x44))
 
                 mstore(add(ptr, 0x44), value)
-                mstore(add(ptr, 0x64), deadline)
+                mstore(add(ptr, 0x64), sub(deadline, 1))
                 mstore(add(ptr, 0x84), add(27, shr(255, vs)))
                 mstore(add(ptr, 0xa4), r)
                 mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
                 // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
+                lengthIsValid := true
             }
             case 72 {
                 let ptr := mload(0x40)
@@ -146,16 +147,17 @@ library SafeERC20 {
                 let nonce := shr(224, calldataload(permit.offset))
                 let expiry := shr(224, calldataload(add(permit.offset, 0x04)))
                 let r := calldataload(add(permit.offset, 0x08))
-                let vs := calldataload(add(permit.offset, 0x24))
+                let vs := calldataload(add(permit.offset, 0x28))
 
                 mstore(add(ptr, 0x44), nonce)
-                mstore(add(ptr, 0x64), expiry)
+                mstore(add(ptr, 0x64), sub(expiry, 1))
                 mstore(add(ptr, 0x84), true)
                 mstore(add(ptr, 0xa4), add(27, shr(255, vs)))
                 mstore(add(ptr, 0xc4), r)
                 mstore(add(ptr, 0xe4), shr(1, shl(1, vs)))
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0x104, 0, 0)
+                lengthIsValid := true
             }
             case 224 {
                 let ptr := mload(0x40)
@@ -163,6 +165,7 @@ library SafeERC20 {
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
+                lengthIsValid := true
             }
             case 256 {
                 let ptr := mload(0x40)
@@ -170,11 +173,12 @@ library SafeERC20 {
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
+                lengthIsValid := true
             }
-            default {
-                mstore(0, exception)
-                revert(0, 4)
-            }
+        }
+
+        if (!lengthIsValid) {
+            revert SafePermitBadLength();
         }
     }
 

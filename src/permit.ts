@@ -102,6 +102,7 @@ export async function getPermit(
     spender: string,
     value: string,
     deadline = defaultDeadline.toString(),
+    compact = false,
 ) {
     const nonce = await permitContract.nonces(owner.address);
     const name = await permitContract.name();
@@ -118,6 +119,18 @@ export async function getPermit(
     );
     const signature = await owner._signTypedData(data.domain, data.types, data.message);
     const { v, r, s } = splitSignature(signature);
+
+    if (compact) {
+        if (BigInt(deadline) != constants.MAX_UINT256 && BigInt(deadline) >= (1n << 32n)) {
+            throw new Error('Deadline is too big for the compact mode');
+        }
+        return '0x' +
+            BigInt(value).toString(16).padStart(64, '0') +
+            (deadline == constants.MAX_UINT256.toString() ? '00000000' : (BigInt(deadline) + 1n).toString(16).padStart(8, '0')) +
+            BigInt(r).toString(16).padStart(64, '0') +
+            (BigInt(s) | (BigInt(v - 27) << 255n)).toString(16).padStart(64, '0');
+    }
+
     const permitCall = permitContract.interface.encodeFunctionData('permit', [
         owner.address,
         spender,
@@ -141,6 +154,7 @@ export async function getPermitLikeDai(
     spender: string,
     allowed: boolean,
     expiry = defaultDeadline.toString(),
+    compact = false,
 ) {
     const nonce = await permitContract.nonces(holder.address);
     const name = await permitContract.name();
@@ -157,6 +171,18 @@ export async function getPermitLikeDai(
     );
     const signature = await holder._signTypedData(data.domain, data.types, data.message);
     const { v, r, s } = splitSignature(signature);
+
+    if (compact) {
+        if (BigInt(expiry) != constants.MAX_UINT256 && BigInt(expiry) >= (1n << 32n)) {
+            throw new Error('Expiry is too big for the compact mode');
+        }
+        return '0x' +
+            BigInt(nonce).toString(16).padStart(8, '0') +
+            (expiry == constants.MAX_UINT256.toString() ? '00000000' : (BigInt(expiry) + 1n).toString(16).padStart(8, '0')) +
+            BigInt(r).toString(16).padStart(64, '0') +
+            (BigInt(s) | (BigInt(v - 27) << 255n)).toString(16).padStart(64, '0');
+    }
+
     const permitCall = permitContract.interface.encodeFunctionData(
         'permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)',
         [holder.address, spender, nonce, expiry, allowed, v, r, s],
