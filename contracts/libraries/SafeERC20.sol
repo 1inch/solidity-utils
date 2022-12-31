@@ -112,7 +112,7 @@ library SafeERC20 {
     function tryPermit(IERC20 token, address owner, address spender, bytes calldata permit) internal returns(bool success) {
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
-        bool lengthIsValid;
+        bool lengthIsInvalid;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             switch permit.length
@@ -135,7 +135,6 @@ library SafeERC20 {
                 mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
                 // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
-                lengthIsValid := true
             }
             case 72 {
                 let ptr := mload(0x40)
@@ -157,7 +156,6 @@ library SafeERC20 {
                 mstore(add(ptr, 0xe4), shr(1, shl(1, vs)))
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0x104, 0, 0)
-                lengthIsValid := true
             }
             case 224 {
                 let ptr := mload(0x40)
@@ -165,7 +163,6 @@ library SafeERC20 {
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
-                lengthIsValid := true
             }
             case 256 {
                 let ptr := mload(0x40)
@@ -173,11 +170,13 @@ library SafeERC20 {
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
-                lengthIsValid := true
+            }
+            default {
+                lengthIsInvalid := true
             }
         }
 
-        if (!lengthIsValid) {
+        if (lengthIsInvalid) {
             revert SafePermitBadLength();
         }
     }

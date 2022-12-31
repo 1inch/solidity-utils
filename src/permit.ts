@@ -121,12 +121,12 @@ export async function getPermit(
     const { v, r, s } = splitSignature(signature);
 
     if (compact) {
-        if (BigInt(deadline) != constants.MAX_UINT256 && BigInt(deadline) >= (1n << 32n)) {
+        if (BigInt(deadline) !== constants.MAX_UINT256 && BigInt(deadline) >= (1n << 32n)) {
             throw new Error('Deadline is too big for the compact mode');
         }
         return '0x' +
             BigInt(value).toString(16).padStart(64, '0') +
-            (deadline == constants.MAX_UINT256.toString() ? '00000000' : (BigInt(deadline) + 1n).toString(16).padStart(8, '0')) +
+            (deadline === constants.MAX_UINT256.toString() ? '00000000' : (BigInt(deadline) + 1n).toString(16).padStart(8, '0')) +
             BigInt(r).toString(16).padStart(64, '0') +
             (BigInt(s) | (BigInt(v - 27) << 255n)).toString(16).padStart(64, '0');
     }
@@ -173,12 +173,12 @@ export async function getPermitLikeDai(
     const { v, r, s } = splitSignature(signature);
 
     if (compact) {
-        if (BigInt(expiry) != constants.MAX_UINT256 && BigInt(expiry) >= (1n << 32n)) {
+        if (BigInt(expiry) !== constants.MAX_UINT256 && BigInt(expiry) >= (1n << 32n)) {
             throw new Error('Expiry is too big for the compact mode');
         }
         return '0x' +
             BigInt(nonce).toString(16).padStart(8, '0') +
-            (expiry == constants.MAX_UINT256.toString() ? '00000000' : (BigInt(expiry) + 1n).toString(16).padStart(8, '0')) +
+            (expiry === constants.MAX_UINT256.toString() ? '00000000' : (BigInt(expiry) + 1n).toString(16).padStart(8, '0')) +
             BigInt(r).toString(16).padStart(64, '0') +
             (BigInt(s) | (BigInt(v - 27) << 255n)).toString(16).padStart(64, '0');
     }
