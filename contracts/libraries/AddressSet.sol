@@ -63,4 +63,18 @@ library AddressSet {
         delete s.lookup[item];
         return true;
     }
+
+    /// @dev Erases set from storage `s` and returns all removed items
+    function erase(Data storage s) internal returns(address[] memory items) {
+        items = s.items.get();
+        uint256 len = items.length;
+        if (len > 0) {
+            s.items.erase();
+            unchecked {
+                for (uint256 i = 0; i < len; i++) {
+                    delete s.lookup[items[i]];
+                }
+            }
+        }
+    }
 }
