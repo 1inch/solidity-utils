@@ -157,4 +157,13 @@ library AddressArray {
         }
         if (exception) revert IndexOutOfBounds();
     }
+
+    /// @dev Erase length of the array
+    function erase(Data storage self) internal {
+        uint256[1 << 32] storage raw = self._raw;
+        /// @solidity memory-safe-assembly
+        assembly { // solhint-disable-line no-inline-assembly
+            sstore(raw.offset, ADDRESS_MASK)
+        }
+    }
 }
