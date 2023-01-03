@@ -49,18 +49,18 @@ library AddressSet {
     /// @dev Removes `item` from storage `s` and returns true if successful.
     function remove(Data storage s, address item) internal returns (bool) {
         uint256 index = s.lookup[item];
+        delete s.lookup[item];
         if (index == 0) {
             return false;
         }
+
+        address lastItem = s.items.pop();
         if (index < s.items.length()) {
             unchecked {
-                address lastItem = s.items.at(s.items.length() - 1);
                 s.items.set(index - 1, lastItem);
                 s.lookup[lastItem] = index;
             }
         }
-        s.items.pop();
-        delete s.lookup[item];
         return true;
     }
 

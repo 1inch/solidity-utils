@@ -105,7 +105,7 @@ library AddressArray {
     }
 
     /// @dev Array pop back operation for storage `self`.
-    function pop(Data storage self) internal {
+    function pop(Data storage self) internal returns(address res) {
         bool exception;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
@@ -118,9 +118,11 @@ library AddressArray {
                 exception := true
             }
             case 1 {
+                res := and(sload(self.offset), ADDRESS_MASK)
                 sstore(self.offset, ZERO_ADDRESS)
             }
             default {
+                res := and(sload(add(self.offset, sub(len, 1))), ADDRESS_MASK)
                 sstore(self.offset, sub(lengthAndFirst, ONE_LENGTH))
             }
         }
