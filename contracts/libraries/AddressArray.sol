@@ -13,6 +13,7 @@ library AddressArray {
     uint256 internal constant LENGTH_MASK  = 0x0000000000000000ffffffff0000000000000000000000000000000000000000;
     uint256 internal constant ADDRESS_MASK = 0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff;
     uint256 internal constant ONE_LENGTH   = 0x0000000000000000000000010000000000000000000000000000000000000000;
+    uint256 internal constant LENGTH_OFFSET = 160;
 
     /// @dev Data struct containing raw mapping.
     struct Data {
@@ -23,7 +24,7 @@ library AddressArray {
     function length(Data storage self) internal view returns (uint256 res) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            res := shr(160, and(sload(self.offset), LENGTH_MASK))
+            res := shr(LENGTH_OFFSET, and(sload(self.offset), LENGTH_MASK))
         }
     }
 
@@ -41,7 +42,7 @@ library AddressArray {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.offset)
-            let len := shr(160, and(lengthAndFirst, LENGTH_MASK))
+            let len := shr(LENGTH_OFFSET, and(lengthAndFirst, LENGTH_MASK))
             let fst := and(lengthAndFirst, ADDRESS_MASK)
 
             // Allocate array
@@ -66,7 +67,7 @@ library AddressArray {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.offset)
-            let len := shr(160, and(lengthAndFirst, LENGTH_MASK))
+            let len := shr(LENGTH_OFFSET, and(lengthAndFirst, LENGTH_MASK))
             let fst := and(lengthAndFirst, ADDRESS_MASK)
 
             if gt(len, mload(input)) {
@@ -89,7 +90,7 @@ library AddressArray {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.offset)
-            let len := shr(160, and(lengthAndFirst, LENGTH_MASK))
+            let len := shr(LENGTH_OFFSET, and(lengthAndFirst, LENGTH_MASK))
             let fst := and(lengthAndFirst, ADDRESS_MASK)
 
             switch len
@@ -110,7 +111,7 @@ library AddressArray {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.offset)
-            let len := shr(160, and(lengthAndFirst, LENGTH_MASK))
+            let len := shr(LENGTH_OFFSET, and(lengthAndFirst, LENGTH_MASK))
             let fst := and(lengthAndFirst, ADDRESS_MASK)
 
             switch len
@@ -135,7 +136,7 @@ library AddressArray {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.offset)
-            let len := shr(160, and(lengthAndFirst, LENGTH_MASK))
+            let len := shr(LENGTH_OFFSET, and(lengthAndFirst, LENGTH_MASK))
             let fst := and(lengthAndFirst, ADDRESS_MASK)
 
             if iszero(lt(index, len)) {
