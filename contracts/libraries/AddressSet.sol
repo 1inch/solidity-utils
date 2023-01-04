@@ -14,9 +14,9 @@ import "./AddressArray.sol";
 library AddressSet {
     using AddressArray for AddressArray.Data;
 
-    /** @dev Data struct from AddressArray.Data items
-     * and lookup mapping address => index in data array.
-     */
+    uint256 internal constant NULL_INDEX = type(uint256).max;
+
+    /// @dev Data struct from AddressArray.Data items and lookup mapping address => index in data array.
     struct Data {
         AddressArray.Data items;
         mapping(address => uint256) lookup;
@@ -34,12 +34,14 @@ library AddressSet {
 
     /// @dev Returns true if storage `s` has `item`.
     function contains(Data storage s, address item) internal view returns (bool) {
-        return s.lookup[item] != 0;
+        uint256 index = s.lookup[item];
+        return index != 0 && index != NULL_INDEX;
     }
 
     /// @dev Adds `item` into storage `s` and returns true if successful.
     function add(Data storage s, address item) internal returns (bool) {
-        if (s.lookup[item] > 0) {
+        uint256 index = s.lookup[item];
+        if (index != 0 && index != NULL_INDEX) {
             return false;
         }
         s.lookup[item] = s.items.push(item);
@@ -49,8 +51,8 @@ library AddressSet {
     /// @dev Removes `item` from storage `s` and returns true if successful.
     function remove(Data storage s, address item) internal returns (bool) {
         uint256 index = s.lookup[item];
-        delete s.lookup[item];
-        if (index == 0) {
+        s.lookup[item] = NULL_INDEX;
+        if (index == 0 || index == NULL_INDEX) {
             return false;
         }
 
@@ -72,7 +74,7 @@ library AddressSet {
             s.items.erase();
             unchecked {
                 for (uint256 i = 0; i < len; i++) {
-                    delete s.lookup[items[i]];
+                    s.lookup[items[i]] = NULL_INDEX;
                 }
             }
         }
