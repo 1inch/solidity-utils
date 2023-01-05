@@ -3,6 +3,7 @@ import { constants } from './prelude';
 import { Contract } from 'ethers';
 import { Wallet } from 'ethers';
 import { splitSignature } from 'ethers/lib/utils';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -95,7 +96,7 @@ export function buildDataLikeDai(
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
  */
 export async function getPermit(
-    owner: Wallet,
+    owner: Wallet | SignerWithAddress,
     permitContract: Contract,
     tokenVersion: string,
     chainId: number,
@@ -147,7 +148,7 @@ export async function getPermit(
  * @param permitContract The contract object with ERC20PermitLikeDai type and token address for which the permit creating.
  */
 export async function getPermitLikeDai(
-    holder: Wallet,
+    holder: Wallet | SignerWithAddress,
     permitContract: Contract,
     tokenVersion: string,
     chainId: number,
