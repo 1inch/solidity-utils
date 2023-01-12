@@ -127,10 +127,10 @@ library SafeERC20 {
                     let deadline := shr(224, calldataload(add(permit.offset, 0x20)))
                     let vs := calldataload(add(permit.offset, 0x44))
 
-                    calldatacopy(add(ptr, 0x44), permit.offset, 0x20)
+                    calldatacopy(add(ptr, 0x44), permit.offset, 0x20) // value
                     mstore(add(ptr, 0x64), sub(deadline, 1))
                     mstore(add(ptr, 0x84), add(27, shr(255, vs)))
-                    calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20)
+                    calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20) // r
                     mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
                 }
                 // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
@@ -152,7 +152,7 @@ library SafeERC20 {
                     mstore(add(ptr, 0x64), sub(expiry, 1))
                     mstore(add(ptr, 0x84), true)
                     mstore(add(ptr, 0xa4), add(27, shr(255, vs)))
-                    calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x08), 0x20)
+                    calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x08), 0x20) // r
                     mstore(add(ptr, 0xe4), shr(1, shl(1, vs)))
                 }
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
