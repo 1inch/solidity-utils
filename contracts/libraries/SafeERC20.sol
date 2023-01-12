@@ -97,19 +97,89 @@ library SafeERC20 {
         forceApprove(token, spender, allowance - value);
     }
 
-    /// @dev Calls either ERC20 or Dai `permit` for `token`, if unsuccessful forwards revert from external call.
     function safePermit(IERC20 token, bytes calldata permit) internal {
-        if (!tryPermit(token, permit)) RevertReasonForwarder.reRevert();
+        if (!tryPermit(token, msg.sender, address(this), permit)) RevertReasonForwarder.reRevert();
     }
 
-    function tryPermit(IERC20 token, bytes calldata permit) internal returns(bool) {
-        if (permit.length == 32 * 7) {
-            return _makeCalldataCall(token, IERC20Permit.permit.selector, permit);
+    function safePermit(IERC20 token, address owner, address spender, bytes calldata permit) internal {
+        if (!tryPermit(token, owner, spender, permit)) RevertReasonForwarder.reRevert();
+    }
+
+    function tryPermit(IERC20 token, bytes calldata permit) internal returns(bool success) {
+        return tryPermit(token, msg.sender, address(this), permit);
+    }
+
+    function tryPermit(IERC20 token, address owner, address spender, bytes calldata permit) internal returns(bool success) {
+        bytes4 permitSelector = IERC20Permit.permit.selector;
+        bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
+        bool lengthIsInvalid;
+        /// @solidity memory-safe-assembly
+        assembly { // solhint-disable-line no-inline-assembly
+            switch permit.length
+            case 100 {
+                let ptr := mload(0x40)
+                mstore(ptr, permitSelector)
+                mstore(add(ptr, 0x04), owner)
+                mstore(add(ptr, 0x24), spender)
+
+                // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
+                {  // stack too deep
+                    let deadline := shr(224, calldataload(add(permit.offset, 0x20)))
+                    let vs := calldataload(add(permit.offset, 0x44))
+
+                    calldatacopy(add(ptr, 0x44), permit.offset, 0x20)
+                    mstore(add(ptr, 0x64), sub(deadline, 1))
+                    mstore(add(ptr, 0x84), add(27, shr(255, vs)))
+                    calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20)
+                    mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
+                }
+                // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+                success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
+            }
+            case 72 {
+                let ptr := mload(0x40)
+                mstore(ptr, daiPermitSelector)
+                mstore(add(ptr, 0x04), owner)
+                mstore(add(ptr, 0x24), spender)
+
+                // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
+                {  // stack too deep
+                    let nonce := shr(224, calldataload(permit.offset))
+                    let expiry := shr(224, calldataload(add(permit.offset, 0x04)))
+                    let vs := calldataload(add(permit.offset, 0x28))
+
+                    mstore(add(ptr, 0x44), nonce)
+                    mstore(add(ptr, 0x64), sub(expiry, 1))
+                    mstore(add(ptr, 0x84), true)
+                    mstore(add(ptr, 0xa4), add(27, shr(255, vs)))
+                    calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x08), 0x20)
+                    mstore(add(ptr, 0xe4), shr(1, shl(1, vs)))
+                }
+                // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
+                success := call(gas(), token, 0, ptr, 0x104, 0, 0)
+            }
+            case 224 {
+                let ptr := mload(0x40)
+                mstore(ptr, permitSelector)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
+                // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+                success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
+            }
+            case 256 {
+                let ptr := mload(0x40)
+                mstore(ptr, daiPermitSelector)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
+                // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
+                success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
+            }
+            default {
+                lengthIsInvalid := true
+            }
         }
-        if (permit.length == 32 * 8) {
-            return _makeCalldataCall(token, IDaiLikePermit.permit.selector, permit);
+
+        if (lengthIsInvalid) {
+            revert SafePermitBadLength();
         }
-        revert SafePermitBadLength();
     }
 
     function _makeCall(
@@ -126,31 +196,6 @@ library SafeERC20 {
             mstore(add(data, 0x04), to)
             mstore(add(data, 0x24), amount)
             success := call(gas(), token, 0, data, 0x44, 0x0, 0x20)
-            if success {
-                switch returndatasize()
-                case 0 {
-                    success := gt(extcodesize(token), 0)
-                }
-                default {
-                    success := and(gt(returndatasize(), 31), eq(mload(0), 1))
-                }
-            }
-        }
-    }
-
-    function _makeCalldataCall(
-        IERC20 token,
-        bytes4 selector,
-        bytes calldata args
-    ) private returns (bool success) {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
-            let len := add(4, args.length)
-            let data := mload(0x40)
-
-            mstore(data, selector)
-            calldatacopy(add(data, 0x04), args.offset, args.length)
-            success := call(gas(), token, 0, data, len, 0x0, 0x20)
             if success {
                 switch returndatasize()
                 case 0 {
