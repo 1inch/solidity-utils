@@ -123,14 +123,16 @@ library SafeERC20 {
                 mstore(add(ptr, 0x24), spender)
 
                 // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
-                let deadline := shr(224, calldataload(add(permit.offset, 0x20)))
-                let vs := calldataload(add(permit.offset, 0x44))
+                {  // stack too deep
+                    let deadline := shr(224, calldataload(add(permit.offset, 0x20)))
+                    let vs := calldataload(add(permit.offset, 0x44))
 
-                calldatacopy(add(ptr, 0x44), permit.offset, 0x20)
-                mstore(add(ptr, 0x64), sub(deadline, 1))
-                mstore(add(ptr, 0x84), add(27, shr(255, vs)))
-                calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20)
-                mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
+                    calldatacopy(add(ptr, 0x44), permit.offset, 0x20)
+                    mstore(add(ptr, 0x64), sub(deadline, 1))
+                    mstore(add(ptr, 0x84), add(27, shr(255, vs)))
+                    calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20)
+                    mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
+                }
                 // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
             }
@@ -141,16 +143,18 @@ library SafeERC20 {
                 mstore(add(ptr, 0x24), spender)
 
                 // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
-                let nonce := shr(224, calldataload(permit.offset))
-                let expiry := shr(224, calldataload(add(permit.offset, 0x04)))
-                let vs := calldataload(add(permit.offset, 0x28))
+                {  // stack too deep
+                    let nonce := shr(224, calldataload(permit.offset))
+                    let expiry := shr(224, calldataload(add(permit.offset, 0x04)))
+                    let vs := calldataload(add(permit.offset, 0x28))
 
-                mstore(add(ptr, 0x44), nonce)
-                mstore(add(ptr, 0x64), sub(expiry, 1))
-                mstore(add(ptr, 0x84), true)
-                mstore(add(ptr, 0xa4), add(27, shr(255, vs)))
-                calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x08), 0x20)
-                mstore(add(ptr, 0xe4), shr(1, shl(1, vs)))
+                    mstore(add(ptr, 0x44), nonce)
+                    mstore(add(ptr, 0x64), sub(expiry, 1))
+                    mstore(add(ptr, 0x84), true)
+                    mstore(add(ptr, 0xa4), add(27, shr(255, vs)))
+                    calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x08), 0x20)
+                    mstore(add(ptr, 0xe4), shr(1, shl(1, vs)))
+                }
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0x104, 0, 0)
             }
