@@ -28,7 +28,7 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
             wallet.toLowerCase() === txResult.from.toLowerCase() && isETH
                 ? txReceipt.gasUsed.toBigInt() * txReceipt.effectiveGasPrice.toBigInt()
                 : 0n;
-        return [postBalance.sub(preBalance).add(txFees), txResult];
+        return [postBalance.sub(preBalance).add(txFees), txReceipt];
     } else {
         return [postBalance.sub(preBalance), txResult];
     }
