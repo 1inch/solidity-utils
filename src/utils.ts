@@ -15,19 +15,23 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
     txPromise: (...args: T) => Promise<ContractTransaction>,
     ...args: T
 ) {
-    const [balanceFunc, isETH] =
-        'balanceOf' in token
-            ? [() => token.balanceOf(wallet), false]
-            : [async () => await provider.getBalance(wallet), true];
-    const preBalance = await balanceFunc();
+    const isETH = token.address === constants.ZERO_ADDRESS || token.address === constants.EEE_ADDRESS;
+    const getBalance = 'balanceOf' in token ? token.balanceOf : provider.getBalance;
+
+    const preBalance = await getBalance(wallet);
     const txResult = await txPromise(...args);
-    const txReceipt = await txResult.wait();
-    const txFees =
-        wallet.toLowerCase() === txResult.from.toLowerCase() && isETH
-            ? txReceipt.gasUsed.toBigInt() * txReceipt.effectiveGasPrice.toBigInt()
-            : 0n;
-    const postBalance = await balanceFunc();
-    return [postBalance.sub(preBalance).add(txFees), txResult] as const;
+    const postBalance = await getBalance(wallet);
+
+    if ('wait' in txResult) {
+        const txReceipt = await txResult.wait();
+        const txFees =
+            wallet.toLowerCase() === txResult.from.toLowerCase() && isETH
+                ? txReceipt.gasUsed.toBigInt() * txReceipt.effectiveGasPrice.toBigInt()
+                : 0n;
+        return [postBalance.sub(preBalance).add(txFees), txResult];
+    } else {
+        return [postBalance.sub(preBalance), txResult];
+    }
 }
 
 export function fixSignature(signature: string) {
