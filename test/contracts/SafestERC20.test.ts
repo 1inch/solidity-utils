@@ -13,6 +13,8 @@ const Permit = [
     { name: 'deadline', type: 'uint256' },
 ];
 
+const PERMIT2 = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
+
 describe('SafeERC20', function () {
     let owner: SignerWithAddress;
     let spender: SignerWithAddress;
@@ -270,6 +272,18 @@ describe('SafeERC20', function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transferFrom();
         });
+
+        it("doesn't revert on transferFromUniversal, permit2", async function () {
+            const { wrapper } = await loadFixture(fixture);
+            await wrapper.transferFromUniversal(PERMIT2);
+        });
+
+
+        it("doesn't revert on transferFromUniversal, no permit2", async function () {
+            const { wrapper } = await loadFixture(fixture);
+            await wrapper.transferFromUniversal(constants.ZERO_ADDRESS);
+        });
+
 
         describe('approvals', function () {
             describe('with zero allowance', function () {

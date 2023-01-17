@@ -6,6 +6,7 @@ pragma abicoder v1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 import "../interfaces/IDaiLikePermit.sol";
+import "../interfaces/IPermit2.sol";
 import "../libraries/RevertReasonForwarder.sol";
 
 /// @title Implements efficient safe methods for ERC20 interface.
@@ -16,6 +17,21 @@ library SafeERC20 {
     error SafeIncreaseAllowanceFailed();
     error SafeDecreaseAllowanceFailed();
     error SafePermitBadLength();
+
+    /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
+    function safeTransferFromUniversal(
+        IERC20 token,
+        address from,
+        address to,
+        uint256 amount,
+        address permit2
+    ) internal {
+        if (permit2 == address(0)) {
+            safeTransferFrom(token, from, to, amount);
+        } else {
+            safeTransferFromPermit2(token, from, to, amount, IPermit2(permit2));
+        }
+    }
 
     /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
     function safeTransferFrom(
@@ -35,6 +51,39 @@ library SafeERC20 {
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
             success := call(gas(), token, 0, data, 100, 0x0, 0x20)
+            if success {
+                switch returndatasize()
+                case 0 {
+                    success := gt(extcodesize(token), 0)
+                }
+                default {
+                    success := and(gt(returndatasize(), 31), eq(mload(0), 1))
+                }
+            }
+        }
+        if (!success) revert SafeTransferFromFailed();
+    }
+
+    /// @dev Permit2 version of safeTransferFrom above.
+    function safeTransferFromPermit2(
+        IERC20 token,
+        address from,
+        address to,
+        uint256 amount,
+        IPermit2 permit2
+    ) internal {
+        bytes4 selector = permit2.transferFrom.selector;
+        bool success;
+        /// @solidity memory-safe-assembly
+        assembly { // solhint-disable-line no-inline-assembly
+            let data := mload(0x40)
+
+            mstore(data, selector)
+            mstore(add(data, 0x04), from)
+            mstore(add(data, 0x24), to)
+            mstore(add(data, 0x44), amount)
+            mstore(add(data, 0x64), token)
+            success := call(gas(), permit2, 0, data, 0x84, 0x0, 0x20)
             if success {
                 switch returndatasize()
                 case 0 {

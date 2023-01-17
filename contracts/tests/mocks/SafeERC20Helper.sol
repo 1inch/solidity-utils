@@ -171,6 +171,10 @@ contract SafeERC20Wrapper {
         _token.safeTransferFrom(address(0), address(0), 0);
     }
 
+    function transferFromUniversal(address permit2) public {
+        _token.safeTransferFromUniversal(address(0), address(0), 0, permit2);
+    }
+
     function approve(uint256 amount) public {
         _token.forceApprove(address(0), amount);
     }
