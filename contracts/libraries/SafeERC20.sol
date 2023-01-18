@@ -85,7 +85,7 @@ library SafeERC20 {
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
             mstore(add(data, 0x64), token)
-            success := call(gas(), 0x000000000022D473030F116dDEE9F6B43aC78BA3, 0, data, 0x84, 0x0, 0x20)
+            success := call(gas(), _PERMIT2, 0, data, 0x84, 0x0, 0x20)
             if success {
                 switch returndatasize()
                 case 0 {
