@@ -271,6 +271,18 @@ describe('SafeERC20', function () {
             await wrapper.transferFrom();
         });
 
+        it("doesn't revert on transferFromUniversal, permit2", async function () {
+            const { wrapper } = await loadFixture(fixture);
+            await wrapper.transferFromUniversal(true);
+        });
+
+
+        it("doesn't revert on transferFromUniversal, no permit2", async function () {
+            const { wrapper } = await loadFixture(fixture);
+            await wrapper.transferFromUniversal(false);
+        });
+
+
         describe('approvals', function () {
             describe('with zero allowance', function () {
                 it("doesn't revert when approving a non-zero allowance", async function () {

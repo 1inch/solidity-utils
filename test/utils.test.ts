@@ -97,12 +97,11 @@ describe('utils', function () {
                 usdt.transfer(signer2.address, ether('1')),
             );
             expect(received).to.be.equal(ether('1'));
-            expect(tx.data.length).equal(138);
             expect(tx.from).equal(signer1.address);
             expect(tx.to).equal(usdt.address);
-            const events = (await tx.wait()).events!;
-            expect(events.length).equal(1);
-            expect(events[0].event).equal('Transfer');
+            expect(tx.events.length).equal(1);
+            expect(tx.events[0].event).equal('Transfer');
+            expect(tx.events[0].data.length).equal(66);
         });
 
         it('should be tracked ERC20 Approve', async function () {
@@ -112,12 +111,11 @@ describe('utils', function () {
                 usdt.approve(signer2.address, ether('1')),
             );
             expect(received).to.be.equal('0');
-            expect(tx.data.length).equal(138);
             expect(tx.from).equal(signer1.address);
             expect(tx.to).equal(usdt.address);
-            const events = (await tx.wait()).events!;
-            expect(events.length).equal(1);
-            expect(events[0].event).equal('Approval');
+            expect(tx.events.length).equal(1);
+            expect(tx.events[0].event).equal('Approval');
+            expect(tx.events[0].data.length).equal(66);
         });
     });
 
@@ -148,7 +146,7 @@ describe('utils', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2.address, ether('1')),
             );
-            expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+            expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                 0, 0, 2, 2,
             ]);
         });
@@ -159,7 +157,7 @@ describe('utils', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2.address, ether('1')),
             );
-            expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+            expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                 0, 0, 1, 0,
             ]);
         });

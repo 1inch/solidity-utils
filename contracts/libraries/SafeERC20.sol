@@ -6,6 +6,7 @@ pragma abicoder v1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 import "../interfaces/IDaiLikePermit.sol";
+import "../interfaces/IPermit2.sol";
 import "../libraries/RevertReasonForwarder.sol";
 
 /// @title Implements efficient safe methods for ERC20 interface.
@@ -16,6 +17,24 @@ library SafeERC20 {
     error SafeIncreaseAllowanceFailed();
     error SafeDecreaseAllowanceFailed();
     error SafePermitBadLength();
+
+    address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
+    bytes4 private constant _PERMIT_LENGHT_ERROR = 0x68275857;  // SafePermitBadLength.selector
+
+    /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
+    function safeTransferFromUniversal(
+        IERC20 token,
+        address from,
+        address to,
+        uint256 amount,
+        bool permit2
+    ) internal {
+        if (permit2) {
+            safeTransferFromPermit2(token, from, to, amount);
+        } else {
+            safeTransferFrom(token, from, to, amount);
+        }
+    }
 
     /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
     function safeTransferFrom(
@@ -35,6 +54,38 @@ library SafeERC20 {
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
             success := call(gas(), token, 0, data, 100, 0x0, 0x20)
+            if success {
+                switch returndatasize()
+                case 0 {
+                    success := gt(extcodesize(token), 0)
+                }
+                default {
+                    success := and(gt(returndatasize(), 31), eq(mload(0), 1))
+                }
+            }
+        }
+        if (!success) revert SafeTransferFromFailed();
+    }
+
+    /// @dev Permit2 version of safeTransferFrom above.
+    function safeTransferFromPermit2(
+        IERC20 token,
+        address from,
+        address to,
+        uint256 amount
+    ) internal {
+        bytes4 selector = IPermit2.transferFrom.selector;
+        bool success;
+        /// @solidity memory-safe-assembly
+        assembly { // solhint-disable-line no-inline-assembly
+            let data := mload(0x40)
+
+            mstore(data, selector)
+            mstore(add(data, 0x04), from)
+            mstore(add(data, 0x24), to)
+            mstore(add(data, 0x44), amount)
+            mstore(add(data, 0x64), token)
+            success := call(gas(), _PERMIT2, 0, data, 0x84, 0x0, 0x20)
             if success {
                 switch returndatasize()
                 case 0 {
@@ -112,12 +163,12 @@ library SafeERC20 {
     function tryPermit(IERC20 token, address owner, address spender, bytes calldata permit) internal returns(bool success) {
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
-        bool lengthIsInvalid;
+        bytes4 permit2Selector = IPermit2.permit.selector;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
+            let ptr := mload(0x40)
             switch permit.length
             case 100 {
-                let ptr := mload(0x40)
                 mstore(ptr, permitSelector)
                 mstore(add(ptr, 0x04), owner)
                 mstore(add(ptr, 0x24), spender)
@@ -137,7 +188,6 @@ library SafeERC20 {
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
             }
             case 72 {
-                let ptr := mload(0x40)
                 mstore(ptr, daiPermitSelector)
                 mstore(add(ptr, 0x04), owner)
                 mstore(add(ptr, 0x24), spender)
@@ -159,26 +209,27 @@ library SafeERC20 {
                 success := call(gas(), token, 0, ptr, 0x104, 0, 0)
             }
             case 224 {
-                let ptr := mload(0x40)
                 mstore(ptr, permitSelector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
             }
             case 256 {
-                let ptr := mload(0x40)
                 mstore(ptr, daiPermitSelector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
             }
-            default {
-                lengthIsInvalid := true
+            case 384 {
+                mstore(ptr, permit2Selector)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
+                success := call(gas(), _PERMIT2, 0, ptr, add(4, permit.length), 0, 0)
             }
-        }
-
-        if (lengthIsInvalid) {
-            revert SafePermitBadLength();
+            // TODO: add case for compact permit2
+            default {
+                mstore(ptr, _PERMIT_LENGHT_ERROR)
+                revert(ptr, 4)
+            }
         }
     }
 
