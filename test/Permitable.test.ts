@@ -7,7 +7,6 @@ import { cutSelector } from '../src/permit';
 import { constants } from '../src/prelude';
 import { splitSignature } from 'ethers/lib/utils';
 import { bytecode } from './permit2Data/permit2.json';
-import { SafeERC20__factory } from '../typechain-types';
 
 const value = 42n;
 const PERMIT2 = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
