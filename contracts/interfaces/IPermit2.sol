@@ -22,8 +22,19 @@ interface IPermit2 {
         // deadline on the permit signature
         uint256 sigDeadline;
     }
+    /// @notice Packed allowance
+    struct PackedAllowance {
+        // amount allowed
+        uint160 amount;
+        // permission expiry
+        uint48 expiration;
+        // an incrementing value indexed per owner,token,and spender for each signature
+        uint48 nonce;
+    }
 
     function transferFrom(address user, address spender, uint160 amount, address token) external;
 
     function permit(address owner, PermitSingle memory permitSingle, bytes calldata signature) external;
+
+    function allowance(address user, address token, address spender) external view returns (PackedAllowance memory);
 }

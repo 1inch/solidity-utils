@@ -8,6 +8,7 @@ export const constants = {
     ZERO_BYTES32: '0x0000000000000000000000000000000000000000000000000000000000000000',
     MAX_UINT256: 2n ** 256n - 1n,
     MAX_INT256: 2n ** 255n - 1n,
+    MAX_UINT48: 2n ** 48n - 1n,
     MIN_INT256: -(2n ** 255n),
     MAX_UINT128: 2n ** 128n - 1n,
 } as const;

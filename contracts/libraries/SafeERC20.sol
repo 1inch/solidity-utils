@@ -18,18 +18,20 @@ library SafeERC20 {
     error SafeDecreaseAllowanceFailed();
     error SafePermitBadLength();
 
+    uint256 public constant PERMIT2_CALL_LEN = 384;
+
     /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
     function safeTransferFromUniversal(
         IERC20 token,
         address from,
         address to,
         uint256 amount,
-        address permit2
+        bool permit2
     ) internal {
-        if (permit2 == address(0)) {
-            safeTransferFrom(token, from, to, amount);
+        if (permit2) {
+            safeTransferFromPermit2(token, from, to, amount);
         } else {
-            safeTransferFromPermit2(token, from, to, amount, IPermit2(permit2));
+            safeTransferFrom(token, from, to, amount);
         }
     }
 
@@ -69,10 +71,9 @@ library SafeERC20 {
         IERC20 token,
         address from,
         address to,
-        uint256 amount,
-        IPermit2 permit2
+        uint256 amount
     ) internal {
-        bytes4 selector = permit2.transferFrom.selector;
+        bytes4 selector = IPermit2.transferFrom.selector;
         bool success;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
@@ -83,7 +84,7 @@ library SafeERC20 {
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
             mstore(add(data, 0x64), token)
-            success := call(gas(), permit2, 0, data, 0x84, 0x0, 0x20)
+            success := call(gas(), 0x000000000022D473030F116dDEE9F6B43aC78BA3, 0, data, 0x84, 0x0, 0x20)
             if success {
                 switch returndatasize()
                 case 0 {
@@ -225,7 +226,19 @@ library SafeERC20 {
                 lengthIsInvalid := true
             }
         }
-
+        // Process separately due to "stack too deep"
+        bytes4 permit2Selector = IPermit2.permit.selector;
+        /// @solidity memory-safe-assembly
+        assembly { // solhint-disable-line no-inline-assembly
+            switch permit.length
+            case 384 {
+                let ptr := mload(0x40)
+                mstore(ptr, permit2Selector)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
+                lengthIsInvalid := false
+                success := call(gas(), 0x000000000022D473030F116dDEE9F6B43aC78BA3, 0, ptr, add(4, permit.length), 0, 0)
+            }
+        }
         if (lengthIsInvalid) {
             revert SafePermitBadLength();
         }

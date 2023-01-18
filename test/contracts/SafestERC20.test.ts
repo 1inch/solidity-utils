@@ -275,13 +275,13 @@ describe('SafeERC20', function () {
 
         it("doesn't revert on transferFromUniversal, permit2", async function () {
             const { wrapper } = await loadFixture(fixture);
-            await wrapper.transferFromUniversal(PERMIT2);
+            await wrapper.transferFromUniversal(true);
         });
 
 
         it("doesn't revert on transferFromUniversal, no permit2", async function () {
             const { wrapper } = await loadFixture(fixture);
-            await wrapper.transferFromUniversal(constants.ZERO_ADDRESS);
+            await wrapper.transferFromUniversal(false);
         });
 
 

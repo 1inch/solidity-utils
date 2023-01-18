@@ -1,13 +1,15 @@
 import { expect } from '../src/prelude';
-import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermitLikeDai } from '../src/permit';
+import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermit2, getPermitLikeDai } from '../src/permit';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { cutSelector } from '../src/permit';
 import { constants } from '../src/prelude';
 import { splitSignature } from 'ethers/lib/utils';
+import { bytecode } from './permit2Data/permit2.json';
 
 const value = 42n;
+const PERMIT2 = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
 
 describe('Permitable', function () {
     let signer1: SignerWithAddress;
@@ -89,6 +91,18 @@ describe('Permitable', function () {
 
         expect(await daiLikePermitMock.nonces(signer1.address)).to.be.equal('1');
         expect(await daiLikePermitMock.allowance(signer1.address, permitableMock.address)).to.be.equal(constants.MAX_UINT128);
+    });
+
+    it('should be permitted for IPermit2', async function () {
+        const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
+        await ethers.provider.send('hardhat_setCode', [PERMIT2, bytecode]);
+        const permit2Contract = await ethers.getContractAt('IPermit2', PERMIT2);
+        const permit = await getPermit2(signer1, permit2Contract, daiLikePermitMock.address, chainId, signer2.address, constants.MAX_UINT128);
+        await permitableMock.mockPermit(daiLikePermitMock.address, permit);
+
+        const allowance = await permit2Contract.allowance(signer1.address, daiLikePermitMock.address, signer2.address);
+        expect(allowance.amount).to.equal(constants.MAX_UINT128);
+        expect(allowance.nonce).to.equal(1);
     });
 
     it('should be permitted for IDaiLikePermit (compact)', async function () {

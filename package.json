@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "2.2.10",
+  "version": "2.2.11",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "repository": {
@@ -33,6 +33,7 @@
     "@nomicfoundation/hardhat-network-helpers": "1.0.6",
     "@nomiclabs/hardhat-ethers": "2.1.1",
     "@openzeppelin/contracts": "4.7.3",
+    "@uniswap/permit2-sdk": "^1.2.0",
     "ethereumjs-util": "7.1.5",
     "ethers": "5.7.1",
     "hardhat": "2.11.2"
