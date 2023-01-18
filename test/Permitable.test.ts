@@ -7,6 +7,7 @@ import { cutSelector } from '../src/permit';
 import { constants } from '../src/prelude';
 import { splitSignature } from 'ethers/lib/utils';
 import { bytecode } from './permit2Data/permit2.json';
+import { SafeERC20__factory } from '../typechain-types';
 
 const value = 42n;
 const PERMIT2 = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
@@ -23,12 +24,14 @@ describe('Permitable', function () {
         const PermitableMock = await ethers.getContractFactory('PermitableMock');
         const ERC20PermitMock = await ethers.getContractFactory('ERC20PermitMock');
         const DaiLikePermitMock = await ethers.getContractFactory('DaiLikePermitMock');
+        const SafeERC20 = await ethers.getContractFactory('SafeERC20');
 
         const chainId = (await ethers.provider.getNetwork()).chainId;
         const permitableMock = await PermitableMock.deploy();
         const erc20PermitMock = await ERC20PermitMock.deploy('USDC', 'USDC', signer1.address, 100n);
         const daiLikePermitMock = await DaiLikePermitMock.deploy('DAI', 'DAI', signer1.address, 100n);
-        return { permitableMock, erc20PermitMock, daiLikePermitMock, chainId };
+        const safeERC20 = await SafeERC20.attach(permitableMock.address);
+        return { permitableMock, erc20PermitMock, daiLikePermitMock, safeERC20, chainId };
     }
 
     it('should be permitted for IERC20Permit', async function () {
@@ -147,7 +150,7 @@ describe('Permitable', function () {
     });
 
     it('should be wrong permit length', async function () {
-        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const { permitableMock, erc20PermitMock, safeERC20, chainId } = await loadFixture(deployTokens);
 
         const name = await erc20PermitMock.name();
         const nonce = await erc20PermitMock.nonces(signer1.address);
@@ -179,7 +182,7 @@ describe('Permitable', function () {
             ).substring(64);
 
         await expect(permitableMock.mockPermit(erc20PermitMock.address, permit)).to.be.revertedWithCustomError(
-            permitableMock,
+            safeERC20,
             'SafePermitBadLength',
         );
     });

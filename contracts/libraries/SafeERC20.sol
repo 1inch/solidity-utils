@@ -18,7 +18,8 @@ library SafeERC20 {
     error SafeDecreaseAllowanceFailed();
     error SafePermitBadLength();
 
-    uint256 public constant PERMIT2_CALL_LEN = 384;
+    address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
+    bytes4 private constant _PERMIT_LENGHT_ERROR = 0x68275857;  // SafePermitBadLength.selector
 
     /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
     function safeTransferFromUniversal(
@@ -162,12 +163,12 @@ library SafeERC20 {
     function tryPermit(IERC20 token, address owner, address spender, bytes calldata permit) internal returns(bool success) {
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
-        bool lengthIsInvalid;
+        bytes4 permit2Selector = IPermit2.permit.selector;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
+            let ptr := mload(0x40)
             switch permit.length
             case 100 {
-                let ptr := mload(0x40)
                 mstore(ptr, permitSelector)
                 mstore(add(ptr, 0x04), owner)
                 mstore(add(ptr, 0x24), spender)
@@ -187,7 +188,6 @@ library SafeERC20 {
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
             }
             case 72 {
-                let ptr := mload(0x40)
                 mstore(ptr, daiPermitSelector)
                 mstore(add(ptr, 0x04), owner)
                 mstore(add(ptr, 0x24), spender)
@@ -209,38 +209,27 @@ library SafeERC20 {
                 success := call(gas(), token, 0, ptr, 0x104, 0, 0)
             }
             case 224 {
-                let ptr := mload(0x40)
                 mstore(ptr, permitSelector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
             }
             case 256 {
-                let ptr := mload(0x40)
                 mstore(ptr, daiPermitSelector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
             }
-            default {
-                lengthIsInvalid := true
-            }
-        }
-        // Process separately due to "stack too deep"
-        bytes4 permit2Selector = IPermit2.permit.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
-            switch permit.length
             case 384 {
-                let ptr := mload(0x40)
                 mstore(ptr, permit2Selector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
-                lengthIsInvalid := false
-                success := call(gas(), 0x000000000022D473030F116dDEE9F6B43aC78BA3, 0, ptr, add(4, permit.length), 0, 0)
+                success := call(gas(), _PERMIT2, 0, ptr, add(4, permit.length), 0, 0)
             }
-        }
-        if (lengthIsInvalid) {
-            revert SafePermitBadLength();
+            // TODO: add case for compact permit2
+            default {
+                mstore(ptr, _PERMIT_LENGHT_ERROR)
+                revert(ptr, 4)
+            }
         }
     }
 
