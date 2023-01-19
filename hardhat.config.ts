@@ -1,4 +1,5 @@
 import '@typechain/hardhat';
+import '@nomiclabs/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
 import 'hardhat-gas-reporter';
 require('solidity-coverage'); // require because no TS typings available

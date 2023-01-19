@@ -1,15 +1,15 @@
+import '@nomiclabs/hardhat-ethers';
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
 import { constants } from './prelude';
-import { Contract } from 'ethers';
-import { Wallet } from 'ethers';
+import { Contract, Wallet } from 'ethers';
+import { ethers } from 'hardhat';
 import { splitSignature } from 'ethers/lib/utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { AllowanceTransfer } from '@uniswap/permit2-sdk';
+import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
 export const defaultDeadlinePermit2 = constants.MAX_UINT48;
-export const PERMIT2_ADDRESS = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
 
 export const EIP712Domain = [
     { name: 'name', type: 'string' },
@@ -174,12 +174,8 @@ export async function getPermit2(
     };
     const data = AllowanceTransfer.getPermitData(permitSingle, permitContract.address, chainId);
     const signature = await owner._signTypedData(data.domain, data.types, data.values);
-    const permitCall = permitContract.interface.encodeFunctionData('permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)', [
-        owner.address,
-        permitSingle,
-        signature,
-    ]);
-    return cutSelector(permitCall);
+    const permitCall = await permitContract.populateTransaction.permit(owner.address, permitSingle, signature);
+    return cutSelector(permitCall.data!);
 }
 
 /*
