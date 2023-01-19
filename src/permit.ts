@@ -9,6 +9,7 @@ import { AllowanceTransfer } from '@uniswap/permit2-sdk';
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
 export const defaultDeadlinePermit2 = constants.MAX_UINT48;
+export const PERMIT2_ADDRESS = '0x000000000022D473030F116dDEE9F6B43aC78BA3';
 
 export const EIP712Domain = [
     { name: 'name', type: 'string' },
@@ -151,7 +152,6 @@ export async function getPermit(
  */
 export async function getPermit2(
     owner: Wallet | SignerWithAddress,
-    permitContract: Contract,
     token: string,
     chainId: number,
     spender: string,
@@ -159,6 +159,7 @@ export async function getPermit2(
     expiration = constants.MAX_UINT48,
     sigDeadline = constants.MAX_UINT48,
 ) {
+    const permitContract = await ethers.getContractAt('IPermit2', PERMIT2_ADDRESS);
     const nonce = (await permitContract.allowance(owner.address, token, spender)).nonce;
     const details = {
         token,
