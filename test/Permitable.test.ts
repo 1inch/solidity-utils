@@ -98,10 +98,10 @@ describe('Permitable', function () {
     it('should be permitted for IPermit2', async function () {
         const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
         await ethers.provider.send('hardhat_setCode', [PERMIT2, bytecode]);
-        const permit2Contract = await ethers.getContractAt('IPermit2', PERMIT2);
-        const permit = await getPermit2(signer1, permit2Contract, daiLikePermitMock.address, chainId, signer2.address, constants.MAX_UINT128);
+        const permit = await getPermit2(signer1, daiLikePermitMock.address, chainId, signer2.address, constants.MAX_UINT128);
         await permitableMock.mockPermit(daiLikePermitMock.address, permit);
 
+        const permit2Contract = await ethers.getContractAt('IPermit2', PERMIT2);
         const allowance = await permit2Contract.allowance(signer1.address, daiLikePermitMock.address, signer2.address);
         expect(allowance.amount).to.equal(constants.MAX_UINT128);
         expect(allowance.nonce).to.equal(1);

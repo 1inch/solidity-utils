@@ -1,10 +1,11 @@
+import '@nomiclabs/hardhat-ethers';
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
 import { constants } from './prelude';
-import { Contract } from 'ethers';
-import { Wallet } from 'ethers';
+import { Contract, Wallet } from 'ethers';
+import { ethers } from 'hardhat';
 import { splitSignature } from 'ethers/lib/utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { AllowanceTransfer } from '@uniswap/permit2-sdk';
+import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -151,7 +152,6 @@ export async function getPermit(
  */
 export async function getPermit2(
     owner: Wallet | SignerWithAddress,
-    permitContract: Contract,
     token: string,
     chainId: number,
     spender: string,
@@ -159,6 +159,7 @@ export async function getPermit2(
     expiration = constants.MAX_UINT48,
     sigDeadline = constants.MAX_UINT48,
 ) {
+    const permitContract = await ethers.getContractAt('IPermit2', PERMIT2_ADDRESS);
     const nonce = (await permitContract.allowance(owner.address, token, spender)).nonce;
     const details = {
         token,
@@ -173,12 +174,8 @@ export async function getPermit2(
     };
     const data = AllowanceTransfer.getPermitData(permitSingle, permitContract.address, chainId);
     const signature = await owner._signTypedData(data.domain, data.types, data.values);
-    const permitCall = permitContract.interface.encodeFunctionData('permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)', [
-        owner.address,
-        permitSingle,
-        signature,
-    ]);
-    return cutSelector(permitCall);
+    const permitCall = await permitContract.populateTransaction.permit(owner.address, permitSingle, signature);
+    return cutSelector(permitCall.data!);
 }
 
 /*
