@@ -6,6 +6,7 @@ import { ethers } from 'hardhat';
 import { splitSignature } from 'ethers/lib/utils';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
+import { bytecode as permit2Bytecode } from './permit2.json';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -95,6 +96,13 @@ export function buildDataLikeDai(
     } as const;
 }
 
+export async function permit2Contract() {
+    if ((await ethers.provider.getCode(PERMIT2_ADDRESS)) === '0x') {
+        await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, permit2Bytecode]);
+    }
+    return ethers.getContractAt('IPermit2', PERMIT2_ADDRESS);
+}
+
 /*
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
  */
@@ -156,10 +164,10 @@ export async function getPermit2(
     chainId: number,
     spender: string,
     amount: bigint,
-    expiration = constants.MAX_UINT48,
-    sigDeadline = constants.MAX_UINT48,
+    expiration = defaultDeadlinePermit2,
+    sigDeadline = defaultDeadlinePermit2,
 ) {
-    const permitContract = await ethers.getContractAt('IPermit2', PERMIT2_ADDRESS);
+    const permitContract = await permit2Contract();
     const nonce = (await permitContract.allowance(owner.address, token, spender)).nonce;
     const details = {
         token,
