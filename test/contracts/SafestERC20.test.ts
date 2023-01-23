@@ -3,6 +3,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 import { Contract, ContractFactory } from 'ethers';
+import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { splitSignature } from 'ethers/lib/utils';
 
 const Permit = [
@@ -36,6 +37,13 @@ describe('SafeERC20', function () {
         const wrapper = await SafeERC20Wrapper.deploy(falseMock.address);
         await wrapper.deployed();
         return { wrapper };
+    }
+
+    async function deployPermit2Mock() {
+        const Permit2ReturnTrueMock = await ethers.getContractFactory('Permit2ReturnTrueMock');
+        const permit2Mock = await Permit2ReturnTrueMock.deploy();
+        await permit2Mock.deployed();
+        return { permit2Mock };
     }
 
     async function deployWrapperTrueMock() {
@@ -273,9 +281,11 @@ describe('SafeERC20', function () {
 
         it("doesn't revert on transferFromUniversal, permit2", async function () {
             const { wrapper } = await loadFixture(fixture);
+            const { permit2Mock } = await deployPermit2Mock();
+            const code = await ethers.provider.getCode(permit2Mock.address);
+            await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, code]);
             await wrapper.transferFromUniversal(true);
         });
-
 
         it("doesn't revert on transferFromUniversal, no permit2", async function () {
             const { wrapper } = await loadFixture(fixture);

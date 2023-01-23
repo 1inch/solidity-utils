@@ -73,6 +73,21 @@ contract ERC20ReturnTrueMock {
     }
 }
 
+contract Permit2ReturnTrueMock {
+    // IPermit2's functions are not pure, but these mock implementations are: to prevent Solidity from issuing warnings,
+    // we write to a dummy state variable.
+    uint256 private _dummy;
+
+    function transferFrom(
+        address,
+        address,
+        uint160,
+        address
+    ) public {
+        _dummy = 0;
+    }
+}
+
 contract ERC20NoReturnMock {
     mapping(address => uint256) private _allowances;
 

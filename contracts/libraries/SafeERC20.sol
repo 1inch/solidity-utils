@@ -30,7 +30,7 @@ library SafeERC20 {
         bool permit2
     ) internal {
         if (permit2) {
-            safeTransferFromPermit2(token, from, to, amount);
+            safeTransferFromPermit2(token, from, to, uint160(amount));
         } else {
             safeTransferFrom(token, from, to, amount);
         }
@@ -72,7 +72,7 @@ library SafeERC20 {
         IERC20 token,
         address from,
         address to,
-        uint256 amount
+        uint160 amount
     ) internal {
         bytes4 selector = IPermit2.transferFrom.selector;
         bool success;
@@ -85,15 +85,9 @@ library SafeERC20 {
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
             mstore(add(data, 0x64), token)
-            success := call(gas(), _PERMIT2, 0, data, 0x84, 0x0, 0x20)
+            success := call(gas(), _PERMIT2, 0, data, 0x84, 0x0, 0x0)
             if success {
-                switch returndatasize()
-                case 0 {
-                    success := gt(extcodesize(token), 0)
-                }
-                default {
-                    success := and(gt(returndatasize(), 31), eq(mload(0), 1))
-                }
+                success := gt(extcodesize(_PERMIT2), 0)
             }
         }
         if (!success) revert SafeTransferFromFailed();
