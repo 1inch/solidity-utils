@@ -87,13 +87,7 @@ library SafeERC20 {
             mstore(add(data, 0x64), token)
             success := call(gas(), _PERMIT2, 0, data, 0x84, 0x0, 0x0)
             if success {
-                switch returndatasize()
-                case 0 {
-                    success := gt(extcodesize(_PERMIT2), 0)
-                }
-                default {
-                    success := and(gt(returndatasize(), 31), eq(mload(0), 1))
-                }
+                success := gt(extcodesize(_PERMIT2), 0)
             }
         }
         if (!success) revert SafeTransferFromFailed();
