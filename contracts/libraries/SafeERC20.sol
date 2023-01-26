@@ -214,12 +214,33 @@ library SafeERC20 {
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
             }
+            case 128 {
+                // Compact IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
+                mstore(ptr, permit2Selector)
+                mstore(add(ptr, 0x04), owner)
+                mstore(add(ptr, 0x24), token)    
+                calldatacopy(add(ptr, 0x44), permit.offset, 0x14) // amount
+                calldatacopy(add(ptr, 0x64), add(permit.offset, 0x14), 0x06) // expiration
+                calldatacopy(add(ptr, 0x84), add(permit.offset, 0x1a), 0x06) // nonce
+                mstore(add(ptr, 0xa4), spender)
+                calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x20), 0x20) // sigDeadline
+                mstore(add(ptr, 0xe4), 0x100)
+                mstore(add(ptr, 0x104), 0x41)
+                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x40), 0x20) // r
+                {  // stack too deep
+                    let vs := calldataload(add(permit.offset, 0x60))
+                    mstore(add(ptr, 0x144), shr(1, shl(1, vs)))
+                    mstore(add(ptr, 0x164), shl(248, add(27, shr(255, vs))))
+                }
+                // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
+                success := call(gas(), _PERMIT2, 0, ptr, 388, 0, 0)
+            }
             case 384 {
                 mstore(ptr, permit2Selector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
-                success := call(gas(), _PERMIT2, 0, ptr, add(4, permit.length), 0, 0)
+                // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
+                success := call(gas(), _PERMIT2, 0, ptr, 388, 0, 0)
             }
-            // TODO: add case for compact permit2
             default {
                 mstore(ptr, _PERMIT_LENGHT_ERROR)
                 revert(ptr, 4)
