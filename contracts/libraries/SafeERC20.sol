@@ -188,11 +188,10 @@ library SafeERC20 {
 
                 // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
                 {  // stack too deep
-                    let nonce := shr(224, calldataload(permit.offset))
                     let expiry := shr(224, calldataload(add(permit.offset, 0x04)))
                     let vs := calldataload(add(permit.offset, 0x28))
 
-                    mstore(add(ptr, 0x44), nonce)
+                    mstore(add(ptr, 0x44), shr(224, calldataload(permit.offset)))
                     mstore(add(ptr, 0x64), sub(expiry, 1))
                     mstore(add(ptr, 0x84), true)
                     mstore(add(ptr, 0xa4), add(27, shr(255, vs)))
@@ -219,9 +218,9 @@ library SafeERC20 {
                 mstore(ptr, permit2Selector)
                 mstore(add(ptr, 0x04), owner)
                 mstore(add(ptr, 0x24), token)    
-                calldatacopy(add(ptr, 0x44), permit.offset, 0x14) // amount
-                calldatacopy(add(ptr, 0x64), add(permit.offset, 0x14), 0x06) // expiration
-                calldatacopy(add(ptr, 0x84), add(permit.offset, 0x1a), 0x06) // nonce
+                calldatacopy(add(ptr, 0x50), permit.offset, 0x14) // amount
+                calldatacopy(add(ptr, 0x7e), add(permit.offset, 0x14), 0x06) // expiration
+                calldatacopy(add(ptr, 0x9e), add(permit.offset, 0x1a), 0x06) // nonce
                 mstore(add(ptr, 0xa4), spender)
                 calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x20), 0x20) // sigDeadline
                 mstore(add(ptr, 0xe4), 0x100)
