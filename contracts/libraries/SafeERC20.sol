@@ -283,11 +283,13 @@ library SafeERC20 {
 
     function safeWithdrawTo(IWETH weth, uint256 amount, address to) internal {
         safeWithdraw(weth, amount);
-        /// @solidity memory-safe-assembly
-        assembly {  // solhint-disable-line no-inline-assembly
-            if iszero(call(gas(), to, amount, 0, 0, 0, 0)) {
-                returndatacopy(0, 0, returndatasize())
-                revert(0, returndatasize())
+        if (to != address(this)) {
+            /// @solidity memory-safe-assembly
+            assembly {  // solhint-disable-line no-inline-assembly
+                if iszero(call(gas(), to, amount, 0, 0, 0, 0)) {
+                    returndatacopy(0, 0, returndatasize())
+                    revert(0, returndatasize())
+                }
             }
         }
     }
