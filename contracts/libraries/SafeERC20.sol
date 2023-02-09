@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 import "../interfaces/IDaiLikePermit.sol";
 import "../interfaces/IPermit2.sol";
+import "../interfaces/IWETH.sol";
 import "../libraries/RevertReasonForwarder.sol";
 
 /// @title Implements efficient safe methods for ERC20 interface.
@@ -248,6 +249,46 @@ library SafeERC20 {
                 }
                 default {
                     success := and(gt(returndatasize(), 31), eq(mload(0), 1))
+                }
+            }
+        }
+    }
+
+    function safeDeposit(IWETH weth, uint256 amount) internal {
+        if (amount > 0) {
+            bytes4 selector = IWETH.deposit.selector;
+            /// @solidity memory-safe-assembly
+            assembly { // solhint-disable-line no-inline-assembly
+                mstore(0, selector)
+                if iszero(call(gas(), weth, amount, 0, 4, 0, 0)) {
+                    returndatacopy(0, 0, returndatasize())
+                    revert(0, returndatasize())
+                }
+            }
+        }
+    }
+
+    function safeWithdraw(IWETH weth, uint256 amount) internal {
+        bytes4 selector = IWETH.withdraw.selector;
+        /// @solidity memory-safe-assembly
+        assembly {  // solhint-disable-line no-inline-assembly
+            mstore(0, selector)
+            mstore(4, amount)
+            if iszero(call(gas(), weth, 0, 0, 0x24, 0, 0)) {
+                returndatacopy(0, 0, returndatasize())
+                revert(0, returndatasize())
+            }
+        }
+    }
+
+    function safeWithdrawTo(IWETH weth, uint256 amount, address to) internal {
+        safeWithdraw(weth, amount);
+        if (to != address(this)) {
+            /// @solidity memory-safe-assembly
+            assembly {  // solhint-disable-line no-inline-assembly
+                if iszero(call(gas(), to, amount, 0, 0, 0, 0)) {
+                    returndatacopy(0, 0, returndatasize())
+                    revert(0, returndatasize())
                 }
             }
         }
