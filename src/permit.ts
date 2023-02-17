@@ -164,6 +164,7 @@ export async function getPermit2(
     chainId: number,
     spender: string,
     amount: bigint,
+    compact = false,
     expiration = defaultDeadlinePermit2,
     sigDeadline = defaultDeadlinePermit2,
 ) {
@@ -182,6 +183,12 @@ export async function getPermit2(
     };
     const data = AllowanceTransfer.getPermitData(permitSingle, permitContract.address, chainId);
     const signature = await owner._signTypedData(data.domain, data.types, data.values);
+    const { v, r, s } = ethers.utils.splitSignature(signature);
+    if (compact) {
+        return '0x' + amount.toString(16).padStart(40, '0') + expiration.toString(16).padStart(12, '0') +
+            BigInt(nonce).toString(16).padStart(12, '0') + sigDeadline.toString(16).padStart(64, '0') +
+            BigInt(r).toString(16).padStart(64, '0') + (BigInt(s) | (BigInt(v - 27) << 255n)).toString(16).padStart(64, '0');
+    }
     const permitCall = await permitContract.populateTransaction.permit(owner.address, permitSingle, signature);
     return cutSelector(permitCall.data!);
 }
