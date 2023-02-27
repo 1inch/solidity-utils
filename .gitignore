@@ -3,13 +3,11 @@ cache
 node_modules
 coverage
 coverage.json
-build
 dist
+typechain-types
 .coverage_contracts
 .coverage_artifacts
 .env
 .idea
-typechain-types
 .DS_Store
 *.log
-mochaOutput.json
