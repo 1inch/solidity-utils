@@ -646,6 +646,13 @@
     deep-eql "^4.0.1"
     ordinal "^1.0.3"
 
+"@nomicfoundation/hardhat-foundry@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@nomicfoundation/hardhat-foundry/-/hardhat-foundry-1.0.0.tgz#14eba643138b09e4a8f2fed2a99bc9c96c487b0a"
+  integrity sha512-/2cmtIZPnsQj/SRIu9idbBan5j19RD35MECAGmZCcuXX4AO6Wn0nOnpUwpcvGomKW403h4+rXh8AHMWC4Vvw0Q==
+  dependencies:
+    chalk "^2.4.2"
+
 "@nomicfoundation/hardhat-network-helpers@1.0.6":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@nomicfoundation/hardhat-network-helpers/-/hardhat-network-helpers-1.0.6.tgz#5e2026ddde5ca539f70a2bf498528afd08bd0827"

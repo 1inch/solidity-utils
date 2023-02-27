@@ -1,9 +1,12 @@
 artifacts
 cache
+cache_forge
 node_modules
 coverage
 coverage.json
+coverage-forge
 build
+out
 dist
 .coverage_contracts
 .coverage_artifacts
@@ -11,5 +14,6 @@ dist
 .idea
 typechain-types
 .DS_Store
+lcov.info
 *.log
 mochaOutput.json
