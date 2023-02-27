@@ -9,10 +9,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "prebuild": "rimraf ./dist && cti src -b",
-    "build": "tsc -p tsconfig.publish.json",
-    "postbuild": "echo done",
-    "prepublish": "yarn build",
+    "clean": "rimraf artifacts cache coverage contracts/hardhat-dependency-compiler dist typechain-types",
+    "build": "yarn typechain && cti src -b && tsc -p tsconfig.publish.json",
+    "prepack": "yarn clean && yarn build",
     "coverage": "hardhat coverage",
     "format": "yarn format-ts && yarn format-sol",
     "format-ts": "prettier '**/*.ts' --write",
