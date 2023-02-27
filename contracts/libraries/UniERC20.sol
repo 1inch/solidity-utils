@@ -133,8 +133,7 @@ library UniERC20 {
                 that overall data length is greater or equal than string length + extra 64 bytes
             */
             if (offset == 0x20 && data.length >= 0x40 + len) {
-                /// @solidity memory-safe-assembly
-                assembly { // solhint-disable-line no-inline-assembly
+                assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                     result := add(data, 0x40)
                 }
                 return result;
@@ -149,8 +148,7 @@ library UniERC20 {
             }
 
             if (len > 0) {
-                /// @solidity memory-safe-assembly
-                assembly { // solhint-disable-line no-inline-assembly
+                assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                     mstore(data, len)
                 }
                 return string(data);
