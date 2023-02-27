@@ -46,8 +46,7 @@ library SafeERC20 {
     ) internal {
         bytes4 selector = token.transferFrom.selector;
         bool success;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
 
             mstore(data, selector)
@@ -77,8 +76,7 @@ library SafeERC20 {
     ) internal {
         bytes4 selector = IPermit2.transferFrom.selector;
         bool success;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
 
             mstore(data, selector)
@@ -159,8 +157,7 @@ library SafeERC20 {
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
         bytes4 permit2Selector = IPermit2.permit.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             switch permit.length
             case 100 {
@@ -250,8 +247,7 @@ library SafeERC20 {
         address to,
         uint256 amount
     ) private returns (bool success) {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let data := mload(0x40)
 
             mstore(data, selector)
@@ -273,8 +269,7 @@ library SafeERC20 {
     function safeDeposit(IWETH weth, uint256 amount) internal {
         if (amount > 0) {
             bytes4 selector = IWETH.deposit.selector;
-            /// @solidity memory-safe-assembly
-            assembly { // solhint-disable-line no-inline-assembly
+            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                 mstore(0, selector)
                 if iszero(call(gas(), weth, amount, 0, 4, 0, 0)) {
                     returndatacopy(0, 0, returndatasize())
@@ -286,8 +281,7 @@ library SafeERC20 {
 
     function safeWithdraw(IWETH weth, uint256 amount) internal {
         bytes4 selector = IWETH.withdraw.selector;
-        /// @solidity memory-safe-assembly
-        assembly {  // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") {  // solhint-disable-line no-inline-assembly
             mstore(0, selector)
             mstore(4, amount)
             if iszero(call(gas(), weth, 0, 0, 0x24, 0, 0)) {
@@ -300,8 +294,7 @@ library SafeERC20 {
     function safeWithdrawTo(IWETH weth, uint256 amount, address to) internal {
         safeWithdraw(weth, amount);
         if (to != address(this)) {
-            /// @solidity memory-safe-assembly
-            assembly {  // solhint-disable-line no-inline-assembly
+            assembly ("memory-safe") {  // solhint-disable-line no-inline-assembly
                 if iszero(call(gas(), to, amount, 0, 0, 0, 0)) {
                     returndatacopy(0, 0, returndatasize())
                     revert(0, returndatasize())

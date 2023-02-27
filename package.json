@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "2.2.17",
+  "version": "2.2.19",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "repository": {
@@ -9,10 +9,9 @@
   },
   "license": "MIT",
   "scripts": {
-    "prebuild": "rimraf ./dist && cti src -b",
-    "build": "tsc -p tsconfig.publish.json",
-    "postbuild": "echo done",
-    "prepublish": "yarn build",
+    "clean": "rimraf artifacts cache coverage contracts/hardhat-dependency-compiler dist typechain-types",
+    "build": "yarn typechain && cti src -b && tsc -p tsconfig.publish.json",
+    "prepack": "yarn clean && yarn build",
     "coverage": "hardhat coverage && yarn coverage:forge",
     "coverage:forge": "mkdir coverage-forge && forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage-forge",
     "format": "yarn format-ts && yarn format-sol",
