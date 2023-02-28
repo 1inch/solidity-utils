@@ -24,6 +24,11 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
       - run: yarn typechain
