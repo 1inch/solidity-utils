@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
-pragma abicoder v1;
 
 import "../libraries/RevertReasonParser.sol";
+import "forge-std/Test.sol";
 
-contract RevertReasonParserTest {
+contract RevertReasonParserTest is Test {
     error TestDidNotThrow();
 
     function emptyRevert() external pure {
@@ -66,8 +66,13 @@ contract RevertReasonParserTest {
         }
     }
 
-    function testWithThrow() external view {
-        _test(this.withoutAssertion, "Error(reason)");
+    function testTryCatch() external {
+        vm.expectRevert(TestDidNotThrow.selector);
+        this.noRevertCheck();
+    }
+
+    function noRevertCheck() external view {
+        _test(this.withoutAssertion, "");
     }
 
     function _test(function() external pure testFunction, string memory expectedReason) private pure {
