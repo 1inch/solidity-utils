@@ -24,6 +24,8 @@ runs:
     - run: yarn
       shell: bash
 
+    - uses: danielealbano/lcov-action@v3
+
     - uses: foundry-rs/foundry-toolchain@v1
       with:
         version: nightly
