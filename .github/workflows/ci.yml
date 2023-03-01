@@ -27,6 +27,5 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
       - run: yarn typechain
-      - uses: foundry-rs/foundry-toolchain@v1
       - run: yarn coverage
       - uses: codecov/codecov-action@v3

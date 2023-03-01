@@ -20,3 +20,7 @@ runs:
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
+
+    - uses: foundry-rs/foundry-toolchain@v1
+      with:
+        version: nightly
