@@ -21,6 +21,9 @@ runs:
         restore-keys: |
           ${{ runner.os }}-yarn-
 
+    - run: yarn
+      shell: bash
+
     - uses: foundry-rs/foundry-toolchain@v1
       with:
         version: nightly
