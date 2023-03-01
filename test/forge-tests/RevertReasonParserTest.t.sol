@@ -2,13 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-<<<<<<< HEAD:test/forge-tests/RevertReasonParserTest.t.sol
-import 'forge-std/Test.sol';
-import "../../contracts/libraries/RevertReasonParser.sol";
-=======
-import "../libraries/RevertReasonParser.sol";
 import "forge-std/Test.sol";
->>>>>>> d0c5d4cfbfc85c601d0bad4113ae55562db4c4fa:contracts/tests/RevertReasonParserTest.sol
+import "../../contracts/libraries/RevertReasonParser.sol";
 
 contract RevertReasonParserTest is Test {
     error TestDidNotThrow();
