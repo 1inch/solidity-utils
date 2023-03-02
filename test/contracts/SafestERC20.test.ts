@@ -1,10 +1,11 @@
-import { constants, expect } from '../../src/prelude';
+import { constants, ether, expect } from '../../src/prelude';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 import { Contract, ContractFactory } from 'ethers';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { splitSignature } from 'ethers/lib/utils';
+import { countInstructions, trackReceivedTokenAndTx } from '../../src/utils';
 
 const Permit = [
     { name: 'owner', type: 'address' },
@@ -18,10 +19,12 @@ describe('SafeERC20', function () {
     let owner: SignerWithAddress;
     let spender: SignerWithAddress;
     let SafeERC20Wrapper: ContractFactory;
+    let SafeWETHWrapper: ContractFactory;
 
     before(async function () {
         [owner, spender] = await ethers.getSigners();
         SafeERC20Wrapper = await ethers.getContractFactory('SafeERC20Wrapper');
+        SafeWETHWrapper = await ethers.getContractFactory('SafeWETHWrapper');
     });
 
     async function deployWrapperSimple() {
@@ -98,6 +101,22 @@ describe('SafeERC20', function () {
         //console.log(data);
         const signature = splitSignature(await owner._signTypedData(domain, { Permit }, data));
         return { token, wrapper, data, signature };
+    }
+
+    async function deployWrapperWETH() {
+        const WETH = await ethers.getContractFactory('WETH');
+        const weth = await WETH.deploy();
+        await weth.deployed();
+
+        const wrapper = await SafeWETHWrapper.deploy(weth.address);
+        await wrapper.deployed();
+        return { weth, wrapper };
+    }
+
+    async function deployWrapperWETHAndDeposit() {
+        const { weth, wrapper } = await deployWrapperWETH();
+        await wrapper.deposit({ value: ether('1') });
+        return { weth, wrapper };
     }
 
     describe('with address that has no contract code', function () {
@@ -230,6 +249,60 @@ describe('SafeERC20', function () {
                 invalidSignature.r,
                 invalidSignature.s,
             );
+        });
+    });
+
+    describe('IWETH methods', function () {
+        it('should deposit tokens', async function () {
+            const { weth, wrapper } = await loadFixture(deployWrapperWETH);
+            const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
+                wrapper.deposit({ value: ether('1') }),
+            );
+            expect(received).to.be.equal(ether('1'));
+            expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                0, 1, 6, 2, 1, 2,
+            ]);
+        });
+
+        it('should be cheap on deposit 0 tokens', async function () {
+            const { weth, wrapper } = await loadFixture(deployWrapperWETH);
+            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
+                wrapper.deposit(),
+            );
+            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                0, 0, 1, 0, 0, 1,
+            ]);
+        });
+
+        it('should withdrawal tokens on withdraw', async function () {
+            const { weth, wrapper } = await loadFixture(deployWrapperWETHAndDeposit);
+            const [received] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
+                wrapper.withdraw(ether('0.5')),
+            );
+            expect(received).to.be.equal(-ether('0.5'));
+        });
+
+        it('should withdrawal tokens on withdrawTo', async function () {
+            const { weth, wrapper } = await loadFixture(deployWrapperWETHAndDeposit);
+            const spenderBalanceBefore = await ethers.provider.getBalance(spender.address);
+            const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
+                wrapper.withdrawTo(ether('0.5'), spender.address),
+            );
+            expect(received).to.be.equal(-ether('0.5'));
+            expect(await ethers.provider.getBalance(spender.address)).to.be.equal(spenderBalanceBefore.toBigInt() + ether('0.5'));
+            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
+                0, 3,
+            ]);
+        });
+
+        it('should be cheap on withdrawTo to self', async function () {
+            const { weth, wrapper } = await loadFixture(deployWrapperWETHAndDeposit);
+            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
+                wrapper.withdrawTo(ether('0.5'), wrapper.address),
+            );
+            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
+                0, 2,
+            ]);
         });
     });
 

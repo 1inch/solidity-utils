@@ -222,3 +222,29 @@ contract SafeERC20Wrapper {
         return _token.allowance(address(0), address(0));
     }
 }
+
+contract SafeWETHWrapper {
+    using SafeERC20 for IWETH;
+
+    IWETH private _token;
+
+    constructor(IWETH token) {
+        _token = token;
+    }
+
+    // solhint-disable-next-line no-empty-blocks
+    receive() external payable {
+    }
+
+    function deposit() external payable {
+        _token.safeDeposit(msg.value);
+    }
+
+    function withdraw(uint256 amount) external {
+        _token.safeWithdraw(amount);
+    }
+
+    function withdrawTo(uint256 amount, address to) external {
+        _token.safeWithdrawTo(amount, to);
+    }
+}

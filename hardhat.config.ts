@@ -2,6 +2,7 @@ import '@typechain/hardhat';
 import '@nomiclabs/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
 import 'hardhat-gas-reporter';
+import 'hardhat-tracer';
 require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
