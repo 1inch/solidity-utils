@@ -1,7 +1,6 @@
 import '@typechain/hardhat';
 import '@nomiclabs/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
-import '@nomicfoundation/hardhat-foundry';
 import 'hardhat-gas-reporter';
 require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
