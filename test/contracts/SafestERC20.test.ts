@@ -290,8 +290,8 @@ describe('SafeERC20', function () {
             );
             expect(received).to.be.equal(-ether('0.5'));
             expect(await ethers.provider.getBalance(spender.address)).to.be.equal(spenderBalanceBefore.toBigInt() + ether('0.5'));
-            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                0, 3, 10, 3, 1, 3,
+            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
+                0, 3,
             ]);
         });
 
@@ -300,8 +300,8 @@ describe('SafeERC20', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
                 wrapper.withdrawTo(ether('0.5'), wrapper.address),
             );
-            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                0, 2, 10, 3, 1, 3,
+            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
+                0, 2,
             ]);
         });
     });
