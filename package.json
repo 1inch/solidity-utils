@@ -62,7 +62,7 @@
     "eslint-plugin-standard": "5.0.0",
     "ethereumjs-wallet": "1.0.2",
     "hardhat-gas-reporter": "1.0.9",
-    "hardhat-tracer": "^2.1.2",
+    "hardhat-tracer": "2.1.2",
     "prettier": "2.7.1",
     "prettier-plugin-solidity": "1.0.0-beta.24",
     "rimraf": "3.0.2",
