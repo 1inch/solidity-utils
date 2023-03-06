@@ -259,9 +259,11 @@ describe('SafeERC20', function () {
                 wrapper.deposit({ value: ether('1') }),
             );
             expect(received).to.be.equal(ether('1'));
-            expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                0, 1, 6, 2, 1, 2,
-            ]);
+            if (!process.env.skip_on_coverage) {
+                expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 1, 6, 1, 1, 2,
+                ]);
+            }
         });
 
         it('should be cheap on deposit 0 tokens', async function () {
@@ -269,9 +271,11 @@ describe('SafeERC20', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
                 wrapper.deposit(),
             );
-            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                0, 0, 1, 0, 0, 1,
-            ]);
+            if (!process.env.skip_on_coverage) {
+                expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 0, 1, 0, 0, 1,
+                ]);
+            }
         });
 
         it('should withdrawal tokens on withdraw', async function () {

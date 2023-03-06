@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
-pragma abicoder v1;
 
 contract GasChecker {
     error GasCostDiffers(uint256 expected, uint256 actual);
@@ -12,6 +11,8 @@ contract GasChecker {
         unchecked {
             gas -= gasleft();
         }
-        if (expected > 0 && gas != expected) revert GasCostDiffers(expected, gas);
+        if (expected > 0 && gas != expected) {
+            revert GasCostDiffers(expected, gas);
+        }
     }
 }

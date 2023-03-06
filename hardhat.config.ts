@@ -17,13 +17,36 @@ const config: HardhatUserConfig = {
             optimizer: {
                 enabled: true,
                 runs: 1000000,
+                details: {
+                    yulDetails: {
+                        optimizerSteps:
+                        /* eslint-disable */
+                        'dhfoDgvulfnTUtnIf' +          // None of these can make stack problems worse
+                        '[' +
+                            'xa[r]EscLM' +             // Turn into SSA and simplify
+                            'cCTUtTOntnfDIul' +        // Perform structural simplification
+                            'Lcul' +                   // Simplify again
+                            'Vcul [j]' +               // Reverse SSA
+
+                        // should have good 'compilability' property here.
+
+                            'Tpeul' +                  // Run functional expression inliner
+                            'xa[rul]' +                // Prune a bit more in SSA
+                            'xa[r]cL' +                // Turn into SSA again and simplify
+                            // 'gvif' +                   // Run full inliner
+                            'CTUca[r]LSsTFOtfDnca[r]Iulc' + // SSA plus simplify
+                        ']' +
+                        'jmul[jul] VcTOcul jmul',     // Make source short and pretty
+                        /* eslint-enable */
+                    },
+                },
             },
+            viaIR: true,
         },
     },
     networks,
     gasReporter: {
         enabled: true,
-        currency: 'USD',
     },
     typechain: {
         target: 'ethers-v5',
