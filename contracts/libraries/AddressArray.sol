@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
-pragma abicoder v1;
 
 /// @title Library that implements address array on mapping, stores array length at 0 index.
 library AddressArray {
