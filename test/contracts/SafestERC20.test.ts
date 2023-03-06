@@ -261,7 +261,7 @@ describe('SafeERC20', function () {
             expect(received).to.be.equal(ether('1'));
             if (!process.env.skip_on_coverage) {
                 expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                    0, 1, 6, 1, 1, 2,
+                    0, 1, 6, 3, 1, 2,
                 ]);
             }
         });
@@ -273,7 +273,7 @@ describe('SafeERC20', function () {
             );
             if (!process.env.skip_on_coverage) {
                 expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                    0, 0, 1, 0, 0, 1,
+                    0, 0, 1, 1, 0, 1,
                 ]);
             }
         });

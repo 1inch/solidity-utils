@@ -228,7 +228,7 @@ describe('UniERC20', function () {
             return { wrapper, receiver };
         }
 
-        it('uni failed transfer @skip-on-coverage ', async function () {
+        it('uni failed transfer', async function () {
             const { wrapper, receiver } = await loadFixture(deployMocks);
             await expect(
                 wrapper.transfer(receiver.address, 100, {
@@ -237,7 +237,7 @@ describe('UniERC20', function () {
             ).to.eventually.be.rejectedWith('ETHTransferFailed');
         });
 
-        it('uni failed transferFrom @skip-on-coverage ', async function () {
+        it('uni failed transferFrom', async function () {
             const { wrapper, receiver } = await loadFixture(deployMocks);
             await expect(
                 receiver.transfer(wrapper.address, 100, {

@@ -66,33 +66,33 @@ describe('StringUtil', function () {
     });
 
     describe('Gas usage @skip-on-coverage', function () {
-        it('Uint 256', () => testGasUint256(uint256TestValue, 936));
+        it('Uint 256', () => testGasUint256(uint256TestValue, 837));
 
-        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 21524));
+        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 21335));
 
         it('Uint 256 as bytes', () => testGasBytes(uint256TestValue, 716));
 
-        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 21292));
+        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 21214));
 
-        it('Uint 128', () => testGasUint256(uint128TestValue, 936));
+        it('Uint 128', () => testGasUint256(uint128TestValue, 837));
 
-        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 21524));
+        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 21335));
 
         it('Very long byte array gas', () => testGasBytes(veryLongArray, 1766));
 
-        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 43844));
+        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 43766));
 
         it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray, 17009));
 
-        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 645061));
+        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 644983));
 
         it('Empty bytes', () => testGasBytes(emptyBytes, 191));
 
-        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 672));
+        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 594));
 
         it('Single byte', () => testGasBytes(singleByte, 716));
 
-        it('Single byte naive', () => testGasNaiveBytes(singleByte, 1316));
+        it('Single byte naive', () => testGasNaiveBytes(singleByte, 1238));
 
         async function testGasUint256(value: string, expectedGas: number) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
