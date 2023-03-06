@@ -34,8 +34,7 @@
     "@openzeppelin/contracts": "4.7.3",
     "@uniswap/permit2-sdk": "^1.2.0",
     "ethereumjs-util": "7.1.5",
-    "ethers": "5.7.1",
-    "hardhat": "2.11.2"
+    "ethers": "5.7.1"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "1.0.3",
@@ -61,6 +60,7 @@
     "eslint-plugin-promise": "6.0.1",
     "eslint-plugin-standard": "5.0.0",
     "ethereumjs-wallet": "1.0.2",
+    "hardhat": "2.12.8-viair.0",
     "hardhat-gas-reporter": "1.0.9",
     "hardhat-tracer": "2.1.2",
     "prettier": "2.7.1",
