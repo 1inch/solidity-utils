@@ -146,9 +146,11 @@ describe('utils', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2.address, ether('1')),
             );
-            expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                0, 0, 2, 2,
-            ]);
+            if (!process.env.skip_on_coverage) {
+                expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 0, 2, 2,
+                ]);
+            }
         });
 
         it('should be counted ERC20 Approve', async function () {
@@ -157,9 +159,11 @@ describe('utils', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2.address, ether('1')),
             );
-            expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                0, 0, 1, 0,
-            ]);
+            if (!process.env.skip_on_coverage) {
+                expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 0, 1, 0,
+                ]);
+            }
         });
     });
 });

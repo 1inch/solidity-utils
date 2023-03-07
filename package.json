@@ -12,7 +12,7 @@
     "clean": "rimraf artifacts cache coverage contracts/hardhat-dependency-compiler dist typechain-types",
     "build": "yarn typechain && cti src -b && tsc -p tsconfig.publish.json",
     "prepack": "yarn clean && yarn build",
-    "coverage": "hardhat coverage",
+    "coverage": "skip_on_coverage=true hardhat coverage",
     "coverage:forge": "forge coverage --report lcov",
     "coverage:all": "yarn coverage && yarn coverage:forge",
     "format": "yarn format-ts && yarn format-sol",
@@ -33,14 +33,13 @@
   },
   "dependencies": {
     "@metamask/eth-sig-util": "4.0.1",
-    "@nomicfoundation/hardhat-foundry": "^1.0.0",
+    "@nomicfoundation/hardhat-foundry": "1.0.0",
     "@nomicfoundation/hardhat-network-helpers": "1.0.6",
     "@nomiclabs/hardhat-ethers": "2.1.1",
     "@openzeppelin/contracts": "4.7.3",
-    "@uniswap/permit2-sdk": "^1.2.0",
+    "@uniswap/permit2-sdk": "1.2.0",
     "ethereumjs-util": "7.1.5",
-    "ethers": "5.7.1",
-    "hardhat": "2.11.2"
+    "ethers": "5.7.1"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "1.0.3",
@@ -66,6 +65,7 @@
     "eslint-plugin-promise": "6.0.1",
     "eslint-plugin-standard": "5.0.0",
     "ethereumjs-wallet": "1.0.2",
+    "hardhat": "2.12.8-viair.0",
     "hardhat-gas-reporter": "1.0.9",
     "hardhat-tracer": "2.1.2",
     "prettier": "2.7.1",
