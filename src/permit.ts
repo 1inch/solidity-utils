@@ -183,11 +183,11 @@ export async function getPermit2(
     };
     const data = AllowanceTransfer.getPermitData(permitSingle, permitContract.address, chainId);
     const signature = await owner._signTypedData(data.domain, data.types, data.values);
-    const { v, r, s } = ethers.utils.splitSignature(signature);
+    const { r, _vs } = ethers.utils.splitSignature(signature);
     if (compact) {
-        return '0x' + amount.toString(16).padStart(40, '0') + expiration.toString(16).padStart(12, '0') +
-            BigInt(nonce).toString(16).padStart(12, '0') + sigDeadline.toString(16).padStart(64, '0') +
-            BigInt(r).toString(16).padStart(64, '0') + (BigInt(s) | (BigInt(v - 27) << 255n)).toString(16).padStart(64, '0');
+        return '0x' + amount.toString(16).padStart(40, '0') + (expiration === constants.MAX_UINT48 ? '00000000' : (BigInt(expiration) + 1n).toString(16).padStart(8, '0')) +
+            BigInt(nonce).toString(16).padStart(8, '0') + (sigDeadline === constants.MAX_UINT48 ? '00000000' : (BigInt(sigDeadline) + 1n).toString(16).padStart(8, '0')) +
+            BigInt(r).toString(16).padStart(64, '0') + BigInt(_vs).toString(16).padStart(64, '0');
     }
     const permitCall = await permitContract.populateTransaction.permit(owner.address, permitSingle, signature);
     return cutSelector(permitCall.data!);
@@ -242,4 +242,63 @@ export async function getPermitLikeDai(
 
 export function withTarget(target: bigint | string, data: bigint | string) {
     return target.toString() + trim0x(data);
+}
+
+// Type | EIP-2612 | DAI | Permit2
+// Uncompressed | 224 | 256 | 384
+// Compressed | 100 | 72 | 96
+
+export function compressPermit(permit: string) {
+    const abiCoder = ethers.utils.defaultAbiCoder;
+    switch (permit.length) {
+        case 224: {
+            // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+            const args = abiCoder.decode(['address owner', 'address spender', 'uint256 value', 'uint256 deadline', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
+            // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
+            return permit.slice(0, 10) +
+                BigInt(args.value).toString(16).padStart(64, '0') +
+                BigInt(args.deadline).toString(16).padStart(8, '0') +
+                BigInt(args.r).toString(16).padStart(64, '0') +
+                ((BigInt(args.v - 27) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
+        }
+        case 256: {
+            // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
+            const args = abiCoder.decode(['address holder', 'address spender', 'uint256 nonce', 'uint256 expiry', 'bool allowed', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
+            // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
+            return permit.slice(0, 10) +
+                BigInt(args.nonce).toString(16).padStart(8, '0') +
+                (args.expiry === constants.MAX_UINT256.toString() ? '00000000' : (BigInt(args.expiry) + 1n).toString(16).padStart(8, '0')) +
+                BigInt(args.r).toString(16).padStart(64, '0') +
+                ((BigInt(args.v - 27) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
+        }
+        case 384: {
+            // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
+            const args = abiCoder.decode(['address owner', 'address token', 'uint160 amount', 'uint48 expiration', 'uint48 nonce', 'address spender', 'uint256 sigDeadline'], permit);
+            // Compact IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
+            return permit.slice(0, 10) + permit.slice(74, 82) + permit.slice(146, 154) + permit.slice(218, 226);
+        }
+        case 100:
+        case 72:
+        case 96:
+            throw new Error('Permit is already compressed');
+        default:
+            throw new Error('Invalid permit length');
+    }
+}
+
+export function decompressPermit(permit: string) {
+    switch (permit.length) {
+        case 100:
+            return permit;
+        case 72:
+            return permit;
+        case 96:
+            return permit;
+        case 224:
+        case 256:
+        case 384:
+            throw new Error('Permit is already decompressed');
+        default:
+            throw new Error('Invalid permit length');
+    }
 }

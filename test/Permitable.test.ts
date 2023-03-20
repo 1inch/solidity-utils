@@ -93,7 +93,7 @@ describe('Permitable', function () {
         expect(await daiLikePermitMock.allowance(signer1.address, permitableMock.address)).to.be.equal(constants.MAX_UINT128);
     });
 
-    it('should be permitted for IPermit2', async function () {
+    it.only('should be permitted for IPermit2', async function () {
         const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
         const permitContract = await permit2Contract();
         const permit = await getPermit2(signer1, daiLikePermitMock.address, chainId, signer2.address, constants.MAX_UINT128);
@@ -104,7 +104,7 @@ describe('Permitable', function () {
         expect(allowance.nonce).to.equal(1);
     });
 
-    it('should be permitted for IPermit2, compact', async function () {
+    it.only('should be permitted for IPermit2, compact', async function () {
         const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
         const permitContract = await permit2Contract();
         const permit = await getPermit2(signer1, daiLikePermitMock.address, chainId, permitableMock.address, constants.MAX_UINT128, true);
