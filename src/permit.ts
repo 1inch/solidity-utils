@@ -255,99 +255,116 @@ export function withTarget(target: bigint | string, data: bigint | string) {
 export function compressPermit(permit: string) {
     const abiCoder = ethers.utils.defaultAbiCoder;
     switch (permit.length) {
-        case 224: {
-            // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
-            const args = abiCoder.decode(['address owner', 'address spender', 'uint256 value', 'uint256 deadline', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
-            // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
-            return BigInt(args.value).toString(16).padStart(64, '0') +
+    case 224: {
+        // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+        const args = abiCoder.decode(['address owner', 'address spender', 'uint256 value', 'uint256 deadline', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
+        // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
+        return BigInt(args.value).toString(16).padStart(64, '0') +
                 BigInt(args.deadline).toString(16).padStart(8, '0') +
                 BigInt(args.r).toString(16).padStart(64, '0') +
                 ((BigInt(args.v - 27) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
-        }
-        case 256: {
-            // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
-            const args = abiCoder.decode(['address holder', 'address spender', 'uint256 nonce', 'uint256 expiry', 'bool allowed', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
-            // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
-            return BigInt(args.nonce).toString(16).padStart(8, '0') +
+    }
+    case 256: {
+        // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
+        const args = abiCoder.decode(['address holder', 'address spender', 'uint256 nonce', 'uint256 expiry', 'bool allowed', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
+        // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
+        return BigInt(args.nonce).toString(16).padStart(8, '0') +
                 (args.expiry === constants.MAX_UINT256.toString() ? '00000000' : (BigInt(args.expiry) + 1n).toString(16).padStart(8, '0')) +
                 BigInt(args.r).toString(16).padStart(64, '0') +
                 ((BigInt(args.v - 27) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
-        }
-        case 384: {
-            // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-            const args = abiCoder.decode(['address owner', 'address token', 'uint160 amount', 'uint48 expiration', 'uint48 nonce', 'address spender', 'uint256 sigDeadline'], permit);
-            // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
-            return BigInt(args.amount).toString(16).padStart(40, '0') +
+    }
+    case 384: {
+        // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
+        const args = abiCoder.decode(['address owner', 'address token', 'uint160 amount', 'uint48 expiration', 'uint48 nonce', 'address spender', 'uint256 sigDeadline'], permit);
+        // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
+        return BigInt(args.amount).toString(16).padStart(40, '0') +
                 (args.expiration === constants.MAX_UINT48.toString() ? '00000000' : (BigInt(args.expiration) + 1n).toString(16).padStart(8, '0')) +
                 BigInt(args.nonce).toString(16).padStart(8, '0') +
                 (args.sigDeadline === constants.MAX_UINT48.toString() ? '00000000' : (BigInt(args.sigDeadline) + 1n).toString(16).padStart(8, '0')) +
                 BigInt(args.r).toString(16).padStart(64, '0') +
                 ((BigInt(args.v - 27) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
-        }
-        case 100:
-        case 72:
-        case 96:
-            throw new Error('Permit is already compressed');
-        default:
-            throw new Error('Invalid permit length');
+    }
+    case 100:
+    case 72:
+    case 96:
+        throw new Error('Permit is already compressed');
+    default:
+        throw new Error('Invalid permit length');
     }
 }
 
 export function decompressPermit(permit: string, token: string, owner: string, spender: string) {
     const abiCoder = ethers.utils.defaultAbiCoder;
     switch (permit.length) {
-        case 100: {
-            // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
-            const args = {
-                value: BigInt('0x' + permit.slice(0, 66)),
-                deadline: BigInt('0x' + permit.slice(66, 74)),
-                r: BigInt('0x' + permit.slice(74, 138)),
-                vs: BigInt('0x' + permit.slice(138, 202)),
-            };
+    case 100: {
+        // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
+        const args = {
+            value: BigInt('0x' + permit.slice(0, 66)),
+            deadline: BigInt('0x' + permit.slice(66, 74)),
+            r: BigInt('0x' + permit.slice(74, 138)),
+            vs: BigInt('0x' + permit.slice(138, 202)),
+        };
             // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
-            return abiCoder.encode(
-                ['address owner', 'address spender', 'uint256 value', 'uint256 deadline', 'uint8 v', 'bytes32 r', 'bytes32 s'],
-                [ owner, spender, args.value, args.deadline, Number(args.vs >> 255n) + 27, args.r, args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn],
-            );
-        }
-        case 72: {
-            // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
-            const args = {
-                nonce: BigInt('0x' + permit.slice(0, 18)),
-                expiry: BigInt('0x' + permit.slice(18, 26)),
-                r: BigInt('0x' + permit.slice(26, 90)),
-                vs: BigInt('0x' + permit.slice(90, 154)),
-            };
+        return abiCoder.encode(
+            ['address owner', 'address spender', 'uint256 value', 'uint256 deadline', 'uint8 v', 'bytes32 r', 'bytes32 s'],
+            [ owner, spender, args.value, args.deadline, Number(args.vs >> 255n) + 27, args.r, args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn],
+        );
+    }
+    case 72: {
+        // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
+        const args = {
+            nonce: BigInt('0x' + permit.slice(0, 18)),
+            expiry: BigInt('0x' + permit.slice(18, 26)),
+            r: BigInt('0x' + permit.slice(26, 90)),
+            vs: BigInt('0x' + permit.slice(90, 154)),
+        };
             // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
-            return abiCoder.encode(
-                ['address holder', 'address spender', 'uint256 nonce', 'uint256 expiry', 'bool allowed', 'uint8 v', 'bytes32 r', 'bytes32 s'],
-                [ owner, spender, args.nonce, args.expiry === 0n ? constants.MAX_UINT256 : args.expiry - 1n, true, Number(args.vs >> 255n) + 27, args.r, args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn],
-            );
-        }
-        case 96: {
-            // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
-            const args = {
-                amount: BigInt('0x' + permit.slice(0, 42)),
-                expiration: BigInt('0x' + permit.slice(42, 50)),
-                nonce: BigInt('0x' + permit.slice(50, 58)),
-                sigDeadline: BigInt('0x' + permit.slice(58, 66)),
-                r: BigInt('0x' + permit.slice(66, 130)),
-                vs: BigInt('0x' + permit.slice(130, 194)),
-            };
+        return abiCoder.encode(
+            ['address holder', 'address spender', 'uint256 nonce', 'uint256 expiry', 'bool allowed', 'uint8 v', 'bytes32 r', 'bytes32 s'],
+            [
+                owner,
+                spender,
+                args.nonce,
+                args.expiry === 0n ? constants.MAX_UINT256 : args.expiry - 1n,
+                true,
+                Number(args.vs >> 255n) + 27,
+                args.r,
+                args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn,
+            ],
+        );
+    }
+    case 96: {
+        // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
+        const args = {
+            amount: BigInt('0x' + permit.slice(0, 42)),
+            expiration: BigInt('0x' + permit.slice(42, 50)),
+            nonce: BigInt('0x' + permit.slice(50, 58)),
+            sigDeadline: BigInt('0x' + permit.slice(58, 66)),
+            r: BigInt('0x' + permit.slice(66, 130)),
+            vs: BigInt('0x' + permit.slice(130, 194)),
+        };
             // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-            return abiCoder.encode(
-                ['address owner', 'address token', 'uint160 amount', 'uint48 expiration', 'uint48 nonce', 'address spender', 'uint256 sigDeadline'],
-                [ owner, token, args.amount, args.expiration === 0n ? constants.MAX_UINT48 : args.expiration - 1n, args.nonce, spender, args.sigDeadline === 0n ? constants.MAX_UINT48 : args.sigDeadline - 1n],
-            ) + abiCoder.encode(
-                ['uint8 v', 'bytes32 r', 'bytes32 s'],
-                [ Number(args.vs >> 255n) + 27, args.r, args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn],
-            );
-        }
-        case 224:
-        case 256:
-        case 384:
-            throw new Error('Permit is already decompressed');
-        default:
-            throw new Error('Invalid permit length');
+        return abiCoder.encode(
+            ['address owner', 'address token', 'uint160 amount', 'uint48 expiration', 'uint48 nonce', 'address spender', 'uint256 sigDeadline'],
+            [
+                owner,
+                token,
+                args.amount,
+                args.expiration === 0n ? constants.MAX_UINT48 : args.expiration - 1n,
+                args.nonce,
+                spender,
+                args.sigDeadline === 0n ? constants.MAX_UINT48 : args.sigDeadline - 1n,
+            ],
+        ) + abiCoder.encode(
+            ['uint8 v', 'bytes32 r', 'bytes32 s'],
+            [ Number(args.vs >> 255n) + 27, args.r, args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn],
+        );
+    }
+    case 224:
+    case 256:
+    case 384:
+        throw new Error('Permit is already decompressed');
+    default:
+        throw new Error('Invalid permit length');
     }
 }
