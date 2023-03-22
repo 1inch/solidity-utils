@@ -319,7 +319,7 @@ export function decompressPermit(permit: string, token: string, owner: string, s
                 args.nonce,
                 spender,
                 args.sigDeadline === 0n ? constants.MAX_UINT48 : args.sigDeadline - 1n,
-                args.r + trim0x(args.vs)
+                args.r + trim0x(args.vs),
             ],
         );
     }

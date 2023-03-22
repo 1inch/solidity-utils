@@ -175,7 +175,7 @@ library SafeERC20 {
                     calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20) // r
                     mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
                 }
-                // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+                // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
             }
             case 72 {
@@ -201,7 +201,7 @@ library SafeERC20 {
             case 224 {
                 mstore(ptr, permitSelector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
-                // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+                // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
             }
             case 256 {
