@@ -225,13 +225,13 @@ library SafeERC20 {
                 calldatacopy(add(ptr, 0x124), add(permit.offset, 0x20), 0x20) // r
                 calldatacopy(add(ptr, 0x144), add(permit.offset, 0x40), 0x20) // vs
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 388, 0, 0)
+                success := call(gas(), _PERMIT2, 0, ptr, 356, 0, 0)
             }
-            case 384 {
+            case 352 {
                 mstore(ptr, permit2Selector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 388, 0, 0)
+                success := call(gas(), _PERMIT2, 0, ptr, 356, 0, 0)
             }
             default {
                 mstore(ptr, _PERMIT_LENGHT_ERROR)
