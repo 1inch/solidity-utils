@@ -222,8 +222,8 @@ library SafeERC20 {
                 mstore(add(ptr, 0xc4), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x1c))), 1))) // sigDeadline
                 mstore(add(ptr, 0xe4), 0x100)
                 mstore(add(ptr, 0x104), 0x40)
-                calldatacopy(add(ptr, 0x104), add(permit.offset, 0x40), 0x20) // r
-                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x60), 0x20) // vs
+                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x20), 0x20) // r
+                calldatacopy(add(ptr, 0x144), add(permit.offset, 0x40), 0x20) // vs
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
                 success := call(gas(), _PERMIT2, 0, ptr, 388, 0, 0)
             }
