@@ -33,7 +33,7 @@ describe('timeIncreaseTo', function () {
 
     it('should be thrown with increase time to a moment in the past', async function () {
         await expect(shouldIncrease(-1000)).to.be.rejectedWith(
-            /Invalid timestamp \d+ is not larger than current timestamp \d+/,
+            /Timestamp \d+ is lower than the previous block's timestamp \d+/,
         );
     });
 });
@@ -147,7 +147,7 @@ describe('utils', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2.address, ether('1')),
             );
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 2, 2,
                 ]);
@@ -160,7 +160,7 @@ describe('utils', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2.address, ether('1')),
             );
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 0,
                 ]);

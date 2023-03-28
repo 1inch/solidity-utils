@@ -12,7 +12,7 @@ dotenv.config();
 
 declare module 'hardhat/types/runtime' {
     interface HardhatRuntimeEnvironment {
-        __SOLIDITY_COVERAGE_RUNNING?: boolean;
+        __SOLIDITY_COVERAGE_RUNNING?: boolean | undefined;
     }
 }
 
