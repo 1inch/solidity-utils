@@ -175,7 +175,7 @@ library SafeERC20 {
                     calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20) // r
                     mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
                 }
-                // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+                // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
             }
             case 72 {
@@ -201,7 +201,7 @@ library SafeERC20 {
             case 224 {
                 mstore(ptr, permitSelector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
-                // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
+                // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
             }
             case 256 {
@@ -210,28 +210,28 @@ library SafeERC20 {
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
             }
-            case 128 {
-                // Compact IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
+            case 96 {
+                // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
                 mstore(ptr, permit2Selector)
                 mstore(add(ptr, 0x04), owner)
                 mstore(add(ptr, 0x24), token)
                 calldatacopy(add(ptr, 0x50), permit.offset, 0x14) // amount
-                calldatacopy(add(ptr, 0x7e), add(permit.offset, 0x14), 0x06) // expiration
-                calldatacopy(add(ptr, 0x9e), add(permit.offset, 0x1a), 0x06) // nonce
+                mstore(add(ptr, 0x64), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x14))), 1))) // expiration
+                mstore(add(ptr, 0x84), shr(224, calldataload(add(permit.offset, 0x18)))) // nonce
                 mstore(add(ptr, 0xa4), spender)
-                calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x20), 0x20) // sigDeadline
+                mstore(add(ptr, 0xc4), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x1c))), 1))) // sigDeadline
                 mstore(add(ptr, 0xe4), 0x100)
                 mstore(add(ptr, 0x104), 0x40)
-                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x40), 0x20) // r
-                calldatacopy(add(ptr, 0x144), add(permit.offset, 0x60), 0x20) // vs
+                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x20), 0x20) // r
+                calldatacopy(add(ptr, 0x144), add(permit.offset, 0x40), 0x20) // vs
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 388, 0, 0)
+                success := call(gas(), _PERMIT2, 0, ptr, 356, 0, 0)
             }
-            case 384 {
+            case 352 {
                 mstore(ptr, permit2Selector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 388, 0, 0)
+                success := call(gas(), _PERMIT2, 0, ptr, 356, 0, 0)
             }
             default {
                 mstore(ptr, _PERMIT_LENGHT_ERROR)
