@@ -1,7 +1,7 @@
 import { expect, ether, time } from '../src/prelude';
 import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../src/utils';
-import { ethers } from 'hardhat';
 import hre from 'hardhat';
+const { ethers } = hre;
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { arrayify, hexlify, toUtf8Bytes, randomBytes } from 'ethers/lib/utils';

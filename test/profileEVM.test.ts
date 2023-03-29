@@ -1,7 +1,7 @@
 import { expect, ether } from '../src/prelude';
 import { profileEVM, gasspectEVM } from '../src/profileEVM';
-import { ethers } from 'hardhat';
 import hre from 'hardhat';
+const { ethers } = hre;
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 

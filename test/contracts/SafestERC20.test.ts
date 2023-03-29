@@ -1,8 +1,8 @@
 import { constants, ether, expect } from '../../src/prelude';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
 import hre from 'hardhat';
+const { ethers } = hre;
 import { Contract, ContractFactory } from 'ethers';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { splitSignature } from 'ethers/lib/utils';
