@@ -64,6 +64,10 @@ describe('StringUtil', function () {
     });
 
     describe('Gas usage', function () {
+        before(function () {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+        });
+
         it('Uint 256', () => testGasUint256(uint256TestValue, 834));
 
         it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 16277));
@@ -93,25 +97,21 @@ describe('StringUtil', function () {
         it('Single byte naive', () => testGasNaiveBytes(singleByte, 988));
 
         async function testGasUint256(value: string, expectedGas: number) {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) return;
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await stringUtilTest.toHex(value, expectedGas);
         }
 
         async function testGasBytes(value: string, expectedGas: number) {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) return;
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await stringUtilTest.toHexBytes(value, expectedGas);
         }
 
         async function testGasNaiveUint256(value: string, expectedGas: number) {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) return;
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await stringUtilTest.toHexNaive(value, expectedGas);
         }
 
         async function testGasNaiveBytes(value: string, expectedGas: number) {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) return;
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             await stringUtilTest.toHexNaiveBytes(value, expectedGas);
         }
