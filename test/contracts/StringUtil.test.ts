@@ -1,6 +1,7 @@
 import { expect } from '../../src/prelude';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import hre from 'hardhat';
+const { ethers } = hre;
 
 describe('StringUtil', function () {
     const uint256TestValue = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
@@ -62,7 +63,11 @@ describe('StringUtil', function () {
         }
     });
 
-    describe('Gas usage @skip-on-coverage', function () {
+    describe('Gas usage', function () {
+        before(function () {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+        });
+
         it('Uint 256', () => testGasUint256(uint256TestValue, 834));
 
         it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 16277));

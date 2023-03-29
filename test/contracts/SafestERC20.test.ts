@@ -1,8 +1,8 @@
 import { constants, ether, expect } from '../../src/prelude';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
 import hre from 'hardhat';
+const { ethers } = hre;
 import { Contract, ContractFactory } from 'ethers';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { splitSignature } from 'ethers/lib/utils';
@@ -260,7 +260,7 @@ describe('SafeERC20', function () {
                 wrapper.deposit({ value: ether('1') }),
             );
             expect(received).to.be.equal(ether('1'));
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 1, 6, 3, 1, 2,
                 ]);
@@ -272,7 +272,7 @@ describe('SafeERC20', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
                 wrapper.deposit(),
             );
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 1, 0, 1,
                 ]);
