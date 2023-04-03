@@ -1,11 +1,19 @@
 import { constants } from './prelude';
+import { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { providers, Wallet, Contract, Bytes, ContractTransaction } from 'ethers';
+import { providers, Wallet, Contract, Bytes, ContractTransaction, BigNumberish } from 'ethers';
 
 export async function timeIncreaseTo(seconds: number | string) {
     const delay = 1000 - new Date().getMilliseconds();
     await new Promise((resolve) => setTimeout(resolve, delay));
     await time.increaseTo(seconds);
+}
+
+export async function deployContract(name: string, parameters: Array<BigNumberish> = []) {
+    const ContractFactory = await ethers.getContractFactory(name);
+    const instance = await ContractFactory.deploy(...parameters);
+    await instance.deployed();
+    return instance;
 }
 
 export async function trackReceivedTokenAndTx<T extends unknown[]>(

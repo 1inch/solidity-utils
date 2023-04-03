@@ -1,5 +1,5 @@
-import { expect, ether, time } from '../src/prelude';
-import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../src/utils';
+import { expect, ether, time, constants } from '../src/prelude';
+import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract } from '../src/utils';
 import hre from 'hardhat';
 const { ethers } = hre;
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -165,6 +165,21 @@ describe('utils', function () {
                     0, 0, 1, 0,
                 ]);
             }
+        });
+    });
+
+    describe('deployContract', function () {
+        it('should be deploy new contract instance', async function () {
+            const token = await deployContract('TokenMock', ['SomeToken', 'STM']);
+            expect(token.address).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await token.name()).to.be.eq('SomeToken');
+        });
+
+
+        it('should be using without arguments', async function () {
+            const weth = await deployContract('WETH');
+            expect(weth.address).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await weth.name()).to.be.eq('Wrapped Ether');
         });
     });
 });
