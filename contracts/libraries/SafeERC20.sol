@@ -17,6 +17,7 @@ library SafeERC20 {
     error SafeIncreaseAllowanceFailed();
     error SafeDecreaseAllowanceFailed();
     error SafePermitBadLength();
+    error Permit2TransferAmountTooHigh();
 
     address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
     bytes4 private constant _PERMIT_LENGHT_ERROR = 0x68275857;  // SafePermitBadLength.selector
@@ -30,6 +31,7 @@ library SafeERC20 {
         bool permit2
     ) internal {
         if (permit2) {
+            if (amount > type(uint160).max) revert Permit2TransferAmountTooHigh();
             safeTransferFromPermit2(token, from, to, uint160(amount));
         } else {
             safeTransferFrom(token, from, to, amount);
