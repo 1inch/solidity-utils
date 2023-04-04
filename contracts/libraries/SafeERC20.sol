@@ -204,13 +204,13 @@ library SafeERC20 {
                 mstore(ptr, permitSelector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
-                success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
+                success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
             }
             case 256 {
                 mstore(ptr, daiPermitSelector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
-                success := call(gas(), token, 0, ptr, add(4, permit.length), 0, 0)
+                success := call(gas(), token, 0, ptr, 0x104, 0, 0)
             }
             case 96 {
                 // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
@@ -227,13 +227,13 @@ library SafeERC20 {
                 calldatacopy(add(ptr, 0x124), add(permit.offset, 0x20), 0x20) // r
                 calldatacopy(add(ptr, 0x144), add(permit.offset, 0x40), 0x20) // vs
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 356, 0, 0)
+                success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
             }
             case 352 {
                 mstore(ptr, permit2Selector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 356, 0, 0)
+                success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
             }
             default {
                 mstore(ptr, _PERMIT_LENGHT_ERROR)
