@@ -21,6 +21,7 @@ library SafeERC20 {
 
     address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
     bytes4 private constant _PERMIT_LENGTH_ERROR = 0x68275857;  // SafePermitBadLength.selector
+    uint256 private constant _RAW_CALL_GAS_LIMIT = 5000;
 
     /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
     function safeTransferFromUniversal(
@@ -296,7 +297,7 @@ library SafeERC20 {
         safeWithdraw(weth, amount);
         if (to != address(this)) {
             assembly ("memory-safe") {  // solhint-disable-line no-inline-assembly
-                if iszero(call(gas(), to, amount, 0, 0, 0, 0)) {
+                if iszero(call(_RAW_CALL_GAS_LIMIT, to, amount, 0, 0, 0, 0)) {
                     returndatacopy(0, 0, returndatasize())
                     revert(0, returndatasize())
                 }
