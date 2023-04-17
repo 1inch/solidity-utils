@@ -20,7 +20,7 @@ library SafeERC20 {
     error Permit2TransferAmountTooHigh();
 
     address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
-    bytes4 private constant _PERMIT_LENGHT_ERROR = 0x68275857;  // SafePermitBadLength.selector
+    bytes4 private constant _PERMIT_LENGTH_ERROR = 0x68275857;  // SafePermitBadLength.selector
 
     /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
     function safeTransferFromUniversal(
@@ -236,7 +236,7 @@ library SafeERC20 {
                 success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
             }
             default {
-                mstore(ptr, _PERMIT_LENGHT_ERROR)
+                mstore(ptr, _PERMIT_LENGTH_ERROR)
                 revert(ptr, 4)
             }
         }
