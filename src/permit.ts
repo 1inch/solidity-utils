@@ -271,7 +271,7 @@ export function decompressPermit(permit: string, token: string, owner: string, s
                 args.deadline === 0n ? constants.MAX_UINT256 : args.deadline - 1n,
                 Number(args.vs >> 255n) + 27,
                 args.r,
-                '0x' + (args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn).toString(16),
+                '0x' + (args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn).toString(16).padStart(64, '0'),
             ],
         );
     }
@@ -294,7 +294,7 @@ export function decompressPermit(permit: string, token: string, owner: string, s
                 true,
                 Number(args.vs >> 255n) + 27,
                 args.r,
-                '0x' + (args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn).toString(16),
+                '0x' + (args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn).toString(16).padStart(64, '0'),
             ],
         );
     }
