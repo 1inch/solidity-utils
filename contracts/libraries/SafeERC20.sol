@@ -287,8 +287,9 @@ library SafeERC20 {
             mstore(0, selector)
             mstore(4, amount)
             if iszero(call(gas(), weth, 0, 0, 0x24, 0, 0)) {
-                returndatacopy(0, 0, returndatasize())
-                revert(0, returndatasize())
+                let ptr := mload(0x40)
+                returndatacopy(ptr, 0, returndatasize())
+                revert(ptr, returndatasize())
             }
         }
     }
@@ -298,8 +299,9 @@ library SafeERC20 {
         if (to != address(this)) {
             assembly ("memory-safe") {  // solhint-disable-line no-inline-assembly
                 if iszero(call(_RAW_CALL_GAS_LIMIT, to, amount, 0, 0, 0, 0)) {
-                    returndatacopy(0, 0, returndatasize())
-                    revert(0, returndatasize())
+                    let ptr := mload(0x40)
+                    returndatacopy(ptr, 0, returndatasize())
+                    revert(ptr, returndatasize())
                 }
             }
         }
