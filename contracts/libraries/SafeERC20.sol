@@ -23,6 +23,25 @@ library SafeERC20 {
     bytes4 private constant _PERMIT_LENGTH_ERROR = 0x68275857;  // SafePermitBadLength.selector
     uint256 private constant _RAW_CALL_GAS_LIMIT = 5000;
 
+    function safeBalanceOf(
+        IERC20 token,
+        address account
+    ) internal view returns(uint256 tokenBalance) {
+        bytes4 selector = IERC20.balanceOf.selector;
+        assembly ("memory-safe") {
+            mstore(0x00, selector)
+            mstore(0x04, account)
+            let success := staticcall(gas(), token, 0x00, 0x24, 0x00, 0x20)
+            tokenBalance := mload(0)
+
+            if or(not(success), xor(returndatasize(), 0x20)) {
+                let ptr := mload(0x40)
+                returndatacopy(ptr, 0, returndatasize())
+                revert(ptr, returndatasize())
+            }
+        }
+    }
+
     /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
     function safeTransferFromUniversal(
         IERC20 token,
