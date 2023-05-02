@@ -13,6 +13,11 @@ contract ERC20ReturnFalseMock {
     // we write to a dummy state variable.
     uint256 private _dummy;
 
+    function balanceOf(address) external view returns (uint256) {
+        require(_dummy == 0, "Dummy"); // Dummy read from a state variable so that the function is view
+        return 0;
+    }
+
     function transfer(address, uint256) public returns (bool) {
         _dummy = 0;
         return false;
@@ -178,6 +183,10 @@ contract SafeERC20Wrapper {
         _token = token;
     }
 
+    function balanceOf() public view returns (uint256) {
+        return _token.safeBalanceOf(address(0));
+    }
+
     function transfer() public {
         _token.safeTransfer(address(0), 0);
     }
@@ -246,5 +255,23 @@ contract SafeWETHWrapper {
 
     function withdrawTo(uint256 amount, address to) external {
         _token.safeWithdrawTo(amount, to);
+    }
+}
+
+contract ERC20WithSafeBalance {
+    using SafeERC20 for IERC20;
+
+    IERC20 private immutable _token;
+
+    constructor(IERC20 token) {
+        _token = token;
+    }
+
+    function balanceOf(address account) public view returns (uint256) {
+        return _token.balanceOf(account);
+    }
+
+    function safeBalanceOf(address account) public view returns (uint256) {
+        return _token.safeBalanceOf(account);
     }
 }
