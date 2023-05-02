@@ -34,7 +34,7 @@ library SafeERC20 {
             let success := staticcall(gas(), token, 0x00, 0x24, 0x00, 0x20)
             tokenBalance := mload(0)
 
-            if or(not(success), xor(returndatasize(), 0x20)) {
+            if or(not(success), lt(returndatasize(), 0x20)) {
                 let ptr := mload(0x40)
                 returndatacopy(ptr, 0, returndatasize())
                 revert(ptr, returndatasize())
