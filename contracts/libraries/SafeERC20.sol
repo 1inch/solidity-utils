@@ -28,13 +28,13 @@ library SafeERC20 {
         address account
     ) internal view returns(uint256 tokenBalance) {
         bytes4 selector = IERC20.balanceOf.selector;
-        assembly ("memory-safe") {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             mstore(0x00, selector)
             mstore(0x04, account)
             let success := staticcall(gas(), token, 0x00, 0x24, 0x00, 0x20)
             tokenBalance := mload(0)
 
-            if or(not(success), lt(returndatasize(), 0x20)) {
+            if or(iszero(success), lt(returndatasize(), 0x20)) {
                 let ptr := mload(0x40)
                 returndatacopy(ptr, 0, returndatasize())
                 revert(ptr, returndatasize())
