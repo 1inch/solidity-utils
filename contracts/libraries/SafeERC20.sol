@@ -32,8 +32,7 @@ library SafeERC20 {
         bool permit2
     ) internal {
         if (permit2) {
-            if (amount > type(uint160).max) revert Permit2TransferAmountTooHigh();
-            safeTransferFromPermit2(token, from, to, uint160(amount));
+            safeTransferFromPermit2(token, from, to, amount);
         } else {
             safeTransferFrom(token, from, to, amount);
         }
@@ -74,8 +73,9 @@ library SafeERC20 {
         IERC20 token,
         address from,
         address to,
-        uint160 amount
+        uint256 amount
     ) internal {
+        if (amount > type(uint160).max) revert Permit2TransferAmountTooHigh();
         bytes4 selector = IPermit2.transferFrom.selector;
         bool success;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
