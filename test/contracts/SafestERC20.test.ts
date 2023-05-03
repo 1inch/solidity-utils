@@ -120,16 +120,36 @@ describe('SafeERC20', function () {
         return { weth, wrapper };
     }
 
+    async function deployERC20WithSafeBalance() {
+        const WETH = await ethers.getContractFactory('WETH');
+        const weth = await WETH.deploy();
+        await weth.deployed();
+
+        const ERC20WithSafeBalance = await ethers.getContractFactory('ERC20WithSafeBalance');
+        const wrapper = await ERC20WithSafeBalance.deploy(weth.address);
+        await wrapper.deployed();
+        return { weth, wrapper };
+    }
+
     describe('with address that has no contract code', function () {
         shouldRevertOnAllCalls(
-            ['SafeTransferFailed', 'SafeTransferFromFailed', 'ForceApproveFailed', ''],
+            {
+                transfer: 'SafeTransferFailed',
+                transferFrom: 'SafeTransferFromFailed',
+                approve: 'ForceApproveFailed',
+                changeAllowance: '',
+            },
             deployWrapperSimple,
         );
     });
 
     describe('with token that returns false on all calls', function () {
         shouldRevertOnAllCalls(
-            ['SafeTransferFailed', 'SafeTransferFromFailed', 'ForceApproveFailed'],
+            {
+                transfer: 'SafeTransferFailed',
+                transferFrom: 'SafeTransferFromFailed',
+                approve: 'ForceApproveFailed',
+            },
             deployWrapperFalseMock,
         );
     });
@@ -159,6 +179,22 @@ describe('SafeERC20', function () {
             await wrapper.approve(100);
             await wrapper.approve(0);
             await wrapper.approve(100);
+        });
+    });
+
+    describe('safeBalanceOf', function () {
+        it('should be cheaper than balanceOf', async function () {
+            const { wrapper } = await loadFixture(deployERC20WithSafeBalance);
+
+            const tx = await wrapper.populateTransaction.balanceOf(owner.address);
+            const receipt = await owner.sendTransaction(tx);
+            const gasUsed = (await receipt.wait()).gasUsed;
+            const safeTx = await wrapper.populateTransaction.safeBalanceOf(owner.address);
+            const safeReceipt = await owner.sendTransaction(safeTx);
+            const safeGasUsed = (await safeReceipt.wait()).gasUsed;
+
+            expect(gasUsed).gt(safeGasUsed);
+            console.log(`balanceOf:safeBalanceOf gasUsed - ${gasUsed.toString()}:${safeGasUsed.toString()}`);
         });
     });
 
@@ -311,37 +347,37 @@ describe('SafeERC20', function () {
         });
     });
 
-    function shouldRevertOnAllCalls(reasons: string[], fixture: () => Promise<{ wrapper: Contract }>) {
+    function shouldRevertOnAllCalls(reasons: { [methodName: string]: string }, fixture: () => Promise<{ wrapper: Contract }>) {
         it('reverts on transfer', async function () {
             const { wrapper } = await loadFixture(fixture);
-            await expect(wrapper.transfer()).to.be.revertedWithCustomError(wrapper, reasons[0]);
+            await expect(wrapper.transfer()).to.be.revertedWithCustomError(wrapper, reasons.transfer);
         });
 
         it('reverts on transferFrom', async function () {
             const { wrapper } = await loadFixture(fixture);
-            await expect(wrapper.transferFrom()).to.be.revertedWithCustomError(wrapper, reasons[1]);
+            await expect(wrapper.transferFrom()).to.be.revertedWithCustomError(wrapper, reasons.transferFrom);
         });
 
         it('reverts on approve', async function () {
             const { wrapper } = await loadFixture(fixture);
-            await expect(wrapper.approve(0)).to.be.revertedWithCustomError(wrapper, reasons[2]);
+            await expect(wrapper.approve(0)).to.be.revertedWithCustomError(wrapper, reasons.approve);
         });
 
         it('reverts on increaseAllowance', async function () {
             const { wrapper } = await loadFixture(fixture);
-            if (reasons.length === 3) {
-                await expect(wrapper.increaseAllowance(0)).to.be.revertedWithCustomError(wrapper, reasons[2]);
-            } else {
+            if (reasons.changeAllowance === '') {
                 await expect(wrapper.increaseAllowance(0)).to.be.reverted;
+            } else {
+                await expect(wrapper.increaseAllowance(0)).to.be.revertedWithCustomError(wrapper, reasons.approve);
             }
         });
 
         it('reverts on decreaseAllowance', async function () {
             const { wrapper } = await loadFixture(fixture);
-            if (reasons.length === 3) {
-                await expect(wrapper.decreaseAllowance(0)).to.be.revertedWithCustomError(wrapper, reasons[2]);
-            } else {
+            if (reasons.changeAllowance === '') {
                 await expect(wrapper.decreaseAllowance(0)).to.be.reverted;
+            } else {
+                await expect(wrapper.decreaseAllowance(0)).to.be.revertedWithCustomError(wrapper, reasons.approve);
             }
         });
     }
