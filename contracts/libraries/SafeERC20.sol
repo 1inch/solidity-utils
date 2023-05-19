@@ -9,7 +9,14 @@ import "../interfaces/IPermit2.sol";
 import "../interfaces/IWETH.sol";
 import "../libraries/RevertReasonForwarder.sol";
 
-/// @title Implements efficient safe methods for ERC20 interface.
+/**
+ * @title Implements efficient safe methods for ERC20 interface.
+ * @notice Compared to the standard ERC20, this implementation offers several enhancements:
+ * 1. more gas-efficient, providing significant savings in transaction costs.
+ * 2. extends compatibility to include the USDT token.
+ * 3. incorporates support for the Uniswap Permit2 function.
+ * 4. a permit failure will always result in `false` and a success will alsways return `true`.
+ */
 library SafeERC20 {
     error SafeTransferFailed();
     error SafeTransferFromFailed();
@@ -19,10 +26,18 @@ library SafeERC20 {
     error SafePermitBadLength();
     error Permit2TransferAmountTooHigh();
 
+    // Uniswap Permit2 address
     address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
     bytes4 private constant _PERMIT_LENGTH_ERROR = 0x68275857;  // SafePermitBadLength.selector
     uint256 private constant _RAW_CALL_GAS_LIMIT = 5000;
 
+    /**
+     * @notice Fetches the balance of a specific ERC20 token held by an account.
+     * Consumes less gas then regular `ERC20.balanceOf`.
+     * @param token The IERC20 token contract for which the balance will be fetched.
+     * @param account The address of the account whose token balance will be fetched.
+     * @return tokenBalance The balance of the specified ERC20 token held by the account.
+     */
     function safeBalanceOf(
         IERC20 token,
         address account
@@ -42,7 +57,16 @@ library SafeERC20 {
         }
     }
 
-    /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
+    /**
+     * @notice Attempts to safely transfer tokens from one address to another.
+     * @dev If permit2 is true, uses the Permit2 standard; otherwise uses the standard ERC20 transferFrom. 
+     * Ensures method do not revert or return boolean `true` on failure, and permits call to non-smart-contract.
+     * @param token The IERC20 token contract from which the tokens will be transferred.
+     * @param from The address from which the tokens will be transferred.
+     * @param to The address to which the tokens will be transferred.
+     * @param amount The amount of tokens to transfer.
+     * @param permit2 If true, uses the Permit2 standard for the transfer; otherwise uses the standard ERC20 transferFrom.
+     */
     function safeTransferFromUniversal(
         IERC20 token,
         address from,
@@ -57,7 +81,14 @@ library SafeERC20 {
         }
     }
 
-    /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
+    /**
+     * @notice Attempts to safely transfer tokens from one address to another using the ERC20 standard.
+     * @dev Ensures method do not revert or return boolean `true` on failure, and permits call to non-smart-contract.
+     * @param token The IERC20 token contract from which the tokens will be transferred.
+     * @param from The address from which the tokens will be transferred.
+     * @param to The address to which the tokens will be transferred.
+     * @param amount The amount of tokens to transfer.
+     */
     function safeTransferFrom(
         IERC20 token,
         address from,
@@ -87,7 +118,15 @@ library SafeERC20 {
         if (!success) revert SafeTransferFromFailed();
     }
 
-    /// @dev Permit2 version of safeTransferFrom above.
+    /**
+     * @notice Attempts to safely transfer tokens from one address to another using the Permit2 standard.
+     * @dev Ensures method do not revert or return boolean `true` on failure, and permits call to non-smart-contract.
+     * @param token The IERC20 token contract from which the tokens will be transferred.
+     * @param from The address from which the tokens will be transferred.
+     * @param to The address to which the tokens will be transferred.
+     * @param amount The amount of tokens to transfer.
+     */
+    /// Permit2 version of safeTransferFrom above.
     function safeTransferFromPermit2(
         IERC20 token,
         address from,
@@ -113,7 +152,13 @@ library SafeERC20 {
         if (!success) revert SafeTransferFromFailed();
     }
 
-    /// @dev Ensures method do not revert or return boolean `true`, admits call to non-smart-contract.
+    /**
+     * @notice Attempts to safely transfer tokens to another address.
+     * @dev Ensures method do not revert or return boolean `true` on failure.
+     * @param token The IERC20 token contract from which the tokens will be transferred.
+     * @param to The address to which the tokens will be transferred.
+     * @param value The amount of tokens to transfer.
+     */
     function safeTransfer(
         IERC20 token,
         address to,
@@ -124,7 +169,13 @@ library SafeERC20 {
         }
     }
 
-    /// @dev If `approve(from, to, amount)` fails, try to `approve(from, to, 0)` before retry.
+    /**
+     * @notice Attempts to approve a spender to spend a certain amount of tokens.
+     * @dev If If `approve(from, to, amount)` fails, it tries to set the allowance to zero, and retries the `approve` call.
+     * @param token The IERC20 token contract on which the call will be made.
+     * @param spender The address which will spend the funds.
+     * @param value The amount of tokens to be spent.
+     */
     function forceApprove(
         IERC20 token,
         address spender,
@@ -140,7 +191,14 @@ library SafeERC20 {
         }
     }
 
-    /// @dev Allowance increase with safe math check.
+    /**
+     * @notice Safely increases the allowance of a spender.
+     * @dev Increases with safe math check. Checks if the increased allowance will overflow, if yes, then it reverts the transaction.
+     * Then uses `forceApprove` to increase the allowance.
+     * @param token The IERC20 token contract on which the call will be made.
+     * @param spender The address which will spend the funds.
+     * @param value The amount of tokens to increase the allowance by.
+     */
     function safeIncreaseAllowance(
         IERC20 token,
         address spender,
@@ -151,7 +209,14 @@ library SafeERC20 {
         forceApprove(token, spender, allowance + value);
     }
 
-    /// @dev Allowance decrease with safe math check.
+    /**
+     * @notice Safely decreases the allowance of a spender.
+     * @dev Decreases with safe math check. Checks if the decreased allowance will underflow, if yes, then it reverts the transaction.
+     * Then uses `forceApprove` to increase the allowance.
+     * @param token The IERC20 token contract on which the call will be made.
+     * @param spender The address which will spend the funds.
+     * @param value The amount of tokens to decrease the allowance by.
+     */
     function safeDecreaseAllowance(
         IERC20 token,
         address spender,
@@ -162,99 +227,150 @@ library SafeERC20 {
         forceApprove(token, spender, allowance - value);
     }
 
+    /**
+     * @notice Attempts to execute the `permit` function on the provided token with the sender and contract as parameters.
+     * Permit type is determined automatically based on permit calldata (IERC20Permit, IDaiLikePermit, and IPermit2).
+     * @dev Wraps `tryPermit` function and forwards revert reason if permit fails.
+     * @param token The IERC20 token to execute the permit function on.
+     * @param permit The permit data to be used in the function call.
+     */
     function safePermit(IERC20 token, bytes calldata permit) internal {
         if (!tryPermit(token, msg.sender, address(this), permit)) RevertReasonForwarder.reRevert();
     }
 
+    /**
+     * @notice Attempts to execute the `permit` function on the provided token with custom owner and spender parameters. 
+     * Permit type is determined automatically based on permit calldata (IERC20Permit, IDaiLikePermit, and IPermit2).
+     * @dev Wraps `tryPermit` function and forwards revert reason if permit fails.
+     * @param token The IERC20 token to execute the permit function on.
+     * @param owner The owner of the tokens for which the permit is made.
+     * @param spender The spender allowed to spend the tokens by the permit.
+     * @param permit The permit data to be used in the function call.
+     */
     function safePermit(IERC20 token, address owner, address spender, bytes calldata permit) internal {
         if (!tryPermit(token, owner, spender, permit)) RevertReasonForwarder.reRevert();
     }
 
+    /**
+     * @notice Attempts to execute the `permit` function on the provided token with the sender and contract as parameters.
+     * @dev Invokes `tryPermit` with sender as owner and contract as spender.
+     * @param token The IERC20 token to execute the permit function on.
+     * @param permit The permit data to be used in the function call.
+     * @return success Returns true if the permit function was successfully executed, false otherwise.
+     */
     function tryPermit(IERC20 token, bytes calldata permit) internal returns(bool success) {
         return tryPermit(token, msg.sender, address(this), permit);
     }
 
+    /**
+     * @notice The function attempts to call the permit function on a given ERC20 token.
+     * @dev The function is designed to support a variety of permit functions, namely: IERC20Permit, IDaiLikePermit, and IPermit2.
+     * It accommodates both Compact and Full formats of these permit types.
+     * Please note, it is expected that the `expiration` parameter for the compact Permit2 and the `deadline` parameter 
+     * for the compact Permit are to be incremented by one before invoking this function. This approach is motivated by
+     * gas efficiency considerations; as the unlimited expiration period is likely to be the most common scenario, and 
+     * zeros are cheaper to pass in terms of gas cost. Thus, callers should increment the expiration or deadline by one
+     * before invocation for optimized performance.
+     * @param token The address of the ERC20 token on which to call the permit function.
+     * @param owner The owner of the tokens. This address should have signed the off-chain permit.
+     * @param spender The address which will be approved for transfer of tokens.
+     * @param permit The off-chain permit data, containing different fields depending on the type of permit function.
+     * @return success A boolean indicating whether the permit call was successful.
+     */
     function tryPermit(IERC20 token, address owner, address spender, bytes calldata permit) internal returns(bool success) {
+        // Define the function selectors for different permit standards
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
         bytes4 permit2Selector = IPermit2.permit.selector;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
+
+            // Switch case for different permit lengths, indicating different permit standards
             switch permit.length
+            // Compact IERC20Permit
             case 100 {
-                mstore(ptr, permitSelector)
-                mstore(add(ptr, 0x04), owner)
-                mstore(add(ptr, 0x24), spender)
+                mstore(ptr, permitSelector)     // store selector
+                mstore(add(ptr, 0x04), owner)   // store owner
+                mstore(add(ptr, 0x24), spender) // store spender
 
                 // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
                 {  // stack too deep
-                    let deadline := shr(224, calldataload(add(permit.offset, 0x20)))
-                    let vs := calldataload(add(permit.offset, 0x44))
+                    let deadline := shr(224, calldataload(add(permit.offset, 0x20))) // loads permit.offset 0x20..0x23
+                    let vs := calldataload(add(permit.offset, 0x44))                 // loads permit.offset 0x44..0x63
 
-                    calldatacopy(add(ptr, 0x44), permit.offset, 0x20) // value
-                    mstore(add(ptr, 0x64), sub(deadline, 1))
-                    mstore(add(ptr, 0x84), add(27, shr(255, vs)))
-                    calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20) // r
-                    mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))
+                    calldatacopy(add(ptr, 0x44), permit.offset, 0x20)            // store value     = copy permit.offset 0x00..0x19
+                    mstore(add(ptr, 0x64), sub(deadline, 1))                     // store deadline  = deadline - 1
+                    mstore(add(ptr, 0x84), add(27, shr(255, vs)))                // store v         = most significant bit of vs + 27 (27 or 28)
+                    calldatacopy(add(ptr, 0xa4), add(permit.offset, 0x24), 0x20) // store r         = copy permit.offset 0x24..0x43
+                    mstore(add(ptr, 0xc4), shr(1, shl(1, vs)))                   // store s         = vs without most significant bit
                 }
                 // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
             }
+            // Compact IDaiLikePermit
             case 72 {
-                mstore(ptr, daiPermitSelector)
-                mstore(add(ptr, 0x04), owner)
-                mstore(add(ptr, 0x24), spender)
+                mstore(ptr, daiPermitSelector)  // store selector
+                mstore(add(ptr, 0x04), owner)   // store owner
+                mstore(add(ptr, 0x24), spender) // store spender
 
                 // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
                 {  // stack too deep
-                    let expiry := shr(224, calldataload(add(permit.offset, 0x04)))
-                    let vs := calldataload(add(permit.offset, 0x28))
+                    let expiry := shr(224, calldataload(add(permit.offset, 0x04))) // loads permit.offset 0x04..0x07
+                    let vs := calldataload(add(permit.offset, 0x28))               // loads permit.offset 0x28..0x47
 
-                    mstore(add(ptr, 0x44), shr(224, calldataload(permit.offset)))
-                    mstore(add(ptr, 0x64), sub(expiry, 1))
-                    mstore(add(ptr, 0x84), true)
-                    mstore(add(ptr, 0xa4), add(27, shr(255, vs)))
-                    calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x08), 0x20) // r
-                    mstore(add(ptr, 0xe4), shr(1, shl(1, vs)))
+                    mstore(add(ptr, 0x44), shr(224, calldataload(permit.offset))) // store nonce   = copy permit.offset 0x00..0x03
+                    mstore(add(ptr, 0x64), sub(expiry, 1))                        // store expiry  = expiry - 1
+                    mstore(add(ptr, 0x84), true)                                  // store allowed = true
+                    mstore(add(ptr, 0xa4), add(27, shr(255, vs)))                 // store v       = most significant bit of vs + 27 (27 or 28)
+                    calldatacopy(add(ptr, 0xc4), add(permit.offset, 0x08), 0x20)  // store r       = copy permit.offset 0x08..0x27
+                    mstore(add(ptr, 0xe4), shr(1, shl(1, vs)))                    // store s       = vs without most significant bit
                 }
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0x104, 0, 0)
             }
+            // IERC20Permit
             case 224 {
                 mstore(ptr, permitSelector)
-                calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
                 // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
             }
+            // IDaiLikePermit
             case 256 {
                 mstore(ptr, daiPermitSelector)
-                calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
                 // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
                 success := call(gas(), token, 0, ptr, 0x104, 0, 0)
             }
+            // Compact IPermit2
             case 96 {
                 // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
-                mstore(ptr, permit2Selector)
-                mstore(add(ptr, 0x04), owner)
-                mstore(add(ptr, 0x24), token)
-                calldatacopy(add(ptr, 0x50), permit.offset, 0x14) // amount
-                mstore(add(ptr, 0x64), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x14))), 1))) // expiration
-                mstore(add(ptr, 0x84), shr(224, calldataload(add(permit.offset, 0x18)))) // nonce
-                mstore(add(ptr, 0xa4), spender)
-                mstore(add(ptr, 0xc4), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x1c))), 1))) // sigDeadline
-                mstore(add(ptr, 0xe4), 0x100)
-                mstore(add(ptr, 0x104), 0x40)
-                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x20), 0x20) // r
-                calldatacopy(add(ptr, 0x144), add(permit.offset, 0x40), 0x20) // vs
+                mstore(ptr, permit2Selector)  // store selector
+                mstore(add(ptr, 0x04), owner) // store owner
+                mstore(add(ptr, 0x24), token) // store token
+
+                calldatacopy(add(ptr, 0x50), permit.offset, 0x14)             // store amount = copy permit.offset 0x00..0x13
+                // and(0xffffffffffff, ...) - conversion to uint48 
+                mstore(add(ptr, 0x64), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x14))), 1))) // store expiration = ((permit.offset 0x14..0x17 - 1) & 0xffffffffffff)
+                mstore(add(ptr, 0x84), shr(224, calldataload(add(permit.offset, 0x18)))) // store nonce = copy permit.offset 0x18..0x1b
+                mstore(add(ptr, 0xa4), spender)                               // store spender
+                // and(0xffffffffffff, ...) - conversion to uint48
+                mstore(add(ptr, 0xc4), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x1c))), 1))) // store sigDeadline = ((permit.offset 0x1c..0x1f - 1) & 0xffffffffffff)
+                mstore(add(ptr, 0xe4), 0x100)                                 // store offset = 256
+                mstore(add(ptr, 0x104), 0x40)                                 // store length = 64
+                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x20), 0x20) // store r      = copy permit.offset 0x20..0x3f
+                calldatacopy(add(ptr, 0x144), add(permit.offset, 0x40), 0x20) // store vs     = copy permit.offset 0x40..0x5f
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
                 success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
             }
+            // IPermit2
             case 352 {
                 mstore(ptr, permit2Selector)
-                calldatacopy(add(ptr, 0x04), permit.offset, permit.length)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
                 success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
             }
+            // Unknown
             default {
                 mstore(ptr, _PERMIT_LENGTH_ERROR)
                 revert(ptr, 4)
@@ -262,6 +378,16 @@ library SafeERC20 {
         }
     }
 
+    /**
+     * @dev Executes a low level call to a token contract, making it resistant to reversion and erroneous boolean returns.
+     * @param token The IERC20 token contract on which the call will be made.
+     * @param selector The function signature that is to be called on the token contract.
+     * @param to The address to which the token amount will be transferred.
+     * @param amount The token amount to be transferred.
+     * @return success A boolean indicating if the call was successful. Returns 'true' on success and 'false' on failure. 
+     * In case of success but no returned data, validates that the contract code exists.
+     * In case of returned data, ensures that it's a boolean `true`.
+     */
     function _makeCall(
         IERC20 token,
         bytes4 selector,
@@ -287,6 +413,11 @@ library SafeERC20 {
         }
     }
 
+    /**
+     * @notice Safely deposits a specified amount of Ether into the IWETH contract. Consumes less gas then regular `IWETH.deposit`.
+     * @param weth The IWETH token contract.
+     * @param amount The amount of Ether to deposit into the IWETH contract.
+     */
     function safeDeposit(IWETH weth, uint256 amount) internal {
         if (amount > 0) {
             bytes4 selector = IWETH.deposit.selector;
@@ -300,6 +431,12 @@ library SafeERC20 {
         }
     }
 
+    /**
+     * @notice Safely withdraws a specified amount of wrapped Ether from the IWETH contract. Consumes less gas then regular `IWETH.withdraw`.
+     * @dev Uses inline assembly to interact with the IWETH contract.
+     * @param weth The IWETH token contract.
+     * @param amount The amount of wrapped Ether to withdraw from the IWETH contract.
+     */
     function safeWithdraw(IWETH weth, uint256 amount) internal {
         bytes4 selector = IWETH.withdraw.selector;
         assembly ("memory-safe") {  // solhint-disable-line no-inline-assembly
@@ -313,6 +450,13 @@ library SafeERC20 {
         }
     }
 
+    /**
+     * @notice Safely withdraws a specified amount of wrapped Ether from the IWETH contract to a specified recipient.
+     * Consumes less gas then regular `IWETH.withdraw`.
+     * @param weth The IWETH token contract.
+     * @param amount The amount of wrapped Ether to withdraw from the IWETH contract.
+     * @param to The recipient of the withdrawn Ether.
+     */
     function safeWithdrawTo(IWETH weth, uint256 amount, address to) internal {
         safeWithdraw(weth, amount);
         if (to != address(this)) {
