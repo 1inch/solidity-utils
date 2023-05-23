@@ -13,9 +13,9 @@ import "../libraries/RevertReasonForwarder.sol";
  * @title Implements efficient safe methods for ERC20 interface.
  * @notice Compared to the standard ERC20, this implementation offers several enhancements:
  * 1. more gas-efficient, providing significant savings in transaction costs.
- * 2. extends compatibility to include the USDT token.
- * 3. incorporates support for the Uniswap Permit2 function.
- * 4. a permit failure will always result in `false` and a success will alsways return `true`.
+ * 2. support for different permit implementations
+ * 3. forceApprove functionality
+ * 4. support for WETH deposit and withdraw
  */
 library SafeERC20 {
     error SafeTransferFailed();
@@ -60,7 +60,7 @@ library SafeERC20 {
     /**
      * @notice Attempts to safely transfer tokens from one address to another.
      * @dev If permit2 is true, uses the Permit2 standard; otherwise uses the standard ERC20 transferFrom. 
-     * Ensures method do not revert or return boolean `true` on failure, and permits call to non-smart-contract.
+     * Either requires `true` in return data, or requires target to be smart-contract and empty return data.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param from The address from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
@@ -83,7 +83,7 @@ library SafeERC20 {
 
     /**
      * @notice Attempts to safely transfer tokens from one address to another using the ERC20 standard.
-     * @dev Ensures method do not revert or return boolean `true` on failure, and permits call to non-smart-contract.
+     * @dev Either requires `true` in return data, or requires target to be smart-contract and empty return data.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param from The address from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
@@ -120,13 +120,12 @@ library SafeERC20 {
 
     /**
      * @notice Attempts to safely transfer tokens from one address to another using the Permit2 standard.
-     * @dev Ensures method do not revert or return boolean `true` on failure, and permits call to non-smart-contract.
+     * @dev Either requires `true` in return data, or requires target to be smart-contract and empty return data.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param from The address from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
      * @param amount The amount of tokens to transfer.
      */
-    /// Permit2 version of safeTransferFrom above.
     function safeTransferFromPermit2(
         IERC20 token,
         address from,
@@ -154,7 +153,7 @@ library SafeERC20 {
 
     /**
      * @notice Attempts to safely transfer tokens to another address.
-     * @dev Ensures method do not revert or return boolean `true` on failure.
+     * @dev Either requires `true` in return data, or requires target to be smart-contract and empty return data.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
      * @param value The amount of tokens to transfer.
@@ -171,7 +170,7 @@ library SafeERC20 {
 
     /**
      * @notice Attempts to approve a spender to spend a certain amount of tokens.
-     * @dev If If `approve(from, to, amount)` fails, it tries to set the allowance to zero, and retries the `approve` call.
+     * @dev If `approve(from, to, amount)` fails, it tries to set the allowance to zero, and retries the `approve` call.
      * @param token The IERC20 token contract on which the call will be made.
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to be spent.
@@ -278,7 +277,7 @@ library SafeERC20 {
      * @return success A boolean indicating whether the permit call was successful.
      */
     function tryPermit(IERC20 token, address owner, address spender, bytes calldata permit) internal returns(bool success) {
-        // Define the function selectors for different permit standards
+        // load function selectors for different permit standards
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
         bytes4 permit2Selector = IPermit2.permit.selector;
