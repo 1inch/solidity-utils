@@ -12,6 +12,7 @@ export const constants = {
     MIN_INT256: -(2n ** 255n),
     MAX_UINT128: 2n ** 128n - 1n,
     MAX_UINT32: 2n ** 32n - 1n,
+    DEV_CHAINS: ['hardhat', 'localhost'] as string[],
 } as const;
 
 // utils
