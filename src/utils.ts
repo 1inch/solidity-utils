@@ -9,25 +9,6 @@ const _delay = (ms: number ) =>
         setTimeout(resolve, ms);
     });
 
-const _tryRun = async (f: () => Promise<any>, n = 10) => {
-    const delayMs = 2000;
-    if (typeof f !== 'function') {
-        throw Error('f is not a function');
-    }
-
-    for (let i = 0; ; i++) {
-        try {
-            return await f();
-        } catch (error) {
-            console.error(error);
-            await _delay(delayMs);
-            if (i > n) {
-                throw new Error(`Couldn't verify deploy in ${n} runs`);
-            }
-        }
-    }
-};
-
 const _getContract = async (contractName: string, contractAddress: string): Promise<Contract> => {
     const contractFactory = await ethers.getContractFactory(contractName);
     return contractFactory.attach(contractAddress);
@@ -35,7 +16,7 @@ const _getContract = async (contractName: string, contractAddress: string): Prom
 
 interface DeployContractOptions {
     contractName: string;
-    constructorArgs: any[];
+    constructorArgs?: any[];
     deployments: {
         deploy: (name: string, options: DeployOptions) => Promise<DeployResult>;
         getOrNull: (name: string) => Promise<Deployment | null>
@@ -47,90 +28,7 @@ interface DeployContractOptions {
     gasPrice?: BigNumber;
     maxPriorityFeePerGas?: BigNumber;
     maxFeePerGas?: BigNumber;
-}
-
-export async function deployUnverified({
-    contractName,
-    constructorArgs,
-    deployments,
-    deployer,
-    deploymentName = contractName,
-    skipIfAlreadyDeployed = true,
-    gasPrice,
-    maxPriorityFeePerGas,
-    maxFeePerGas,
-}: DeployContractOptions): Promise<DeployResult | Deployment> {
-    /**
-     * Deploys a contract using hardhat-deploy plugin.
-     * @remarks
-     * This function will skip deployment if there is a deployment with the same name and `skipIfAlreadyDeployed` is true.
-     * Thus, even if the contract bytecode changes, the contract will not be redeployed.
-     */
-    const { deploy, getOrNull } = deployments;
-
-    const existingContract = await getOrNull(deploymentName);
-    if (existingContract && skipIfAlreadyDeployed) {
-        console.log(`Skipping deploy for existing contract ${contractName} (${deploymentName}) at address: ${existingContract.address}`);
-        return existingContract;
-    }
-
-    const deployOptions: DeployOptions = {
-        args: constructorArgs,
-        from: deployer,
-        contract: contractName,
-        skipIfAlreadyDeployed,
-        gasPrice,
-        maxPriorityFeePerGas,
-        maxFeePerGas,
-    };
-
-    const contract = await deploy(deploymentName, deployOptions);
-
-    console.log(`${deploymentName} deployed to: ${contract.address}`);
-    return contract;
-}
-
-export async function deployAndVerify({
-    contractName,
-    constructorArgs,
-    deployments,
-    deployer,
-    deploymentName = contractName,
-    skipIfAlreadyDeployed = true,
-    gasPrice,
-    maxPriorityFeePerGas,
-    maxFeePerGas,
-}: DeployContractOptions): Promise<DeployResult | Deployment> {
-    /**
-     * Deploys contract and tries to verify it on Etherscan.
-     * @remarks
-     * If the contract is deployed on a dev chain, verification is skipped.
-     */
-    const deployResult = await deployUnverified({
-        contractName,
-        constructorArgs,
-        deployments,
-        deployer,
-        deploymentName,
-        skipIfAlreadyDeployed,
-        gasPrice,
-        maxPriorityFeePerGas,
-        maxFeePerGas,
-    });
-
-    if (!constants.DEV_CHAINS.includes(hre.network.name)) {
-        await _delay(2000);
-        await _tryRun(() =>
-            hre.run('verify:verify', {
-                address: deployResult.address,
-                constructorArguments: constructorArgs,
-            }),
-        );
-    } else {
-        console.log('Skipping verification');
-    }
-
-    return deployResult;
+    log?: boolean;
 }
 
 export async function deployAndGetContract({
@@ -144,23 +42,37 @@ export async function deployAndGetContract({
     gasPrice,
     maxPriorityFeePerGas,
     maxFeePerGas,
+    log = true,
 }: DeployContractOptions): Promise<Contract> {
     /**
      * Deploys contract and tries to verify it on Etherscan if requested.
+     * @remarks
+     * If the contract is deployed on a dev chain, verification is skipped.
      * @returns Deployed contract instance
      */
-    const deployOptions: DeployContractOptions = {
-        contractName,
-        constructorArgs,
-        deployments,
-        deployer,
-        deploymentName,
+    const { deploy } = deployments;
+
+    const deployOptions: DeployOptions = {
+        args: constructorArgs,
+        from: deployer,
+        contract: contractName,
         skipIfAlreadyDeployed,
         gasPrice,
         maxPriorityFeePerGas,
         maxFeePerGas,
+        log,
+        waitConfirmations: constants.DEV_CHAINS.includes(hre.network.name) ? 1: 6,
     };
-    const deployResult = await (skipVerify ? deployUnverified(deployOptions) : deployAndVerify(deployOptions));
+    const deployResult = await deploy(deploymentName, deployOptions);
+
+    if (!(skipVerify || constants.DEV_CHAINS.includes(hre.network.name))) {
+        await hre.run('verify:verify', {
+            address: deployResult.address,
+            constructorArguments: constructorArgs,
+        });
+    } else {
+        console.log('Skipping verification');
+    }
     return _getContract(contractName, deployResult.address);
 }
 

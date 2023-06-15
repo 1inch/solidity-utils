@@ -4,6 +4,7 @@ import '@nomicfoundation/hardhat-chai-matchers';
 import 'hardhat-gas-reporter';
 import 'hardhat-tracer';
 import 'hardhat-deploy';
+import '@nomicfoundation/hardhat-verify';
 require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';

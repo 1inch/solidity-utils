@@ -183,10 +183,10 @@ describe('utils', function () {
         });
     });
 
-    // TODO: fix the problem when plugin saves deployment on hardhat network in test env
     describe('deployAndGetContract', function () {
         it('should deploy new contract instance', async function () {
             const tokenName = 'SomeToken';
+            // If hardhat-deploy `deploy` function logs need to be displayed, add HARDHAT_DEPLOY_LOG = 'true' to the .env file
             const token = await deployAndGetContract({
                 contractName: 'TokenMock',
                 constructorArgs: [tokenName, 'STM'],
@@ -197,6 +197,6 @@ describe('utils', function () {
             });
             expect(token.address).to.be.not.eq(constants.ZERO_ADDRESS);
             expect(await token.name()).to.be.eq(tokenName);
-        });
+        }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
     });
 });
