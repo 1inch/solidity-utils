@@ -688,7 +688,7 @@
   dependencies:
     ethereumjs-util "^7.1.4"
 
-"@nomicfoundation/hardhat-verify@^1.0.1":
+"@nomicfoundation/hardhat-verify@1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@nomicfoundation/hardhat-verify/-/hardhat-verify-1.0.1.tgz#440e6ea7538c5485b2fb8fab7ac17b510d8e2d60"
   integrity sha512-Z++nYMcgbCU3nXkWMVzqAPrhrIyRhrKErWHOWxj0k/GzlhindQzm/D3282mdV4bG9D5qz3+tse9kzhbi1ILCJA==

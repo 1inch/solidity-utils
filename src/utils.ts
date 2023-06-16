@@ -4,10 +4,11 @@ import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { providers, Wallet, Contract, Bytes, ContractTransaction, BigNumberish, BigNumber } from 'ethers';
 import { Deployment, DeployOptions, DeployResult } from 'hardhat-deploy/types';
 
-const _delay = (ms: number ) =>
+const _delay = function (ms: number ) {
     new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
+};
 
 const _getContract = async (contractName: string, contractAddress: string): Promise<Contract> => {
     const contractFactory = await ethers.getContractFactory(contractName);
@@ -16,6 +17,7 @@ const _getContract = async (contractName: string, contractAddress: string): Prom
 
 interface DeployContractOptions {
     contractName: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructorArgs?: any[];
     deployments: {
         deploy: (name: string, options: DeployOptions) => Promise<DeployResult>;
@@ -29,6 +31,7 @@ interface DeployContractOptions {
     maxPriorityFeePerGas?: BigNumber;
     maxFeePerGas?: BigNumber;
     log?: boolean;
+    waitConfirmations?: number;
 }
 
 export async function deployAndGetContract({
@@ -43,6 +46,7 @@ export async function deployAndGetContract({
     maxPriorityFeePerGas,
     maxFeePerGas,
     log = true,
+    waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1: 6,
 }: DeployContractOptions): Promise<Contract> {
     /**
      * Deploys contract and tries to verify it on Etherscan if requested.
@@ -61,7 +65,7 @@ export async function deployAndGetContract({
         maxPriorityFeePerGas,
         maxFeePerGas,
         log,
-        waitConfirmations: constants.DEV_CHAINS.includes(hre.network.name) ? 1: 6,
+        waitConfirmations,
     };
     const deployResult = await deploy(deploymentName, deployOptions);
 
