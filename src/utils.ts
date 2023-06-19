@@ -10,11 +10,6 @@ const _delay = function (ms: number) {
     });
 };
 
-const _getContract = async (contractName: string, contractAddress: string): Promise<Contract> => {
-    const contractFactory = await ethers.getContractFactory(contractName);
-    return contractFactory.attach(contractAddress);
-};
-
 interface DeployContractOptions {
     contractName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,7 +69,7 @@ export async function deployAndGetContract({
     } else {
         console.log('Skipping verification');
     }
-    return _getContract(contractName, deployResult.address);
+    return await ethers.getContractAt(contractName, deployResult.address);
 }
 
 export async function timeIncreaseTo(seconds: number | string) {
