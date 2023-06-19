@@ -2,9 +2,9 @@ import { constants } from './prelude';
 import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { providers, Wallet, Contract, Bytes, ContractTransaction, BigNumberish, BigNumber } from 'ethers';
-import { Deployment, DeployOptions, DeployResult } from 'hardhat-deploy/types';
+import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
 
-const _delay = function (ms: number ) {
+const _delay = function (ms: number) {
     new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
@@ -19,10 +19,7 @@ interface DeployContractOptions {
     contractName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructorArgs?: any[];
-    deployments: {
-        deploy: (name: string, options: DeployOptions) => Promise<DeployResult>;
-        getOrNull: (name: string) => Promise<Deployment | null>
-    },
+    deployments: {deploy: (name: string, options: DeployOptions) => Promise<DeployResult>},
     deployer: string;
     deploymentName?: string;
     skipVerify?: boolean;
