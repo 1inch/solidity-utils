@@ -4,12 +4,6 @@ import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { providers, Wallet, Contract, Bytes, ContractTransaction, BigNumberish, BigNumber } from 'ethers';
 import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
 
-const _delay = function (ms: number) {
-    new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
-};
-
 interface DeployContractOptions {
     contractName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,7 +68,7 @@ export async function deployAndGetContract({
 
 export async function timeIncreaseTo(seconds: number | string) {
     const delay = 1000 - new Date().getMilliseconds();
-    await _delay(delay);
+    await new Promise((resolve) => setTimeout(resolve, delay));
     await time.increaseTo(seconds);
 }
 
