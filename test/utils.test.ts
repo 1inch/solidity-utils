@@ -1,6 +1,6 @@
 import { expect, ether, time, constants } from '../src/prelude';
-import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract } from '../src/utils';
-import hre from 'hardhat';
+import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract, deployAndGetContract } from '../src/utils';
+import hre, { deployments } from 'hardhat';
 const { ethers } = hre;
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -181,5 +181,22 @@ describe('utils', function () {
             expect(weth.address).to.be.not.eq(constants.ZERO_ADDRESS);
             expect(await weth.name()).to.be.eq('Wrapped Ether');
         });
+    });
+
+    describe('deployAndGetContract', function () {
+        it('should deploy new contract instance', async function () {
+            const tokenName = 'SomeToken';
+            // If hardhat-deploy `deploy` function logs need to be displayed, add HARDHAT_DEPLOY_LOG = 'true' to the .env file
+            const token = await deployAndGetContract({
+                contractName: 'TokenMock',
+                constructorArgs: [tokenName, 'STM'],
+                deployments,
+                deployer: signer1.address,
+                skipIfAlreadyDeployed: false,
+                skipVerify: true,
+            });
+            expect(token.address).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await token.name()).to.be.eq(tokenName);
+        }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
     });
 });

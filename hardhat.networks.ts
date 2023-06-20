@@ -3,7 +3,11 @@ import { NetworksUserConfig } from 'hardhat/types';
 
 dotenv.config();
 
-const networks: NetworksUserConfig = {};
+const networks: NetworksUserConfig = {
+    hardhat: {
+        saveDeployments: false,
+    },
+};
 
 function register(name: string, chainId: number, url?: string, privateKey?: string) {
     if (url && privateKey) {

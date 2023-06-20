@@ -1,7 +1,70 @@
 import { constants } from './prelude';
-import { ethers } from 'hardhat';
+import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { providers, Wallet, Contract, Bytes, ContractTransaction, BigNumberish } from 'ethers';
+import { providers, Wallet, Contract, Bytes, ContractTransaction, BigNumberish, BigNumber } from 'ethers';
+import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
+
+interface DeployContractOptions {
+    contractName: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    constructorArgs?: any[];
+    deployments: {deploy: (name: string, options: DeployOptions) => Promise<DeployResult>},
+    deployer: string;
+    deploymentName?: string;
+    skipVerify?: boolean;
+    skipIfAlreadyDeployed?: boolean;
+    gasPrice?: BigNumber;
+    maxPriorityFeePerGas?: BigNumber;
+    maxFeePerGas?: BigNumber;
+    log?: boolean;
+    waitConfirmations?: number;
+}
+
+export async function deployAndGetContract({
+    contractName,
+    constructorArgs,
+    deployments,
+    deployer,
+    deploymentName = contractName,
+    skipVerify = false,
+    skipIfAlreadyDeployed = true,
+    gasPrice,
+    maxPriorityFeePerGas,
+    maxFeePerGas,
+    log = true,
+    waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1: 6,
+}: DeployContractOptions): Promise<Contract> {
+    /**
+     * Deploys contract and tries to verify it on Etherscan if requested.
+     * @remarks
+     * If the contract is deployed on a dev chain, verification is skipped.
+     * @returns Deployed contract instance
+     */
+    const { deploy } = deployments;
+
+    const deployOptions: DeployOptions = {
+        args: constructorArgs,
+        from: deployer,
+        contract: contractName,
+        skipIfAlreadyDeployed,
+        gasPrice,
+        maxPriorityFeePerGas,
+        maxFeePerGas,
+        log,
+        waitConfirmations,
+    };
+    const deployResult = await deploy(deploymentName, deployOptions);
+
+    if (!(skipVerify || constants.DEV_CHAINS.includes(hre.network.name))) {
+        await hre.run('verify:verify', {
+            address: deployResult.address,
+            constructorArguments: constructorArgs,
+        });
+    } else {
+        console.log('Skipping verification');
+    }
+    return await ethers.getContractAt(contractName, deployResult.address);
+}
 
 export async function timeIncreaseTo(seconds: number | string) {
     const delay = 1000 - new Date().getMilliseconds();
