@@ -1,7 +1,7 @@
 import { constants } from './prelude';
 import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { providers, Wallet, Contract, Bytes, ContractTransaction, BigNumberish, BigNumber } from 'ethers';
+import { providers, Wallet, Contract, Bytes, ContractReceipt, ContractTransaction, BigNumberish, BigNumber } from 'ethers';
 import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
 
 interface DeployContractOptions {
@@ -90,19 +90,18 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
     const getBalance = 'balanceOf' in token ? token.balanceOf : provider.getBalance;
 
     const preBalance = await getBalance(wallet);
-    const txResult = await txPromise(...args);
-    const postBalance = await getBalance(wallet);
+    let txResult: ContractTransaction | ContractReceipt = await txPromise(...args);
+    let txFees = 0n;
 
     if ('wait' in txResult) {
-        const txReceipt = await txResult.wait();
-        const txFees =
+        txResult = await txResult.wait();
+        txFees =
             wallet.toLowerCase() === txResult.from.toLowerCase() && isETH
-                ? txReceipt.gasUsed.toBigInt() * txReceipt.effectiveGasPrice.toBigInt()
+                ? txResult.gasUsed.toBigInt() * txResult.effectiveGasPrice.toBigInt()
                 : 0n;
-        return [postBalance.sub(preBalance).add(txFees), txReceipt];
-    } else {
-        return [postBalance.sub(preBalance), txResult];
     }
+    const postBalance = await getBalance(wallet);
+    return [postBalance.sub(preBalance).add(txFees), txResult];
 }
 
 export function fixSignature(signature: string) {
