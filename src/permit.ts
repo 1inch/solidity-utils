@@ -1,10 +1,9 @@
-import '@nomiclabs/hardhat-ethers';
+import '@nomicfoundation/hardhat-ethers';
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
 import { constants } from './prelude';
-import { Contract, Wallet } from 'ethers';
+import { Contract, Signature, TypedDataDomain, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
-import { splitSignature } from 'ethers/lib/utils';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { bytecode as permit2Bytecode } from './permit2.json';
 
@@ -116,21 +115,21 @@ export async function getPermit(
     deadline = defaultDeadline.toString(),
     compact = false,
 ) {
-    const nonce = await permitContract.nonces(owner.address);
+    const nonce = await permitContract.nonces(owner);
     const name = await permitContract.name();
     const data = buildData(
         name,
         tokenVersion,
         chainId,
-        permitContract.address,
+        await permitContract.getAddress(),
         owner.address,
         spender,
         value,
         nonce.toString(),
         deadline,
     );
-    const signature = await owner._signTypedData(data.domain, data.types, data.message);
-    const { v, r, s } = splitSignature(signature);
+    const signature = await owner.signTypedData(data.domain, data.types, data.message);
+    const { v, r, s } = Signature.from(signature);
     const permitCall = cutSelector(permitContract.interface.encodeFunctionData('permit', [owner.address, spender, value, deadline, v, r, s]));
     return compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), constants.ZERO_ADDRESS, owner.address, spender);
 }
@@ -149,7 +148,7 @@ export async function getPermit2(
     sigDeadline = defaultDeadlinePermit2,
 ) {
     const permitContract = await permit2Contract();
-    const nonce = (await permitContract.allowance(owner.address, token, spender)).nonce;
+    const nonce = (await permitContract.allowance(owner, token, spender)).nonce;
     const details = {
         token,
         amount,
@@ -161,9 +160,9 @@ export async function getPermit2(
         spender,
         sigDeadline,
     };
-    const data = AllowanceTransfer.getPermitData(permitSingle, permitContract.address, chainId);
-    const { r, _vs } = ethers.utils.splitSignature(await owner._signTypedData(data.domain, data.types, data.values));
-    const permitCall = cutSelector(permitContract.interface.encodeFunctionData('permit', [owner.address, permitSingle, r + trim0x(_vs)]));
+    const data = AllowanceTransfer.getPermitData(permitSingle, await permitContract.getAddress(), chainId);
+    const sig = Signature.from(await owner.signTypedData(data.domain as TypedDataDomain, data.types, data.values));
+    const permitCall = cutSelector(permitContract.interface.encodeFunctionData('permit', [owner.address, permitSingle, sig.r + trim0x(sig.yParityAndS)]));
     return compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), token, owner.address, spender);
 }
 
@@ -180,21 +179,21 @@ export async function getPermitLikeDai(
     expiry = defaultDeadline.toString(),
     compact = false,
 ) {
-    const nonce = await permitContract.nonces(holder.address);
+    const nonce = await permitContract.nonces(holder);
     const name = await permitContract.name();
     const data = buildDataLikeDai(
         name,
         tokenVersion,
         chainId,
-        permitContract.address,
+        await permitContract.getAddress(),
         holder.address,
         spender,
         nonce.toString(),
         allowed,
         expiry,
     );
-    const signature = await holder._signTypedData(data.domain, data.types, data.message);
-    const { v, r, s } = splitSignature(signature);
+    const signature = await holder.signTypedData(data.domain, data.types, data.message);
+    const { v, r, s } = Signature.from(signature);
     const permitCall = cutSelector(permitContract.interface.encodeFunctionData(
         'permit(address,address,uint256,uint256,bool,uint8,bytes32,bytes32)',
         [holder.address, spender, nonce, expiry, allowed, v, r, s],
@@ -211,34 +210,34 @@ export function withTarget(target: bigint | string, data: bigint | string) {
 // Compressed | 100 | 72 | 96
 
 export function compressPermit(permit: string) {
-    const abiCoder = ethers.utils.defaultAbiCoder;
+    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
     switch (permit.length) {
     case 450: {
         // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
         const args = abiCoder.decode(['address owner', 'address spender', 'uint256 value', 'uint256 deadline', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
         // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
-        return '0x' + args.value.toBigInt().toString(16).padStart(64, '0') +
-                (args.deadline.toString() === constants.MAX_UINT256.toString() ? '00000000' : (args.expiry.toBigInt() + 1n).toString(16).padStart(8, '0')) +
+        return '0x' + args.value.toString(16).padStart(64, '0') +
+                (args.deadline.toString() === constants.MAX_UINT256.toString() ? '00000000' : (args.expiry + 1n).toString(16).padStart(8, '0')) +
                 BigInt(args.r).toString(16).padStart(64, '0') +
-                ((BigInt(args.v - 27) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
+                (((args.v - 27n) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
     }
     case 514: {
         // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
         const args = abiCoder.decode(['address holder', 'address spender', 'uint256 nonce', 'uint256 expiry', 'bool allowed', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
         // Compact IDaiLikePermit.permit(uint32 nonce, uint32 expiry, uint256 r, uint256 vs)
-        return '0x' + args.nonce.toBigInt().toString(16).padStart(8, '0') +
-                (args.expiry.toString() === constants.MAX_UINT256.toString() ? '00000000' : (args.expiry.toBigInt() + 1n).toString(16).padStart(8, '0')) +
+        return '0x' + args.nonce.toString(16).padStart(8, '0') +
+                (args.expiry.toString() === constants.MAX_UINT256.toString() ? '00000000' : (args.expiry + 1n).toString(16).padStart(8, '0')) +
                 BigInt(args.r).toString(16).padStart(64, '0') +
-                ((BigInt(args.v - 27) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
+                (((args.v - 27n) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
     }
     case 706: {
         // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
         const args = abiCoder.decode(['address owner', 'address token', 'uint160 amount', 'uint48 expiration', 'uint48 nonce', 'address spender', 'uint256 sigDeadline', 'bytes signature'], permit);
         // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
-        return '0x' + args.amount.toBigInt().toString(16).padStart(40, '0') +
-                (args.expiration.toString() === constants.MAX_UINT48.toString() ? '00000000' : (args.expiration.toBigInt() + 1n).toString(16).padStart(8, '0')) +
+        return '0x' + args.amount.toString(16).padStart(40, '0') +
+                (args.expiration.toString() === constants.MAX_UINT48.toString() ? '00000000' : (args.expiration + 1n).toString(16).padStart(8, '0')) +
                 args.nonce.toString(16).padStart(8, '0') +
-                (args.sigDeadline.toString() === constants.MAX_UINT48.toString() ? '00000000' : (args.sigDeadline.toBigInt() + 1n).toString(16).padStart(8, '0')) +
+                (args.sigDeadline.toString() === constants.MAX_UINT48.toString() ? '00000000' : (args.sigDeadline + 1n).toString(16).padStart(8, '0')) +
                 BigInt(args.signature).toString(16).padStart(128, '0');
     }
     case 202:
@@ -251,7 +250,7 @@ export function compressPermit(permit: string) {
 }
 
 export function decompressPermit(permit: string, token: string, owner: string, spender: string) {
-    const abiCoder = ethers.utils.defaultAbiCoder;
+    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
     switch (permit.length) {
     case 202: {
         // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
@@ -269,7 +268,7 @@ export function decompressPermit(permit: string, token: string, owner: string, s
                 spender,
                 args.value,
                 args.deadline === 0n ? constants.MAX_UINT256 : args.deadline - 1n,
-                Number(args.vs >> 255n) + 27,
+                (args.vs >> 255n) + 27n,
                 args.r,
                 '0x' + (args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn).toString(16).padStart(64, '0'),
             ],
@@ -292,7 +291,7 @@ export function decompressPermit(permit: string, token: string, owner: string, s
                 args.nonce,
                 args.expiry === 0n ? constants.MAX_UINT256 : args.expiry - 1n,
                 true,
-                Number(args.vs >> 255n) + 27,
+                (args.vs >> 255n) + 27n,
                 args.r,
                 '0x' + (args.vs & 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn).toString(16).padStart(64, '0'),
             ],

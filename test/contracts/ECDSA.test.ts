@@ -1,13 +1,12 @@
 import { expect, constants } from '../../src/prelude';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { Wallet } from 'ethers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { arrayify, concat, splitSignature, hexConcat, hashMessage, keccak256, toUtf8Bytes } from 'ethers/lib/utils';
+import { getBytes, concat, Signature, hashMessage, HDNodeWallet, keccak256, toUtf8Bytes } from 'ethers';
 
 describe('ECDSA', function () {
     let account: SignerWithAddress;
-    let randomAccount: Wallet;
+    let randomAccount: HDNodeWallet;
 
     before(async function () {
         [account] = await ethers.getSigners();
@@ -18,7 +17,7 @@ describe('ECDSA', function () {
         const ECDSATest = await ethers.getContractFactory('ECDSATest');
         const ecdsa = await ECDSATest.deploy();
         const ERC1271WalletMock = await ethers.getContractFactory('ERC1271WalletMock');
-        const erc1271wallet = await ERC1271WalletMock.deploy(account.address);
+        const erc1271wallet = await ERC1271WalletMock.deploy(account);
         const erc1271walletV0 = await ERC1271WalletMock.deploy(signerV0);
         const erc1271walletV1 = await ERC1271WalletMock.deploy(signerV1);
 
@@ -28,26 +27,25 @@ describe('ECDSA', function () {
     const TEST_MESSAGE = '1inch-ecdsa-asm-library';
     const HASHED_TEST_MESSAGE = hashMessage('1inch-ecdsa-asm-library');
     const WRONG_MESSAGE = keccak256(toUtf8Bytes('Nope'));
-    const NON_HASH_MESSAGE = arrayify('0x' + Buffer.from('abcd').toString('hex'));
+    const NON_HASH_MESSAGE = getBytes('0x' + Buffer.from('abcd').toString('hex'));
 
     function split2(signature: string): [string, string] {
-        const { r, _vs } = splitSignature(signature);
-        return [r, _vs];
+        const sig =  Signature.from(signature);
+        return [sig.r, sig.yParityAndS];
     }
 
     function split3(signature: string): [string, string, string] {
-        const { v, r, s } = splitSignature(signature);
+        const { v, r, s } = Signature.from(signature);
         return [v.toString(), r, s];
     }
 
     function to2098Format(signature: string): string {
-        const { compact } = splitSignature(signature);
-        return compact;
+        return Signature.from(signature).compactSerialized;
     }
 
     function from2098Format(signature: string): string {
-        const { v, r, s } = splitSignature(signature);
-        const ret = hexConcat([r, s, arrayify(v)]);
+        const { v, r, s } = Signature.from(signature);
+        const ret = concat([r, s, getBytes('0x' + v.toString(16))]);
         return ret;
     }
 
@@ -209,7 +207,7 @@ describe('ECDSA', function () {
         describe('with invalid signature', function () {
             it('with short signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
-                expect(await ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(
+                expect(await ecdsa.isValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(
                     false,
                 );
             });
@@ -217,7 +215,7 @@ describe('ECDSA', function () {
             it('with long signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
-                    await ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, longSignature),
+                    await ecdsa.isValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, longSignature),
                 ).to.be.equals(false);
             });
         });
@@ -228,10 +226,10 @@ describe('ECDSA', function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
-                        await ecdsa.isValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.isValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.isValidSignature(randomAccount.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.isValidSignature(randomAccount, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                 });
 
@@ -239,10 +237,10 @@ describe('ECDSA', function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(
-                        await ecdsa.isValidSignature(erc1271wallet.address, hashMessage(NON_HASH_MESSAGE), signature),
+                        await ecdsa.isValidSignature(erc1271wallet, hashMessage(NON_HASH_MESSAGE), signature),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.isValidSignature(randomAccount.address, hashMessage(NON_HASH_MESSAGE), signature),
+                        await ecdsa.isValidSignature(randomAccount, hashMessage(NON_HASH_MESSAGE), signature),
                     ).to.be.equals(false);
                 });
 
@@ -250,7 +248,7 @@ describe('ECDSA', function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     expect(
                         await ecdsa.isValidSignature(
-                            erc1271wallet.address,
+                            erc1271wallet,
                             hashMessage(NON_HASH_MESSAGE),
                             invalidSignature,
                         ),
@@ -264,11 +262,11 @@ describe('ECDSA', function () {
                     const version = '00';
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
-                        await ecdsa.isValidSignature(erc1271walletV0.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.isValidSignature(erc1271walletV0, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                     const [, r, s] = split3(signature);
                     expect(
-                        await ecdsa.isValidSignature_v_r_s(erc1271walletV0.address, HASHED_TEST_MESSAGE, 0, r, s),
+                        await ecdsa.isValidSignature_v_r_s(erc1271walletV0, HASHED_TEST_MESSAGE, 0, r, s),
                     ).to.be.equals(false);
                 });
 
@@ -277,31 +275,31 @@ describe('ECDSA', function () {
                     const version = '1b'; // 27 = 1b.
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
-                        await ecdsa.isValidSignature(erc1271walletV0.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.isValidSignature(erc1271walletV0, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
-                    expect(await ecdsa.isValidSignature(account.address, HASHED_TEST_MESSAGE, signature)).to.be.equals(
+                    expect(await ecdsa.isValidSignature(account, HASHED_TEST_MESSAGE, signature)).to.be.equals(
                         false,
                     );
                     expect(
                         await ecdsa.isValidSignature_v_r_s(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             ...split3(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.isValidSignature_v_r_s(account.address, HASHED_TEST_MESSAGE, ...split3(signature)),
+                        await ecdsa.isValidSignature_v_r_s(account, HASHED_TEST_MESSAGE, ...split3(signature)),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.isValidSignature_r_vs(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             ...split2(to2098Format(signature)),
                         ),
                     ).to.equal(true);
                     expect(
                         await ecdsa.isValidSignature_r_vs(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             ...split2(to2098Format(signature)),
                         ),
@@ -314,14 +312,14 @@ describe('ECDSA', function () {
                     // The only valid values are 0, 1, 27 and 28.
                     expect(
                         await ecdsa.isValidSignature(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             signatureWithoutVersionV0 + '02',
                         ),
                     ).to.be.equals(false);
                     const [, r, s] = split3(signatureWithoutVersionV1 + '01');
                     expect(
-                        await ecdsa.isValidSignature_v_r_s(erc1271walletV0.address, HASHED_TEST_MESSAGE, 2, r, s),
+                        await ecdsa.isValidSignature_v_r_s(erc1271walletV0, HASHED_TEST_MESSAGE, 2, r, s),
                     ).to.be.equals(false);
                 });
 
@@ -331,24 +329,24 @@ describe('ECDSA', function () {
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
                         await ecdsa.isValidSignature(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             to2098Format(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.isValidSignature(account.address, HASHED_TEST_MESSAGE, to2098Format(signature)),
+                        await ecdsa.isValidSignature(account, HASHED_TEST_MESSAGE, to2098Format(signature)),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.isValidSignature(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             from2098Format(to2098Format(signature)),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.isValidSignature(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             from2098Format(to2098Format(signature)),
                         ),
@@ -361,14 +359,14 @@ describe('ECDSA', function () {
                     const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     expect(
                         await ecdsa.isValidSignature(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             signatureWithoutVersionV1 + '01',
                         ),
                     ).to.be.equals(false);
                     const [, r, s] = split3(signatureWithoutVersionV1 + '01');
                     expect(
-                        await ecdsa.isValidSignature_v_r_s(erc1271walletV1.address, HASHED_TEST_MESSAGE, 1, r, s),
+                        await ecdsa.isValidSignature_v_r_s(erc1271walletV1, HASHED_TEST_MESSAGE, 1, r, s),
                     ).to.be.equals(false);
                 });
 
@@ -377,31 +375,31 @@ describe('ECDSA', function () {
                     const version = '1c'; // 28 = 1c.
                     const signature = signatureWithoutVersionV1 + version;
                     expect(
-                        await ecdsa.isValidSignature(erc1271walletV1.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.isValidSignature(erc1271walletV1, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
-                    expect(await ecdsa.isValidSignature(account.address, HASHED_TEST_MESSAGE, signature)).to.be.equals(
+                    expect(await ecdsa.isValidSignature(account, HASHED_TEST_MESSAGE, signature)).to.be.equals(
                         false,
                     );
                     expect(
                         await ecdsa.isValidSignature_v_r_s(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             ...split3(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.isValidSignature_v_r_s(account.address, HASHED_TEST_MESSAGE, ...split3(signature)),
+                        await ecdsa.isValidSignature_v_r_s(account, HASHED_TEST_MESSAGE, ...split3(signature)),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.isValidSignature_r_vs(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             ...split2(to2098Format(signature)),
                         ),
                     ).to.equal(true);
                     expect(
                         await ecdsa.isValidSignature_r_vs(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             ...split2(to2098Format(signature)),
                         ),
@@ -414,14 +412,14 @@ describe('ECDSA', function () {
                     // The only valid values are 0, 1, 27 and 28.
                     expect(
                         await ecdsa.isValidSignature(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             signatureWithoutVersionV1 + '02',
                         ),
                     ).to.be.equals(false);
                     const [, r, s] = split3(signatureWithoutVersionV1 + '01');
                     expect(
-                        await ecdsa.isValidSignature_v_r_s(erc1271walletV1.address, HASHED_TEST_MESSAGE, 2, r, s),
+                        await ecdsa.isValidSignature_v_r_s(erc1271walletV1, HASHED_TEST_MESSAGE, 2, r, s),
                     ).to.be.equals(false);
                 });
 
@@ -431,24 +429,24 @@ describe('ECDSA', function () {
                     const signature = signatureWithoutVersionV1 + version;
                     expect(
                         await ecdsa.isValidSignature(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             to2098Format(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.isValidSignature(account.address, HASHED_TEST_MESSAGE, to2098Format(signature)),
+                        await ecdsa.isValidSignature(account, HASHED_TEST_MESSAGE, to2098Format(signature)),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.isValidSignature(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             from2098Format(to2098Format(signature)),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.isValidSignature(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             from2098Format(to2098Format(signature)),
                         ),
@@ -462,7 +460,7 @@ describe('ECDSA', function () {
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.isValidSignature65(
-                            erc1271wallet.address,
+                            erc1271wallet,
                             HASHED_TEST_MESSAGE,
                             ...split2(signature),
                         ),
@@ -474,7 +472,7 @@ describe('ECDSA', function () {
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.isValidSignature65(
-                            randomAccount.address,
+                            randomAccount,
                             HASHED_TEST_MESSAGE,
                             ...split2(signature),
                         ),
@@ -487,7 +485,7 @@ describe('ECDSA', function () {
                     const HASHED_WRONG_MESSAGE = hashMessage(WRONG_MESSAGE);
                     expect(
                         await ecdsa.isValidSignature65(
-                            erc1271wallet.address,
+                            erc1271wallet,
                             HASHED_WRONG_MESSAGE,
                             ...split2(signature),
                         ),
@@ -502,20 +500,20 @@ describe('ECDSA', function () {
             it('with short signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
-                    await ecdsa.recoverOrIsValidSignature(account.address, HASHED_TEST_MESSAGE, '0x1234'),
+                    await ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, '0x1234'),
                 ).to.be.equals(false);
                 expect(
-                    await ecdsa.recoverOrIsValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, '0x1234'),
+                    await ecdsa.recoverOrIsValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, '0x1234'),
                 ).to.be.equals(false);
             });
 
             it('with long signature', async function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
-                    await ecdsa.recoverOrIsValidSignature(account.address, HASHED_TEST_MESSAGE, longSignature),
+                    await ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, longSignature),
                 ).to.be.equals(false);
                 expect(
-                    await ecdsa.recoverOrIsValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, longSignature),
+                    await ecdsa.recoverOrIsValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, longSignature),
                 ).to.be.equals(false);
             });
         });
@@ -526,13 +524,13 @@ describe('ECDSA', function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(account.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(randomAccount.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(randomAccount, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(erc1271wallet.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
                 });
 
@@ -541,21 +539,21 @@ describe('ECDSA', function () {
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            account.address,
+                            account,
                             hashMessage(NON_HASH_MESSAGE),
                             signature,
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            randomAccount.address,
+                            randomAccount,
                             hashMessage(NON_HASH_MESSAGE),
                             signature,
                         ),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            erc1271wallet.address,
+                            erc1271wallet,
                             hashMessage(NON_HASH_MESSAGE),
                             signature,
                         ),
@@ -566,14 +564,14 @@ describe('ECDSA', function () {
                     const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            account.address,
+                            account,
                             hashMessage(NON_HASH_MESSAGE),
                             invalidSignature,
                         ),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            erc1271wallet.address,
+                            erc1271wallet,
                             hashMessage(NON_HASH_MESSAGE),
                             invalidSignature,
                         ),
@@ -590,7 +588,7 @@ describe('ECDSA', function () {
                         await ecdsa.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(erc1271walletV0.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(erc1271walletV0, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                     const [, r, s] = split3(signature);
                     expect(
@@ -598,7 +596,7 @@ describe('ECDSA', function () {
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             0,
                             r,
@@ -615,10 +613,10 @@ describe('ECDSA', function () {
                         await ecdsa.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(erc1271walletV0.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(erc1271walletV0, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(account.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
@@ -629,14 +627,14 @@ describe('ECDSA', function () {
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             ...split3(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             ...split3(signature),
                         ),
@@ -650,14 +648,14 @@ describe('ECDSA', function () {
                     ).to.equal(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_r_vs(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             ...split2(to2098Format(signature)),
                         ),
                     ).to.equal(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_r_vs(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             ...split2(to2098Format(signature)),
                         ),
@@ -677,7 +675,7 @@ describe('ECDSA', function () {
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             signatureWithoutVersionV0 + '02',
                         ),
@@ -688,7 +686,7 @@ describe('ECDSA', function () {
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             2,
                             r,
@@ -706,14 +704,14 @@ describe('ECDSA', function () {
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             to2098Format(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             to2098Format(signature),
                         ),
@@ -727,14 +725,14 @@ describe('ECDSA', function () {
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            erc1271walletV0.address,
+                            erc1271walletV0,
                             HASHED_TEST_MESSAGE,
                             from2098Format(to2098Format(signature)),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             from2098Format(to2098Format(signature)),
                         ),
@@ -751,7 +749,7 @@ describe('ECDSA', function () {
                         await ecdsa.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(erc1271walletV1.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(erc1271walletV1, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                     const [, r, s] = split3(signature);
                     expect(
@@ -759,7 +757,7 @@ describe('ECDSA', function () {
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             1,
                             r,
@@ -776,10 +774,10 @@ describe('ECDSA', function () {
                         await ecdsa.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(erc1271walletV1.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(erc1271walletV1, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(true);
                     expect(
-                        await ecdsa.recoverOrIsValidSignature(account.address, HASHED_TEST_MESSAGE, signature),
+                        await ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, signature),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
@@ -790,14 +788,14 @@ describe('ECDSA', function () {
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             ...split3(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             ...split3(signature),
                         ),
@@ -811,14 +809,14 @@ describe('ECDSA', function () {
                     ).to.equal(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_r_vs(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             ...split2(to2098Format(signature)),
                         ),
                     ).to.equal(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_r_vs(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             ...split2(to2098Format(signature)),
                         ),
@@ -838,7 +836,7 @@ describe('ECDSA', function () {
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             signatureWithoutVersionV1 + '02',
                         ),
@@ -849,7 +847,7 @@ describe('ECDSA', function () {
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature_v_r_s(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             2,
                             r,
@@ -867,14 +865,14 @@ describe('ECDSA', function () {
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             to2098Format(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             to2098Format(signature),
                         ),
@@ -888,14 +886,14 @@ describe('ECDSA', function () {
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            erc1271walletV1.address,
+                            erc1271walletV1,
                             HASHED_TEST_MESSAGE,
                             from2098Format(to2098Format(signature)),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             from2098Format(to2098Format(signature)),
                         ),
@@ -909,14 +907,14 @@ describe('ECDSA', function () {
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature65(
-                            account.address,
+                            account,
                             HASHED_TEST_MESSAGE,
                             ...split2(signature),
                         ),
                     ).to.be.equals(true);
                     expect(
                         await ecdsa.recoverOrIsValidSignature65(
-                            erc1271wallet.address,
+                            erc1271wallet,
                             HASHED_TEST_MESSAGE,
                             ...split2(signature),
                         ),
@@ -928,7 +926,7 @@ describe('ECDSA', function () {
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature65(
-                            randomAccount.address,
+                            randomAccount,
                             HASHED_TEST_MESSAGE,
                             ...split2(signature),
                         ),
@@ -941,14 +939,14 @@ describe('ECDSA', function () {
                     const HASHED_WRONG_MESSAGE = hashMessage(WRONG_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature65(
-                            account.address,
+                            account,
                             HASHED_WRONG_MESSAGE,
                             ...split2(signature),
                         ),
                     ).to.be.equals(false);
                     expect(
                         await ecdsa.recoverOrIsValidSignature65(
-                            erc1271wallet.address,
+                            erc1271wallet,
                             HASHED_WRONG_MESSAGE,
                             ...split2(signature),
                         ),
@@ -965,9 +963,7 @@ describe('ECDSA', function () {
             const msg = concat([
                 toUtf8Bytes('\x19Ethereum Signed Message:\n'),
                 toUtf8Bytes(String(hashedTestMessageWithoutPrefix.length / 2)),
-                arrayify(hashedTestMessageWithoutPrefix, {
-                    allowMissingPrefix: true,
-                }),
+                getBytes(HASHED_TEST_MESSAGE),
             ]);
             const ethSignedMessage = keccak256(msg);
             expect(await ecdsa.toEthSignedMessageHash(HASHED_TEST_MESSAGE)).to.be.equals(ethSignedMessage);
@@ -977,13 +973,13 @@ describe('ECDSA', function () {
     describe('toTypedDataHash', function () {
         it('correct hash', async function () {
             const { ecdsa } = await loadFixture(deployContracts);
-            const domainSeparator = HASHED_TEST_MESSAGE.substring(2);
-            const structHash = HASHED_TEST_MESSAGE.substring(2);
+            const domainSeparator = HASHED_TEST_MESSAGE;
+            const structHash = HASHED_TEST_MESSAGE;
             const typedDataHash = keccak256(
                 concat([
                     toUtf8Bytes('\x19\x01'),
-                    arrayify(domainSeparator, { allowMissingPrefix: true }),
-                    arrayify(String(structHash), { allowMissingPrefix: true }),
+                    getBytes(domainSeparator),
+                    getBytes(structHash),
                 ]),
             );
             expect(await ecdsa.toTypedDataHash(HASHED_TEST_MESSAGE, HASHED_TEST_MESSAGE)).to.be.equals(typedDataHash);
@@ -995,19 +991,19 @@ describe('ECDSA', function () {
             it('with signature', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
-                await account.sendTransaction(await ecdsa.populateTransaction.recover(HASHED_TEST_MESSAGE, signature));
+                await account.sendTransaction(await ecdsa.recover.populateTransaction(HASHED_TEST_MESSAGE, signature));
             });
 
             it('with v0 signature', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
-                await account.sendTransaction(await ecdsa.populateTransaction.recover(HASHED_TEST_MESSAGE, signature));
+                await account.sendTransaction(await ecdsa.recover.populateTransaction(HASHED_TEST_MESSAGE, signature));
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recover_v_r_s(HASHED_TEST_MESSAGE, ...split3(signature)),
+                    await ecdsa.recover_v_r_s.populateTransaction(HASHED_TEST_MESSAGE, ...split3(signature)),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recover_r_vs(
+                    await ecdsa.recover_r_vs.populateTransaction(
                         HASHED_TEST_MESSAGE,
                         ...split2(to2098Format(signature)),
                     ),
@@ -1018,12 +1014,12 @@ describe('ECDSA', function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 const version = '1c'; // 28 = 1c.
                 const signature = signatureWithoutVersionV1 + version;
-                await account.sendTransaction(await ecdsa.populateTransaction.recover(HASHED_TEST_MESSAGE, signature));
+                await account.sendTransaction(await ecdsa.recover.populateTransaction(HASHED_TEST_MESSAGE, signature));
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recover_v_r_s(HASHED_TEST_MESSAGE, ...split3(signature)),
+                    await ecdsa.recover_v_r_s.populateTransaction(HASHED_TEST_MESSAGE, ...split3(signature)),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recover_r_vs(
+                    await ecdsa.recover_r_vs.populateTransaction(
                         HASHED_TEST_MESSAGE,
                         ...split2(to2098Format(signature)),
                     ),
@@ -1036,15 +1032,15 @@ describe('ECDSA', function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature(
-                        account.address,
+                    await ecdsa.recoverOrIsValidSignature.populateTransaction(
+                        account,
                         HASHED_TEST_MESSAGE,
                         signature,
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature(
-                        erc1271wallet.address,
+                    await ecdsa.recoverOrIsValidSignature.populateTransaction(
+                        erc1271wallet,
                         HASHED_TEST_MESSAGE,
                         signature,
                     ),
@@ -1056,39 +1052,39 @@ describe('ECDSA', function () {
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature(signerV0, HASHED_TEST_MESSAGE, signature),
+                    await ecdsa.recoverOrIsValidSignature.populateTransaction(signerV0, HASHED_TEST_MESSAGE, signature),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature(
-                        erc1271walletV0.address,
+                    await ecdsa.recoverOrIsValidSignature.populateTransaction(
+                        erc1271walletV0,
                         HASHED_TEST_MESSAGE,
                         signature,
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature_v_r_s(
+                    await ecdsa.recoverOrIsValidSignature_v_r_s.populateTransaction(
                         signerV0,
                         HASHED_TEST_MESSAGE,
                         ...split3(signature),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature_v_r_s(
-                        erc1271walletV0.address,
+                    await ecdsa.recoverOrIsValidSignature_v_r_s.populateTransaction(
+                        erc1271walletV0,
                         HASHED_TEST_MESSAGE,
                         ...split3(signature),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature_r_vs(
+                    await ecdsa.recoverOrIsValidSignature_r_vs.populateTransaction(
                         signerV0,
                         HASHED_TEST_MESSAGE,
                         ...split2(to2098Format(signature)),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature_r_vs(
-                        erc1271walletV0.address,
+                    await ecdsa.recoverOrIsValidSignature_r_vs.populateTransaction(
+                        erc1271walletV0,
                         HASHED_TEST_MESSAGE,
                         ...split2(to2098Format(signature)),
                     ),
@@ -1100,39 +1096,39 @@ describe('ECDSA', function () {
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature(signerV1, HASHED_TEST_MESSAGE, signature),
+                    await ecdsa.recoverOrIsValidSignature.populateTransaction(signerV1, HASHED_TEST_MESSAGE, signature),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature(
-                        erc1271walletV1.address,
+                    await ecdsa.recoverOrIsValidSignature.populateTransaction(
+                        erc1271walletV1,
                         HASHED_TEST_MESSAGE,
                         signature,
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature_v_r_s(
+                    await ecdsa.recoverOrIsValidSignature_v_r_s.populateTransaction(
                         signerV1,
                         HASHED_TEST_MESSAGE,
                         ...split3(signature),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature_v_r_s(
-                        erc1271walletV1.address,
+                    await ecdsa.recoverOrIsValidSignature_v_r_s.populateTransaction(
+                        erc1271walletV1,
                         HASHED_TEST_MESSAGE,
                         ...split3(signature),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature_r_vs(
+                    await ecdsa.recoverOrIsValidSignature_r_vs.populateTransaction(
                         signerV1,
                         HASHED_TEST_MESSAGE,
                         ...split2(to2098Format(signature)),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature_r_vs(
-                        erc1271walletV1.address,
+                    await ecdsa.recoverOrIsValidSignature_r_vs.populateTransaction(
+                        erc1271walletV1,
                         HASHED_TEST_MESSAGE,
                         ...split2(to2098Format(signature)),
                     ),
@@ -1143,15 +1139,15 @@ describe('ECDSA', function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature65(
-                        account.address,
+                    await ecdsa.recoverOrIsValidSignature65.populateTransaction(
+                        account,
                         HASHED_TEST_MESSAGE,
                         ...split2(signature),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.recoverOrIsValidSignature65(
-                        erc1271wallet.address,
+                    await ecdsa.recoverOrIsValidSignature65.populateTransaction(
+                        erc1271wallet,
                         HASHED_TEST_MESSAGE,
                         ...split2(signature),
                     ),
@@ -1164,8 +1160,8 @@ describe('ECDSA', function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.isValidSignature(
-                        erc1271wallet.address,
+                    await ecdsa.isValidSignature.populateTransaction(
+                        erc1271wallet,
                         HASHED_TEST_MESSAGE,
                         signature,
                     ),
@@ -1177,22 +1173,22 @@ describe('ECDSA', function () {
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.isValidSignature(
-                        erc1271walletV0.address,
+                    await ecdsa.isValidSignature.populateTransaction(
+                        erc1271walletV0,
                         HASHED_TEST_MESSAGE,
                         signature,
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.isValidSignature_v_r_s(
-                        erc1271walletV0.address,
+                    await ecdsa.isValidSignature_v_r_s.populateTransaction(
+                        erc1271walletV0,
                         HASHED_TEST_MESSAGE,
                         ...split3(signature),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.isValidSignature_r_vs(
-                        erc1271walletV0.address,
+                    await ecdsa.isValidSignature_r_vs.populateTransaction(
+                        erc1271walletV0,
                         HASHED_TEST_MESSAGE,
                         ...split2(to2098Format(signature)),
                     ),
@@ -1204,22 +1200,22 @@ describe('ECDSA', function () {
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.isValidSignature(
-                        erc1271walletV1.address,
+                    await ecdsa.isValidSignature.populateTransaction(
+                        erc1271walletV1,
                         HASHED_TEST_MESSAGE,
                         signature,
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.isValidSignature_v_r_s(
-                        erc1271walletV1.address,
+                    await ecdsa.isValidSignature_v_r_s.populateTransaction(
+                        erc1271walletV1,
                         HASHED_TEST_MESSAGE,
                         ...split3(signature),
                     ),
                 );
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.isValidSignature_r_vs(
-                        erc1271walletV1.address,
+                    await ecdsa.isValidSignature_r_vs.populateTransaction(
+                        erc1271walletV1,
                         HASHED_TEST_MESSAGE,
                         ...split2(to2098Format(signature)),
                     ),
@@ -1230,8 +1226,8 @@ describe('ECDSA', function () {
                 const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.isValidSignature65(
-                        erc1271wallet.address,
+                    await ecdsa.isValidSignature65.populateTransaction(
+                        erc1271wallet,
                         HASHED_TEST_MESSAGE,
                         ...split2(signature),
                     ),
@@ -1243,14 +1239,14 @@ describe('ECDSA', function () {
             it('toEthSignedMessageHash', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.toEthSignedMessageHash(HASHED_TEST_MESSAGE),
+                    await ecdsa.toEthSignedMessageHash.populateTransaction(HASHED_TEST_MESSAGE),
                 );
             });
 
             it('toTypedDataHash', async function () {
                 const { ecdsa } = await loadFixture(deployContracts);
                 await account.sendTransaction(
-                    await ecdsa.populateTransaction.toTypedDataHash(HASHED_TEST_MESSAGE, HASHED_TEST_MESSAGE),
+                    await ecdsa.toTypedDataHash.populateTransaction(HASHED_TEST_MESSAGE, HASHED_TEST_MESSAGE),
                 );
             });
         });

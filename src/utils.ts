@@ -75,7 +75,7 @@ export async function timeIncreaseTo(seconds: number | string) {
 export async function deployContract(name: string, parameters: Array<BigNumberish> = []) {
     const ContractFactory = await ethers.getContractFactory(name);
     const instance = await ContractFactory.deploy(...parameters);
-    await instance.deployed();
+    await instance.waitForDeployment();
     return instance;
 }
 
