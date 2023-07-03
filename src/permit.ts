@@ -218,7 +218,7 @@ export function compressPermit(permit: string) {
         const args = abiCoder.decode(['address owner', 'address spender', 'uint256 value', 'uint256 deadline', 'uint8 v', 'bytes32 r', 'bytes32 s'], permit);
         // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
         return '0x' + args.value.toString(16).padStart(64, '0') +
-                (args.deadline.toString() === constants.MAX_UINT256.toString() ? '00000000' : (args.expiry + 1n).toString(16).padStart(8, '0')) +
+                (args.deadline.toString() === constants.MAX_UINT256.toString() ? '00000000' : (args.deadline + 1n).toString(16).padStart(8, '0')) +
                 BigInt(args.r).toString(16).padStart(64, '0') +
                 (((args.v - 27n) << 255n) | BigInt(args.s)).toString(16).padStart(64, '0');
     }

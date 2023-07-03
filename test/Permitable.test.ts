@@ -49,6 +49,28 @@ describe('Permitable', function () {
         expect(await erc20PermitMock.allowance(signer1, permitableMock)).to.be.equal(value);
     });
 
+    it('should be permitted for IERC20Permit with deadline less than max int', async function () {
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const blockNumber = await ethers.provider.getBlockNumber();
+        const block = await ethers.provider.getBlock(blockNumber);
+        const deadline  = block ? block.timestamp + 1000 : 6421990892; // 03 Jul 2173 00:00:00 GMT+0000
+
+        const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitableMock.getAddress(), value.toString(), deadline.toString());
+        await permitableMock.mockPermit(erc20PermitMock, permit);
+        expect(await erc20PermitMock.nonces(signer1)).to.be.equal('1');
+        expect(await erc20PermitMock.allowance(signer1, permitableMock)).to.be.equal(value);
+    });
+
+    it('should be not permitted for IERC20Permit with deadline less than current block', async function () {
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const blockNumber = await ethers.provider.getBlockNumber();
+        const block = await ethers.provider.getBlock(blockNumber);
+        const deadline  = block ? block.timestamp - 1000 : 1000;
+
+        const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitableMock.getAddress(), value.toString(), deadline.toString());
+        await expect(permitableMock.mockPermit(erc20PermitMock, permit)).to.be.revertedWith('ERC20Permit: expired deadline');
+    });
+
     it('should not be permitted for IERC20Permit', async function () {
         const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
 
