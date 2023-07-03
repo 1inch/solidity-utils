@@ -1,11 +1,12 @@
 import '@nomicfoundation/hardhat-ethers';
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
 import { constants } from './prelude';
-import { Contract, Signature, TypedDataDomain, Wallet } from 'ethers';
+import { Signature, TypedDataDomain, Wallet } from 'ethers';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { bytecode as permit2Bytecode } from './permit2.json';
+import { DaiLikePermitMock, ERC20Permit } from '../typechain-types';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -107,7 +108,7 @@ export async function permit2Contract() {
  */
 export async function getPermit(
     owner: Wallet | SignerWithAddress,
-    permitContract: Contract,
+    permitContract: ERC20Permit,
     tokenVersion: string,
     chainId: number,
     spender: string,
@@ -171,7 +172,7 @@ export async function getPermit2(
  */
 export async function getPermitLikeDai(
     holder: Wallet | SignerWithAddress,
-    permitContract: Contract,
+    permitContract: DaiLikePermitMock,
     tokenVersion: string,
     chainId: number,
     spender: string,
