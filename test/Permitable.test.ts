@@ -18,16 +18,16 @@ describe('Permitable', function () {
     });
 
     async function deployTokens() {
-        const PermitableMock = await ethers.getContractFactory('PermitableMock');
-        const ERC20PermitMock = await ethers.getContractFactory('ERC20PermitMock');
-        const DaiLikePermitMock = await ethers.getContractFactory('DaiLikePermitMock');
-        const SafeERC20 = await ethers.getContractFactory('SafeERC20');
+        const PermitableMockFactory = await ethers.getContractFactory('PermitableMock');
+        const ERC20PermitMockFactory = await ethers.getContractFactory('ERC20PermitMock');
+        const DaiLikePermitMockFactory = await ethers.getContractFactory('DaiLikePermitMock');
+        const SafeERC20Factory = await ethers.getContractFactory('SafeERC20');
 
         const chainId = Number((await ethers.provider.getNetwork()).chainId);
-        const permitableMock = await PermitableMock.deploy();
-        const erc20PermitMock = await ERC20PermitMock.deploy('USDC', 'USDC', signer1, 100n);
-        const daiLikePermitMock = await DaiLikePermitMock.deploy('DAI', 'DAI', signer1, 100n);
-        const safeERC20 = await SafeERC20.attach(await permitableMock.getAddress());
+        const permitableMock = await PermitableMockFactory.deploy();
+        const erc20PermitMock = await ERC20PermitMockFactory.deploy('USDC', 'USDC', signer1, 100n);
+        const daiLikePermitMock = await DaiLikePermitMockFactory.deploy('DAI', 'DAI', signer1, 100n);
+        const safeERC20 = await SafeERC20Factory.attach(await permitableMock.getAddress());
         return { permitableMock, erc20PermitMock, daiLikePermitMock, safeERC20, chainId };
     }
 
