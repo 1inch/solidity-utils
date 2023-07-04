@@ -53,7 +53,7 @@ describe('fixSignature', function () {
     });
 });
 
-describe.only('utils', function () {
+describe('utils', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;
 

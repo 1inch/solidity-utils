@@ -2,7 +2,6 @@ import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { BaseContract, BigNumberish, Contract, ContractTransactionReceipt, ContractTransactionResponse, JsonRpcProvider, Wallet } from 'ethers';
 import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
-import { ERC20 } from '../typechain-types';
 
 import { constants } from './prelude';
 
@@ -81,9 +80,14 @@ export async function deployContract(name: string, parameters: Array<BigNumberis
     return instance;
 }
 
+type Token = {
+    balanceOf: (address: string) => Promise<bigint>;
+    getAddress: () => Promise<string>;
+}
+
 export async function trackReceivedTokenAndTx<T extends unknown[]>(
     provider: JsonRpcProvider | { getBalance: (address: string) => Promise<bigint> },
-    token: ERC20 | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
+    token: Token | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
     wallet: string,
     txPromise: (...args: T) => Promise<ContractTransactionResponse>,
     ...args: T
