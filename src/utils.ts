@@ -1,8 +1,10 @@
-import { constants } from './prelude';
 import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { providers, Wallet, Contract, Bytes, ContractReceipt, ContractTransaction, BigNumberish, BigNumber } from 'ethers';
+import { BaseContract, BigNumberish, Contract, ContractTransactionReceipt, ContractTransactionResponse, JsonRpcProvider, Wallet } from 'ethers';
 import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
+import { ERC20 } from '../typechain-types';
+
+import { constants } from './prelude';
 
 interface DeployContractOptions {
     contractName: string;
@@ -13,9 +15,9 @@ interface DeployContractOptions {
     deploymentName?: string;
     skipVerify?: boolean;
     skipIfAlreadyDeployed?: boolean;
-    gasPrice?: BigNumber;
-    maxPriorityFeePerGas?: BigNumber;
-    maxFeePerGas?: BigNumber;
+    gasPrice?: bigint;
+    maxPriorityFeePerGas?: bigint;
+    maxFeePerGas?: bigint;
     log?: boolean;
     waitConfirmations?: number;
 }
@@ -47,13 +49,13 @@ export async function deployAndGetContract({
         from: deployer,
         contract: contractName,
         skipIfAlreadyDeployed,
-        gasPrice,
-        maxPriorityFeePerGas,
-        maxFeePerGas,
+        gasPrice: gasPrice?.toString(),
+        maxPriorityFeePerGas: maxPriorityFeePerGas?.toString(),
+        maxFeePerGas: maxFeePerGas?.toString(),
         log,
         waitConfirmations,
     };
-    const deployResult = await deploy(deploymentName, deployOptions);
+    const deployResult: DeployResult = await deploy(deploymentName, deployOptions);
 
     if (!(skipVerify || constants.DEV_CHAINS.includes(hre.network.name))) {
         await hre.run('verify:verify', {
@@ -66,13 +68,13 @@ export async function deployAndGetContract({
     return await ethers.getContractAt(contractName, deployResult.address);
 }
 
-export async function timeIncreaseTo(seconds: number | string) {
+export async function timeIncreaseTo(seconds: number | string): Promise<void> {
     const delay = 1000 - new Date().getMilliseconds();
     await new Promise((resolve) => setTimeout(resolve, delay));
     await time.increaseTo(seconds);
 }
 
-export async function deployContract(name: string, parameters: Array<BigNumberish> = []) {
+export async function deployContract(name: string, parameters: Array<BigNumberish> = []) : Promise<BaseContract> {
     const ContractFactory = await ethers.getContractFactory(name);
     const instance = await ContractFactory.deploy(...parameters);
     await instance.waitForDeployment();
@@ -80,31 +82,27 @@ export async function deployContract(name: string, parameters: Array<BigNumberis
 }
 
 export async function trackReceivedTokenAndTx<T extends unknown[]>(
-    provider: providers.JsonRpcProvider,
-    token: Contract | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
+    provider: JsonRpcProvider | { getBalance: (address: string) => Promise<bigint> },
+    token: ERC20 | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
     wallet: string,
-    txPromise: (...args: T) => Promise<ContractTransaction>,
+    txPromise: (...args: T) => Promise<ContractTransactionResponse>,
     ...args: T
-) {
-    const isETH = token.address === constants.ZERO_ADDRESS || token.address === constants.EEE_ADDRESS;
+) : Promise<[bigint, ContractTransactionReceipt | null]> {
+    const tokenAddress = 'address' in token ? token.address : await token.getAddress();
+    const isETH = tokenAddress === constants.ZERO_ADDRESS || tokenAddress === constants.EEE_ADDRESS;
     const getBalance = 'balanceOf' in token ? token.balanceOf : provider.getBalance;
 
-    const preBalance = await getBalance(wallet);
-    let txResult: ContractTransaction | ContractReceipt = await txPromise(...args);
-    let txFees = 0n;
-
-    if ('wait' in txResult) {
-        txResult = await txResult.wait();
-        txFees =
-            wallet.toLowerCase() === txResult.from.toLowerCase() && isETH
-                ? txResult.gasUsed.toBigInt() * txResult.effectiveGasPrice.toBigInt()
-                : 0n;
-    }
-    const postBalance = await getBalance(wallet);
-    return [postBalance.sub(preBalance).add(txFees), txResult];
+    const preBalance: bigint = await getBalance(wallet);
+    const tx: ContractTransactionResponse = await txPromise(...args);
+    const txResult: ContractTransactionReceipt | null = await tx.wait();
+    const txFees = wallet.toLowerCase() === txResult?.from.toLowerCase() && isETH
+        ? txResult.gasUsed * txResult.gasPrice
+        : 0n;
+    const postBalance: bigint = await getBalance(wallet);
+    return [postBalance - preBalance + txFees, txResult];
 }
 
-export function fixSignature(signature: string) {
+export function fixSignature(signature: string): string {
     // in geth its always 27/28, in ganache its 0/1. Change to 27/28 to prevent
     // signature malleability if version is 0/1
     // see https://github.com/ethereum/go-ethereum/blob/v1.8.23/internal/ethapi/api.go#L465
@@ -116,15 +114,19 @@ export function fixSignature(signature: string) {
     return signature.slice(0, 130) + vHex;
 }
 
-export async function signMessage(signer: Wallet, messageHex: string | Bytes = '0x') {
+export async function signMessage(
+    signer: Wallet | { signMessage: (messageHex: string | Uint8Array) => Promise<string> },
+    messageHex: string | Uint8Array = '0x'
+) {
     return fixSignature(await signer.signMessage(messageHex));
 }
 
 export async function countInstructions(
-    provider: providers.JsonRpcProvider,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider: JsonRpcProvider | { send: (method: string, params: unknown[]) => Promise<any> },
     txHash: string,
     instructions: string[]
-) {
+): Promise<number[]> {
     const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const str = JSON.stringify(trace);
