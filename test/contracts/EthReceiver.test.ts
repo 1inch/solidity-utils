@@ -1,5 +1,5 @@
 import { expect } from '../../src/prelude';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
@@ -21,14 +21,14 @@ describe('EthReceiver', function () {
 
     it('contract transfer', async function () {
         const { ethReceiverMock, ethSenderMock } = await loadFixture(deployMocks);
-        await ethSenderMock.transfer(ethReceiverMock.address, { value: 100 });
+        await ethSenderMock.transfer(ethReceiverMock, { value: 100 });
     });
 
     it('normal transfer', async function () {
         const { ethReceiverMock } = await loadFixture(deployMocks);
 
         await expect(
-            signer1.sendTransaction({ to: ethReceiverMock.address, value: 100 }),
+            signer1.sendTransaction({ to: ethReceiverMock, value: 100 }),
         ).to.be.revertedWithCustomError(ethReceiverMock, 'EthDepositRejected');
     });
 });

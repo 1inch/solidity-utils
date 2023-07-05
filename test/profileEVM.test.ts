@@ -1,8 +1,7 @@
 import { expect, ether } from '../src/prelude';
 import { profileEVM, gasspectEVM } from '../src/profileEVM';
-import hre from 'hardhat';
-const { ethers } = hre;
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import hre, { ethers } from 'hardhat';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 
 describe('trace inspection', function () {
@@ -16,8 +15,8 @@ describe('trace inspection', function () {
     async function deployUSDT() {
         const TokenMock = await ethers.getContractFactory('TokenMock');
         const usdt = await TokenMock.deploy('USDT', 'USDT');
-        await usdt.mint(signer1.address, ether('1000'));
-        await usdt.mint(signer2.address, ether('1000'));
+        await usdt.mint(signer1, ether('1000'));
+        await usdt.mint(signer2, ether('1000'));
         return { usdt };
     }
 
@@ -25,7 +24,7 @@ describe('trace inspection', function () {
         it('should be counted ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const txn = await usdt.transfer(signer2.address, ether('1'));
+            const txn = await usdt.transfer(signer2, ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await profileEVM(ethers.provider, txn.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 2, 2,
@@ -36,7 +35,7 @@ describe('trace inspection', function () {
         it('should be counted ERC20 Approve', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const txn = await usdt.approve(signer2.address, ether('1'));
+            const txn = await usdt.approve(signer2, ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await profileEVM(ethers.provider, txn.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 0,
@@ -49,7 +48,7 @@ describe('trace inspection', function () {
         it('should be counted ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const txn = await usdt.transfer(signer2.address, ether('1'));
+            const txn = await usdt.transfer(signer2, ether('1'));
             expect(await gasspectEVM(ethers.provider, txn.hash)).to.be.deep.equal([
                 '0-0-SLOAD = 2100',
                 '0-0-SSTORE = 2900',
@@ -62,7 +61,7 @@ describe('trace inspection', function () {
         it('should be counted ERC20 Approve', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const txn = await usdt.approve(signer2.address, ether('1'));
+            const txn = await usdt.approve(signer2, ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await gasspectEVM(ethers.provider, txn.hash)).to.be.deep.equal(['0-0-SSTORE_I = 22100', '0-0-LOG3 = 1756']);
             }
@@ -71,7 +70,7 @@ describe('trace inspection', function () {
         it('should be counted ERC20 Transfer with minOpGasCost = 2000', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const txn = await usdt.transfer(signer2.address, ether('1'));
+            const txn = await usdt.transfer(signer2, ether('1'));
             expect(await gasspectEVM(ethers.provider, txn.hash, { minOpGasCost: 2000 })).to.be.deep.equal([
                 '0-0-SLOAD = 2100',
                 '0-0-SSTORE = 2900',
@@ -83,7 +82,7 @@ describe('trace inspection', function () {
         it('should be counted ERC20 Transfer with args', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const txn = await usdt.transfer(signer2.address, ether('1'));
+            const txn = await usdt.transfer(signer2, ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await gasspectEVM(ethers.provider, txn.hash, { args: true })).to.be.deep.equal([
                     '0-0-SLOAD(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722) = 2100',
@@ -98,7 +97,7 @@ describe('trace inspection', function () {
         it('should be counted ERC20 Transfer with res', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const txn = await usdt.transfer(signer2.address, ether('1'));
+            const txn = await usdt.transfer(signer2, ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await gasspectEVM(ethers.provider, txn.hash, { res: true })).to.be.deep.equal([
                     '0-0-SLOAD:0x00000000000000000000000000000000000000000000003635c9adc5dea00000 = 2100',

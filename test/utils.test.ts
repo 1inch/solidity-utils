@@ -3,7 +3,7 @@ import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, cou
 import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog, Log, Wallet, HDNodeWallet } from 'ethers';
+import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog, Log } from 'ethers';
 
 describe('timeIncreaseTo', function () {
     const precision = 2;

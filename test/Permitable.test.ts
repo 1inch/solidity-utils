@@ -27,7 +27,7 @@ describe('Permitable', function () {
         const permitableMock = await PermitableMockFactory.deploy();
         const erc20PermitMock = await ERC20PermitMockFactory.deploy('USDC', 'USDC', signer1, 100n);
         const daiLikePermitMock = await DaiLikePermitMockFactory.deploy('DAI', 'DAI', signer1, 100n);
-        const safeERC20 = await SafeERC20Factory.attach(await permitableMock.getAddress());
+        const safeERC20 = await SafeERC20Factory.attach(permitableMock);
         return { permitableMock, erc20PermitMock, daiLikePermitMock, safeERC20, chainId };
     }
 
@@ -121,7 +121,7 @@ describe('Permitable', function () {
         const permit = await getPermit2(signer1, await daiLikePermitMock.getAddress(), chainId, signer2.address, constants.MAX_UINT128);
         await permitableMock.mockPermit(daiLikePermitMock, permit);
 
-        const allowance = await permitContract.allowance(signer1, await daiLikePermitMock.getAddress(), signer2);
+        const allowance = await permitContract.allowance(signer1, daiLikePermitMock, signer2);
         expect(allowance.amount).to.equal(constants.MAX_UINT128);
         expect(allowance.nonce).to.equal(1);
     });
