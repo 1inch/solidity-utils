@@ -19,7 +19,7 @@ type Op = {
     memory: string[];
 };
 
-function _normalizeOp(ops: Op[], i: number) {
+function _normalizeOp(ops: Op[], i: number): void {
     if (ops[i].op === 'STATICCALL') {
         ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
 
@@ -97,7 +97,7 @@ export async function profileEVM(
     provider: JsonRpcProvider | { send: (method: string, params: unknown[]) => Promise<any> },
     txHash: string, instruction: string[],
     optionalTraceFile?: PathLike | fs.FileHandle
-) {
+): Promise<number[]> {
     const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const str = JSON.stringify(trace);
@@ -117,7 +117,7 @@ export async function gasspectEVM(
     txHash: string,
     gasspectOptions: Record<string, unknown> = {},
     optionalTraceFile?: PathLike | fs.FileHandle
-) {
+): Promise<string[]> {
     const options = { ...gasspectOptionsDefault, ...gasspectOptions };
 
     const trace = await provider.send('debug_traceTransaction', [txHash]);

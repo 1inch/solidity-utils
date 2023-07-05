@@ -121,7 +121,7 @@ export function fixSignature(signature: string): string {
 export async function signMessage(
     signer: Wallet | { signMessage: (messageHex: string | Uint8Array) => Promise<string> },
     messageHex: string | Uint8Array = '0x'
-) {
+): Promise<string> {
     return fixSignature(await signer.signMessage(messageHex));
 }
 

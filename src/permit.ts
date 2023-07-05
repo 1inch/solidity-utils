@@ -6,7 +6,7 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { bytecode as permit2Bytecode } from './permit2.json';
-import { DaiLikePermitMock, ERC20Permit } from '../typechain-types';
+import { DaiLikePermitMock, ERC20Permit, IPermit2 } from '../typechain-types';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -35,7 +35,7 @@ export const DaiLikePermit = [
     { name: 'allowed', type: 'bool' },
 ];
 
-export function trim0x(bigNumber: bigint | string) {
+export function trim0x(bigNumber: bigint | string): string {
     const s = bigNumber.toString();
     if (s.startsWith('0x')) {
         return s.substring(2);
@@ -43,12 +43,12 @@ export function trim0x(bigNumber: bigint | string) {
     return s;
 }
 
-export function cutSelector(data: string) {
+export function cutSelector(data: string): string {
     const hexPrefix = '0x';
     return hexPrefix + data.substr(hexPrefix.length + 8);
 }
 
-export function domainSeparator(name: string, version: string, chainId: string, verifyingContract: string) {
+export function domainSeparator(name: string, version: string, chainId: string, verifyingContract: string): string {
     return (
         '0x' +
         TypedDataUtils.hashStruct(
@@ -96,7 +96,7 @@ export function buildDataLikeDai(
     } as const;
 }
 
-export async function permit2Contract() {
+export async function permit2Contract(): Promise<IPermit2> {
     if ((await ethers.provider.getCode(PERMIT2_ADDRESS)) === '0x') {
         await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, permit2Bytecode]);
     }
@@ -115,7 +115,7 @@ export async function getPermit(
     value: string,
     deadline = defaultDeadline.toString(),
     compact = false,
-) {
+): Promise<string> {
     const nonce = await permitContract.nonces(owner);
     const name = await permitContract.name();
     const data = buildData(
@@ -147,7 +147,7 @@ export async function getPermit2(
     compact = false,
     expiration = defaultDeadlinePermit2,
     sigDeadline = defaultDeadlinePermit2,
-) {
+): Promise<string> {
     const permitContract = await permit2Contract();
     const nonce = (await permitContract.allowance(owner, token, spender)).nonce;
     const details = {
@@ -179,7 +179,7 @@ export async function getPermitLikeDai(
     allowed: boolean,
     expiry = defaultDeadline.toString(),
     compact = false,
-) {
+): Promise<string> {
     const nonce = await permitContract.nonces(holder);
     const name = await permitContract.name();
     const data = buildDataLikeDai(
@@ -202,7 +202,7 @@ export async function getPermitLikeDai(
     return compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), constants.ZERO_ADDRESS, holder.address, spender);
 }
 
-export function withTarget(target: bigint | string, data: bigint | string) {
+export function withTarget(target: bigint | string, data: bigint | string): string {
     return target.toString() + trim0x(data);
 }
 
@@ -210,7 +210,7 @@ export function withTarget(target: bigint | string, data: bigint | string) {
 // Uncompressed | 224 | 256 | 352
 // Compressed | 100 | 72 | 96
 
-export function compressPermit(permit: string) {
+export function compressPermit(permit: string): string {
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
     switch (permit.length) {
     case 450: {
@@ -250,7 +250,7 @@ export function compressPermit(permit: string) {
     }
 }
 
-export function decompressPermit(permit: string, token: string, owner: string, spender: string) {
+export function decompressPermit(permit: string, token: string, owner: string, spender: string): string {
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
     switch (permit.length) {
     case 202: {
