@@ -9,7 +9,7 @@ interface DeployContractOptions {
     contractName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructorArgs?: any[];
-    deployments: {deploy: (name: string, options: DeployOptions) => Promise<DeployResult>},
+    deployments: { deploy: (name: string, options: DeployOptions) => Promise<DeployResult> },
     deployer: string;
     deploymentName?: string;
     skipVerify?: boolean;
@@ -33,7 +33,7 @@ export async function deployAndGetContract({
     maxPriorityFeePerGas,
     maxFeePerGas,
     log = true,
-    waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1: 6,
+    waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1 : 6,
 }: DeployContractOptions): Promise<Contract> {
     /**
      * Deploys contract and tries to verify it on Etherscan if requested.

@@ -118,7 +118,6 @@ export async function gasspectEVM(
     gasspectOptions: Record<string, unknown> = {},
     optionalTraceFile?: PathLike | fs.FileHandle
 ) {
-
     const options = { ...gasspectOptionsDefault, ...gasspectOptions };
 
     const trace = await provider.send('debug_traceTransaction', [txHash]);

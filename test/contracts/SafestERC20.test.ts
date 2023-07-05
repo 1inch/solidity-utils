@@ -2,10 +2,14 @@ import { constants, ether, expect } from '../../src/prelude';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import hre, { ethers } from 'hardhat';
-import { ContractFactory, Signature, TypedDataDomain } from 'ethers';
+import { Signature, TypedDataDomain } from 'ethers';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { countInstructions, trackReceivedTokenAndTx } from '../../src/utils';
-import { SafeERC20Wrapper, SafeERC20Wrapper__factory, SafeWETHWrapper__factory } from '../../typechain-types';
+import {
+    SafeERC20Wrapper,
+    SafeERC20Wrapper__factory as SafeERC20WrapperFactory,
+    SafeWETHWrapper__factory as SafeWETHWrapperFactory,
+} from '../../typechain-types';
 
 const Permit = [
     { name: 'owner', type: 'address' },
@@ -18,8 +22,8 @@ const Permit = [
 describe('SafeERC20', function () {
     let owner: SignerWithAddress;
     let spender: SignerWithAddress;
-    let SafeERC20Wrapper: SafeERC20Wrapper__factory;
-    let SafeWETHWrapper: SafeWETHWrapper__factory;
+    let SafeERC20Wrapper: SafeERC20WrapperFactory;
+    let SafeWETHWrapper: SafeWETHWrapperFactory;
 
     before(async function () {
         [owner, spender] = await ethers.getSigners();
@@ -412,7 +416,6 @@ describe('SafeERC20', function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transferFromUniversal(false);
         });
-
 
         describe('approvals', function () {
             describe('with zero allowance', function () {
