@@ -34,6 +34,7 @@ This repository contains frequently used smart contracts, libraries and interfac
 |--|--|--|
 |asserts|`assertThrowsAsync(action, msg)`|checks the async function `action()` thrown with message `msg`|
 |asserts|`assertRoughlyEqualValues(expected, actual, relativeDiff)`|checks the `expected` value is equal to `actual` value with `relativeDiff` precision|
+|asserts|`assertRoughlyEquals(expected, actual, significantDigits)`|checks if two numeric values are approximately equal within a given precision defined by a specified number of significant digits. It throws an error if the values have different signs or if their difference exceeds the allowed tolerance|
 |utils|`timeIncreaseTo(seconds)`|increases blockchain time to `seconds` sec|
 |utils|`trackReceivedToken(token, wallet, txPromise, ...args)`|returns amount of `token` which recieved the `wallet` in async method `txPromise` with arguments `args`|
 |utils|`trackReceivedTokenAndTx(token, wallet, txPromise, ...args)`|returns transaction info and amount of `token` which recieved the `wallet` in async method `txPromise` with arguments `args`|
@@ -68,7 +69,7 @@ Add to `package.json` file solidity compiler version and shortcut to run command
 
 #### Dependencies list (imports-list)
 
-Lists all imports recursively for the given solidity contract file. 
+Lists all imports recursively for the given solidity contract file.
 
 ##### Usage
 ```
@@ -82,13 +83,13 @@ Options:
   -a, --alias [alias...]  projects alias list
   -h, --help              display help for command
 ```
-Aliases are used to provide source code for third-party projects. 
+Aliases are used to provide source code for third-party projects.
 For example, your contract uses imports from your other project and import is defined as
 ```
 import "@1inch/otherproject/contracts/dependency.sol";
 ```
 and you've got source code for `@1inch/otherproject` locally. Then you provide local path for the project to rip dependencies from `dependency.sol` as well.
-If there are several dependencies they should be provided using space as separator. 
+If there are several dependencies they should be provided using space as separator.
 
 ##### Example
 File imports
