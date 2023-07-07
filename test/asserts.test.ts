@@ -18,6 +18,11 @@ describe('assertRoughlyEquals', function () {
         assertRoughlyEquals(1000000, 1000001, 6);
     });
 
+    it('should not throw error when difference is within permitted range', async function () {
+        assertRoughlyEquals(1000000, 999999, 6);
+        assertRoughlyEquals(1000009, 1000010, 6);
+    });
+
     it('should throw when significantDigits less than 1', async function () {
         expect(() => assertRoughlyEquals(1000000, 1000000, 0)).throws();
         expect(() => assertRoughlyEquals(1000000, 1000000, -2)).throws();
