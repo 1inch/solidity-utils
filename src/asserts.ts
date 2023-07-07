@@ -19,7 +19,7 @@ export function assertRoughlyEquals(
 
     const valid = differenceBN * (10n ** BigInt(significantDigits - 1)) < minExpectedOrActualBN;
     if (!valid) {
-        expect(expected).to.equal(actual, `${expected} != ${actual} with at least ${significantDigits} significant digits`);
+        expect(actualBN).to.equal(expectedBN, `${actual} != ${expected} with at least ${significantDigits} significant digits`);
     }
 }
 
