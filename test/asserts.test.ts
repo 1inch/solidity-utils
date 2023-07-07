@@ -1,5 +1,49 @@
 import { expect } from '../src/prelude';
-import { assertRoughlyEqualValues } from '../src/asserts';
+import { assertRoughlyEquals, assertRoughlyEqualValues } from '../src/asserts';
+
+describe('assertRoughlyEquals', function () {
+    it('should be work when values are identical', async function () {
+        assertRoughlyEquals(1000000, 1000000, 1);
+    });
+
+    it('should be work when values are identical, even when significantDigits exceed the number of digits in the values', async function () {
+        assertRoughlyEquals(1000000, 1000000, 10);
+    });
+
+    it('should be work when the difference between values is less than the significantDigits', async function () {
+        assertRoughlyEquals(1000001, 1000000, 6);
+    });
+
+    it('should be work when the difference between values is less but negative, relative to the significantDigits', async function () {
+        assertRoughlyEquals(1000000, 1000001, 6);
+    });
+
+    it('should throw when significantDigits less than 1', async function () {
+        expect(() => assertRoughlyEquals(1000000, 1000000, 0)).throws();
+        expect(() => assertRoughlyEquals(1000000, 1000000, -2)).throws();
+    });
+
+    it('should throw when values have different signs', async function () {
+        expect(() => assertRoughlyEquals(1000001, -1000000, 1)).throws();
+    });
+
+    it('should throw when values differ on the last significant digit', async function () {
+        expect(() => assertRoughlyEquals(1000000, 1000001, 7)).throws();
+    });
+
+    it('should throw when difference exceeds the significant digits count', async function () {
+        expect(() => assertRoughlyEquals(1012345, 1000000, 3)).throws();
+    });
+
+    it('should throw even when significant digits count is increased, but difference still exceeds it', async function () {
+        expect(() => assertRoughlyEquals(1012345, 1000000, 4)).throws();
+    });
+
+    it('should handle negative values correctly', async function () {
+        assertRoughlyEquals(-1000001, -1000000, 6);
+        expect(() => assertRoughlyEquals(-1012345, -1000000, 4)).throws();
+    });
+});
 
 describe('assertRoughlyEqualValues', function () {
     it('should be work with expected = actual, any relativeDiff', async function () {
