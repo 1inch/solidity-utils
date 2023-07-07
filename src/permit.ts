@@ -1,4 +1,3 @@
-import '@nomicfoundation/hardhat-ethers';
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
 import { constants } from './prelude';
 import { Signature, TypedDataDomain, Wallet } from 'ethers';
