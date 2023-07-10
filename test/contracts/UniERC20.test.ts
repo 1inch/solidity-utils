@@ -25,7 +25,7 @@ describe('UniERC20', function () {
 
         it('is ETH', async function () {
             const { wrapper } = await loadFixture(deployMocks);
-            expect(await wrapper.isETH()).to.equal(false);
+            expect(await wrapper.isETH()).to.be.false;
         });
 
         it('uni transfer', async function () {
@@ -151,7 +151,7 @@ describe('UniERC20', function () {
 
         it('is ETH', async function () {
             const { wrapper } = await loadFixture(deployMocks);
-            expect(await wrapper.isETH()).to.equal(true);
+            expect(await wrapper.isETH()).to.be.true;
         });
 
         it('uni transfer', async function () {
@@ -256,7 +256,7 @@ describe('UniERC20', function () {
 
         it('is ETH', async function () {
             const { wrapper } = await loadFixture(deployMocks);
-            expect(await wrapper.isETH()).to.equal(true);
+            expect(await wrapper.isETH()).to.be.true;
         });
     });
 });
