@@ -4,6 +4,8 @@ import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog } from 'ethers';
+import { TokenMock } from '../typechain-types/contracts/mocks/TokenMock';
+import { WETH } from '../typechain-types/contracts/tests/mocks/WETH';
 
 describe('timeIncreaseTo', function () {
     const precision = 2;
@@ -169,18 +171,15 @@ describe('utils', function () {
 
     describe('deployContract', function () {
         it('should be deploy new contract instance', async function () {
-            const tokenDeployment = await deployContract('TokenMock', ['SomeToken', 'STM']);
-            const token = await ethers.getContractAt('TokenMock', tokenDeployment);
+            const token = await deployContract('TokenMock', ['SomeToken', 'STM']);
             expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
-            expect(await token.name()).to.be.eq('SomeToken');
+            expect(await (<TokenMock>token).name()).to.be.eq('SomeToken');
         });
 
-
         it('should be using without arguments', async function () {
-            const wethDeployment = await deployContract('WETH');
-            const weth = await ethers.getContractAt('WETH', wethDeployment);
+            const weth = await deployContract('WETH');
             expect(await weth.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
-            expect(await weth.name()).to.be.eq('Wrapped Ether');
+            expect(await (<WETH>weth).name()).to.be.eq('Wrapped Ether');
         });
     });
 
