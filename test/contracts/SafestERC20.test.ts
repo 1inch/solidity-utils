@@ -300,11 +300,9 @@ describe('SafeERC20', function () {
             );
             expect(received).to.be.equal(ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-                if (tx) {
-                    expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                        0, 1, 6, 3, 1, 2,
-                    ]);
-                }
+                expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 1, 6, 3, 1, 2,
+                ]);
             }
         });
 
@@ -314,11 +312,9 @@ describe('SafeERC20', function () {
                 wrapper.deposit(),
             );
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-                if (tx) {
-                    expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                        0, 0, 1, 1, 0, 1,
-                    ]);
-                }
+                expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 0, 1, 1, 0, 1,
+                ]);
             }
         });
 
@@ -338,7 +334,7 @@ describe('SafeERC20', function () {
             );
             expect(received).to.be.equal(-ether('0.5'));
             expect(await ethers.provider.getBalance(spender)).to.be.equal(spenderBalanceBefore + ether('0.5'));
-            if (tx) {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
                     0, 3,
                 ]);
@@ -350,7 +346,7 @@ describe('SafeERC20', function () {
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.withdrawTo(ether('0.5'), wrapper),
             );
-            if (tx) {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
                     0, 2,
                 ]);
