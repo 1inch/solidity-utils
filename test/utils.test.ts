@@ -3,7 +3,7 @@ import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, cou
 import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog, Log } from 'ethers';
+import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog } from 'ethers';
 
 describe('timeIncreaseTo', function () {
     const precision = 2;
@@ -97,18 +97,11 @@ describe('utils', function () {
                 usdt.transfer(signer2, ether('1')),
             );
             expect(received).to.be.equal(ether('1'));
-            if (tx) {
-                expect(tx.from).equal(signer1.address);
-                expect(tx.to).equal(await usdt.getAddress());
-                expect(tx.logs.length).equal(1);
-                const log: Log | EventLog = tx.logs[0];
-                if (log && 'eventName' in log) {
-                    expect(log.eventName).equal('Transfer');
-                }
-                if (log && 'data' in log) {
-                    expect(log.data.length).equal(66);
-                }
-            }
+            expect(tx.from).equal(signer1.address);
+            expect(tx.to).equal(await usdt.getAddress());
+            expect(tx.logs.length).equal(1);
+            expect((<EventLog>tx.logs[0]).eventName).equal('Transfer');
+            expect(tx.logs[0].data.length).equal(66);
         });
 
         it('should be tracked ERC20 Approve', async function () {
@@ -117,19 +110,12 @@ describe('utils', function () {
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
             );
-            if (tx) {
-                expect(received).to.be.equal('0');
-                expect(tx.from).equal(signer1.address);
-                expect(tx.to).equal(await usdt.getAddress());
-                expect(tx.logs.length).equal(1);
-                const log: Log | EventLog = tx.logs[0];
-                if (log && 'eventName' in log) {
-                    expect(log.eventName).equal('Approval');
-                }
-                if (log && 'data' in log) {
-                    expect(log.data.length).equal(66);
-                }
-            }
+            expect(received).to.be.equal('0');
+            expect(tx.from).equal(signer1.address);
+            expect(tx.to).equal(await usdt.getAddress());
+            expect(tx.logs.length).equal(1);
+            expect((<EventLog>tx.logs[0]).eventName).equal('Approval');
+            expect(tx.logs[0].data.length).equal(66);
         });
     });
 
@@ -161,11 +147,9 @@ describe('utils', function () {
                 usdt.transfer(signer2, ether('1')),
             );
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-                if (tx) {
-                    expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                        0, 0, 2, 2,
-                    ]);
-                }
+                expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 0, 2, 2,
+                ]);
             }
         });
 
@@ -176,11 +160,9 @@ describe('utils', function () {
                 usdt.approve(signer2, ether('1')),
             );
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-                if (tx) {
-                    expect(await countInstructions(ethers.provider, tx?.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                        0, 0, 1, 0,
-                    ]);
-                }
+                expect(await countInstructions(ethers.provider, tx?.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 0, 1, 0,
+                ]);
             }
         });
     });

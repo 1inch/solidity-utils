@@ -91,19 +91,18 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
     wallet: string,
     txPromise: (...args: T) => Promise<ContractTransactionResponse>,
     ...args: T
-) : Promise<[bigint, ContractTransactionReceipt | null]> {
+) : Promise<[bigint, ContractTransactionReceipt]> {
     const tokenAddress = 'address' in token ? token.address : await token.getAddress();
     const isETH = tokenAddress === constants.ZERO_ADDRESS || tokenAddress === constants.EEE_ADDRESS;
     const getBalance = 'balanceOf' in token ? token.balanceOf : provider.getBalance;
 
     const preBalance: bigint = await getBalance(wallet);
-    const tx: ContractTransactionResponse = await txPromise(...args);
-    const txResult: ContractTransactionReceipt | null = await tx.wait();
-    const txFees = wallet.toLowerCase() === txResult?.from.toLowerCase() && isETH
-        ? txResult.gasUsed * txResult.gasPrice
+    const txResult = await (await txPromise(...args)).wait();
+    const txFees = wallet.toLowerCase() === txResult!.from.toLowerCase() && isETH
+        ? txResult!.gasUsed * txResult!.gasPrice
         : 0n;
     const postBalance: bigint = await getBalance(wallet);
-    return [postBalance - preBalance + txFees, txResult];
+    return [postBalance - preBalance + txFees, txResult!];
 }
 
 export function fixSignature(signature: string): string {
