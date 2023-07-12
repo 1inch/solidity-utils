@@ -191,13 +191,13 @@ describe('SafeERC20', function () {
 
             const tx = await wrapper.balanceOf.populateTransaction(owner);
             const response = await owner.sendTransaction(tx);
-            const gasUsed = (await response.wait())?.gasUsed;
+            const gasUsed = (await response.wait())!.gasUsed;
             const safeTx = await wrapper.safeBalanceOf.populateTransaction(owner);
             const safeRequest = await owner.sendTransaction(safeTx);
-            const safeGasUsed = (await safeRequest.wait())?.gasUsed;
+            const safeGasUsed = (await safeRequest.wait())!.gasUsed;
 
             expect(gasUsed).gt(safeGasUsed);
-            console.log(`balanceOf:safeBalanceOf gasUsed - ${gasUsed?.toString()}:${safeGasUsed?.toString()}`);
+            console.log(`balanceOf:safeBalanceOf gasUsed - ${gasUsed.toString()}:${safeGasUsed.toString()}`);
         });
     });
 
