@@ -171,15 +171,15 @@ describe('utils', function () {
 
     describe('deployContract', function () {
         it('should be deploy new contract instance', async function () {
-            const token = await deployContract('TokenMock', ['SomeToken', 'STM']);
+            const token = <TokenMock> await deployContract('TokenMock', ['SomeToken', 'STM']);
             expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
-            expect(await (<TokenMock>token).name()).to.be.eq('SomeToken');
+            expect(await token.name()).to.be.eq('SomeToken');
         });
 
         it('should be using without arguments', async function () {
-            const weth = await deployContract('WETH');
+            const weth = <WETH> await deployContract('WETH');
             expect(await weth.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
-            expect(await (<WETH>weth).name()).to.be.eq('Wrapped Ether');
+            expect(await weth.name()).to.be.eq('Wrapped Ether');
         });
     });
 
