@@ -4,8 +4,7 @@ import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog } from 'ethers';
-import { TokenMock } from '../typechain-types/contracts/mocks/TokenMock';
-import { WETH } from '../typechain-types/contracts/tests/mocks/WETH';
+import { TokenMock, WETH } from '../typechain-types';
 
 describe('timeIncreaseTo', function () {
     const precision = 2;
