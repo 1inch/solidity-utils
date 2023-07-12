@@ -1,12 +1,15 @@
 import { constants, ether, expect } from '../../src/prelude';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import hre from 'hardhat';
-const { ethers } = hre;
-import { Contract, ContractFactory } from 'ethers';
+import hre, { ethers } from 'hardhat';
+import { Signature, TypedDataDomain } from 'ethers';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
-import { splitSignature } from 'ethers/lib/utils';
 import { countInstructions, trackReceivedTokenAndTx } from '../../src/utils';
+import {
+    SafeERC20Wrapper,
+    SafeERC20Wrapper__factory as SafeERC20WrapperFactory,
+    SafeWETHWrapper__factory as SafeWETHWrapperFactory,
+} from '../../typechain-types';
 
 const Permit = [
     { name: 'owner', type: 'address' },
@@ -19,8 +22,8 @@ const Permit = [
 describe('SafeERC20', function () {
     let owner: SignerWithAddress;
     let spender: SignerWithAddress;
-    let SafeERC20Wrapper: ContractFactory;
-    let SafeWETHWrapper: ContractFactory;
+    let SafeERC20Wrapper: SafeERC20WrapperFactory;
+    let SafeWETHWrapper: SafeWETHWrapperFactory;
 
     before(async function () {
         [owner, spender] = await ethers.getSigners();
@@ -29,60 +32,60 @@ describe('SafeERC20', function () {
     });
 
     async function deployWrapperSimple() {
-        const wrapper = await SafeERC20Wrapper.deploy(spender.address);
-        await wrapper.deployed();
+        const wrapper = await SafeERC20Wrapper.deploy(spender);
+        await wrapper.waitForDeployment();
         return { wrapper };
     }
 
     async function deployWrapperFalseMock() {
         const ERC20ReturnFalseMock = await ethers.getContractFactory('ERC20ReturnFalseMock');
         const falseMock = await ERC20ReturnFalseMock.deploy();
-        await falseMock.deployed();
-        const wrapper = await SafeERC20Wrapper.deploy(falseMock.address);
-        await wrapper.deployed();
+        await falseMock.waitForDeployment();
+        const wrapper = await SafeERC20Wrapper.deploy(falseMock);
+        await wrapper.waitForDeployment();
         return { wrapper };
     }
 
     async function deployPermit2Mock() {
         const Permit2ReturnTrueMock = await ethers.getContractFactory('Permit2ReturnTrueMock');
         const permit2Mock = await Permit2ReturnTrueMock.deploy();
-        await permit2Mock.deployed();
+        await permit2Mock.waitForDeployment();
         return { permit2Mock };
     }
 
     async function deployWrapperTrueMock() {
         const ERC20ReturnTrueMock = await ethers.getContractFactory('ERC20ReturnTrueMock');
         const trueMock = await ERC20ReturnTrueMock.deploy();
-        await trueMock.deployed();
-        const wrapper = await SafeERC20Wrapper.deploy(trueMock.address);
-        await wrapper.deployed();
+        await trueMock.waitForDeployment();
+        const wrapper = await SafeERC20Wrapper.deploy(trueMock);
+        await wrapper.waitForDeployment();
         return { wrapper };
     }
 
     async function deployWrapperNoReturnMock() {
         const ERC20NoReturnMock = await ethers.getContractFactory('ERC20NoReturnMock');
         const noReturnMock = await ERC20NoReturnMock.deploy();
-        await noReturnMock.deployed();
-        const wrapper = await SafeERC20Wrapper.deploy(noReturnMock.address);
-        await wrapper.deployed();
+        await noReturnMock.waitForDeployment();
+        const wrapper = await SafeERC20Wrapper.deploy(noReturnMock);
+        await wrapper.waitForDeployment();
         return { wrapper };
     }
 
     async function deployWrapperZeroApprove() {
         const ERC20ThroughZeroApprove = await ethers.getContractFactory('ERC20ThroughZeroApprove');
         const zeroApprove = await ERC20ThroughZeroApprove.deploy();
-        await zeroApprove.deployed();
-        const wrapper = await SafeERC20Wrapper.deploy(zeroApprove.address);
-        await wrapper.deployed();
+        await zeroApprove.waitForDeployment();
+        const wrapper = await SafeERC20Wrapper.deploy(zeroApprove);
+        await wrapper.waitForDeployment();
         return { wrapper };
     }
 
     async function deployPermitNoRevertAndSign() {
         const ERC20PermitNoRevertMock = await ethers.getContractFactory('ERC20PermitNoRevertMock');
         const token = await ERC20PermitNoRevertMock.deploy();
-        await token.deployed();
-        const wrapper = await SafeERC20Wrapper.deploy(token.address);
-        await wrapper.deployed();
+        await token.waitForDeployment();
+        const wrapper = await SafeERC20Wrapper.deploy(token);
+        await wrapper.waitForDeployment();
 
         const chainId = await token.getChainId();
 
@@ -90,8 +93,8 @@ describe('SafeERC20', function () {
             name: 'ERC20PermitNoRevertMock',
             version: '1',
             chainId,
-            verifyingContract: token.address,
-        };
+            verifyingContract: await token.getAddress(),
+        } as TypedDataDomain;
         const data = {
             owner: owner.address,
             spender: spender.address,
@@ -100,17 +103,17 @@ describe('SafeERC20', function () {
             deadline: constants.MAX_UINT256,
         };
         //console.log(data);
-        const signature = splitSignature(await owner._signTypedData(domain, { Permit }, data));
+        const signature = Signature.from(await owner.signTypedData(domain, { Permit }, data));
         return { token, wrapper, data, signature };
     }
 
     async function deployWrapperWETH() {
         const WETH = await ethers.getContractFactory('WETH');
         const weth = await WETH.deploy();
-        await weth.deployed();
+        await weth.waitForDeployment();
 
-        const wrapper = await SafeWETHWrapper.deploy(weth.address);
-        await wrapper.deployed();
+        const wrapper = await SafeWETHWrapper.deploy(weth);
+        await wrapper.waitForDeployment();
         return { weth, wrapper };
     }
 
@@ -123,11 +126,11 @@ describe('SafeERC20', function () {
     async function deployERC20WithSafeBalance() {
         const WETH = await ethers.getContractFactory('WETH');
         const weth = await WETH.deploy();
-        await weth.deployed();
+        await weth.waitForDeployment();
 
         const ERC20WithSafeBalance = await ethers.getContractFactory('ERC20WithSafeBalance');
-        const wrapper = await ERC20WithSafeBalance.deploy(weth.address);
-        await wrapper.deployed();
+        const wrapper = await ERC20WithSafeBalance.deploy(weth);
+        await wrapper.waitForDeployment();
         return { weth, wrapper };
     }
 
@@ -186,12 +189,12 @@ describe('SafeERC20', function () {
         it('should be cheaper than balanceOf', async function () {
             const { wrapper } = await loadFixture(deployERC20WithSafeBalance);
 
-            const tx = await wrapper.populateTransaction.balanceOf(owner.address);
-            const receipt = await owner.sendTransaction(tx);
-            const gasUsed = (await receipt.wait()).gasUsed;
-            const safeTx = await wrapper.populateTransaction.safeBalanceOf(owner.address);
-            const safeReceipt = await owner.sendTransaction(safeTx);
-            const safeGasUsed = (await safeReceipt.wait()).gasUsed;
+            const tx = await wrapper.balanceOf.populateTransaction(owner);
+            const response = await owner.sendTransaction(tx);
+            const gasUsed = (await response.wait())!.gasUsed;
+            const safeTx = await wrapper.safeBalanceOf.populateTransaction(owner);
+            const safeRequest = await owner.sendTransaction(safeTx);
+            const safeGasUsed = (await safeRequest.wait())!.gasUsed;
 
             expect(gasUsed).gt(safeGasUsed);
             console.log(`balanceOf:safeBalanceOf gasUsed - ${gasUsed.toString()}:${safeGasUsed.toString()}`);
@@ -201,8 +204,8 @@ describe('SafeERC20', function () {
     describe("with token that doesn't revert on invalid permit", function () {
         it('accepts owner signature', async function () {
             const { token, wrapper, data, signature } = await loadFixture(deployPermitNoRevertAndSign);
-            expect(await token.nonces(owner.address)).to.equal('0');
-            expect(await token.allowance(owner.address, spender.address)).to.equal('0');
+            expect(await token.nonces(owner)).to.equal('0');
+            expect(await token.allowance(owner, spender)).to.equal('0');
 
             await wrapper.permit(
                 data.owner,
@@ -214,13 +217,13 @@ describe('SafeERC20', function () {
                 signature.s,
             );
 
-            expect(await token.nonces(owner.address)).to.equal('1');
-            expect(await token.allowance(owner.address, spender.address)).to.equal(data.value);
+            expect(await token.nonces(owner)).to.equal('1');
+            expect(await token.allowance(owner, spender)).to.equal(data.value);
         });
 
         it('revert on reused signature', async function () {
             const { token, wrapper, data, signature } = await loadFixture(deployPermitNoRevertAndSign);
-            expect(await token.nonces(owner.address)).to.equal('0');
+            expect(await token.nonces(owner)).to.equal('0');
             // use valid signature and consume nounce
             await wrapper.permit(
                 data.owner,
@@ -231,7 +234,7 @@ describe('SafeERC20', function () {
                 signature.r,
                 signature.s,
             );
-            expect(await token.nonces(owner.address)).to.equal('1');
+            expect(await token.nonces(owner)).to.equal('1');
             // invalid call does not revert for this token implementation
             await token.permit(
                 data.owner,
@@ -242,7 +245,7 @@ describe('SafeERC20', function () {
                 signature.r,
                 signature.s,
             );
-            expect(await token.nonces(owner.address)).to.equal('1');
+            expect(await token.nonces(owner)).to.equal('1');
             // ignore invalid call when called through the SafeERC20 library
             await wrapper.permit(
                 data.owner,
@@ -253,7 +256,7 @@ describe('SafeERC20', function () {
                 signature.r,
                 signature.s,
             );
-            expect(await token.nonces(owner.address)).to.equal('1');
+            expect(await token.nonces(owner)).to.equal('1');
         });
 
         it('revert on invalid signature', async function () {
@@ -292,12 +295,12 @@ describe('SafeERC20', function () {
     describe('IWETH methods', function () {
         it('should deposit tokens', async function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETH);
-            const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
+            const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.deposit({ value: ether('1') }),
             );
             expect(received).to.be.equal(ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-                expect(await countInstructions(ethers.provider, tx.events[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 1, 6, 3, 1, 2,
                 ]);
             }
@@ -305,11 +308,11 @@ describe('SafeERC20', function () {
 
         it('should be cheap on deposit 0 tokens', async function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETH);
-            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
+            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.deposit(),
             );
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-                expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 1, 0, 1,
                 ]);
             }
@@ -317,7 +320,7 @@ describe('SafeERC20', function () {
 
         it('should withdrawal tokens on withdraw', async function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETHAndDeposit);
-            const [received] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
+            const [received] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.withdraw(ether('0.5')),
             );
             expect(received).to.be.equal(-ether('0.5'));
@@ -325,29 +328,33 @@ describe('SafeERC20', function () {
 
         it('should withdrawal tokens on withdrawTo', async function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETHAndDeposit);
-            const spenderBalanceBefore = await ethers.provider.getBalance(spender.address);
-            const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
-                wrapper.withdrawTo(ether('0.5'), spender.address),
+            const spenderBalanceBefore = await ethers.provider.getBalance(spender);
+            const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
+                wrapper.withdrawTo(ether('0.5'), spender),
             );
             expect(received).to.be.equal(-ether('0.5'));
-            expect(await ethers.provider.getBalance(spender.address)).to.be.equal(spenderBalanceBefore.toBigInt() + ether('0.5'));
-            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
-                0, 3,
-            ]);
+            expect(await ethers.provider.getBalance(spender)).to.be.equal(spenderBalanceBefore + ether('0.5'));
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+                expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
+                    0, 3,
+                ]);
+            }
         });
 
         it('should be cheap on withdrawTo to self', async function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETHAndDeposit);
-            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, wrapper.address, () =>
-                wrapper.withdrawTo(ether('0.5'), wrapper.address),
+            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
+                wrapper.withdrawTo(ether('0.5'), wrapper),
             );
-            expect(await countInstructions(ethers.provider, tx.transactionHash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
-                0, 2,
-            ]);
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+                expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
+                    0, 2,
+                ]);
+            }
         });
     });
 
-    function shouldRevertOnAllCalls(reasons: { [methodName: string]: string }, fixture: () => Promise<{ wrapper: Contract }>) {
+    function shouldRevertOnAllCalls(reasons: { [methodName: string]: string }, fixture: () => Promise<{ wrapper: SafeERC20Wrapper }>) {
         it('reverts on transfer', async function () {
             const { wrapper } = await loadFixture(fixture);
             await expect(wrapper.transfer()).to.be.revertedWithCustomError(wrapper, reasons.transfer);
@@ -382,7 +389,7 @@ describe('SafeERC20', function () {
         });
     }
 
-    function shouldOnlyRevertOnErrors(fixture: () => Promise<{ wrapper: Contract }>) {
+    function shouldOnlyRevertOnErrors(fixture: () => Promise<{ wrapper: SafeERC20Wrapper }>) {
         it("doesn't revert on transfer", async function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transfer();
@@ -396,7 +403,7 @@ describe('SafeERC20', function () {
         it("doesn't revert on transferFromUniversal, permit2", async function () {
             const { wrapper } = await loadFixture(fixture);
             const { permit2Mock } = await deployPermit2Mock();
-            const code = await ethers.provider.getCode(permit2Mock.address);
+            const code = await ethers.provider.getCode(permit2Mock);
             await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, code]);
             await wrapper.transferFromUniversal(true);
         });
@@ -405,7 +412,6 @@ describe('SafeERC20', function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transferFromUniversal(false);
         });
-
 
         describe('approvals', function () {
             describe('with zero allowance', function () {

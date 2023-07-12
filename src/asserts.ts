@@ -4,7 +4,7 @@ export function assertRoughlyEqualValues(
     expected: string | number | bigint,
     actual: string | number | bigint,
     relativeDiff: number,
-) {
+): void {
     let expectedBN = BigInt(expected);
     let actualBN = BigInt(actual);
     expect(expectedBN * actualBN).to.be.gte(0, 'Values are of different sign');

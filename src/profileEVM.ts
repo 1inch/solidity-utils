@@ -1,5 +1,5 @@
 import { PathLike, promises as fs } from 'fs';
-import { providers } from 'ethers';
+import { JsonRpcProvider } from 'ethers';
 
 export const gasspectOptionsDefault = {
     minOpGasCost: 300, // minimal gas cost of returned operations
@@ -19,7 +19,7 @@ type Op = {
     memory: string[];
 };
 
-function _normalizeOp(ops: Op[], i: number) {
+function _normalizeOp(ops: Op[], i: number): void {
     if (ops[i].op === 'STATICCALL') {
         ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
 
@@ -92,7 +92,12 @@ function _normalizeOp(ops: Op[], i: number) {
     }
 }
 
-export async function profileEVM(provider: providers.JsonRpcProvider, txHash: string, instruction: string[], optionalTraceFile?: PathLike | fs.FileHandle) {
+export async function profileEVM(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider: JsonRpcProvider | { send: (method: string, params: unknown[]) => Promise<any> },
+    txHash: string, instruction: string[],
+    optionalTraceFile?: PathLike | fs.FileHandle
+): Promise<number[]> {
     const trace = await provider.send('debug_traceTransaction', [txHash]);
 
     const str = JSON.stringify(trace);
@@ -107,12 +112,12 @@ export async function profileEVM(provider: providers.JsonRpcProvider, txHash: st
 }
 
 export async function gasspectEVM(
-    provider: providers.JsonRpcProvider,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider: JsonRpcProvider | { send: (method: string, params: unknown[]) => Promise<any> },
     txHash: string,
     gasspectOptions: Record<string, unknown> = {},
     optionalTraceFile?: PathLike | fs.FileHandle
-) {
-
+): Promise<string[]> {
     const options = { ...gasspectOptionsDefault, ...gasspectOptions };
 
     const trace = await provider.send('debug_traceTransaction', [txHash]);

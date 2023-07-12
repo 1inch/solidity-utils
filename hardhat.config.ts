@@ -1,5 +1,5 @@
 import '@typechain/hardhat';
-import '@nomiclabs/hardhat-ethers';
+import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
 import 'hardhat-gas-reporter';
 import 'hardhat-tracer';
@@ -34,7 +34,7 @@ const config: HardhatUserConfig = {
         enabled: true,
     },
     typechain: {
-        target: 'ethers-v5',
+        target: 'ethers-v6',
     },
 };
 

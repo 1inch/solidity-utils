@@ -1,7 +1,6 @@
 import { expect } from '../../src/prelude';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import hre from 'hardhat';
-const { ethers } = hre;
+import hre, { ethers } from 'hardhat';
 
 describe('StringUtil', function () {
     const uint256TestValue = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';

@@ -1,5 +1,5 @@
 import { expect } from '../../src/prelude';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
@@ -31,8 +31,8 @@ describe('AddressLib', function () {
         it('should return true when flag in Address', async function () {
             const { addressLibMock, flags } = await loadFixture(deployAddressLibMock);
             for (const flag of flags) {
-                expect(await addressLibMock.getFlag(BigInt(signer.address) | flag, flag)).to.be.equal(true);
-                expect(await addressLibMock.getFlag(BigInt(signer.address) | flag, 1n << 161n)).to.be.equal(false);
+                expect(await addressLibMock.getFlag(BigInt(signer.address) | flag, flag)).to.be.true;
+                expect(await addressLibMock.getFlag(BigInt(signer.address) | flag, 1n << 161n)).to.be.false;
             }
         });
     });
