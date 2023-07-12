@@ -160,7 +160,7 @@ describe('utils', function () {
                 usdt.approve(signer2, ether('1')),
             );
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-                expect(await countInstructions(ethers.provider, tx?.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 0,
                 ]);
             }
