@@ -1,7 +1,7 @@
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
 import { constants } from './prelude';
 import { Signature, TypedDataDomain, Wallet } from 'ethers';
-import "@nomicfoundation/hardhat-ethers";  // required to populate the HardhatRuntimeEnvironment with ethers
+import '@nomicfoundation/hardhat-ethers';  // required to populate the HardhatRuntimeEnvironment with ethers
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
