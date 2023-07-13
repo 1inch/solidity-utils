@@ -1,11 +1,12 @@
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
 import { constants } from './prelude';
 import { Signature, TypedDataDomain, Wallet } from 'ethers';
+import "@nomicfoundation/hardhat-ethers";  // required to populate the HardhatRuntimeEnvironment with ethers
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { bytecode as permit2Bytecode } from './permit2.json';
-import { DaiLikePermitMock, ERC20Permit, IPermit2 } from '../typechain-types';
+import { DaiLikePermitMock, ERC20Permit } from '../typechain-types';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -95,7 +96,7 @@ export function buildDataLikeDai(
     } as const;
 }
 
-export async function permit2Contract(): Promise<IPermit2> {
+export async function permit2Contract() {
     if ((await ethers.provider.getCode(PERMIT2_ADDRESS)) === '0x') {
         await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, permit2Bytecode]);
     }
