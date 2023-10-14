@@ -1,7 +1,7 @@
 import '@nomicfoundation/hardhat-ethers';  // required to populate the HardhatRuntimeEnvironment with ethers
 import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { BaseContract, BigNumberish, Contract, ContractTransactionReceipt, ContractTransactionResponse, JsonRpcProvider, Wallet } from 'ethers';
+import { BaseContract, BigNumberish, BytesLike, Contract, ContractTransactionReceipt, ContractTransactionResponse, JsonRpcProvider, Signer, Wallet } from 'ethers';
 import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
 
 import { constants } from './prelude';
@@ -76,6 +76,14 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
 
 export async function deployContract(name: string, parameters: Array<BigNumberish> = []) : Promise<BaseContract> {
     const ContractFactory = await ethers.getContractFactory(name);
+    const instance = await ContractFactory.deploy(...parameters);
+    await instance.waitForDeployment();
+    return instance;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function deployContractFromBytecode(abi: any[], bytecode: BytesLike, parameters: Array<BigNumberish> = [], signer?: Signer) : Promise<BaseContract> {
+    const ContractFactory = await ethers.getContractFactory(abi, bytecode, signer);
     const instance = await ContractFactory.deploy(...parameters);
     await instance.waitForDeployment();
     return instance;
