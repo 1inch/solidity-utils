@@ -190,7 +190,7 @@ describe('utils', function () {
             expect(await token.name()).to.be.eq('SomeToken');
         });
 
-        it('should be using without arguments', async function () {
+        it('can be used without arguments', async function () {
             const contractArtifact = await hre.artifacts.readArtifact('WETH');
             const weth = <WETH> await deployContractFromBytecode(contractArtifact.abi, contractArtifact.bytecode);
             expect(await weth.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
