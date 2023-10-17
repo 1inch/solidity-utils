@@ -183,7 +183,7 @@ describe('utils', function () {
     });
 
     describe('deployContractFromBytecode', function () {
-        it('should be deploy new contract instance', async function () {
+        it('should deploy new contract instance', async function () {
             const contractArtifact = await hre.artifacts.readArtifact('TokenMock');
             const token = <TokenMock> await deployContractFromBytecode(contractArtifact.abi, contractArtifact.bytecode, ['SomeToken', 'STM']);
             expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
