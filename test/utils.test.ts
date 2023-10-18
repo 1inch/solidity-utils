@@ -1,5 +1,5 @@
 import { expect, ether, time, constants } from '../src/prelude';
-import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract, deployAndGetContract } from '../src/utils';
+import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode } from '../src/utils';
 import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
@@ -177,6 +177,22 @@ describe('utils', function () {
 
         it('should be using without arguments', async function () {
             const weth = <WETH> await deployContract('WETH');
+            expect(await weth.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await weth.name()).to.be.eq('Wrapped Ether');
+        });
+    });
+
+    describe('deployContractFromBytecode', function () {
+        it('should deploy new contract instance', async function () {
+            const contractArtifact = await hre.artifacts.readArtifact('TokenMock');
+            const token = <TokenMock> await deployContractFromBytecode(contractArtifact.abi, contractArtifact.bytecode, ['SomeToken', 'STM']);
+            expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await token.name()).to.be.eq('SomeToken');
+        });
+
+        it('can be used without arguments', async function () {
+            const contractArtifact = await hre.artifacts.readArtifact('WETH');
+            const weth = <WETH> await deployContractFromBytecode(contractArtifact.abi, contractArtifact.bytecode);
             expect(await weth.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
             expect(await weth.name()).to.be.eq('Wrapped Ether');
         });
