@@ -35,7 +35,8 @@
     "@uniswap/permit2-sdk": "1.2.0",
     "ethereumjs-util": "7.1.5",
     "ethers": "6.6.3",
-    "hardhat-deploy": "0.11.34"
+    "hardhat-deploy": "0.11.34",
+    "mocha-chai-jest-snapshot": "1.1.4"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "2.0.1",
