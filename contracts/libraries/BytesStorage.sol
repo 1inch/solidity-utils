@@ -46,7 +46,7 @@ library BytesStorage {
         });
     }
 
-    function unwrap(Slice memory piece) internal view returns(bytes memory ret) {
+    function copy(Slice memory piece) internal view returns(bytes memory ret) {
         uint256 startSlot = piece.slot;
         uint256 offset = piece.offset;
         uint256 length = piece.length;
