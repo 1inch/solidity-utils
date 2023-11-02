@@ -10,7 +10,7 @@ library BytesMemory {
         uint256 length;
     }
 
-    function wrap(bytes memory data) internal pure returns(Slice memory) {
+    function wrap(bytes memory data) internal pure returns (Slice memory) {
         uint256 pointer;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             pointer := add(data, 0x20)
@@ -22,7 +22,7 @@ library BytesMemory {
         });
     }
 
-    function slice(Slice memory data, uint256 offset, uint256 size) internal pure returns(Slice memory) {
+    function slice(Slice memory data, uint256 offset, uint256 size) internal pure returns (Slice memory) {
         if (offset + size > data.length) revert OutOfBounds();
 
         return Slice({
@@ -31,7 +31,7 @@ library BytesMemory {
         });
     }
 
-    function unwrap(Slice memory piece) internal view returns(bytes memory ret) {
+    function unwrap(Slice memory piece) internal view returns (bytes memory ret) {
         uint256 pointer = piece.pointer;
         uint256 length = piece.length;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
