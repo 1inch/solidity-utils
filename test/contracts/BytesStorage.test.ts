@@ -8,7 +8,7 @@ type Slice = {
     slot: bigint,
     offset: bigint,
     length: bigint,
-};
+} | null;
 
 describe('BytesStorageMock', function () {
     const shortBytes = '0x000102030405060708090a';
@@ -40,7 +40,7 @@ describe('BytesStorageMock', function () {
         return { bytesStorageMock, data: { slot, offset, length } };
     }
 
-    shouldRevertOnAllCalls(
+    shouldWork(
         {
             'shortData': deployBytesStorageMockWithShortData,
             'longData': deployBytesStorageMockWithLongData,
@@ -49,7 +49,7 @@ describe('BytesStorageMock', function () {
         },
     );
 
-    function shouldRevertOnAllCalls(fixtures: { [dataType: string]: () => Promise<{ bytesStorageMock: BytesStorageMock, data: Slice }> }) {
+    function shouldWork(fixtures: { [dataType: string]: () => Promise<{ bytesStorageMock: BytesStorageMock, data: Slice }> }) {
         describe('wrap', function () {
             it('should return correct wrapped data with short data', async function () {
                 const { bytesStorageMock } = await loadFixture(fixtures.shortData);
