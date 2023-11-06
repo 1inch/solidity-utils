@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import "../interfaces/IDaiLikePermit.sol";
 import "../interfaces/IPermit2.sol";
 import "../interfaces/IWETH.sol";
@@ -59,7 +59,7 @@ library SafeERC20 {
 
     /**
      * @notice Attempts to safely transfer tokens from one address to another.
-     * @dev If permit2 is true, uses the Permit2 standard; otherwise uses the standard ERC20 transferFrom. 
+     * @dev If permit2 is true, uses the Permit2 standard; otherwise uses the standard ERC20 transferFrom.
      * Either requires `true` in return data, or requires target to be smart-contract and empty return data.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param from The address from which the tokens will be transferred.
@@ -238,7 +238,7 @@ library SafeERC20 {
     }
 
     /**
-     * @notice Attempts to execute the `permit` function on the provided token with custom owner and spender parameters. 
+     * @notice Attempts to execute the `permit` function on the provided token with custom owner and spender parameters.
      * Permit type is determined automatically based on permit calldata (IERC20Permit, IDaiLikePermit, and IPermit2).
      * @dev Wraps `tryPermit` function and forwards revert reason if permit fails.
      * @param token The IERC20 token to execute the permit function on.
@@ -265,9 +265,9 @@ library SafeERC20 {
      * @notice The function attempts to call the permit function on a given ERC20 token.
      * @dev The function is designed to support a variety of permit functions, namely: IERC20Permit, IDaiLikePermit, and IPermit2.
      * It accommodates both Compact and Full formats of these permit types.
-     * Please note, it is expected that the `expiration` parameter for the compact Permit2 and the `deadline` parameter 
+     * Please note, it is expected that the `expiration` parameter for the compact Permit2 and the `deadline` parameter
      * for the compact Permit are to be incremented by one before invoking this function. This approach is motivated by
-     * gas efficiency considerations; as the unlimited expiration period is likely to be the most common scenario, and 
+     * gas efficiency considerations; as the unlimited expiration period is likely to be the most common scenario, and
      * zeros are cheaper to pass in terms of gas cost. Thus, callers should increment the expiration or deadline by one
      * before invocation for optimized performance.
      * @param token The address of the ERC20 token on which to call the permit function.
@@ -349,7 +349,7 @@ library SafeERC20 {
                 mstore(add(ptr, 0x24), token) // store token
 
                 calldatacopy(add(ptr, 0x50), permit.offset, 0x14)             // store amount = copy permit.offset 0x00..0x13
-                // and(0xffffffffffff, ...) - conversion to uint48 
+                // and(0xffffffffffff, ...) - conversion to uint48
                 mstore(add(ptr, 0x64), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x14))), 1))) // store expiration = ((permit.offset 0x14..0x17 - 1) & 0xffffffffffff)
                 mstore(add(ptr, 0x84), shr(224, calldataload(add(permit.offset, 0x18)))) // store nonce = copy permit.offset 0x18..0x1b
                 mstore(add(ptr, 0xa4), spender)                               // store spender
@@ -383,7 +383,7 @@ library SafeERC20 {
      * @param selector The function signature that is to be called on the token contract.
      * @param to The address to which the token amount will be transferred.
      * @param amount The token amount to be transferred.
-     * @return success A boolean indicating if the call was successful. Returns 'true' on success and 'false' on failure. 
+     * @return success A boolean indicating if the call was successful. Returns 'true' on success and 'false' on failure.
      * In case of success but no returned data, validates that the contract code exists.
      * In case of returned data, ensures that it's a boolean `true`.
      */

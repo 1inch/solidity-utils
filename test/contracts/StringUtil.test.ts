@@ -69,31 +69,31 @@ describe('StringUtil', function () {
 
         it('Uint 256', () => testGasUint256(uint256TestValue, 834));
 
-        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 16277));
+        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 16369));
 
         it('Uint 256 as bytes', () => testGasBytes(uint256TestValue, 716));
 
-        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 16159));
+        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 16251));
 
         it('Uint 128', () => testGasUint256(uint128TestValue, 834));
 
-        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 16277));
+        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 16369));
 
         it('Very long byte array gas', () => testGasBytes(veryLongArray, 1766));
 
-        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 33286));
+        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 33483));
 
         it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray, 17009));
 
-        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 489888));
+        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 492884));
 
         it('Empty bytes', () => testGasBytes(emptyBytes, 191));
 
-        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 499));
+        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 495));
 
         it('Single byte', () => testGasBytes(singleByte, 716));
 
-        it('Single byte naive', () => testGasNaiveBytes(singleByte, 988));
+        it('Single byte naive', () => testGasNaiveBytes(singleByte, 987));
 
         async function testGasUint256(value: string, expectedGas: number) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
