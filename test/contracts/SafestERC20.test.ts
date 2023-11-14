@@ -301,7 +301,7 @@ describe('SafeERC20', function () {
             expect(received).to.be.equal(ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                    0, 1, 6, 3, 1, 2,
+                    0, 1, 6, 1, 1, 2,
                 ]);
             }
         });
@@ -313,7 +313,7 @@ describe('SafeERC20', function () {
             );
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                    0, 0, 1, 1, 0, 1,
+                    0, 0, 1, 0, 0, 1,
                 ]);
             }
         });

@@ -68,7 +68,7 @@ describe('Permitable', function () {
         const deadline  = block ? block.timestamp - 1000 : 1000;
 
         const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitableMock.getAddress(), value.toString(), deadline.toString());
-        await expect(permitableMock.mockPermit(erc20PermitMock, permit)).to.be.revertedWith('ERC20Permit: expired deadline');
+        await expect(permitableMock.mockPermit(erc20PermitMock, permit)).to.be.revertedWithCustomError(erc20PermitMock, 'ERC2612ExpiredSignature');
     });
 
     it('should not be permitted for IERC20Permit', async function () {
@@ -100,9 +100,7 @@ describe('Permitable', function () {
                 s,
             ]),
         );
-        await expect(permitableMock.mockPermit(erc20PermitMock, permit)).to.be.revertedWith(
-            'ERC20Permit: invalid signature',
-        );
+        await expect(permitableMock.mockPermit(erc20PermitMock, permit)).to.be.revertedWithCustomError(erc20PermitMock, 'ERC2612InvalidSigner');
     });
 
     it('should be permitted for IDaiLikePermit', async function () {
