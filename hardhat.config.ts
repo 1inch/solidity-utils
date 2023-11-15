@@ -9,7 +9,7 @@ require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 import { HardhatNetworkUserConfig } from 'hardhat/types';
-import networks from './hardhat.networks';
+import { Networks, getNetwork } from './src/networks';
 
 dotenv.config();
 
@@ -19,10 +19,7 @@ declare module 'hardhat/types/runtime' {
     }
 }
 
-function getNetwork(): string {
-    const index = process.argv.findIndex((arg) => arg === '--network') + 1;
-    return index !== 0 ? process.argv[index] : 'unknown';
-}
+const { networks, etherscan } = new Networks();
 
 const config: HardhatUserConfig = {
     solidity: {
@@ -36,6 +33,7 @@ const config: HardhatUserConfig = {
             viaIR: true,
         },
     },
+    etherscan,
     networks,
     gasReporter: {
         enabled: true,
