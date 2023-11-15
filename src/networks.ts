@@ -15,7 +15,10 @@ export class Networks {
 
     constructor(useHardhat: boolean = true, forkingNetworkName?: string, needAuthKeyHttpHeader: boolean = false, saveHardhatDeployments: boolean = false) {
         dotenv.config();
+        this.updateHardhatNetwork(useHardhat, forkingNetworkName, needAuthKeyHttpHeader, saveHardhatDeployments);
+    }
 
+    updateHardhatNetwork(useHardhat: boolean, forkingNetworkName?: string, needAuthKeyHttpHeader: boolean = false, saveHardhatDeployments: boolean = false) {
         if (useHardhat || forkingNetworkName) {
             this.networks.hardhat = {
                 chainId: Number(process.env.FORK_CHAIN_ID) || 31337,
