@@ -8,11 +8,11 @@ type Slice = {
     slot: bigint,
     offset: bigint,
     length: bigint,
-} | null;
+};
 
 describe('BytesStorageMock', function () {
     const shortBytes = '0x000102030405060708090a';
-    const longBytes = '0x101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132';
+    const longBytes = '0x101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f50';
 
     async function deployBytesStorageMockWithShortData() {
         const BytesStorageMock = await ethers.getContractFactory('BytesStorageMock');
@@ -49,7 +49,7 @@ describe('BytesStorageMock', function () {
         },
     );
 
-    function shouldWork(fixtures: { [dataType: string]: () => Promise<{ bytesStorageMock: BytesStorageMock, data: Slice }> }) {
+    function shouldWork(fixtures: { [dataType: string]: () => Promise<{ bytesStorageMock: BytesStorageMock, data: Slice | null }> }) {
         describe('wrap', function () {
             it('should return correct wrapped data with short data', async function () {
                 const { bytesStorageMock } = await loadFixture(fixtures.shortData);
@@ -72,44 +72,44 @@ describe('BytesStorageMock', function () {
             describe('short data', function () {
                 it('should revert with incorrect offset', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
-                    await expect(bytesStorageMock.wrapAndSlice(data.offset + data.length + 1n, 0)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
+                    await expect(bytesStorageMock.wrapAndSlice(data!.offset + data!.length + 1n, 0)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should revert with incorrect size', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
-                    await expect(bytesStorageMock.wrapAndSlice(data.offset, data.length + 1n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
+                    await expect(bytesStorageMock.wrapAndSlice(data!.offset, data!.length + 1n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should revert with incorrect offset + size', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
-                    await expect(bytesStorageMock.wrapAndSlice(data.offset + data.length / 2n, data.length / 2n + 10n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
+                    await expect(bytesStorageMock.wrapAndSlice(data!.offset + data!.length / 2n, data!.length / 2n + 10n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should slice data', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
-                    expect(await bytesStorageMock.wrapAndSlice(data.offset + 2n, 4n)).to.be.deep.eq([data.slot, data.offset + 2n, 4n]);
+                    expect(await bytesStorageMock.wrapAndSlice(data!.offset + 2n, 4n)).to.be.deep.eq([data!.slot, data!.offset + 2n, 4n]);
                 });
             });
 
             describe('long data', function () {
                 it('should revert with incorrect offset with long data', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
-                    await expect(bytesStorageMock.wrapAndSlice(data.offset + data.length + 1n, 0)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
+                    await expect(bytesStorageMock.wrapAndSlice(data!.offset + data!.length + 1n, 0)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should revert with incorrect size with long data', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
-                    await expect(bytesStorageMock.wrapAndSlice(data.offset, data.length + 1n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
+                    await expect(bytesStorageMock.wrapAndSlice(data!.offset, data!.length + 1n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should revert with incorrect offset + size with long data', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
-                    await expect(bytesStorageMock.wrapAndSlice(data.offset + data.length / 2n, data.length / 2n + 10n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
+                    await expect(bytesStorageMock.wrapAndSlice(data!.offset + data!.length / 2n, data!.length / 2n + 10n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should slice data', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
-                    expect(await bytesStorageMock.wrapAndSlice(data.offset + 20n, 10n)).to.be.deep.eq([data.slot, data.offset + 20n, 10n]);
+                    expect(await bytesStorageMock.wrapAndSlice(data!.offset + 20n, 10n)).to.be.deep.eq([data!.slot, data!.offset + 20n, 10n]);
                 });
             });
         });
@@ -123,7 +123,7 @@ describe('BytesStorageMock', function () {
 
                 it('should return correct bytes after slice and copy', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
-                    expect(await bytesStorageMock.wrapWithSliceAndCopy(data.offset + 2n, 4n)).to.be.equal('0x' + trim0x(shortBytes).substring(2*2, 2*2 + 4*2));
+                    expect(await bytesStorageMock.wrapWithSliceAndCopy(data!.offset + 2n, 4n)).to.be.equal('0x' + trim0x(shortBytes).substring(2*2, 2*2 + 4*2));
                 });
             });
 
@@ -135,7 +135,12 @@ describe('BytesStorageMock', function () {
 
                 it('should return correct bytes after slice and copy', async function () {
                     const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
-                    expect(await bytesStorageMock.wrapWithSliceAndCopy(data.offset + 20n, 10n)).to.be.equal('0x' + trim0x(longBytes).substring(20*2, 20*2 + 10*2));
+                    expect(await bytesStorageMock.wrapWithSliceAndCopy(data!.offset + 20n, 10n)).to.be.equal('0x' + trim0x(longBytes).substring(20*2, 20*2 + 10*2));
+                });
+
+                it('should return correct bytes after slice and copy more than 50 bytes', async function () {
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
+                    expect(await bytesStorageMock.wrapWithSliceAndCopy(data!.offset + 2n, 56n)).to.be.equal('0x' + trim0x(longBytes).substring(2*2, 2*2 + 56*2));
                 });
             });
         });
