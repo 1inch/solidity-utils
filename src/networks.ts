@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
-import { ChainConfig } from '@nomicfoundation/hardhat-verify/dist/src/types';
+import { ChainConfig } from '@nomicfoundation/hardhat-verify/src/types';
 import { NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
+import 'hardhat-deploy';  // required to populate the HardhatNetworkUserConfig with saveDeployments
 
 export type Etherscan = { apiKey: {[key: string]: string}, customChains: ChainConfig[] };
 
