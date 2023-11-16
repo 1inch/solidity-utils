@@ -4,11 +4,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
+  publish-npmjs:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'yarn'
+      - run: yarn
       - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      - run: yarn publish
+
+  publish-github:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: 'yarn'
+      - run: yarn
+      - name: Auth in GitHub private registry npm
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
+          echo "@1inch:registry=https://npm.pkg.github.com" >> .npmrc
       - run: yarn publish

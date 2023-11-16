@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import "../libraries/RevertReasonParser.sol";
 
+// solhint-disable custom-errors
 contract RevertReasonParserTest {
     error TestDidNotThrow();
 
