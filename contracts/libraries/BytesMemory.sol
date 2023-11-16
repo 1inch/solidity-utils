@@ -60,7 +60,7 @@ library BytesMemory {
         uint256 length = piece.length;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             ret := mload(0x40)
-            mstore(0x40, add(0x20, length))
+            mstore(0x40, add(ret, add(0x20, length)))
             mstore(ret, length)
 
             pop(staticcall(gas(), 0x04, pointer, length, add(ret, 0x20), length))
