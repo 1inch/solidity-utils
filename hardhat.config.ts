@@ -9,7 +9,7 @@ require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 import { HardhatNetworkUserConfig } from 'hardhat/types';
-import { Networks, getNetwork } from './src/networks';
+import { Networks, getNetwork } from './src/hardhat-setup/networks';
 
 dotenv.config();
 
