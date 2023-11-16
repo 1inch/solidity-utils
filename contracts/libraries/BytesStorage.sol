@@ -83,21 +83,12 @@ library BytesStorage {
             let out := add(ret, 0x20)
             let endSlot := add(startSlot, div(add(add(length, offset), 0x1F), 0x20))
 
+            mstore(out, shl(mul(8, offset), sload(startSlot)))
+            out := add(out, sub(0x20, offset))
 
-            for { let slot := startSlot } lt(slot, endSlot) { slot := add(slot, 1) } {
-                let data := sload(slot)
-                data := shl(mul(8, offset), data)
-                mstore(out, data)
+            for { let slot := add(startSlot, 1) } lt(slot, endSlot) { slot := add(slot, 1) } {
+                mstore(out, sload(slot))
                 out := add(out, 0x20)
-                offset := 0
-            }
-
-            if lt(out, add(ret, add(0x20, length))) {
-                // Handle leftover bytes if any in case `length mod 32` != 0
-                let data := sload(endSlot)
-                let mask := sub(exp(256, sub(0x20, mod(length, 0x20))), 1)
-                data := and(data, not(mask))
-                mstore(out, data)
             }
         }
     }
