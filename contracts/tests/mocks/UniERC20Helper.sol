@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// solhint-disable one-contract-per-file
 
 pragma solidity ^0.8.0;
 
@@ -22,7 +23,7 @@ contract UniERC20Wrapper {
         _token = token;
     }
 
-    function transfer(address payable to, uint256 amount) public payable {
+    function transfer(address payable to, uint256 amount) external payable {
         _token.uniTransfer(to, amount);
     }
 
@@ -30,33 +31,35 @@ contract UniERC20Wrapper {
         address payable from,
         address to,
         uint256 amount
-    ) public payable {
+    ) external payable {
         _token.uniTransferFrom(from, to, amount);
     }
 
-    function approve(address spender, uint256 amount) public {
+    function approve(address spender, uint256 amount) external {
         _token.uniApprove(spender, amount);
     }
 
-    function balanceOf(address account) public view returns (uint256) {
+    function balanceOf(address account) external view returns (uint256) {
         return _token.uniBalanceOf(account);
     }
 
-    function name() public view returns (string memory) {
+    function name() external view returns (string memory) {
         return _token.uniName();
     }
 
-    function symbol() public view returns (string memory) {
+    function symbol() external view returns (string memory) {
         return _token.uniSymbol();
     }
 
-    function isETH() public view returns (bool) {
+    function isETH() external view returns (bool) {
         return _token.isETH();
     }
 }
 
 contract ETHBadReceiver {
     using UniERC20 for IERC20;
+
+    error ReceiveFailed();
 
     IERC20 private _token;
     IUniERC20Wrapper private _wrapper;
@@ -66,13 +69,12 @@ contract ETHBadReceiver {
         _wrapper = wrapper;
     }
 
-    function transfer(address to, uint256 amount) public payable {
+    function transfer(address to, uint256 amount) external payable {
         _wrapper.transferFrom{value: msg.value}(payable(address(this)), to, amount);
     }
 
     receive() external payable {
-        // solhint-disable-next-line reason-string
-        revert();
+        revert ReceiveFailed();
     }
 }
 
