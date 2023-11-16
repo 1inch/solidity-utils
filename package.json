@@ -3,6 +3,10 @@
   "version": "3.5.0",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./hardhat-setup": "./dist/hardhat-setup/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/1inch/solidity-utils.git"
