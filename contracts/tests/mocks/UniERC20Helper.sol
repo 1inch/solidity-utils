@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// solhint-disable one-contract-per-file
 
 pragma solidity ^0.8.0;
 
@@ -58,6 +59,8 @@ contract UniERC20Wrapper {
 contract ETHBadReceiver {
     using UniERC20 for IERC20;
 
+    error ReceiveFailed();
+
     IERC20 private _token;
     IUniERC20Wrapper private _wrapper;
 
@@ -71,8 +74,7 @@ contract ETHBadReceiver {
     }
 
     receive() external payable {
-        // solhint-disable-next-line reason-string
-        revert();
+        revert ReceiveFailed();
     }
 }
 

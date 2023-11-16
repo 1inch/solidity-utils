@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 
 contract TokenCustomDecimalsMock is ERC20Permit, Ownable {
-    uint8 internal immutable _decimals;
+    uint8 internal immutable _DECIMALS;
 
     constructor(
         string memory name,
@@ -15,7 +15,7 @@ contract TokenCustomDecimalsMock is ERC20Permit, Ownable {
         uint8 decimals_
     ) ERC20(name, symbol) ERC20Permit(name) Ownable(msg.sender) {
         _mint(msg.sender, amount);
-        _decimals = decimals_;
+        _DECIMALS = decimals_;
     }
 
     function mint(address account, uint256 amount) external onlyOwner {
@@ -27,7 +27,7 @@ contract TokenCustomDecimalsMock is ERC20Permit, Ownable {
     }
 
     function decimals() public view virtual override returns (uint8) {
-        return _decimals;
+        return _DECIMALS;
     }
 
     function getChainId() external view returns (uint256) {

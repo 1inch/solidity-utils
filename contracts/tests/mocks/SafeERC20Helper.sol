@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+// solhint-disable one-contract-per-file
 
 pragma solidity ^0.8.0;
 
@@ -13,8 +14,7 @@ contract ERC20ReturnFalseMock {
     // we write to a dummy state variable.
     uint256 private _dummy;
 
-    function balanceOf(address) external view returns (uint256) {
-        require(_dummy == 0, "Dummy"); // Dummy read from a state variable so that the function is view
+    function balanceOf(address) external pure returns (uint256) {
         return 0;
     }
 
@@ -37,8 +37,7 @@ contract ERC20ReturnFalseMock {
         return false;
     }
 
-    function allowance(address, address) public view returns (uint256) {
-        require(_dummy == 0, "Dummy"); // Dummy read from a state variable so that the function is view
+    function allowance(address, address) public pure returns (uint256) {
         return 0;
     }
 }
@@ -242,8 +241,7 @@ contract SafeWETHWrapper {
     }
 
     // solhint-disable-next-line no-empty-blocks
-    receive() external payable {
-    }
+    receive() external payable {}
 
     function deposit() external payable {
         _token.safeDeposit(msg.value);
@@ -261,17 +259,17 @@ contract SafeWETHWrapper {
 contract ERC20WithSafeBalance {
     using SafeERC20 for IERC20;
 
-    IERC20 private immutable _token;
+    IERC20 private immutable _TOKEN;
 
     constructor(IERC20 token) {
-        _token = token;
+        _TOKEN = token;
     }
 
     function balanceOf(address account) public view returns (uint256) {
-        return _token.balanceOf(account);
+        return _TOKEN.balanceOf(account);
     }
 
     function safeBalanceOf(address account) public view returns (uint256) {
-        return _token.safeBalanceOf(account);
+        return _TOKEN.safeBalanceOf(account);
     }
 }
