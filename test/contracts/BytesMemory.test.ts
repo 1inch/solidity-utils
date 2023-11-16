@@ -87,7 +87,7 @@ describe('BytesMemoryMock', function () {
 
         it('unwrap', async function () {
             const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes, 235)).to.be.equal(bytes);
+            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes, 205)).to.be.equal(bytes);
         });
     });
 });

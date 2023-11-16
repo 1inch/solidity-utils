@@ -22,7 +22,7 @@ contract BytesMemoryMock {
         return data.slice(offset, size);
     }
 
-    function wrapAndUnwrap(bytes memory data) external view returns (bytes memory ret) {
+    function wrapAndUnwrap(bytes memory data) external pure returns (bytes memory ret) {
         return wrap(data).unwrap();
     }
 
@@ -38,11 +38,11 @@ contract BytesMemoryMock {
         }
     }
 
-    function wrapWithNonDefaultPointerAndUnwrap(bytes calldata data, uint256 n) external view returns (bytes memory ret) {
+    function wrapWithNonDefaultPointerAndUnwrap(bytes calldata data, uint256 n) external pure returns (bytes memory ret) {
         return wrapWithNonDefaultPointer(data, n).unwrap();
     }
 
-    function wrapWithSliceAndUnwrap(bytes calldata data, uint256 offset, uint256 size) external view returns (bytes memory ret) {
+    function wrapWithSliceAndUnwrap(bytes calldata data, uint256 offset, uint256 size) external pure returns (bytes memory ret) {
         return wrap(data).slice(offset, size).unwrap();
     }
 }
