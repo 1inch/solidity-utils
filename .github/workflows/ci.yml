@@ -10,14 +10,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.15
+          cache: 'yarn'
+      - run: yarn
       - run: yarn lint
 
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.15
+          cache: 'yarn'
+      - run: yarn
       - run: yarn typechain
       - run: yarn test:ci
 
@@ -25,7 +33,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.15
+          cache: 'yarn'
+      - run: yarn
       - run: yarn typechain
       - run: yarn coverage
       - uses: codecov/codecov-action@v3
