@@ -1084,13 +1084,6 @@
   dependencies:
     "@types/ms" "*"
 
-"@types/eth-sig-util@2.1.4":
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/@types/eth-sig-util/-/eth-sig-util-2.1.4.tgz#bcf2aeeef681f0d0bfeceb5b1b2c4d31e07c0961"
-  integrity sha512-/uO6uXGVpLEePIyTBuVktnbupOV82L+docw5pDrTum8WSOxgERA1tYvXD3XbCO6y8sefuHhEBMcK/lAnejf4vA==
-  dependencies:
-    "@types/node" "*"
-
 "@types/form-data@0.0.33":
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/@types/form-data/-/form-data-0.0.33.tgz#c9ac85b2a5fd18435b8c85d9ecb50e6d6c893ff8"
