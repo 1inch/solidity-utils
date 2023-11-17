@@ -62,14 +62,12 @@ library BytesMemory {
             ret := mload(0x40)
             mstore(0x40, add(ret, add(0x20, length)))
             mstore(ret, length)
-        }
-        if (length < 33) {
-            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-                let dest := add(ret, 0x20)
-                mstore(dest, mload(pointer))
+
+            switch lt(length, 33)
+            case 1 {
+                mstore(add(ret, 0x20), mload(pointer))
             }
-        } else {
-            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            default {
                 pop(staticcall(gas(), 0x04, pointer, length, add(ret, 0x20), length))
             }
         }

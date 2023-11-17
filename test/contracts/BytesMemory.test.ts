@@ -87,17 +87,17 @@ describe('BytesMemoryMock', function () {
 
         it('unwrap with length less than 33 bytes (32 bytes)', async function () {
             const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes, 142)).to.be.equal(bytes);
+            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes, 141)).to.be.equal(bytes);
         });
 
         it('unwrap with more than 32 bytes (33 bytes)', async function () {
             const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes + 'ff', 275)).to.be.equal(bytes + 'ff');
+            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes + 'ff', 269)).to.be.equal(bytes + 'ff');
         });
 
         it('unwrap with more than 32 bytes (64 bytes)', async function () {
             const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes + trim0x(bytes), 275)).to.be.equal(bytes + trim0x(bytes));
+            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes + trim0x(bytes), 269)).to.be.equal(bytes + trim0x(bytes));
         });
     });
 });
