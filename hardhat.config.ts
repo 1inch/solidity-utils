@@ -9,7 +9,7 @@ require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 import { HardhatNetworkUserConfig } from 'hardhat/types';
-import { Networks, getNetwork } from './src/networks';
+import { Networks, getNetwork } from './hardhat-setup';
 
 dotenv.config();
 
@@ -37,6 +37,9 @@ const config: HardhatUserConfig = {
     networks,
     gasReporter: {
         enabled: true,
+    },
+    tracer: {
+        enableAllOpcodes: true,
     },
     typechain: {
         target: 'ethers-v6',

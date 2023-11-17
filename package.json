@@ -3,6 +3,10 @@
   "version": "3.5.0",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./hardhat-setup": "./dist/hardhat-setup/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/1inch/solidity-utils.git"
@@ -10,7 +14,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf artifacts cache coverage contracts/hardhat-dependency-compiler dist typechain-types",
-    "build": "yarn typechain && cti src -b && tsc -p tsconfig.publish.json",
+    "build": "yarn typechain && cti src hardhat-setup -b && tsc -p tsconfig.publish.json",
     "prepack": "yarn clean && yarn build",
     "coverage": "hardhat coverage",
     "format": "yarn format-ts && yarn format-sol",
