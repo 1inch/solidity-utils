@@ -1,9 +1,10 @@
-import { expect, ether, time } from '../src/prelude';
-import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions } from '../src/utils';
-import { ethers } from 'hardhat';
+import { expect, ether, time, constants } from '../src/prelude';
+import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode } from '../src/utils';
+import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { arrayify, hexlify, toUtf8Bytes, randomBytes } from 'ethers/lib/utils';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog } from 'ethers';
+import { TokenMock, WETH } from '../typechain-types';
 
 describe('timeIncreaseTo', function () {
     const precision = 2;
@@ -32,7 +33,7 @@ describe('timeIncreaseTo', function () {
 
     it('should be thrown with increase time to a moment in the past', async function () {
         await expect(shouldIncrease(-1000)).to.be.rejectedWith(
-            /Invalid timestamp \d+ is not larger than current timestamp \d+/,
+            /Timestamp \d+ is lower than the previous block's timestamp \d+/,
         );
     });
 });
@@ -62,21 +63,21 @@ describe('utils', function () {
     });
 
     describe('signMessage', function () {
-        it('should be signed test1', async function () {
+        it('should be signed 0x message', async function () {
             expect(await signer1.signMessage('0x')).equal(await signMessage(signer1));
         });
 
-        it('should be signed test2', async function () {
+        it('should be signed 32 bytes random bytes', async function () {
             const message = randomBytes(32);
             expect(await signer1.signMessage(message)).equal(await signMessage(signer1, message));
         });
 
-        it('should be signed test3', async function () {
+        it('should be signed string -> Uint8Array -> hex string -> Uint8Array', async function () {
             const message = hexlify(toUtf8Bytes('Test message'));
-            expect(await signer1.signMessage(arrayify(message))).equal(await signMessage(signer1, arrayify(message)));
+            expect(await signer1.signMessage(getBytes(message))).equal(await signMessage(signer1, getBytes(message)));
         });
 
-        it('should be signed test4', async function () {
+        it('should be signed string -> Uint8Array -> hex string', async function () {
             const message = hexlify(toUtf8Bytes('Test message'));
             expect(await signer1.signMessage(message)).equal(await signMessage(signer1, message));
         });
@@ -85,7 +86,7 @@ describe('utils', function () {
     async function deployUSDT() {
         const TokenMock = await ethers.getContractFactory('TokenMock');
         const usdt = await TokenMock.deploy('USDT', 'USDT');
-        await usdt.mint(signer1.address, ether('1000'));
+        await usdt.mint(signer1, ether('1000'));
         return { usdt };
     }
 
@@ -94,30 +95,28 @@ describe('utils', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
-                usdt.transfer(signer2.address, ether('1')),
+                usdt.transfer(signer2, ether('1')),
             );
             expect(received).to.be.equal(ether('1'));
-            expect(tx.data.length).equal(138);
             expect(tx.from).equal(signer1.address);
-            expect(tx.to).equal(usdt.address);
-            const events = (await tx.wait()).events!;
-            expect(events.length).equal(1);
-            expect(events[0].event).equal('Transfer');
+            expect(tx.to).equal(await usdt.getAddress());
+            expect(tx.logs.length).equal(1);
+            expect((<EventLog>tx.logs[0]).eventName).equal('Transfer');
+            expect(tx.logs[0].data.length).equal(66);
         });
 
         it('should be tracked ERC20 Approve', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
-                usdt.approve(signer2.address, ether('1')),
+                usdt.approve(signer2, ether('1')),
             );
             expect(received).to.be.equal('0');
-            expect(tx.data.length).equal(138);
             expect(tx.from).equal(signer1.address);
-            expect(tx.to).equal(usdt.address);
-            const events = (await tx.wait()).events!;
-            expect(events.length).equal(1);
-            expect(events[0].event).equal('Approval');
+            expect(tx.to).equal(await usdt.getAddress());
+            expect(tx.logs.length).equal(1);
+            expect((<EventLog>tx.logs[0]).eventName).equal('Approval');
+            expect(tx.logs[0].data.length).equal(66);
         });
     });
 
@@ -126,7 +125,7 @@ describe('utils', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const [received] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
-                usdt.transfer(signer2.address, ether('1')),
+                usdt.transfer(signer2, ether('1')),
             );
             expect(received).to.be.equal(ether('1'));
         });
@@ -135,7 +134,7 @@ describe('utils', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const [received] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
-                usdt.approve(signer2.address, ether('1')),
+                usdt.approve(signer2, ether('1')),
             );
             expect(received).to.be.equal('0');
         });
@@ -146,22 +145,73 @@ describe('utils', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
-                usdt.transfer(signer2.address, ether('1')),
+                usdt.transfer(signer2, ether('1')),
             );
-            expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                0, 0, 2, 2,
-            ]);
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+                expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 0, 2, 2,
+                ]);
+            }
         });
 
         it('should be counted ERC20 Approve', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
-                usdt.approve(signer2.address, ether('1')),
+                usdt.approve(signer2, ether('1')),
             );
-            expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                0, 0, 1, 0,
-            ]);
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+                expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
+                    0, 0, 1, 0,
+                ]);
+            }
         });
+    });
+
+    describe('deployContract', function () {
+        it('should be deploy new contract instance', async function () {
+            const token = <TokenMock> await deployContract('TokenMock', ['SomeToken', 'STM']);
+            expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await token.name()).to.be.eq('SomeToken');
+        });
+
+        it('should be using without arguments', async function () {
+            const weth = <WETH> await deployContract('WETH');
+            expect(await weth.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await weth.name()).to.be.eq('Wrapped Ether');
+        });
+    });
+
+    describe('deployContractFromBytecode', function () {
+        it('should deploy new contract instance', async function () {
+            const contractArtifact = await hre.artifacts.readArtifact('TokenMock');
+            const token = <TokenMock> await deployContractFromBytecode(contractArtifact.abi, contractArtifact.bytecode, ['SomeToken', 'STM']);
+            expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await token.name()).to.be.eq('SomeToken');
+        });
+
+        it('can be used without arguments', async function () {
+            const contractArtifact = await hre.artifacts.readArtifact('WETH');
+            const weth = <WETH> await deployContractFromBytecode(contractArtifact.abi, contractArtifact.bytecode);
+            expect(await weth.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await weth.name()).to.be.eq('Wrapped Ether');
+        });
+    });
+
+    describe('deployAndGetContract', function () {
+        it('should deploy new contract instance', async function () {
+            const tokenName = 'SomeToken';
+            // If hardhat-deploy `deploy` function logs need to be displayed, add HARDHAT_DEPLOY_LOG = 'true' to the .env file
+            const token = await deployAndGetContract({
+                contractName: 'TokenMock',
+                constructorArgs: [tokenName, 'STM'],
+                deployments,
+                deployer: signer1.address,
+                skipIfAlreadyDeployed: false,
+                skipVerify: true,
+            });
+            expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
+            expect(await token.name()).to.be.eq(tokenName);
+        }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
     });
 });

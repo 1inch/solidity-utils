@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
-pragma abicoder v1;
 
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
@@ -25,8 +24,7 @@ library ECDSA {
         bytes32 r,
         bytes32 s
     ) internal view returns (address signer) {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             if lt(s, _S_BOUNDARY) {
                 let ptr := mload(0x40)
 
@@ -46,8 +44,7 @@ library ECDSA {
         bytes32 r,
         bytes32 vs
     ) internal view returns (address signer) {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let s := and(vs, _COMPACT_S_MASK)
             if lt(s, _S_BOUNDARY) {
                 let ptr := mload(0x40)
@@ -71,8 +68,7 @@ library ECDSA {
     /// signature uniqueness will get rekt.
     /// More info: https://github.com/OpenZeppelin/openzeppelin-contracts/security/advisories/GHSA-4h98-2769-gh6h
     function recover(bytes32 hash, bytes calldata signature) internal view returns (address signer) {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
 
             // memory[ptr:ptr+0x80] = (hash, v, r, s)
@@ -166,8 +162,7 @@ library ECDSA {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, signature));
         // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
 
             mstore(ptr, selector)
@@ -189,8 +184,7 @@ library ECDSA {
         bytes32 s
     ) internal view returns (bool success) {
         bytes4 selector = IERC1271.isValidSignature.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
 
             mstore(ptr, selector)
@@ -215,8 +209,7 @@ library ECDSA {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, abi.encodePacked(r, vs)));
         // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
 
             mstore(ptr, selector)
@@ -240,8 +233,7 @@ library ECDSA {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, abi.encodePacked(r, vs & ~uint256(1 << 255), uint8(vs >> 255))));
         // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
 
             mstore(ptr, selector)
@@ -260,8 +252,7 @@ library ECDSA {
     function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32 res) {
         // 32 is the length in bytes of hash, enforced by the type signature above
         // return keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", hash));
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             mstore(0, 0x19457468657265756d205369676e6564204d6573736167653a0a333200000000) // "\x19Ethereum Signed Message:\n32"
             mstore(28, hash)
             res := keccak256(0, 60)
@@ -270,8 +261,7 @@ library ECDSA {
 
     function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32 res) {
         // return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
             mstore(ptr, 0x1901000000000000000000000000000000000000000000000000000000000000) // "\x19\x01"
             mstore(add(ptr, 0x02), domainSeparator)

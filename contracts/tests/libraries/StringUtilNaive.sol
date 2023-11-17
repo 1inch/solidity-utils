@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
-pragma abicoder v1;
 
 library StringUtilNaive {
     bytes16 private constant _ALPHABET = 0x30313233343536373839616263646566;

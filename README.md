@@ -40,6 +40,7 @@ This repository contains frequently used smart contracts, libraries and interfac
 |utils|`fixSignature(signature)`|patchs ganache's signature to geth's version|
 |utils|`signMessage(signer, messageHex) `|signs `messageHex` with `signer` and patchs ganache's signature to geth's version|
 |utils|`countInstructions(txHash, instruction)`|counts amount of `instruction` in transaction with `txHash` hash|
+|utils|`deployAndGetContract(contractName, constructorArgs, deployments, deployer, deploymentName, skipVerify, skipIfAlreadyDeployed, gasPrice, maxPriorityFeePerGas, maxFeePerGas, log, waitConfirmations)`|deploys contract `contractName` as `deploymentName` if not `skipIfAlreadyDeployed` with `constructorArgs` from `deployer` using `hardhat-deploy` `deployments` with additional gas options `gasPrice`, `maxPriorityFeePerGas` and `maxFeePerGas` and outputs results to the console if `log`. Tries to verify it after `waitConfirmations` on Etherscan if not `skipVerify`.|
 |profileEVM|`profileEVM(txHash, instruction, optionalTraceFile)`|the same as the `countInstructions()` with option of writing all trace to `optionalTraceFile`|
 |profileEVM|`gasspectEVM(txHash, options, optionalTraceFile)`|returns all used operations in `txHash` transaction with `options` and their costs with option of writing all trace to `optionalTraceFile`|
 

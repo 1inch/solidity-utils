@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.0;
-pragma abicoder v1;
 
 import "../libraries/RevertReasonParser.sol";
 
+// solhint-disable custom-errors
 contract RevertReasonParserTest {
     error TestDidNotThrow();
 
@@ -59,8 +59,7 @@ contract RevertReasonParserTest {
     function testParseWithThrow() external view {
         try this.nonEmptyRevert() { // solhint-disable-line no-empty-blocks
         } catch (bytes memory reason) {
-            /// @solidity memory-safe-assembly
-            assembly { // solhint-disable-line no-inline-assembly
+            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                 mstore(reason, sub(mload(reason), 0x20)) // reason = reason[:-32]
             }
             RevertReasonParser.parse(reason, "");

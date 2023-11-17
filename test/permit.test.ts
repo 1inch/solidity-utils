@@ -1,6 +1,6 @@
 import { expect } from '../src/prelude';
 import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { defaultDeadline, Permit, DaiLikePermit } from '../src/permit';
 import { trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit';
@@ -16,9 +16,9 @@ describe('Permit library', function () {
         const ERC20PermitMock = await ethers.getContractFactory('ERC20PermitMock');
         const DaiLikePermitMock = await ethers.getContractFactory('DaiLikePermitMock');
 
-        const chainId = (await ethers.provider.getNetwork()).chainId;
-        const erc20PermitMock = await ERC20PermitMock.deploy('USDC', 'USDC', signer1.address, 100n);
-        const daiLikePermitMock = await DaiLikePermitMock.deploy('DAI', 'DAI', signer1.address, 100n);
+        const chainId = Number((await ethers.provider.getNetwork()).chainId);
+        const erc20PermitMock = await ERC20PermitMock.deploy('USDC', 'USDC', signer1, 100n);
+        const daiLikePermitMock = await DaiLikePermitMock.deploy('DAI', 'DAI', signer1, 100n);
         return { erc20PermitMock, daiLikePermitMock, chainId };
     }
 
@@ -34,7 +34,7 @@ describe('Permit library', function () {
         const { erc20PermitMock, chainId } = await loadFixture(deployTokens);
 
         const name = await erc20PermitMock.name();
-        const data = buildData(name, '1', chainId, erc20PermitMock.address, signer1.address, signer1.address, '1', '1');
+        const data = buildData(name, '1', chainId, await erc20PermitMock.getAddress(), signer1.address, signer1.address, '1', '1');
         expect(data).to.be.deep.equal({
             types: {
                 Permit: Permit,
@@ -43,7 +43,7 @@ describe('Permit library', function () {
                 name,
                 version: '1',
                 chainId: 31337,
-                verifyingContract: erc20PermitMock.address,
+                verifyingContract: await erc20PermitMock.getAddress(),
             },
             message: {
                 owner: signer1.address,
@@ -63,7 +63,7 @@ describe('Permit library', function () {
             name,
             '1',
             chainId,
-            daiLikePermitMock.address,
+            await daiLikePermitMock.getAddress(),
             signer1.address,
             signer1.address,
             '1',
@@ -77,7 +77,7 @@ describe('Permit library', function () {
                 name,
                 version: '1',
                 chainId: 31337,
-                verifyingContract: daiLikePermitMock.address,
+                verifyingContract: await daiLikePermitMock.getAddress(),
             },
             message: {
                 holder: signer1.address,
