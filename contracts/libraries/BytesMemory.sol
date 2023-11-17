@@ -55,17 +55,22 @@ library BytesMemory {
      * @param piece The `Slice` to convert back to a bytes array.
      * @return ret The bytes array represented by the `Slice`.
      */
-    function unwrap(Slice memory piece) internal pure returns (bytes memory ret) {
+    function unwrap(Slice memory piece) internal view returns (bytes memory ret) {
         uint256 pointer = piece.pointer;
         uint256 length = piece.length;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             ret := mload(0x40)
             mstore(0x40, add(ret, add(0x20, length)))
             mstore(ret, length)
-
-            let dest := add(ret, 0x20)
-            for { let i := 0 } lt(i, length) { i := add(i, 0x20) } {
-                mstore(add(dest, i), mload(add(pointer, i)))
+        }
+        if (length < 33) {
+            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+                let dest := add(ret, 0x20)
+                mstore(dest, mload(pointer))
+            }
+        } else {
+            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+                pop(staticcall(gas(), 0x04, pointer, length, add(ret, 0x20), length))
             }
         }
     }
