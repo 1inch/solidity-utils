@@ -103,7 +103,7 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
 ) : Promise<[bigint, ContractTransactionReceipt]> {
     const tokenAddress = 'address' in token ? token.address : await token.getAddress();
     const isETH = tokenAddress === constants.ZERO_ADDRESS || tokenAddress === constants.EEE_ADDRESS;
-    const getBalance = 'balanceOf' in token ? token.balanceOf : provider.getBalance;
+    const getBalance = 'balanceOf' in token ? token.balanceOf.bind(token) : provider.getBalance.bind(provider);
 
     const preBalance: bigint = await getBalance(wallet);
     const txResult = await (await txPromise(...args)).wait();
