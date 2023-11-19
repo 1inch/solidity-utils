@@ -94,25 +94,28 @@ type Token = {
     getAddress: () => Promise<string>;
 }
 
+type TrackReceivedTokenAndTxResult = [bigint, ContractTransactionReceipt | TrackReceivedTokenAndTxResult];
+
 export async function trackReceivedTokenAndTx<T extends unknown[]>(
     provider: JsonRpcProvider | { getBalance: (address: string) => Promise<bigint> },
     token: Token | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
     wallet: string,
     txPromise: (...args: T) => Promise<ContractTransactionResponse>,
     ...args: T
-) : Promise<[bigint, ContractTransactionReceipt, ContractTransactionResponse]> {
+) : Promise<TrackReceivedTokenAndTxResult> {
     const tokenAddress = 'address' in token ? token.address : await token.getAddress();
     const isETH = tokenAddress === constants.ZERO_ADDRESS || tokenAddress === constants.EEE_ADDRESS;
     const getBalance = 'balanceOf' in token ? token.balanceOf : provider.getBalance;
 
     const preBalance: bigint = await getBalance(wallet);
-    const txResponse = await txPromise(...args);
-    const txReceipt = await txResponse.wait();
+    const txResponse: ContractTransactionResponse | TrackReceivedTokenAndTxResult = await txPromise(...args);
+    const txReceipt = 'wait' in txResponse ? await txResponse.wait() : txResponse[1];
     const txFees = wallet.toLowerCase() === txReceipt!.from.toLowerCase() && isETH
         ? txReceipt!.gasUsed * txReceipt!.gasPrice
         : 0n;
     const postBalance: bigint = await getBalance(wallet);
-    return [postBalance - preBalance + txFees, txReceipt!, txResponse];
+    const txResult = 'wait' in txResponse ? await txResponse.wait() : txResponse as TrackReceivedTokenAndTxResult;
+    return [postBalance - preBalance + txFees, txResult as TrackReceivedTokenAndTxResult];
 }
 
 export function fixSignature(signature: string): string {
