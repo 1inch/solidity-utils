@@ -114,7 +114,7 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
         ? txReceipt!.gasUsed * txReceipt!.gasPrice
         : 0n;
     const postBalance: bigint = await getBalance(wallet);
-    return [postBalance - preBalance + txFees, txReceipt!];
+    return [postBalance - preBalance + txFees, 'wait' in txResponse ? txReceipt! : txResponse];
 }
 
 export function fixSignature(signature: string): string {
