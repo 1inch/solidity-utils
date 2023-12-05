@@ -11,34 +11,43 @@ abstract contract BySig is Context, EIP712 {
     using Address for address;
 
     error WrongNonce();
+    error WrongRelayer();
     error WrongSignature();
+
+    struct SignedCall {
+        address relayer;
+        uint256 nonce;
+        bytes data;
+    }
+
+    bytes32 constant public SIGNED_CALL_TYPEHASH = keccak256("SignedCall(address relayer,uint256 nonce,bytes data)");
 
     address[] /* transient */ private _msgSenders;
     mapping(address => uint256) public bySigNonces;
     mapping(address => mapping(bytes4 => uint256)) public bySigSelectorNonces;
 
-    bytes32 constant private _BYSIG_TYPEHASH = keccak256("BySig(uint256 nonce,bytes data)");
-
     function _msgSender() internal view override returns (address) {
         return _msgSenders[_msgSenders.length - 1];
     }
 
-    function hashBySig(uint256 nonce, bytes calldata data) public view returns(bytes32) {
+    function hashBySig(SignedCall calldata sig) public view returns(bytes32) {
         return _hashTypedDataV4(
-            keccak256(abi.encodePacked(
-                _BYSIG_TYPEHASH,
-                nonce,
-                keccak256(data)
+            keccak256(abi.encode(
+                SIGNED_CALL_TYPEHASH,
+                sig.relayer,
+                sig.nonce,
+                keccak256(sig.data)
             ))
         );
     }
 
-    function bySig(address signer, uint256 nonce, bytes calldata data, bytes calldata signature) external payable returns(bytes memory ret) {
-        if (!_useNonce(signer, nonce, data)) revert WrongNonce();
-        if (!ECDSA.recoverOrIsValidSignature(signer, hashBySig(nonce, data), signature)) revert WrongSignature();
+    function bySig(address signer, SignedCall calldata sig, bytes calldata signature) external payable returns(bytes memory ret) {
+        if (sig.relayer != address(0) && sig.relayer != _msgSender()) revert WrongRelayer();
+        if (!_useNonce(signer, sig.nonce, sig.data)) revert WrongNonce();
+        if (!ECDSA.recoverOrIsValidSignature(signer, hashBySig(sig), signature)) revert WrongSignature();
 
         _msgSenders.push(signer);
-        ret = address(this).functionDelegateCall(data);
+        ret = address(this).functionDelegateCall(sig.data);
         _msgSenders.pop();
     }
 
