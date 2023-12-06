@@ -423,8 +423,9 @@ library SafeERC20 {
             assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                 mstore(0, selector)
                 if iszero(call(gas(), weth, amount, 0, 4, 0, 0)) {
-                    returndatacopy(0, 0, returndatasize())
-                    revert(0, returndatasize())
+                    let ptr := mload(0x40)
+                    returndatacopy(ptr, 0, returndatasize())
+                    revert(ptr, returndatasize())
                 }
             }
         }
