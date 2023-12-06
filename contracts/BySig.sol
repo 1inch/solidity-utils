@@ -6,44 +6,60 @@ import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "./libraries/ECDSA.sol";
+import { BySigTraits } from "./libraries/BySigTraits.sol";
 
 abstract contract BySig is Context, EIP712 {
     using Address for address;
+    using BySigTraits for BySigTraits.Value;
 
     error WrongNonce();
     error WrongRelayer();
     error WrongSignature();
+    error DeadlineExceeded();
 
     struct SignedCall {
-        address relayer;
-        uint256 nonce;
+        BySigTraits.Value traits;
         bytes data;
     }
 
-    bytes32 constant public SIGNED_CALL_TYPEHASH = keccak256("SignedCall(address relayer,uint256 nonce,bytes data)");
+    bytes32 constant public SIGNED_CALL_TYPEHASH = keccak256("SignedCall(uint256 traits,bytes data)");
 
     address[] /* transient */ private _msgSenders;
-    mapping(address => uint256) public bySigNonces;
-    mapping(address => mapping(bytes4 => uint256)) public bySigSelectorNonces;
+    mapping(address => uint256) private _bySigAccountNonces;
+    mapping(address => mapping(bytes4 => uint256)) private _bySigSelectorNonces;
+    mapping(address =>  mapping(uint256 => uint256)) private _bySigUniqueNonces;
 
-    function _msgSender() internal view override returns (address) {
-        return _msgSenders[_msgSenders.length - 1];
+    function bySigAccountNonces(address account) external view returns(uint256) {
+        return _bySigAccountNonces[account];
+    }
+
+    function bySigSelectorNonces(address account, bytes4 selector) external view returns(uint256) {
+        return _bySigSelectorNonces[account][selector];
+    }
+
+    function bySigUniqueNonces(address account, uint256 nonce) external view returns(bool) {
+        return (_bySigUniqueNonces[account][nonce >> 8] & (1 << (nonce & 0xff))) != 0;
+    }
+
+    function bySigUniqueNoncesSlot(address account, uint256 nonce) external view returns(uint256) {
+        return _bySigUniqueNonces[account][nonce >> 8];
     }
 
     function hashBySig(SignedCall calldata sig) public view returns(bytes32) {
         return _hashTypedDataV4(
             keccak256(abi.encode(
                 SIGNED_CALL_TYPEHASH,
-                sig.relayer,
-                sig.nonce,
+                sig.traits,
                 keccak256(sig.data)
             ))
         );
     }
 
     function bySig(address signer, SignedCall calldata sig, bytes calldata signature) external payable returns(bytes memory ret) {
-        if (sig.relayer != address(0) && sig.relayer != _msgSender()) revert WrongRelayer();
-        if (!_useNonce(signer, sig.nonce, sig.data)) revert WrongNonce();
+        if (block.timestamp > sig.traits.deadline()) revert DeadlineExceeded();
+        // TODO: should use msg.sender if we want to deny private relay execution redelegation
+        if (sig.traits.isRelayerAllowed(_msgSender())) revert WrongRelayer();
+        if (!_useNonce(signer, sig.traits, sig.data)) revert WrongNonce();
         if (!ECDSA.recoverOrIsValidSignature(signer, hashBySig(sig), signature)) revert WrongSignature();
 
         _msgSenders.push(signer);
@@ -51,19 +67,36 @@ abstract contract BySig is Context, EIP712 {
         _msgSenders.pop();
     }
 
-    function useBySigNonce(uint32 advance) external {
-        bySigNonces[_msgSender()] += advance;
+    function useBySigAccountNonce(uint32 advance) external {
+        _bySigAccountNonces[_msgSender()] += advance;
     }
 
     function useBySigSelectorNonce(bytes4 selector, uint32 advance) external {
-        bySigSelectorNonces[_msgSender()][selector] += advance;
+        _bySigSelectorNonces[_msgSender()][selector] += advance;
     }
 
-    function _useNonce(address signer, uint256 nonce, bytes calldata data) private returns(bool) {
-        if (nonce >> 255 == 0) {
-            return nonce == bySigNonces[signer]++;
-        } else {
-            return ((nonce << 1) >> 1) == bySigSelectorNonces[signer][bytes4(data)]++;
+    function useBySigUniqueNonce(uint256 nonce) external {
+        _bySigUniqueNonces[_msgSender()][nonce >> 8] |= 1 << (nonce & 0xff);
+    }
+
+    function _msgSender() internal view override returns (address) {
+        return _msgSenders[_msgSenders.length - 1];
+    }
+
+    function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool ret) {
+        BySigTraits.NonceType nonceType = traits.nonceType();
+        uint256 nonce = traits.nonce();
+        if (nonceType == BySigTraits.NonceType.Account) {
+            return nonce == _bySigAccountNonces[signer]++;
+        }
+        else if (nonceType == BySigTraits.NonceType.Selector) {
+            return nonce == _bySigSelectorNonces[signer][bytes4(data)]++;
+        }
+        else if (nonceType == BySigTraits.NonceType.Unique) {
+            mapping(uint256 => uint256) storage map = _bySigUniqueNonces[signer];
+            uint256 cache = map[nonce >> 8];
+            map[nonce >> 8] |= 1 << (nonce & 0xff);
+            return cache != map[nonce >> 8];
         }
     }
 }
