@@ -58,7 +58,7 @@ abstract contract BySig is Context, EIP712 {
     }
 
     function bySig(address signer, SignedCall calldata sig, bytes calldata signature) external payable returns(bytes memory ret) {
-        if (block.timestamp > sig.traits.deadline()) revert DeadlineExceeded();
+        if (block.timestamp > sig.traits.deadline()) revert DeadlineExceeded(); // solhint-disable-line not-rely-on-time
         // Using _msgSender() in the next line allows private relay execution redelegation
         if (sig.traits.isRelayerAllowed(_msgSender())) revert WrongRelayer();
         if (!_useNonce(signer, sig.traits, sig.data)) revert WrongNonce();
@@ -81,7 +81,7 @@ abstract contract BySig is Context, EIP712 {
         _bySigUniqueNonces[_msgSender()][nonce >> 8] |= 1 << (nonce & 0xff);
     }
 
-    function _msgSender() internal view override returns (address) {
+    function _msgSender() internal view override virtual returns (address) {
         return _msgSenders.at(_msgSenders.length() - 1);
     }
 
