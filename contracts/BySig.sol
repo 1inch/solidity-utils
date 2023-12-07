@@ -7,10 +7,12 @@ import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "./libraries/ECDSA.sol";
 import { BySigTraits } from "./libraries/BySigTraits.sol";
+import { AddressArray } from "./libraries/AddressArray.sol";
 
 abstract contract BySig is Context, EIP712 {
     using Address for address;
     using BySigTraits for BySigTraits.Value;
+    using AddressArray for AddressArray.Data;
 
     error WrongNonce();
     error WrongRelayer();
@@ -24,10 +26,10 @@ abstract contract BySig is Context, EIP712 {
 
     bytes32 constant public SIGNED_CALL_TYPEHASH = keccak256("SignedCall(uint256 traits,bytes data)");
 
-    address[] /* transient */ private _msgSenders;
+    AddressArray.Data /* transient */ private _msgSenders;
     mapping(address => uint256) private _bySigAccountNonces;
     mapping(address => mapping(bytes4 => uint256)) private _bySigSelectorNonces;
-    mapping(address =>  mapping(uint256 => uint256)) private _bySigUniqueNonces;
+    mapping(address => mapping(uint256 => uint256)) private _bySigUniqueNonces;
 
     function bySigAccountNonces(address account) external view returns(uint256) {
         return _bySigAccountNonces[account];
@@ -57,7 +59,7 @@ abstract contract BySig is Context, EIP712 {
 
     function bySig(address signer, SignedCall calldata sig, bytes calldata signature) external payable returns(bytes memory ret) {
         if (block.timestamp > sig.traits.deadline()) revert DeadlineExceeded();
-        // TODO: should use msg.sender if we want to deny private relay execution redelegation
+        // Using _msgSender() in the next line allows private relay execution redelegation
         if (sig.traits.isRelayerAllowed(_msgSender())) revert WrongRelayer();
         if (!_useNonce(signer, sig.traits, sig.data)) revert WrongNonce();
         if (!ECDSA.recoverOrIsValidSignature(signer, hashBySig(sig), signature)) revert WrongSignature();
@@ -80,7 +82,7 @@ abstract contract BySig is Context, EIP712 {
     }
 
     function _msgSender() internal view override returns (address) {
-        return _msgSenders[_msgSenders.length - 1];
+        return _msgSenders.at(_msgSenders.length() - 1);
     }
 
     function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool ret) {
@@ -89,10 +91,10 @@ abstract contract BySig is Context, EIP712 {
         if (nonceType == BySigTraits.NonceType.Account) {
             return nonce == _bySigAccountNonces[signer]++;
         }
-        else if (nonceType == BySigTraits.NonceType.Selector) {
+        if (nonceType == BySigTraits.NonceType.Selector) {
             return nonce == _bySigSelectorNonces[signer][bytes4(data)]++;
         }
-        else if (nonceType == BySigTraits.NonceType.Unique) {
+        if (nonceType == BySigTraits.NonceType.Unique) {
             mapping(uint256 => uint256) storage map = _bySigUniqueNonces[signer];
             uint256 cache = map[nonce >> 8];
             map[nonce >> 8] |= 1 << (nonce & 0xff);
