@@ -100,7 +100,7 @@ describe('BySigTraits', function () {
             expect(await bySigTraitsMock.isRelayerAllowed(value, bySigTraitsMock)).to.be.equal(true);
         });
 
-        it('should be allowed with setted another relayer', async function () {
+        it('should be denied with setted another relayer', async function () {
             const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits({ relayer: constants.EEE_ADDRESS });
             expect(await bySigTraitsMock.isRelayerAllowed(value, bySigTraitsMock)).to.be.equal(false);
