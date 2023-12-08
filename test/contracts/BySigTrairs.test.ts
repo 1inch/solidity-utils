@@ -13,7 +13,7 @@ export function buildBySigTraits({
     deadline = 0,
     relayer = constants.ZERO_ADDRESS.toString(),
     nonce = 0,
-} = {}) {
+} = {}): bigint {
     if (nonceType > 3) {
         throw new Error('Wrong nonce type, it should be less than 4');
     }

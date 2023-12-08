@@ -14,4 +14,8 @@ contract TokenWithBySig is TokenMock, BySig {
     function _msgSender() internal view override(Context, BySig) returns (address) {
         return BySig._msgSender();
     }
+
+    function getChainId() external view returns (uint256) {
+        return block.chainid;
+    }
 }
