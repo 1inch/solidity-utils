@@ -82,6 +82,9 @@ abstract contract BySig is Context, EIP712 {
     }
 
     function _msgSender() internal view override virtual returns (address) {
+        if (_msgSenders.length() == 0) {
+            return msg.sender;
+        }
         return _msgSenders.at(_msgSenders.length() - 1);
     }
 
