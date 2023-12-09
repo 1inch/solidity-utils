@@ -82,10 +82,11 @@ abstract contract BySig is Context, EIP712 {
     }
 
     function _msgSender() internal view override virtual returns (address) {
-        if (_msgSenders.length() == 0) {
-            return msg.sender;
+        uint256 length = _msgSenders.length();
+        if (length == 0) {
+            return super._msgSender();
         }
-        return _msgSenders.at(_msgSenders.length() - 1);
+        return _msgSenders.at(length - 1);
     }
 
     function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool ret) {
