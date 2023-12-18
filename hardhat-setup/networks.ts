@@ -22,6 +22,7 @@ export class Networks {
         if (useHardhat || forkingNetworkName) {
             this.networks.hardhat = {
                 chainId: Number(process.env.FORK_CHAIN_ID) || 31337,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 saveDeployments: saveHardhatDeployments,
             };
