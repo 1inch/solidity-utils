@@ -3,7 +3,7 @@ import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, cou
 import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog } from 'ethers';
+import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog, ContractTransactionReceipt } from 'ethers';
 import { TokenMock, WETH } from '../typechain-types';
 
 describe('timeIncreaseTo', function () {
@@ -96,7 +96,7 @@ describe('utils', function () {
 
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2, ether('1')),
-            );
+            ) as [bigint, ContractTransactionReceipt];
             expect(received).to.be.equal(ether('1'));
             expect(tx.from).equal(signer1.address);
             expect(tx.to).equal(await usdt.getAddress());
@@ -110,7 +110,7 @@ describe('utils', function () {
 
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
-            );
+            ) as [bigint, ContractTransactionReceipt];
             expect(received).to.be.equal('0');
             expect(tx.from).equal(signer1.address);
             expect(tx.to).equal(await usdt.getAddress());
@@ -144,9 +144,9 @@ describe('utils', function () {
         it('should be counted ERC20 Transfer', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
+            const tx = (await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2, ether('1')),
-            );
+            ))[1] as ContractTransactionReceipt;
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 2, 2,
@@ -157,9 +157,9 @@ describe('utils', function () {
         it('should be counted ERC20 Approve', async function () {
             const { usdt } = await loadFixture(deployUSDT);
 
-            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
+            const tx = (await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
-            );
+            ))[1] as ContractTransactionReceipt;
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 0,
