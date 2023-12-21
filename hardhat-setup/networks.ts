@@ -12,13 +12,19 @@ export function getNetwork(): string {
 export class Networks {
     networks: NetworksUserConfig = {};
     etherscan: Etherscan = { apiKey: {}, customChains: [] };
+    authKeyHttpHeader?: string;
 
-    constructor(useHardhat: boolean = true, forkingNetworkName?: string, needAuthKeyHttpHeader: boolean = false, saveHardhatDeployments: boolean = false) {
+    constructor(useHardhat: boolean = true, forkingNetworkName?: string, authKeyHttpHeaderEnvVar?: string, saveHardhatDeployments: boolean = false) {
         dotenv.config();
-        this.updateHardhatNetwork(useHardhat, forkingNetworkName, needAuthKeyHttpHeader, saveHardhatDeployments);
+        this.authKeyHttpHeader = !authKeyHttpHeaderEnvVar ? undefined : process.env[authKeyHttpHeaderEnvVar] || '';
+        this.updateHardhatNetwork(useHardhat, forkingNetworkName, this.authKeyHttpHeader, saveHardhatDeployments);
     }
 
-    updateHardhatNetwork(useHardhat: boolean, forkingNetworkName?: string, needAuthKeyHttpHeader: boolean = false, saveHardhatDeployments: boolean = false) {
+    setAuthKeyHttpHeader(authKeyHttpHeaderEnvVar?: string) {
+        this.authKeyHttpHeader = !authKeyHttpHeaderEnvVar ? undefined : process.env[authKeyHttpHeaderEnvVar] || '';
+    }
+
+    updateHardhatNetwork(useHardhat: boolean, forkingNetworkName?: string, authKeyHttpHeader?: string, saveHardhatDeployments: boolean = false) {
         if (useHardhat || forkingNetworkName) {
             this.networks.hardhat = {
                 chainId: Number(process.env.FORK_CHAIN_ID) || 31337,
@@ -31,9 +37,7 @@ export class Networks {
         if (forkingNetworkName) {
             this.networks.hardhat!.forking = {
                 url: process.env[`${forkingNetworkName.toUpperCase()}_RPC_URL`] || '',
-                httpHeaders: needAuthKeyHttpHeader
-                    ? { 'auth-key': process.env.RPC_AUTH_HEADER || '' }
-                    : undefined,
+                httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
             };
         }
     }
@@ -42,6 +46,7 @@ export class Networks {
         if (url && privateKey && etherscanNetworkName && etherscanKey) {
             this.networks[name] = {
                 url,
+                httpHeaders: this.authKeyHttpHeader ? { 'auth-key': this.authKeyHttpHeader } : undefined,
                 chainId,
                 accounts: [privateKey],
                 hardfork,
