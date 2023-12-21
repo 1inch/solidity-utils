@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import { ChainConfig } from '@nomicfoundation/hardhat-verify/src/types';
 import { NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
-import 'hardhat-deploy';  // required to populate the HardhatNetworkUserConfig with saveDeployments
 
 export type Etherscan = { apiKey: {[key: string]: string}, customChains: ChainConfig[] };
 
@@ -23,6 +22,8 @@ export class Networks {
         if (useHardhat || forkingNetworkName) {
             this.networks.hardhat = {
                 chainId: Number(process.env.FORK_CHAIN_ID) || 31337,
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 saveDeployments: saveHardhatDeployments,
             };
         }
