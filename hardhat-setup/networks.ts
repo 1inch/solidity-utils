@@ -103,7 +103,7 @@ export class Networks {
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
         this.registerZksync('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL || '', 'mainnet', process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey);
         this.registerZksync('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL || 'http://localhost:3050', process.env.ZKSYNC_LOCAL_ETH_NETWORK || 'http://localhost:8545', process.env.ZKSYNC_PRIVATE_KEY || privateKey); // eslint-disable-line max-len
-        this.registerZksync('zksyncTest', 280, process.env.ZKSYNC_TEST_RPC_URL || 'https://testnet.era.zksync.dev', 'goerli', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, process.env.ZKSYNC_TEST_VERIFY_URL);
+        this.registerZksync('zksyncTest', 280, process.env.ZKSYNC_TEST_RPC_URL || 'https://testnet.era.zksync.dev', 'goerli', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, process.env.ZKSYNC_TEST_VERIFY_URL); // eslint-disable-line max-len
         return { networks: this.networks, etherscan: this.etherscan };
     }
 }
