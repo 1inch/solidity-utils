@@ -106,12 +106,4 @@ export class Networks {
         this.registerZksync('zksyncTest', 280, process.env.ZKSYNC_TEST_RPC_URL || 'https://testnet.era.zksync.dev', 'goerli', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey);
         return { networks: this.networks, etherscan: this.etherscan };
     }
-
-    unregister(name: string) {
-        delete this.networks[name];
-    }
-
-    unregisterBatch(names: string[]) {
-        names.forEach((name) => this.unregister(name));
-    }
 }
