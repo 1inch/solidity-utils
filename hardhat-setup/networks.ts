@@ -55,7 +55,7 @@ export class Networks {
 
     registerCustom(name: string, chainId: number, url?: string, privateKey?: string, etherscanKey?: string, apiURL: string = '', browserURL: string = '', hardfork = 'paris') {
         if (url && privateKey && etherscanKey) {
-            this.register(name, chainId, hardfork, url, privateKey, name, etherscanKey);
+            this.register(name, chainId, url, privateKey, name, etherscanKey, hardfork);
             this.etherscan.customChains.push({ network: name, chainId, urls: { apiURL, browserURL } });
         }
     }
