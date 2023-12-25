@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 
 import "../libraries/StringUtil.sol";
 import "./libraries/StringUtilNaive.sol";
-import "../GasChecker.sol";
 
 contract StringUtilTest {
     function toHex(uint256 value)
