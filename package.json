@@ -28,8 +28,11 @@
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test --parallel",
     "test:ci": "hardhat test",
+    "test:update-snapshots": "UPDATE_SNAPSHOT=1 yarn test:ci",
+    "test:us": "UPDATE_SNAPSHOT=1 yarn test:ci",
     "typecheck": "tsc --noEmit --skipLibCheck",
     "typechain": "hardhat typechain"
+
   },
   "dependencies": {
     "@metamask/eth-sig-util": "7.0.1",
