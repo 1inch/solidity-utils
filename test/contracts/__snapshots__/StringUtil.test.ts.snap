@@ -1,29 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`StringUtil Gas usage Empty bytes 1`] = `191n`;
+exports[`StringUtil Gas usage Empty bytes 1`] = `22305n`;
 
-exports[`StringUtil Gas usage Empty bytes naive 1`] = `495n`;
+exports[`StringUtil Gas usage Empty bytes naive 1`] = `22651n`;
 
-exports[`StringUtil Gas usage Extremely long byte array gas 1`] = `17009n`;
+exports[`StringUtil Gas usage Extremely long byte array gas 1`] = `60428n`;
 
-exports[`StringUtil Gas usage Extremely long byte array gas naive 1`] = `492884n`;
+exports[`StringUtil Gas usage Extremely long byte array gas naive 1`] = `536349n`;
 
-exports[`StringUtil Gas usage Single byte 1`] = `716n`;
+exports[`StringUtil Gas usage Single byte 1`] = `22982n`;
 
-exports[`StringUtil Gas usage Single byte naive 1`] = `987n`;
+exports[`StringUtil Gas usage Single byte naive 1`] = `23301n`;
 
-exports[`StringUtil Gas usage Uint 128 1`] = `840n`;
+exports[`StringUtil Gas usage Uint 128 1`] = `22815n`;
 
-exports[`StringUtil Gas usage Uint 128 naive 1`] = `16366n`;
+exports[`StringUtil Gas usage Uint 128 naive 1`] = `38302n`;
 
-exports[`StringUtil Gas usage Uint 256 1`] = `840n`;
+exports[`StringUtil Gas usage Uint 256 1`] = `23007n`;
 
-exports[`StringUtil Gas usage Uint 256 as bytes 1`] = `716n`;
+exports[`StringUtil Gas usage Uint 256 as bytes 1`] = `23520n`;
 
-exports[`StringUtil Gas usage Uint 256 as bytes naive 1`] = `16251n`;
+exports[`StringUtil Gas usage Uint 256 as bytes naive 1`] = `39097n`;
 
-exports[`StringUtil Gas usage Uint 256 naive 1`] = `16366n`;
+exports[`StringUtil Gas usage Uint 256 naive 1`] = `38494n`;
 
-exports[`StringUtil Gas usage Very long byte array gas 1`] = `1766n`;
+exports[`StringUtil Gas usage Very long byte array gas 1`] = `25412n`;
 
-exports[`StringUtil Gas usage Very long byte array gas naive 1`] = `33483n`;
+exports[`StringUtil Gas usage Very long byte array gas naive 1`] = `57177n`;

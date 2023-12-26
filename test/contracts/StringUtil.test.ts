@@ -40,16 +40,16 @@ describe('StringUtil', function () {
 
         async function test(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            const [result] = await stringUtilTest.toHex(value);
-            const [naiveResult] = await stringUtilTest.toHexNaive(value);
+            const result = await stringUtilTest.toHex(value);
+            const naiveResult = await stringUtilTest.toHexNaive(value);
             expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
             expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
         }
 
         async function testBytes(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            const [result] = await stringUtilTest.toHexBytes(value);
-            const [naiveResult] = await stringUtilTest.toHexNaiveBytes(value);
+            const result = await stringUtilTest.toHexBytes(value);
+            const naiveResult = await stringUtilTest.toHexNaiveBytes(value);
             expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
             expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
         }
@@ -90,28 +90,32 @@ describe('StringUtil', function () {
 
         async function testGasUint256(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            const { gasUsed } = await stringUtilTest.toHex(value);
+            const tx = await (await stringUtilTest.toHex.send(value)).wait();
+            const gasUsed = tx!.gasUsed;
 
             expect(gasUsed).toMatchSnapshot();
         }
 
         async function testGasBytes(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            const { gasUsed } = await stringUtilTest.toHexBytes(value);
+            const tx = await (await stringUtilTest.toHexBytes.send(value)).wait();
+            const gasUsed = tx!.gasUsed;
 
             expect(gasUsed).toMatchSnapshot();
         }
 
         async function testGasNaiveUint256(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            const { gasUsed } = await stringUtilTest.toHexNaive(value);
+            const tx = await (await stringUtilTest.toHexNaive.send(value)).wait();
+            const gasUsed = tx!.gasUsed;
 
             expect(gasUsed).toMatchSnapshot();
         }
 
         async function testGasNaiveBytes(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            const { gasUsed } = await stringUtilTest.toHexNaiveBytes(value);
+            const tx = await (await stringUtilTest.toHexNaiveBytes.send(value)).wait();
+            const gasUsed = tx!.gasUsed;
 
             expect(gasUsed).toMatchSnapshot();
         }

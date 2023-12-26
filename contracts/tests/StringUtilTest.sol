@@ -8,57 +8,33 @@ import "./libraries/StringUtilNaive.sol";
 contract StringUtilTest {
     function toHex(uint256 value)
         external
-        view
-        returns (string memory hexString, uint256 gasUsed)
+        pure
+        returns (string memory)
     {
-        gasUsed = gasleft();
-
-        hexString = StringUtil.toHex(value);
-
-        unchecked {
-            gasUsed -= gasleft();
-        }
+        return StringUtil.toHex(value);
     }
 
     function toHexBytes(bytes memory data)
         external
-        view
-        returns (string memory hexString, uint256 gasUsed)
-    {
-        gasUsed = gasleft();
-        
-        hexString = StringUtil.toHex(data);
-
-        unchecked {
-            gasUsed -= gasleft();
-        }
+        pure
+        returns (string memory)
+    {        
+        return StringUtil.toHex(data);
     }
 
     function toHexNaive(uint256 value)
         external
-        view
-        returns (string memory hexString, uint256 gasUsed)
+        pure
+        returns (string memory)
     {
-        gasUsed = gasleft();
-
-        hexString = StringUtilNaive.toHex(value);
-
-        unchecked {
-            gasUsed -= gasleft();
-        }
+        return StringUtilNaive.toHex(value);
     }
 
     function toHexNaiveBytes(bytes memory data)
         external
-        view
-        returns (string memory hexString, uint256 gasUsed)
+        pure
+        returns (string memory hexString)
     {
-        gasUsed = gasleft();
-
-        hexString = StringUtilNaive.toHex(data);
-
-        unchecked {
-            gasUsed -= gasleft();
-        }
+        return StringUtilNaive.toHex(data);
     }
 }
