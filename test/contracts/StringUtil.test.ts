@@ -88,6 +88,20 @@ describe('StringUtil', function () {
 
         it('Single byte naive', () => testGasNaiveBytes(singleByte));
 
+        it('Compare gas usage Uint256', () => compareGasUint256(uint256TestValue));
+
+        it('Compare gas usage Uint256 as bytes', () => compareGasBytes(uint256TestValue));
+
+        it('Compare gas usage Uint128', () => compareGasUint256(uint128TestValue));
+
+        it('Compare gas usage very long byte array', () => compareGasBytes(veryLongArray));
+
+        it('Compare gas usage extremly long byte array', () => compareGasBytes(extremelyLongArray));
+
+        it('Compare gas usage empty bytes', () => compareGasBytes(emptyBytes));
+
+        it('Compare gas usage single byte', () => compareGasBytes(singleByte));
+
         async function testGasUint256(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
             const tx = await (await stringUtilTest.toHex.send(value)).wait();
@@ -118,6 +132,24 @@ describe('StringUtil', function () {
             const gasUsed = tx!.gasUsed;
 
             expect(gasUsed).toMatchSnapshot();
+        }
+
+        async function compareGasUint256(value: string) {
+            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const tx = await (await stringUtilTest.toHex.send(value)).wait();
+            const gasUsed = tx!.gasUsed;
+            const naiveTx = await (await stringUtilTest.toHexNaive.send(value)).wait();
+            const naiveGasUsed = naiveTx!.gasUsed;
+            expect(gasUsed).to.be.lessThan(naiveGasUsed);
+        }
+
+        async function compareGasBytes(value: string) {
+            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const tx = await (await stringUtilTest.toHexBytes.send(value)).wait();
+            const gasUsed = tx!.gasUsed;
+            const naiveTx = await (await stringUtilTest.toHexNaiveBytes.send(value)).wait();
+            const naiveGasUsed = naiveTx!.gasUsed;
+            expect(gasUsed).to.be.lessThan(naiveGasUsed);
         }
     });
 });
