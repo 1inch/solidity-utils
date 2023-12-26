@@ -18,7 +18,7 @@ contract StringUtilTest {
         external
         pure
         returns (string memory)
-    {        
+    {
         return StringUtil.toHex(data);
     }
 
@@ -33,7 +33,7 @@ contract StringUtilTest {
     function toHexNaiveBytes(bytes memory data)
         external
         pure
-        returns (string memory hexString)
+        returns (string memory)
     {
         return StringUtilNaive.toHex(data);
     }
