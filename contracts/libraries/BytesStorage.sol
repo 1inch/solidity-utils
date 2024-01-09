@@ -34,7 +34,7 @@ library BytesStorage {
                 slot := data.slot
                 length := shr(1, and(blob, 0xFF))
             }
-            case 1 { // Long
+            default { // Long
                 mstore(0, data.slot)
                 slot := keccak256(0, 0x20)
                 length := shr(1, blob)

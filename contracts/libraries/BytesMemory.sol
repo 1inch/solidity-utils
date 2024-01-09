@@ -63,8 +63,8 @@ library BytesMemory {
             mstore(0x40, add(ret, add(0x20, length)))
             mstore(ret, length)
 
-            switch lt(length, 33)
-            case 1 {
+            switch gt(length, 32)
+            case 0 {
                 mstore(add(ret, 0x20), mload(pointer))
             }
             default {
