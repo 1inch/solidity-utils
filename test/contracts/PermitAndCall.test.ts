@@ -7,7 +7,7 @@ import { PermitAndCallMock } from '../../typechain-types';
 
 const value = 42n;
 
-describe.only('Permitable', function () {
+describe('Permitable', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;
 
@@ -30,6 +30,7 @@ describe.only('Permitable', function () {
         const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), true);
         const tx = await permitAndCallMock.permitAndCall(erc20PermitMock.target + trim0x(permit), (await permitAndCallMock.foo.populateTransaction()).data);
         expect(tx).to.emit(permitAndCallMock, 'FooCalled');
+        expect(await erc20PermitMock.allowance(signer1.address, permitAndCallMock.target)).to.equal(value);
     });
 
     it('should work with invalid permit', async function () {
@@ -37,5 +38,6 @@ describe.only('Permitable', function () {
         const badPermit = await getPermit(signer1, erc20PermitMock, '2', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), true);
         const tx = await permitAndCallMock.permitAndCall(erc20PermitMock.target + trim0x(badPermit), (await permitAndCallMock.foo.populateTransaction()).data);
         expect(tx).to.emit(permitAndCallMock, 'FooCalled');
+        expect(await erc20PermitMock.allowance(signer1.address, permitAndCallMock.target)).to.equal(0);
     });
 });
