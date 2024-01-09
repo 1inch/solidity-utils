@@ -16,14 +16,14 @@ describe('BytesStorageMock', function () {
 
     async function deployBytesStorageMockWithShortData() {
         const BytesStorageMock = await ethers.getContractFactory('BytesStorageMock');
-        const bytesStorageMock = await BytesStorageMock.deploy();
+        const bytesStorageMock = <BytesStorageMock><unknown> await BytesStorageMock.deploy();
         await bytesStorageMock.setData(shortBytes);
         return { bytesStorageMock, data: null };
     }
 
     async function deployBytesStorageMockWithLongData() {
         const BytesStorageMock = await ethers.getContractFactory('BytesStorageMock');
-        const bytesStorageMock = await BytesStorageMock.deploy();
+        const bytesStorageMock = <BytesStorageMock><unknown> await BytesStorageMock.deploy();
         await bytesStorageMock.setData(longBytes);
         return { bytesStorageMock, data: null };
     }
