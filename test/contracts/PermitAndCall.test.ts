@@ -9,10 +9,9 @@ const value = 42n;
 
 describe('Permitable', function () {
     let signer1: SignerWithAddress;
-    let signer2: SignerWithAddress;
 
     before(async function () {
-        [signer1, signer2] = await ethers.getSigners();
+        [signer1] = await ethers.getSigners();
     });
 
     async function deployTokens() {
