@@ -20,18 +20,16 @@ library BytesMemory {
     /**
      * @dev Creates a `Slice` from a bytes array.
      * @param data The bytes array to create a slice from.
-     * @return A `Slice` struct representing the entire bytes array.
+     * @return ret A `Slice` struct representing the entire bytes array.
      */
-    function wrap(bytes memory data) internal pure returns (Slice memory) {
+    function wrap(bytes memory data) internal pure returns (Slice memory ret) {
         uint256 pointer;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             pointer := add(data, 0x20)
         }
 
-        return Slice({
-            pointer: pointer,
-            length: data.length
-        });
+        ret.pointer = pointer;
+        ret.length = data.length;
     }
 
     /**
