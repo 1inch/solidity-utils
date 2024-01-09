@@ -6,35 +6,30 @@ import { trim0x } from '../../src';
 describe('BytesMemoryMock', function () {
     const bytes = '0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
 
-    async function deployBytesMemoryMock() {
+    async function deployBytesMemoryMockWithData() {
         const BytesMemoryMock = await ethers.getContractFactory('BytesMemoryMock');
         const bytesMemoryMock = await BytesMemoryMock.deploy();
-        return { bytesMemoryMock };
-    }
-
-    async function deployBytesMemoryMockWithData() {
-        const { bytesMemoryMock } = await deployBytesMemoryMock();
         const [pointer, length]: Array<bigint> = await bytesMemoryMock.wrap(bytes);
         return { bytesMemoryMock, data: { pointer, length } };
     }
 
     describe('wrap', function () {
         it('should return correct pointer and length of data', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
             const [pointer, length]: Array<bigint> = await bytesMemoryMock.wrap(bytes);
             expect(pointer).to.be.equal(160n);
             expect(length).to.be.equal(trim0x(bytes).length / 2);
         });
 
         it('should return correct pointer and length of empty data', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
             const [pointer, length]: Array<bigint> = await bytesMemoryMock.wrap('0x');
             expect(pointer).to.be.equal(160n);
             expect(length).to.be.equal(0);
         });
 
         it('should return correct pointer and length of data with non-default pointer', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
             const [pointer, length]: Array<bigint> = await bytesMemoryMock.wrapWithNonDefaultPointer(bytes, 1);
             expect(pointer).to.be.equal(288);
             expect(length).to.be.equal(trim0x(bytes).length / 2);
@@ -65,17 +60,17 @@ describe('BytesMemoryMock', function () {
 
     describe('unwrap', function () {
         it('should return correct bytes after wrap', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
             expect(await bytesMemoryMock.wrapAndUnwrap(bytes)).to.be.equal(bytes);
         });
 
         it('should return correct bytes after wrap with non-default pointer', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
             expect(await bytesMemoryMock.wrapWithNonDefaultPointerAndUnwrap(bytes, 10n)).to.be.equal(bytes);
         });
 
         it('should return correct bytes slice', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
             expect(await bytesMemoryMock.wrapWithSliceAndUnwrap(bytes, 16n, 10n)).to.be.equal('0x' + trim0x(bytes).substring(32, 32 + 20));
         });
     });
@@ -85,19 +80,28 @@ describe('BytesMemoryMock', function () {
             if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
         });
 
-        it('unwrap with length less than 33 bytes (32 bytes)', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes, 140)).to.be.equal(bytes);
+        it('unwrap 32 bytes', async function () {
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
+            const tx = await (await bytesMemoryMock.wrapAndUnwrap.send(bytes)).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         });
 
-        it('unwrap with more than 32 bytes (33 bytes)', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes + 'ff', 268)).to.be.equal(bytes + 'ff');
+        it('unwrap 33 bytes', async function () {
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
+            const tx = await (await bytesMemoryMock.wrapAndUnwrap.send(bytes + 'ff')).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         });
 
-        it('unwrap with more than 32 bytes (64 bytes)', async function () {
-            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes + trim0x(bytes), 268)).to.be.equal(bytes + trim0x(bytes));
+        it('unwrap 64 bytes', async function () {
+            const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMockWithData);
+            const tx = await (await bytesMemoryMock.wrapAndUnwrap.send(bytes + trim0x(bytes))).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
+        });
+
+        it('slice', async function () {
+            const { bytesMemoryMock, data } = await loadFixture(deployBytesMemoryMockWithData);
+            const tx = await (await bytesMemoryMock.slice.send(data, 10n, 20n)).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         });
     });
 });

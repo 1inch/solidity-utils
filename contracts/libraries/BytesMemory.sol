@@ -20,18 +20,13 @@ library BytesMemory {
     /**
      * @dev Creates a `Slice` from a bytes array.
      * @param data The bytes array to create a slice from.
-     * @return A `Slice` struct representing the entire bytes array.
+     * @return ret A `Slice` struct representing the entire bytes array.
      */
-    function wrap(bytes memory data) internal pure returns (Slice memory) {
-        uint256 pointer;
+    function wrap(bytes memory data) internal pure returns (Slice memory ret) {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            pointer := add(data, 0x20)
+            mstore(ret, add(data, 0x20))
+            mstore(add(ret, 0x20), mload(data))
         }
-
-        return Slice({
-            pointer: pointer,
-            length: data.length
-        });
     }
 
     /**
@@ -39,15 +34,15 @@ library BytesMemory {
      * @param data The original `Slice` to take a portion from.
      * @param offset The offset in bytes from the start of the original `Slice`.
      * @param size The size of the new `Slice` in bytes.
-     * @return A new `Slice` struct representing the specified portion of the original.
+     * @return ret A new `Slice` struct representing the specified portion of the original.
      */
-    function slice(Slice memory data, uint256 offset, uint256 size) internal pure returns (Slice memory) {
+    function slice(Slice memory data, uint256 offset, uint256 size) internal pure returns (Slice memory ret) {
         if (offset + size > data.length) revert OutOfBounds();
 
-        return Slice({
-            pointer: data.pointer + offset,
-            length: size
-        });
+        unchecked {
+            ret.pointer = data.pointer + offset;
+            ret.length = size;
+        }
     }
 
     /**
