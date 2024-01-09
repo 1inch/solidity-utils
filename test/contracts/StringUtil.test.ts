@@ -1,17 +1,18 @@
 import { expect } from '../../src/prelude';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { BigNumberish, BytesLike } from 'ethers';
 import hre, { ethers } from 'hardhat';
 
 describe('StringUtil', function () {
     const uint256TestValue = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
     const uint128TestValue = '0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';
-    const veryLongArray = '0xffffffffffffffafafafbcbcbcbcbdeded' + 'aa'.repeat(50);
-    const extremelyLongArray = '0x' + '0f'.repeat(1000);
+    const veryLongArray = '0xFFFFFFFFFFFFFFAFAFAFBCBCBCBCBDEDED' + 'AA'.repeat(50);
+    const extremelyLongArray = '0x' + '0F'.repeat(1000);
     const emptyBytes = '0x';
-    const singleByte = '0xaf';
-    const randomBytes = '0x01de89fff130adeaad';
-    const sameBytesShort = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-    const sameBytesLong = '0x' + 'aa'.repeat(1000);
+    const singleByte = '0xAF';
+    const randomBytes = '0x01DE89FFF130ADEAAD';
+    const sameBytesShort = '0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    const sameBytesLong = '0x' + 'AA'.repeat(1000);
 
     async function deployStringUtilTest() {
         const StringUtilTest = await ethers.getContractFactory('StringUtilTest');
@@ -38,27 +39,20 @@ describe('StringUtil', function () {
 
         it('Same bytes long', () => testBytes(sameBytesLong));
 
-        it('Single byte naive', () => testIncorrectGas(singleByte, 2000));
-
         async function test(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            const result = await stringUtilTest.toHex(value, 0);
-            const naiveResult = await stringUtilTest.toHexNaive(value, 0);
-            expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
-            expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
+            const result = await stringUtilTest.toHex(value);
+            const naiveResult = await stringUtilTest.toHexNaive(value);
+            expect(result).to.be.equal(value);
+            expect(result).to.be.equal(naiveResult);
         }
 
         async function testBytes(value: string) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            const result = await stringUtilTest.toHexBytes(value, 0);
-            const naiveResult = await stringUtilTest.toHexNaiveBytes(value, 0);
-            expect(result.toLowerCase()).to.be.equal(value.toLowerCase());
-            expect(result.toLowerCase()).to.be.equal(naiveResult.toLowerCase());
-        }
-
-        async function testIncorrectGas(value: string, expectedGas: number) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            await expect(stringUtilTest.toHexNaiveBytes(value, expectedGas)).to.be.reverted; // TODO: change to revertedWithCustomError(stringUtilTest, 'GasCostDiffers')
+            const result = await stringUtilTest.toHexBytes(value);
+            const naiveResult = await stringUtilTest.toHexNaiveBytes(value);
+            expect(result).to.be.equal(value);
+            expect(result).to.be.equal(naiveResult);
         }
     });
 
@@ -67,52 +61,84 @@ describe('StringUtil', function () {
             if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
         });
 
-        it('Uint 256', () => testGasUint256(uint256TestValue, 834));
+        it('Uint 256', () => testGasUint256(uint256TestValue));
 
-        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue, 16369));
+        it('Uint 256 naive', () => testGasNaiveUint256(uint256TestValue));
 
-        it('Uint 256 as bytes', () => testGasBytes(uint256TestValue, 716));
+        it('Uint 256 as bytes', () => testGasBytes(uint256TestValue));
 
-        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue, 16251));
+        it('Uint 256 as bytes naive', () => testGasNaiveBytes(uint256TestValue));
 
-        it('Uint 128', () => testGasUint256(uint128TestValue, 834));
+        it('Uint 128', () => testGasUint256(uint128TestValue));
 
-        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue, 16369));
+        it('Uint 128 naive', () => testGasNaiveUint256(uint128TestValue));
 
-        it('Very long byte array gas', () => testGasBytes(veryLongArray, 1766));
+        it('Very long byte array gas', () => testGasBytes(veryLongArray));
 
-        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray, 33483));
+        it('Very long byte array gas naive', () => testGasNaiveBytes(veryLongArray));
 
-        it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray, 17009));
+        it('Extremely long byte array gas', () => testGasBytes(extremelyLongArray));
 
-        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray, 492884));
+        it('Extremely long byte array gas naive', () => testGasNaiveBytes(extremelyLongArray));
 
-        it('Empty bytes', () => testGasBytes(emptyBytes, 191));
+        it('Empty bytes', () => testGasBytes(emptyBytes));
 
-        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes, 495));
+        it('Empty bytes naive', () => testGasNaiveBytes(emptyBytes));
 
-        it('Single byte', () => testGasBytes(singleByte, 716));
+        it('Single byte', () => testGasBytes(singleByte));
 
-        it('Single byte naive', () => testGasNaiveBytes(singleByte, 987));
+        it('Single byte naive', () => testGasNaiveBytes(singleByte));
 
-        async function testGasUint256(value: string, expectedGas: number) {
+        it('Compare gas usage Uint256', () => compareGasUint256(uint256TestValue));
+
+        it('Compare gas usage Uint256 as bytes', () => compareGasBytes(uint256TestValue));
+
+        it('Compare gas usage Uint128', () => compareGasUint256(uint128TestValue));
+
+        it('Compare gas usage very long byte array', () => compareGasBytes(veryLongArray));
+
+        it('Compare gas usage extremly long byte array', () => compareGasBytes(extremelyLongArray));
+
+        it('Compare gas usage empty bytes', () => compareGasBytes(emptyBytes));
+
+        it('Compare gas usage single byte', () => compareGasBytes(singleByte));
+
+        async function testGasUint256(value: BigNumberish) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            await stringUtilTest.toHex(value, expectedGas);
+            const tx = await (await stringUtilTest.toHex.send(value)).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         }
 
-        async function testGasBytes(value: string, expectedGas: number) {
+        async function testGasBytes(value: BytesLike) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            await stringUtilTest.toHexBytes(value, expectedGas);
+            const tx = await (await stringUtilTest.toHexBytes.send(value)).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         }
 
-        async function testGasNaiveUint256(value: string, expectedGas: number) {
+        async function testGasNaiveUint256(value: BigNumberish) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            await stringUtilTest.toHexNaive(value, expectedGas);
+            const tx = await (await stringUtilTest.toHexNaive.send(value)).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         }
 
-        async function testGasNaiveBytes(value: string, expectedGas: number) {
+        async function testGasNaiveBytes(value: BytesLike) {
             const { stringUtilTest } = await loadFixture(deployStringUtilTest);
-            await stringUtilTest.toHexNaiveBytes(value, expectedGas);
+            const tx = await (await stringUtilTest.toHexNaiveBytes.send(value)).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
+        }
+
+        async function compareGasUint256(value: BigNumberish) {
+            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const tx = await (await stringUtilTest.toHex.send(value)).wait();
+            const naiveTx = await (await stringUtilTest.toHexNaive.send(value)).wait();
+            expect(tx!.gasUsed).to.be.lessThan(naiveTx!.gasUsed);
+        }
+
+        async function compareGasBytes(value: BytesLike) {
+            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const tx = await (await stringUtilTest.toHexBytes.send(value)).wait();
+            const naiveTx = await (await stringUtilTest.toHexNaiveBytes.send(value)).wait();
+            expect(tx!.gasUsed).to.be.lessThan(naiveTx!.gasUsed);
         }
     });
 });

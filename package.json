@@ -28,8 +28,11 @@
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
     "test": "hardhat test --parallel",
     "test:ci": "hardhat test",
+    "test:update-snapshots": "UPDATE_SNAPSHOT=1 yarn test:ci",
+    "test:us": "UPDATE_SNAPSHOT=1 yarn test:ci",
     "typecheck": "tsc --noEmit --skipLibCheck",
     "typechain": "hardhat typechain"
+
   },
   "dependencies": {
     "@metamask/eth-sig-util": "7.0.1",
@@ -43,7 +46,8 @@
     "ethereumjs-util": "7.1.5",
     "ethers": "6.9.0",
     "hardhat": "2.19.2",
-    "hardhat-deploy": "0.11.44"
+    "hardhat-deploy": "0.11.44",
+    "mocha-chai-jest-snapshot": "1.1.4"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "2.0.2",
