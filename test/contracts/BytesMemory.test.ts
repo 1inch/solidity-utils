@@ -85,19 +85,22 @@ describe('BytesMemoryMock', function () {
             if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
         });
 
-        it('unwrap with length less than 33 bytes (32 bytes)', async function () {
+        it('unwrap 32 bytes', async function () {
             const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes, 140)).to.be.equal(bytes);
+            const tx = await (await bytesMemoryMock.wrapAndUnwrap.send(bytes)).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         });
 
-        it('unwrap with more than 32 bytes (33 bytes)', async function () {
+        it('unwrap 33 bytes', async function () {
             const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes + 'ff', 268)).to.be.equal(bytes + 'ff');
+            const tx = await (await bytesMemoryMock.wrapAndUnwrap.send(bytes + 'ff')).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         });
 
-        it('unwrap with more than 32 bytes (64 bytes)', async function () {
+        it('unwrap 64 bytes', async function () {
             const { bytesMemoryMock } = await loadFixture(deployBytesMemoryMock);
-            expect(await bytesMemoryMock.wrapAndUnwrapWithGasCost(bytes + trim0x(bytes), 268)).to.be.equal(bytes + trim0x(bytes));
+            const tx = await (await bytesMemoryMock.wrapAndUnwrap.send(bytes + trim0x(bytes))).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
         });
     });
 });
