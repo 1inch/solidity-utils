@@ -102,5 +102,11 @@ describe('BytesMemoryMock', function () {
             const tx = await (await bytesMemoryMock.wrapAndUnwrap.send(bytes + trim0x(bytes))).wait();
             expect(tx!.gasUsed).toMatchSnapshot();
         });
+
+        it('slice', async function () {
+            const { bytesMemoryMock, data } = await loadFixture(deployBytesMemoryMockWithData);
+            const tx = await (await bytesMemoryMock.slice.send(data, 10n, 20n)).wait();
+            expect(tx!.gasUsed).toMatchSnapshot();
+        });
     });
 });
