@@ -6,8 +6,13 @@ import "../../PermitAndCall.sol";
 
 contract PermitAndCallMock is PermitAndCall {
     event FooCalled();
+    event MsgValue(uint256 value);
 
     function foo() external {
         emit FooCalled();
+    }
+
+    function payableFoo() external payable {
+        emit MsgValue(msg.value);
     }
 }
