@@ -8,7 +8,7 @@ import { SafeERC20 } from "./libraries/SafeERC20.sol";
 abstract contract PermitAndCall {
     using SafeERC20 for IERC20;
 
-    function permitAndCall(bytes calldata permit, bytes calldata action) external {
+    function permitAndCall(bytes calldata permit, bytes calldata action) external payable {
         IERC20(address(bytes20(permit))).tryPermit(permit[20:]);
         // solhint-disable-next-line no-inline-assembly
         assembly ("memory-safe") {
