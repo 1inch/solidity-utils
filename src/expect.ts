@@ -1,4 +1,7 @@
-import { expect } from './prelude';
+import { Assertion, AssertionError, assert, expect, config, should, use } from 'chai';
+import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
+
+use(jestSnapshotPlugin());
 
 export function assertRoughlyEqualValues(
     expected: string | number | bigint,
@@ -24,3 +27,6 @@ export function assertRoughlyEqualValues(
         expect(actualBN).to.be.equal(expectedBN, `${actual} != ${expected} with ${relativeDiff} precision`);
     }
 }
+
+// chai
+export { Assertion, AssertionError, assert, expect, config, should };

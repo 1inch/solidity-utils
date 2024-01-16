@@ -1,4 +1,5 @@
-import { constants, ether, expect } from '../../src/prelude';
+import { constants, ether } from '../../src/prelude';
+import { expect } from '../../src/expect';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import hre, { ethers } from 'hardhat';

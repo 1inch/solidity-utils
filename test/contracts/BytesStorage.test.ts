@@ -1,7 +1,7 @@
-import { expect } from '../../src/prelude';
+import { expect } from '../../src/expect';
+import { trim0x } from '../../src/permit';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
-import { trim0x } from '../../src';
 import { BytesStorageMock } from '../../typechain-types';
 
 type Slice = {

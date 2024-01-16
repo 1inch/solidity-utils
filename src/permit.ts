@@ -45,7 +45,7 @@ export function trim0x(bigNumber: bigint | string): string {
 
 export function cutSelector(data: string): string {
     const hexPrefix = '0x';
-    return hexPrefix + data.substr(hexPrefix.length + 8);
+    return hexPrefix + data.substring(hexPrefix.length + 8);
 }
 
 export function domainSeparator(name: string, version: string, chainId: string, verifyingContract: string): string {
