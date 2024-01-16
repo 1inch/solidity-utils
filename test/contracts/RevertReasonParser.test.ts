@@ -1,4 +1,4 @@
-import { expect } from '../../src/prelude';
+import { expect } from '../../src/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 

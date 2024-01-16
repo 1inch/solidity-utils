@@ -1,4 +1,4 @@
-import { expect } from '../../src/prelude';
+import { expect } from '../../src/expect';
 import { getPermit, trim0x } from '../../src/permit';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';

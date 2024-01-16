@@ -1,11 +1,9 @@
-import { expect } from '../src/prelude';
-import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermit2, getPermitLikeDai, permit2Contract } from '../src/permit';
+import { expect } from '../src/expect';
+import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermit2, getPermitLikeDai, permit2Contract, cutSelector } from '../src/permit';
+import { constants } from '../src/prelude';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { cutSelector } from '../src/permit';
-import { constants } from '../src/prelude';
-import { Signature } from 'ethers';
 
 const value = 42n;
 
@@ -87,7 +85,7 @@ describe('Permitable', function () {
             nonce.toString(),
         );
         const signature = await signer1.signTypedData(data.domain, data.types, data.message);
-        const { v, r, s } = Signature.from(signature);
+        const { v, r, s } = ethers.Signature.from(signature);
         // spender is signer1 but in signature spender was signer2
         const permit = cutSelector(
             erc20PermitMock.interface.encodeFunctionData('permit', [
@@ -161,7 +159,7 @@ describe('Permitable', function () {
             true,
         );
         const signature = await signer1.signTypedData(data.domain, data.types, data.message);
-        const { v, r, s } = Signature.from(signature);
+        const { v, r, s } = ethers.Signature.from(signature);
 
         // spender is signer1 but in signature spender was signer2
         const permit = cutSelector(
@@ -192,7 +190,7 @@ describe('Permitable', function () {
             nonce.toString(),
         );
         const signature = await signer1.signTypedData(data.domain, data.types, data.message);
-        const { v, r, s } = Signature.from(signature);
+        const { v, r, s } = ethers.Signature.from(signature);
 
         const permit =
             '0x' +
