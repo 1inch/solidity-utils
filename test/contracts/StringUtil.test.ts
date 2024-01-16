@@ -2,6 +2,9 @@ import { expect } from '../../src/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { BigNumberish, BytesLike } from 'ethers';
 import hre, { ethers } from 'hardhat';
+import chai from 'chai';
+import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
+chai.use(jestSnapshotPlugin());
 
 describe('StringUtil', function () {
     const uint256TestValue = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';

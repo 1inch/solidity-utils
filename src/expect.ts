@@ -1,7 +1,4 @@
-import { Assertion, AssertionError, assert, expect, config, should, use } from 'chai';
-import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
-
-use(jestSnapshotPlugin());
+import { Assertion, AssertionError, assert, expect, config, should } from 'chai';
 
 export function assertRoughlyEqualValues(
     expected: string | number | bigint,
