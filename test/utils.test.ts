@@ -1,5 +1,6 @@
-import { expect, ether, time, constants } from '../src/prelude';
+import { ether, time, constants } from '../src/prelude';
 import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode } from '../src/utils';
+import { expect } from '../src/expect';
 import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
