@@ -1,12 +1,32 @@
 import dotenv from 'dotenv';
 import { ChainConfig } from '@nomicfoundation/hardhat-verify/src/types';
-import { NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
+import { Network, NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
 
 export type Etherscan = { apiKey: {[key: string]: string}, customChains: ChainConfig[] };
 
 export function getNetwork(): string {
     const index = process.argv.findIndex((arg) => arg === '--network') + 1;
     return index !== 0 ? process.argv[index] : 'unknown';
+}
+
+export async function resetHardhatNetworkFork(network: Network, networkName: string) {
+    if (networkName.toLowerCase() === 'hardhat') {
+        await network.provider.request({ // reset to local network
+            method: 'hardhat_reset',
+            params: [],
+        });
+    } else {
+        const { url, authKeyHttpHeader } = (new Networks())._parseRpcEnv(process.env[`${networkName.toUpperCase()}_RPC_URL`] || '');
+        await network.provider.request({ // reset to networkName fork
+            method: 'hardhat_reset',
+            params: [{
+                forking: {
+                    jsonRpcUrl: url,
+                    httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
+                },
+            }],
+        });
+    }
 }
 
 export class Networks {
