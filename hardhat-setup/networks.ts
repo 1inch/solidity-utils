@@ -16,7 +16,7 @@ export async function resetHardhatNetworkFork(network: Network, networkName: str
             params: [],
         });
     } else {
-        const { url, authKeyHttpHeader } = (new Networks())._parseRpcEnv(process.env[`${networkName.toUpperCase()}_RPC_URL`] || '');
+        const { url, authKeyHttpHeader } = Networks.parseRpcEnv(process.env[`${networkName.toUpperCase()}_RPC_URL`] || '');
         await network.provider.request({ // reset to networkName fork
             method: 'hardhat_reset',
             params: [{
@@ -33,7 +33,7 @@ export class Networks {
     networks: NetworksUserConfig = {};
     etherscan: Etherscan = { apiKey: {}, customChains: [] };
 
-    _parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: string } {
+    static parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: string } {
         const [ url, authKeyHttpHeader, overflow ] = envRpc.split('|');
         if (overflow || url === '') {
             throw new Error(`Invalid RPC PARAM: ${envRpc}. It should be in the format: <RPC_URL> or <RPC_URL>|<AUTH_KEY_HTTP_HEADER>`);
@@ -54,7 +54,7 @@ export class Networks {
         }
 
         if (forkingNetworkName) {
-            const { url, authKeyHttpHeader } = this._parseRpcEnv(process.env[`${forkingNetworkName.toUpperCase()}_RPC_URL`] || '');
+            const { url, authKeyHttpHeader } = Networks.parseRpcEnv(process.env[`${forkingNetworkName.toUpperCase()}_RPC_URL`] || '');
             this.networks.hardhat!.forking = {
                 url,
                 httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
@@ -64,7 +64,7 @@ export class Networks {
 
     register(name: string, chainId: number, rpc?: string, privateKey?: string, etherscanNetworkName?: string, etherscanKey?: string, hardfork: string = 'paris') {
         if (rpc && privateKey && etherscanNetworkName && etherscanKey) {
-            const { url, authKeyHttpHeader } = this._parseRpcEnv(rpc);
+            const { url, authKeyHttpHeader } = Networks.parseRpcEnv(rpc);
             this.networks[name] = {
                 url,
                 httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
@@ -88,7 +88,7 @@ export class Networks {
 
     registerZksync(name: string, chainId: number, rpc: string, ethNetwork: string, privateKey?: string, verifyUrl?: string, hardfork: string = 'paris') {
         if (privateKey) {
-            const { url, authKeyHttpHeader } = this._parseRpcEnv(rpc);
+            const { url, authKeyHttpHeader } = Networks.parseRpcEnv(rpc);
             this.networks[name] = {
                 url,
                 httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
