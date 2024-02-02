@@ -24,7 +24,7 @@ export async function resetHardhatNetworkFork(network: Network, networkName: str
             params: [],
         });
     } else {
-        const { url, authKeyHttpHeader } = Networks.parseRpcEnv(process.env[`${networkName.toUpperCase()}_RPC_URL`] || '');
+        const { url, authKeyHttpHeader } = parseRpcEnv(process.env[`${networkName.toUpperCase()}_RPC_URL`] || '');
         await network.provider.request({ // reset to networkName fork
             method: 'hardhat_reset',
             params: [{
