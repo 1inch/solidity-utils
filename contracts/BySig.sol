@@ -57,7 +57,7 @@ abstract contract BySig is Context, EIP712 {
         );
     }
 
-    function bySig(address signer, SignedCall calldata sig, bytes calldata signature) external payable returns(bytes memory ret) {
+    function bySig(address signer, SignedCall calldata sig, bytes calldata signature) public payable returns(bytes memory ret) {
         if (block.timestamp > sig.traits.deadline()) revert DeadlineExceeded(); // solhint-disable-line not-rely-on-time
         // Using _msgSender() in the next line allows private relay execution redelegation
         if (!sig.traits.isRelayerAllowed(_msgSender())) revert WrongRelayer();
@@ -68,6 +68,22 @@ abstract contract BySig is Context, EIP712 {
         ret = address(this).functionDelegateCall(sig.data);
         _msgSenders.pop();
     }
+
+    function sponsoredCall(address token, uint256 amount, bytes calldata data) external payable returns(bytes memory ret) {
+        ret = address(this).functionDelegateCall(data);
+        _chargeSigner(_msgSender(), msg.sender, token, amount);
+    }
+
+    // Override this method to implement sponsored call accounting
+    // Example imeplementation:
+    //
+    // function _chargeSigner(address signer, address relayer, address token, uint256 amount) internal override {
+    //     balances[token][signer] -= amount;
+    //     balances[token][relayer] += amount;
+    // }
+    //
+    function _chargeSigner(address signer, address relayer, address token, uint256 amount) internal virtual;
+
 
     function useBySigAccountNonce(uint32 advance) external {
         _bySigAccountNonces[_msgSender()] += advance;
@@ -104,5 +120,6 @@ abstract contract BySig is Context, EIP712 {
             map[nonce >> 8] |= 1 << (nonce & 0xff);
             return cache != map[nonce >> 8];
         }
+        return false;
     }
 }

@@ -8,6 +8,8 @@ import { TokenMock } from "../../mocks/TokenMock.sol";
 import { BySig } from "../../BySig.sol";
 
 contract TokenWithBySig is TokenMock, BySig {
+    event ChargedSigner(address signer, address relayer, address token, uint256 amount);
+
     // solhint-disable-next-line no-empty-blocks
     constructor(string memory name, string memory symbol, string memory version) TokenMock(name, symbol) EIP712(name, version) {}
 
@@ -17,5 +19,9 @@ contract TokenWithBySig is TokenMock, BySig {
 
     function getChainId() external view returns (uint256) {
         return block.chainid;
+    }
+
+    function _chargeSigner(address signer, address relayer, address token, uint256 amount) internal override {
+        emit ChargedSigner(signer, relayer, token, amount);
     }
 }

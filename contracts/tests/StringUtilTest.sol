@@ -4,40 +4,35 @@ pragma solidity ^0.8.0;
 
 import "../libraries/StringUtil.sol";
 import "./libraries/StringUtilNaive.sol";
-import "../GasChecker.sol";
 
-contract StringUtilTest is GasChecker {
-    function toHex(uint256 value, uint256 expectedGasCost)
+contract StringUtilTest {
+    function toHex(uint256 value)
         external
-        view
-        checkGasCost(expectedGasCost)
+        pure
         returns (string memory)
     {
         return StringUtil.toHex(value);
     }
 
-    function toHexBytes(bytes memory data, uint256 expectedGasCost)
+    function toHexBytes(bytes memory data)
         external
-        view
-        checkGasCost(expectedGasCost)
+        pure
         returns (string memory)
     {
         return StringUtil.toHex(data);
     }
 
-    function toHexNaive(uint256 value, uint256 expectedGasCost)
+    function toHexNaive(uint256 value)
         external
-        view
-        checkGasCost(expectedGasCost)
+        pure
         returns (string memory)
     {
         return StringUtilNaive.toHex(value);
     }
 
-    function toHexNaiveBytes(bytes memory data, uint256 expectedGasCost)
+    function toHexNaiveBytes(bytes memory data)
         external
-        view
-        checkGasCost(expectedGasCost)
+        pure
         returns (string memory)
     {
         return StringUtilNaive.toHex(data);

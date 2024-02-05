@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { ChainConfig } from '@nomicfoundation/hardhat-verify/src/types';
-import { NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
+import { Network, NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
 
 export type Etherscan = { apiKey: {[key: string]: string}, customChains: ChainConfig[] };
 
@@ -9,17 +9,37 @@ export function getNetwork(): string {
     return index !== 0 ? process.argv[index] : 'unknown';
 }
 
+export function parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: string } {
+    const [ url, authKeyHttpHeader, overflow ] = envRpc.split('|');
+    if (overflow || url === '') {
+        throw new Error(`Invalid RPC PARAM: ${envRpc}. It should be in the format: <RPC_URL> or <RPC_URL>|<AUTH_KEY_HTTP_HEADER>`);
+    }
+    return { url, authKeyHttpHeader };
+}
+
+export async function resetHardhatNetworkFork(network: Network, networkName: string) {
+    if (networkName.toLowerCase() === 'hardhat') {
+        await network.provider.request({ // reset to local network
+            method: 'hardhat_reset',
+            params: [],
+        });
+    } else {
+        const { url, authKeyHttpHeader } = parseRpcEnv(process.env[`${networkName.toUpperCase()}_RPC_URL`] || '');
+        await network.provider.request({ // reset to networkName fork
+            method: 'hardhat_reset',
+            params: [{
+                forking: {
+                    jsonRpcUrl: url,
+                    httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
+                },
+            }],
+        });
+    }
+}
+
 export class Networks {
     networks: NetworksUserConfig = {};
     etherscan: Etherscan = { apiKey: {}, customChains: [] };
-
-    _parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: string } {
-        const [ url, authKeyHttpHeader, overflow ] = envRpc.split('|');
-        if (overflow || url === '') {
-            throw new Error(`Invalid RPC PARAM: ${envRpc}. It should be in the format: <RPC_URL> or <RPC_URL>|<AUTH_KEY_HTTP_HEADER>`);
-        }
-        return { url, authKeyHttpHeader };
-    }
 
     constructor(useHardhat: boolean = true, forkingNetworkName?: string, saveHardhatDeployments: boolean = false) {
         dotenv.config();
@@ -34,7 +54,7 @@ export class Networks {
         }
 
         if (forkingNetworkName) {
-            const { url, authKeyHttpHeader } = this._parseRpcEnv(process.env[`${forkingNetworkName.toUpperCase()}_RPC_URL`] || '');
+            const { url, authKeyHttpHeader } = parseRpcEnv(process.env[`${forkingNetworkName.toUpperCase()}_RPC_URL`] || '');
             this.networks.hardhat!.forking = {
                 url,
                 httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
@@ -44,7 +64,7 @@ export class Networks {
 
     register(name: string, chainId: number, rpc?: string, privateKey?: string, etherscanNetworkName?: string, etherscanKey?: string, hardfork: string = 'paris') {
         if (rpc && privateKey && etherscanNetworkName && etherscanKey) {
-            const { url, authKeyHttpHeader } = this._parseRpcEnv(rpc);
+            const { url, authKeyHttpHeader } = parseRpcEnv(rpc);
             this.networks[name] = {
                 url,
                 httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
@@ -68,7 +88,7 @@ export class Networks {
 
     registerZksync(name: string, chainId: number, rpc: string, ethNetwork: string, privateKey?: string, verifyUrl?: string, hardfork: string = 'paris') {
         if (privateKey) {
-            const { url, authKeyHttpHeader } = this._parseRpcEnv(rpc);
+            const { url, authKeyHttpHeader } = parseRpcEnv(rpc);
             this.networks[name] = {
                 url,
                 httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,

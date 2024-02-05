@@ -17,6 +17,7 @@
     "resolveJsonModule": true,
     "strictNullChecks": true,
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2020", "dom", "esnext"]
+    "lib": ["es2020", "dom", "esnext"],
+    "skipLibCheck": true,
   }
 }

@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 library StringUtilNaive {
-    bytes16 private constant _ALPHABET = 0x30313233343536373839616263646566;
+    bytes16 private constant _ALPHABET = 0x30313233343536373839414243444546;
 
     function toHex(uint256 value) internal pure returns (string memory) {
         return toHex(abi.encodePacked(value));

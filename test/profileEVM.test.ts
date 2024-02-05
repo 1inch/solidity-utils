@@ -1,4 +1,5 @@
-import { expect, ether } from '../src/prelude';
+import { ether } from '../src/prelude';
+import { expect } from '../src/expect';
 import { profileEVM, gasspectEVM } from '../src/profileEVM';
 import hre, { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
