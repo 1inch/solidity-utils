@@ -29,7 +29,7 @@ const config: HardhatUserConfig = {
                 enabled: true,
                 runs: 1000000,
             },
-            evmVersion: (networks[getNetwork()] as HardhatNetworkUserConfig)?.hardfork || 'shanghai',
+            evmVersion: 'shanghai',
             viaIR: true,
         },
     },
