@@ -86,8 +86,8 @@ export class Networks {
         }
     }
 
-    registerZksync(name: string, chainId: number, rpc: string, ethNetwork: string, privateKey?: string, verifyUrl?: string, hardfork: string = 'paris') {
-        if (privateKey) {
+    registerZksync(name: string, chainId: number, rpc?: string, ethNetwork?: string, privateKey?: string, verifyUrl?: string, hardfork: string = 'paris') {
+        if (privateKey && rpc && ethNetwork) {
             const { url, authKeyHttpHeader } = parseRpcEnv(rpc);
             this.networks[name] = {
                 url,
@@ -119,11 +119,11 @@ export class Networks {
         this.register('aurora', 1313161554, process.env.AURORA_RPC_URL, process.env.AURORA_PRIVATE_KEY || privateKey, 'aurora', process.env.AURORA_ETHERSCAN_KEY);
         this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', process.env.BASE_ETHERSCAN_KEY);
         this.registerCustom('klaytn', 8217, process.env.KLAYTN_RPC_URL, process.env.KLAYTN_PRIVATE_KEY || privateKey, process.env.KLAYTN_ETHERSCAN_KEY, 'https://scope.klaytn.com/', 'https://scope.klaytn.com/'); // eslint-disable-line max-len
-        this.registerZksync('zksync', 324, process.env.ZKSYNC_RPC_URL || 'https://mainnet.era.zksync.io', 'mainnet', process.env.ZKSYNC_PRIVATE_KEY || privateKey, process.env.ZKSYNC_VERIFY_URL || 'https://zksync2-mainnet-explorer.zksync.io/contract_verification'); // eslint-disable-line max-len
+        this.registerZksync('zksync', 324, process.env.ZKSYNC_RPC_URL, 'mainnet', process.env.ZKSYNC_PRIVATE_KEY || privateKey, process.env.ZKSYNC_VERIFY_URL);
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
-        this.registerZksync('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL || '', 'mainnet', process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey);
-        this.registerZksync('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL || 'http://localhost:3050', process.env.ZKSYNC_LOCAL_ETH_NETWORK || 'http://localhost:8545', process.env.ZKSYNC_PRIVATE_KEY || privateKey); // eslint-disable-line max-len
-        this.registerZksync('zksyncTest', 280, process.env.ZKSYNC_TEST_RPC_URL || 'https://testnet.era.zksync.dev', 'goerli', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, process.env.ZKSYNC_TEST_VERIFY_URL); // eslint-disable-line max-len
+        this.registerZksync('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL, 'mainnet', process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey);
+        this.registerZksync('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL, process.env.ZKSYNC_LOCAL_ETH_NETWORK, process.env.ZKSYNC_PRIVATE_KEY || privateKey);
+        this.registerZksync('zksyncTest', 280, process.env.ZKSYNC_TEST_RPC_URL, 'goerli', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, process.env.ZKSYNC_TEST_VERIFY_URL);
         return { networks: this.networks, etherscan: this.etherscan };
     }
 }
