@@ -188,17 +188,19 @@ describe('SafeERC20', function () {
 
     describe('safeBalanceOf', function () {
         it('should be cheaper than balanceOf', async function () {
-            const { wrapper } = await loadFixture(deployERC20WithSafeBalance);
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+                const { wrapper } = await loadFixture(deployERC20WithSafeBalance);
 
-            const tx = await wrapper.balanceOf.populateTransaction(owner);
-            const response = await owner.sendTransaction(tx);
-            const gasUsed = (await response.wait())!.gasUsed;
-            const safeTx = await wrapper.safeBalanceOf.populateTransaction(owner);
-            const safeRequest = await owner.sendTransaction(safeTx);
-            const safeGasUsed = (await safeRequest.wait())!.gasUsed;
+                const tx = await wrapper.balanceOf.populateTransaction(owner);
+                const response = await owner.sendTransaction(tx);
+                const gasUsed = (await response.wait())!.gasUsed;
+                const safeTx = await wrapper.safeBalanceOf.populateTransaction(owner);
+                const safeRequest = await owner.sendTransaction(safeTx);
+                const safeGasUsed = (await safeRequest.wait())!.gasUsed;
 
-            expect(gasUsed).gt(safeGasUsed);
-            console.log(`balanceOf:safeBalanceOf gasUsed - ${gasUsed.toString()}:${safeGasUsed.toString()}`);
+                expect(gasUsed).gt(safeGasUsed);
+                console.log(`balanceOf:safeBalanceOf gasUsed - ${gasUsed.toString()}:${safeGasUsed.toString()}`);
+            }
         });
     });
 
