@@ -62,7 +62,7 @@ export class Networks {
         }
     }
 
-    register(name: string, chainId: number, rpc?: string, privateKey?: string, etherscanNetworkName?: string, etherscanKey?: string, hardfork: string = 'paris') {
+    register(name: string, chainId: number, rpc?: string, privateKey?: string, etherscanNetworkName?: string, etherscanKey?: string, hardfork: string = 'shanghai') {
         if (rpc && privateKey && etherscanNetworkName && etherscanKey) {
             const { url, authKeyHttpHeader } = parseRpcEnv(rpc);
             this.networks[name] = {
@@ -86,8 +86,8 @@ export class Networks {
         }
     }
 
-    registerZksync(name: string, chainId: number, rpc: string, ethNetwork: string, privateKey?: string, verifyUrl?: string, hardfork: string = 'paris') {
-        if (privateKey) {
+    registerZksync(name: string, chainId: number, rpc?: string, ethNetwork?: string, privateKey?: string, verifyUrl?: string, hardfork: string = 'paris') {
+        if (privateKey && rpc && ethNetwork) {
             const { url, authKeyHttpHeader } = parseRpcEnv(rpc);
             this.networks[name] = {
                 url,
@@ -107,23 +107,23 @@ export class Networks {
 
     registerAll(): { networks: NetworksUserConfig, etherscan: Etherscan } {
         const privateKey = process.env.PRIVATE_KEY;
-        this.register('mainnet', 1, process.env.MAINNET_RPC_URL, process.env.MAINNET_PRIVATE_KEY || privateKey, 'mainnet', process.env.MAINNET_ETHERSCAN_KEY, 'shanghai');
+        this.register('mainnet', 1, process.env.MAINNET_RPC_URL, process.env.MAINNET_PRIVATE_KEY || privateKey, 'mainnet', process.env.MAINNET_ETHERSCAN_KEY);
         this.register('bsc', 56, process.env.BSC_RPC_URL, process.env.BSC_PRIVATE_KEY || privateKey, 'bsc', process.env.BSC_ETHERSCAN_KEY);
-        this.register('kovan', 42, process.env.KOVAN_RPC_URL, process.env.KOVAN_PRIVATE_KEY || privateKey, 'kovan', process.env.KOVAN_ETHERSCAN_KEY);
+        this.register('sepolia', 11155111, process.env.SEPOLIA_RPC_URL, process.env.SEPOLIA_PRIVATE_KEY || privateKey, 'sepolia', process.env.SEPOLIA_ETHERSCAN_KEY);
         this.register('optimistic', 10, process.env.OPTIMISTIC_RPC_URL, process.env.OPTIMISTIC_PRIVATE_KEY || privateKey, 'optimisticEthereum', process.env.OPTIMISTIC_ETHERSCAN_KEY);
         this.register('matic', 137, process.env.MATIC_RPC_URL, process.env.MATIC_PRIVATE_KEY || privateKey, 'polygon', process.env.MATIC_ETHERSCAN_KEY);
         this.register('arbitrum', 42161, process.env.ARBITRUM_RPC_URL, process.env.ARBITRUM_PRIVATE_KEY || privateKey, 'arbitrumOne', process.env.ARBITRUM_ETHERSCAN_KEY);
         this.register('xdai', 100, process.env.XDAI_RPC_URL, process.env.XDAI_PRIVATE_KEY || privateKey, 'xdai', process.env.XDAI_ETHERSCAN_KEY);
-        this.register('avax', 43114, process.env.AVAX_RPC_URL, process.env.AVAX_PRIVATE_KEY || privateKey, 'avalanche', process.env.AVAX_ETHERSCAN_KEY);
-        this.register('fantom', 250, process.env.FANTOM_RPC_URL, process.env.FANTOM_PRIVATE_KEY || privateKey, 'opera', process.env.FANTOM_ETHERSCAN_KEY);
+        this.register('avax', 43114, process.env.AVAX_RPC_URL, process.env.AVAX_PRIVATE_KEY || privateKey, 'avalanche', process.env.AVAX_ETHERSCAN_KEY, 'paris');
+        this.register('fantom', 250, process.env.FANTOM_RPC_URL, process.env.FANTOM_PRIVATE_KEY || privateKey, 'opera', process.env.FANTOM_ETHERSCAN_KEY, 'paris');
         this.register('aurora', 1313161554, process.env.AURORA_RPC_URL, process.env.AURORA_PRIVATE_KEY || privateKey, 'aurora', process.env.AURORA_ETHERSCAN_KEY);
         this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', process.env.BASE_ETHERSCAN_KEY);
         this.registerCustom('klaytn', 8217, process.env.KLAYTN_RPC_URL, process.env.KLAYTN_PRIVATE_KEY || privateKey, process.env.KLAYTN_ETHERSCAN_KEY, 'https://scope.klaytn.com/', 'https://scope.klaytn.com/'); // eslint-disable-line max-len
-        this.registerZksync('zksync', 324, process.env.ZKSYNC_RPC_URL || 'https://mainnet.era.zksync.io', 'mainnet', process.env.ZKSYNC_PRIVATE_KEY || privateKey, process.env.ZKSYNC_VERIFY_URL || 'https://zksync2-mainnet-explorer.zksync.io/contract_verification'); // eslint-disable-line max-len
+        this.registerZksync('zksync', 324, process.env.ZKSYNC_RPC_URL, 'mainnet', process.env.ZKSYNC_PRIVATE_KEY || privateKey, process.env.ZKSYNC_VERIFY_URL);
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
-        this.registerZksync('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL || '', 'mainnet', process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey);
-        this.registerZksync('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL || 'http://localhost:3050', process.env.ZKSYNC_LOCAL_ETH_NETWORK || 'http://localhost:8545', process.env.ZKSYNC_PRIVATE_KEY || privateKey); // eslint-disable-line max-len
-        this.registerZksync('zksyncTest', 280, process.env.ZKSYNC_TEST_RPC_URL || 'https://testnet.era.zksync.dev', 'goerli', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, process.env.ZKSYNC_TEST_VERIFY_URL); // eslint-disable-line max-len
+        this.registerZksync('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL, 'mainnet', process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey);
+        this.registerZksync('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL, process.env.ZKSYNC_LOCAL_ETH_NETWORK, process.env.ZKSYNC_PRIVATE_KEY || privateKey);
+        this.registerZksync('zksyncTest', 280, process.env.ZKSYNC_TEST_RPC_URL, 'goerli', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, process.env.ZKSYNC_TEST_VERIFY_URL);
         return { networks: this.networks, etherscan: this.etherscan };
     }
 }
