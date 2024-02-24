@@ -86,7 +86,7 @@ export class Networks {
         }
     }
 
-    registerZksync(name: string, chainId: number, rpc?: string, ethNetwork?: string, privateKey?: string, verifyUrl?: string, hardfork: string = 'paris') {
+    registerZksync(name: string, chainId: number, rpc?: string, ethNetwork?: string, privateKey?: string, verifyURL?: string, hardfork: string = 'paris') {
         if (privateKey && rpc && ethNetwork) {
             const { url, authKeyHttpHeader } = parseRpcEnv(rpc);
             this.networks[name] = {
@@ -96,7 +96,7 @@ export class Networks {
                 chainId,
                 accounts: [privateKey],
                 hardfork,
-                verifyUrl,
+                verifyURL,
                 ethNetwork,
             } as NetworkUserConfig;
             console.log(`Network '${name}' registered`);
