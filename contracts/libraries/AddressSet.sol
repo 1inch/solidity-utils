@@ -4,16 +4,16 @@ pragma solidity ^0.8.0;
 
 import "./AddressArray.sol";
 
-/** @title Library that is using AddressArray library for AddressArray.Data
- * and allows Set operations on address storage data:
- * 1. add
- * 2. remove
- * 3. contains
+/**
+ * @title AddressSet
+ * @notice Library for managing sets of addresses, allowing operations such as add, remove, and contains.
+ * Utilizes the AddressArray library for underlying data storage.
  */
 library AddressSet {
     using AddressArray for AddressArray.Data;
 
-    /** @dev Data struct from AddressArray.Data items
+    /**
+     * @dev Data struct from AddressArray.Data items
      * and lookup mapping address => index in data array.
      */
     struct Data {
@@ -21,22 +21,41 @@ library AddressSet {
         mapping(address => uint256) lookup;
     }
 
-    /// @dev Length of data storage.
+    /**
+     * @notice Determines the number of addresses in the set.
+     * @param s The set of addresses.
+     * @return The number of addresses in the set.
+     */
     function length(Data storage s) internal view returns (uint256) {
         return s.items.length();
     }
 
-    /// @dev Returns data item from `s` storage at `index`.
+    /**
+     * @notice Retrieves the address at a specified index in the set.
+     * @param s The set of addresses.
+     * @param index The index of the address to retrieve.
+     * @return The address at the specified index.
+     */
     function at(Data storage s, uint256 index) internal view returns (address) {
         return s.items.at(index);
     }
 
-    /// @dev Returns true if storage `s` has `item`.
+    /**
+     * @notice Checks if the set contains the specified address.
+     * @param s The set of addresses.
+     * @param item The address to check for.
+     * @return True if the set contains the address, false otherwise.
+     */
     function contains(Data storage s, address item) internal view returns (bool) {
         return s.lookup[item] != 0;
     }
 
-    /// @dev Adds `item` into storage `s` and returns true if successful.
+    /**
+     * @notice Adds an address to the set if it is not already present.
+     * @param s The set of addresses.
+     * @param item The address to add.
+     * @return True if the address was added to the set, false if it was already present.
+     */
     function add(Data storage s, address item) internal returns (bool) {
         if (s.lookup[item] > 0) {
             return false;
@@ -45,7 +64,12 @@ library AddressSet {
         return true;
     }
 
-    /// @dev Removes `item` from storage `s` and returns true if successful.
+    /**
+     * @notice Removes an address from the set if it exists.
+     * @param s The set of addresses.
+     * @param item The address to remove.
+     * @return True if the address was removed from the set, false if it was not found.
+     */
     function remove(Data storage s, address item) internal returns (bool) {
         uint256 index = s.lookup[item];
         if (index == 0) {

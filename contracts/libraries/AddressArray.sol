@@ -2,35 +2,70 @@
 
 pragma solidity ^0.8.0;
 
-/// @title Library that implements address array on mapping, stores array length at 0 index.
+/**
+ * @title AddressArray
+ * @notice Implements a dynamic array of addresses using a mapping for storage efficiency, with the array length stored at index 0.
+ * @dev This library provides basic functionalities such as push, pop, set, and retrieval of addresses in a storage-efficient manner.
+ */
 library AddressArray {
+    /**
+     * @dev Error thrown when attempting to access an index outside the bounds of the array.
+     */
     error IndexOutOfBounds();
+
+    /**
+     * @dev Error thrown when attempting to pop an element from an empty array.
+     */
     error PopFromEmptyArray();
+
+    /**
+     * @dev Error thrown when the output array provided for getting the list of addresses is too small.
+     */
     error OutputArrayTooSmall();
 
-    /// @dev Data struct containing raw mapping.
+    /**
+     * @dev Struct containing the raw mapping used to store the addresses and the array length.
+     */
     struct Data {
         mapping(uint256 => uint256) _raw;
     }
 
-    /// @dev Length of array.
+    /**
+     * @notice Returns the number of addresses stored in the array.
+     * @param self The instance of the Data struct.
+     * @return The number of addresses.
+     */
     function length(Data storage self) internal view returns (uint256) {
         return self._raw[0] >> 160;
     }
 
-    /// @dev Returns data item from `self` storage at `i`.
+    /**
+     * @notice Retrieves the address at a specified index in the array.
+     * @param self The instance of the Data struct.
+     * @param i The index to retrieve the address from.
+     * @return The address stored at the specified index.
+     */
     function at(Data storage self, uint256 i) internal view returns (address) {
         return address(uint160(self._raw[i]));
     }
 
-    /// @dev Returns list of addresses from storage `self`.
+    /**
+     * @notice Returns all addresses in the array from storage.
+     * @param self The instance of the Data struct.
+     * @return arr Array containing all the addresses.
+     */
     function get(Data storage self) internal view returns (address[] memory arr) {
         uint256 lengthAndFirst = self._raw[0];
         arr = new address[](lengthAndFirst >> 160);
         _get(self, arr, lengthAndFirst);
     }
 
-    /// @dev Puts list of addresses from `self` storage into `output` array.
+    /**
+     * @notice Copies the addresses into the provided output array.
+     * @param self The instance of the Data struct.
+     * @param output The array to copy the addresses into.
+     * @return The provided output array filled with addresses.
+     */
     function get(Data storage self, address[] memory output) internal view returns (address[] memory) {
         return _get(self, output, self._raw[0]);
     }
@@ -53,7 +88,12 @@ library AddressArray {
         return output;
     }
 
-    /// @dev Array push back `account` operation on storage `self`.
+    /**
+     * @notice Adds an address to the end of the array.
+     * @param self The instance of the Data struct.
+     * @param account The address to add.
+     * @return The new length of the array.
+     */
     function push(Data storage self, address account) internal returns (uint256) {
         unchecked {
             uint256 lengthAndFirst = self._raw[0];
@@ -68,7 +108,10 @@ library AddressArray {
         }
     }
 
-    /// @dev Array pop back operation for storage `self`.
+    /**
+     * @notice Removes the last address from the array.
+     * @param self The instance of the Data struct.
+     */
     function pop(Data storage self) internal {
         unchecked {
             uint256 lengthAndFirst = self._raw[0];
@@ -81,7 +124,12 @@ library AddressArray {
         }
     }
 
-    /// @dev Set element for storage `self` at `index` to `account`.
+    /**
+     * @notice Sets the address at a specified index in the array.
+     * @param self The instance of the Data struct.
+     * @param index The index at which to set the address.
+     * @param account The address to set at the specified index.
+     */
     function set(
         Data storage self,
         uint256 index,

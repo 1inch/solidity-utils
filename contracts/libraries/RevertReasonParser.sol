@@ -4,7 +4,9 @@ pragma solidity ^0.8.0;
 
 import "./StringUtil.sol";
 
-/** @title Library that allows to parse unsuccessful arbitrary calls revert reasons.
+/**
+ * @title RevertReasonParser
+ * @notice Library that allows to parse unsuccessful arbitrary calls revert reasons.
  * See https://solidity.readthedocs.io/en/latest/control-structures.html#revert for details.
  * Note that we assume revert reason being abi-encoded as Error(string) so it may fail to parse reason
  * if structured reverts appear in the future.
@@ -20,7 +22,14 @@ library RevertReasonParser {
     bytes4 private constant _ERROR_SELECTOR = bytes4(keccak256("Error(string)"));
     bytes4 private constant _PANIC_SELECTOR = bytes4(keccak256("Panic(uint256)"));
 
-    /// @dev Parses error `data` and returns actual with `prefix`.
+    /**
+     * @dev Parses revert reason from failed calls, returning it with a `prefix`.
+     * Handles standard `Error(string)` and `Panic(uint256)` formats, defaulting to `Unknown(data)` for unrecognized patterns.
+     *
+     * @param data The revert data to parse.
+     * @param prefix String to add before the parsed reason for context.
+     * @return The formatted revert reason.
+     */
     function parse(bytes memory data, string memory prefix) internal pure returns (string memory) {
         // https://solidity.readthedocs.io/en/latest/control-structures.html#revert
         // We assume that revert reason is abi-encoded as Error(string)

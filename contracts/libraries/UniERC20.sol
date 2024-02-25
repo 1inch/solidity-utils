@@ -8,7 +8,11 @@ import "../interfaces/IERC20MetadataUppercase.sol";
 import "./SafeERC20.sol";
 import "./StringUtil.sol";
 
-/// @title Library, which allows usage of ETH as ERC20 and ERC20 itself. Uses SafeERC20 library for ERC20 interface.
+/**
+ * @title UniERC20
+ * @dev Library to abstract the handling of ETH and ERC20 tokens, enabling unified interaction with both. It allows usage of ETH as ERC20.
+ * Utilizes SafeERC20 for ERC20 interactions and provides additional utility functions.
+ */
 library UniERC20 {
     using SafeERC20 for IERC20;
 
@@ -23,12 +27,21 @@ library UniERC20 {
     IERC20 private constant _ETH_ADDRESS = IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     IERC20 private constant _ZERO_ADDRESS = IERC20(address(0));
 
-    /// @dev Returns true if `token` is ETH.
+    /**
+     * @dev Determines if the specified token is ETH.
+     * @param token The token to check.
+     * @return bool True if the token is ETH, false otherwise.
+     */
     function isETH(IERC20 token) internal pure returns (bool) {
         return (token == _ZERO_ADDRESS || token == _ETH_ADDRESS);
     }
 
-    /// @dev Returns `account` ERC20 `token` balance.
+    /**
+     * @dev Retrieves the balance of the specified token for an account.
+     * @param token The token to query the balance of.
+     * @param account The address of the account.
+     * @return uint256 The balance of the token for the specified account.
+     */
     function uniBalanceOf(IERC20 token, address account) internal view returns (uint256) {
         if (isETH(token)) {
             return account.balance;
@@ -37,8 +50,13 @@ library UniERC20 {
         }
     }
 
-    /// @dev `token` transfer `to` `amount`.
-    /// Note that this function does nothing in case of zero amount.
+    /**
+     * @dev Transfers a specified amount of the token to a given address.
+     * Note: Does nothing if the amount is zero.
+     * @param token The token to transfer.
+     * @param to The address to transfer the token to.
+     * @param amount The amount of the token to transfer.
+     */
     function uniTransfer(
         IERC20 token,
         address payable to,
@@ -56,8 +74,14 @@ library UniERC20 {
         }
     }
 
-    /// @dev `token` transfer `from` `to` `amount`.
-    /// Note that this function does nothing in case of zero amount.
+    /**
+     * @dev Transfers a specified amount of the token from one address to another.
+     * Note: Does nothing if the amount is zero.
+     * @param token The token to transfer.
+     * @param from The address to transfer the token from.
+     * @param to The address to transfer the token to.
+     * @param amount The amount of the token to transfer.
+     */
     function uniTransferFrom(
         IERC20 token,
         address payable from,
@@ -83,17 +107,31 @@ library UniERC20 {
         }
     }
 
-    /// @dev Returns `token` symbol from ERC20 metadata.
+    /**
+     * @dev Retrieves the symbol from ERC20 metadata of the specified token.
+     * @param token The token to retrieve the symbol of.
+     * @return string The symbol of the token.
+     */
     function uniSymbol(IERC20 token) internal view returns (string memory) {
         return _uniDecode(token, IERC20Metadata.symbol.selector, IERC20MetadataUppercase.SYMBOL.selector);
     }
 
-    /// @dev Returns `token` name from ERC20 metadata.
+    /**
+     * @dev Retrieves the name from ERC20 metadata of the specified token.
+     * @param token The token to retrieve the name of.
+     * @return string The name of the token.
+     */
     function uniName(IERC20 token) internal view returns (string memory) {
         return _uniDecode(token, IERC20Metadata.name.selector, IERC20MetadataUppercase.NAME.selector);
     }
 
-    /// @dev Reverts if `token` is ETH, otherwise performs ERC20 forceApprove.
+    /**
+     * @dev forceApprove the specified amount of the token to a given address.
+     * Reverts if the token is ETH.
+     * @param token The token to approve.
+     * @param to The address to approve the token to.
+     * @param amount The amount of the token to approve.
+     */
     function uniApprove(
         IERC20 token,
         address to,
@@ -104,8 +142,15 @@ library UniERC20 {
         token.forceApprove(to, amount);
     }
 
-    /// @dev 20K gas is provided to account for possible implementations of name/symbol
-    /// (token implementation might be behind proxy or store the value in storage)
+    /**
+     * @dev Internal function to decode token metadata (name or symbol).
+     * 20K gas is provided to account for possible implementations of name/symbol
+     * (token implementation might be behind proxy or store the value in storage)
+     * @param token The token to decode metadata for.
+     * @param lowerCaseSelector The selector for the lowercase metadata function.
+     * @param upperCaseSelector The selector for the uppercase metadata function.
+     * @return string The decoded metadata value.
+     */
     function _uniDecode(
         IERC20 token,
         bytes4 lowerCaseSelector,

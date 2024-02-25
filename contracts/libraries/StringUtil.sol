@@ -2,18 +2,36 @@
 
 pragma solidity ^0.8.0;
 
-/// @title Library with gas-efficient string operations
+/**
+ * @title StringUtil
+ * @dev Library with gas-efficient string operations.
+ */
 library StringUtil {
+    /**
+     * @notice Converts a uint256 value to its hexadecimal string representation.
+     * @param value The uint256 value to convert.
+     * @return The hexadecimal string representation of the input value.
+     */
     function toHex(uint256 value) internal pure returns (string memory) {
         return toHex(abi.encodePacked(value));
     }
 
+    /**
+     * @notice Converts an address to its hexadecimal string representation.
+     * @param value The address to convert.
+     * @return The hexadecimal string representation of the input address.
+     */
     function toHex(address value) internal pure returns (string memory) {
         return toHex(abi.encodePacked(value));
     }
 
-    /// @dev this is the assembly adaptation of highly optimized toHex16 code from Mikhail Vladimirov
-    /// https://stackoverflow.com/a/69266989
+    /**
+     * @dev Converts arbitrary bytes to their hexadecimal string representation.
+     * This is an assembly adaptation of highly optimized toHex16 code by Mikhail Vladimirov.
+     * Reference: https://stackoverflow.com/a/69266989
+     * @param data The bytes to be converted to hexadecimal string.
+     * @return result The hexadecimal string representation of the input bytes.
+     */
     function toHex(bytes memory data) internal pure returns (string memory result) {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             function _toHex16(input) -> output {
