@@ -22,6 +22,20 @@ interface DeployContractOptions {
     waitConfirmations?: number;
 }
 
+/**
+ * @notice Deploys a contract with optional Etherscan verification.
+ * @param contractName Name of the contract to deploy.
+ * @param constructorArgs Arguments for the contract's constructor.
+ * @param deployments Deployment facilitator object from Hardhat.
+ * @param deployer Address deploying the contract.
+ * @param deploymentName Optional custom name for deployment; defaults to contract name.
+ * @param skipVerify Skips Etherscan verification if true.
+ * @param skipIfAlreadyDeployed Avoids redeployment if contract already deployed.
+ * @param gasPrice, maxPriorityFeePerGas, maxFeePerGas Gas strategy options.
+ * @param log Toggles deployment logging.
+ * @param waitConfirmations Number of confirmations to wait based on network. Ussually it's need for waiting before Etherscan verification.
+ * @returns The deployed contract instance.
+ */
 export async function deployAndGetContract({
     contractName,
     constructorArgs,
@@ -68,12 +82,22 @@ export async function deployAndGetContract({
     return await ethers.getContractAt(contractName, deployResult.address);
 }
 
+/**
+ * @notice Advances the blockchain time to a specific timestamp for testing purposes.
+ * @param seconds Target time in seconds or string format to increase to.
+ */
 export async function timeIncreaseTo(seconds: number | string): Promise<void> {
     const delay = 1000 - new Date().getMilliseconds();
     await new Promise((resolve) => setTimeout(resolve, delay));
     await time.increaseTo(seconds);
 }
 
+/**
+ * @notice Deploys a contract given a name and optional constructor parameters.
+ * @param name The contract name.
+ * @param parameters Constructor parameters for the contract.
+ * @returns The deployed contract instance.
+ */
 export async function deployContract(name: string, parameters: Array<BigNumberish> = []) : Promise<BaseContract> {
     const ContractFactory = await ethers.getContractFactory(name);
     const instance = await ContractFactory.deploy(...parameters);
@@ -81,6 +105,14 @@ export async function deployContract(name: string, parameters: Array<BigNumberis
     return instance;
 }
 
+/**
+ * @notice Deploys a contract from bytecode, useful for testing and deployment of minimal proxies.
+ * @param abi Contract ABI.
+ * @param bytecode Contract bytecode.
+ * @param parameters Constructor parameters.
+ * @param signer Optional signer object.
+ * @returns The deployed contract instance.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function deployContractFromBytecode(abi: any[], bytecode: BytesLike, parameters: Array<BigNumberish> = [], signer?: Signer) : Promise<BaseContract> {
     const ContractFactory = await ethers.getContractFactory(abi, bytecode, signer);
@@ -96,6 +128,16 @@ type Token = {
 
 type TrackReceivedTokenAndTxResult = [bigint, ContractTransactionReceipt | TrackReceivedTokenAndTxResult];
 
+/**
+ * @notice Tracks token balance changes and transaction receipts for specified wallet addresses during test scenarios.
+ * It could be used recursively for multiple tokens via specific `txPromise` function.
+ * @param provider JSON RPC provider or custom provider object.
+ * @param token Token contract instance or ETH address constants.
+ * @param wallet Wallet address to track.
+ * @param txPromise Function returning a transaction promise.
+ * @param args Arguments for the transaction promise function.
+ * @returns Tuple of balance change and transaction receipt.
+ */
 export async function trackReceivedTokenAndTx<T extends unknown[]>(
     provider: JsonRpcProvider | { getBalance: (address: string) => Promise<bigint> },
     token: Token | { address: typeof constants.ZERO_ADDRESS } | { address: typeof constants.EEE_ADDRESS },
@@ -117,6 +159,11 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
     return [postBalance - preBalance + txFees, 'wait' in txResponse ? txReceipt! : txResponse];
 }
 
+/**
+ * @notice Corrects the ECDSA signature 'v' value according to Ethereum's standard.
+ * @param signature The original signature string.
+ * @returns The corrected signature string.
+ */
 export function fixSignature(signature: string): string {
     // in geth its always 27/28, in ganache its 0/1. Change to 27/28 to prevent
     // signature malleability if version is 0/1
@@ -129,6 +176,12 @@ export function fixSignature(signature: string): string {
     return signature.slice(0, 130) + vHex;
 }
 
+/**
+ * @notice Signs a message with a given signer and fixes the signature format.
+ * @param signer Signer object or wallet instance.
+ * @param messageHex The message to sign, in hex format.
+ * @returns The signed message string.
+ */
 export async function signMessage(
     signer: Wallet | { signMessage: (messageHex: string | Uint8Array) => Promise<string> },
     messageHex: string | Uint8Array = '0x'
@@ -136,6 +189,13 @@ export async function signMessage(
     return fixSignature(await signer.signMessage(messageHex));
 }
 
+/**
+ * @notice Counts the occurrences of specified EVM instructions in a transaction's execution trace.
+ * @param provider JSON RPC provider or custom provider object.
+ * @param txHash Transaction hash to analyze.
+ * @param instructions Array of EVM instructions (opcodes) to count.
+ * @returns Array of instruction counts.
+ */
 export async function countInstructions(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     provider: JsonRpcProvider | { send: (method: string, params: unknown[]) => Promise<any> },
