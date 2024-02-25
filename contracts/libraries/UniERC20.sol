@@ -149,7 +149,7 @@ library UniERC20 {
      * @param token The token to decode metadata for.
      * @param lowerCaseSelector The selector for the lowercase metadata function.
      * @param upperCaseSelector The selector for the uppercase metadata function.
-     * @return string The decoded metadata value.
+     * @return result The decoded metadata value.
      */
     function _uniDecode(
         IERC20 token,

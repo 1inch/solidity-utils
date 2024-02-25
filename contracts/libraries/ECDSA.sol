@@ -85,7 +85,7 @@ library ECDSA {
      * @notice Recovers the signer's address from a hash and a signature.
      * @param hash The keccak256 hash of the signed data.
      * @param signature The full signature from which the signer will be recovered.
-     * @return The address of the signer.
+     * @return signer The address of the signer.
      */
     /// @dev WARNING!!!
     /// There is a known signature malleability issue with two representations of signatures!
@@ -223,7 +223,7 @@ library ECDSA {
      * @param signer The address of the signer to validate against, which could be an EOA or a contract.
      * @param hash The hash of the signed data.
      * @param signature The signature to validate.
-     * @return True if the signature is valid according to EIP-1271, false otherwise.
+     * @return success True if the signature is valid according to EIP-1271, false otherwise.
      */
     function isValidSignature(
         address signer,
@@ -255,7 +255,7 @@ library ECDSA {
      * @param v The recovery byte of the signature.
      * @param r The first 32 bytes of the signature.
      * @param s The second 32 bytes of the signature.
-     * @return True if the signature is valid according to EIP-1271, false otherwise.
+     * @return success True if the signature is valid according to EIP-1271, false otherwise.
      */
     function isValidSignature(
         address signer,
@@ -288,7 +288,7 @@ library ECDSA {
      * @param hash The hash of the signed data.
      * @param r The first 32 bytes of the signature.
      * @param vs The last 32 bytes of the signature, with the last byte being the recovery id.
-     * @return True if the signature is valid according to EIP-1271, false otherwise.
+     * @return success True if the signature is valid according to EIP-1271, false otherwise.
      */
     function isValidSignature(
         address signer,
@@ -320,7 +320,7 @@ library ECDSA {
      * @param hash The hash of the signed data.
      * @param r The first 32 bytes of the signature.
      * @param vs The combined `v` (recovery id) and `s` component of the signature, packed into the last 32 bytes.
-     * @return True if the signature is valid according to EIP-1271, false otherwise.
+     * @return success True if the signature is valid according to EIP-1271, false otherwise.
      */
     function isValidSignature65(
         address signer,
@@ -351,7 +351,7 @@ library ECDSA {
      * @notice Generates a hash compatible with Ethereum's signed message format.
      * @dev Prepends the hash with Ethereum's message prefix before hashing it.
      * @param hash The hash of the data to sign.
-     * @return The Ethereum signed message hash.
+     * @return res The Ethereum signed message hash.
      */
     function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32 res) {
         // 32 is the length in bytes of hash, enforced by the type signature above
@@ -368,7 +368,7 @@ library ECDSA {
      * @dev Encodes the domain separator and the struct hash according to EIP-712.
      * @param domainSeparator The EIP-712 domain separator.
      * @param structHash The EIP-712 struct hash.
-     * @return The EIP-712 compliant hash.
+     * @return res The EIP-712 compliant hash.
      */
     function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32 res) {
         // return keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
