@@ -8,35 +8,33 @@ This class is your go-to assistant for setting up various blockchain networks fo
 
 ## Methods:
 
-1. **`_parseRpcEnv(envRpc: string)`**: A helper method to parse RPC configuration strings. Checks that the string is in the expected format.
-
-2. **`constructor(useHardhat: boolean, forkingNetworkName?: string, saveHardhatDeployments: boolean)`**: Initializes the class. It can set up a Hardhat network, including Hardhad forking, and determines whether to save deployments files.
+1. **`constructor(useHardhat: boolean, forkingNetworkName?: string, saveHardhatDeployments: boolean)`**: Initializes the class. It can set up a Hardhat network, including Hardhad forking, and determines whether to save deployments files.
 
    **Constructor Parameters**
 
     - **`useHardhat`** (default: `true`):
-    
+
       Determines whether to configure the class for using the Hardhat network. If `true`, sets up the class to operate with Hardhat.
-    
+
     - **`forkingNetworkName`** (optional):
-      
+
       Specifies the network to fork in Hardhat. If provided, Hardhat will simulate the specified network, allowing for local testing and development. If not provided, Hardhat will not perform any network forking.
-   
+
     - **`saveHardhatDeployments`** (default: `false`):
-      
+
       Decides whether to save deployment files in the Hardhat environment. If `true`, saves deployment details such as contract addresses in json file, useful for tracking and referencing in subsequent testing or deployments.
 
-4. **`register(...)`**: Registers a new network with specified parameters, such as the RPC URL, private key, and Etherscan keys.
+2. **`register(...)`**: Registers a new network with specified parameters, such as the RPC URL, private key, and Etherscan keys.
 
-5. **`registerCustom(...)`**: Allows registering custom networks with custom parameters for Etherscan contract verifications.
+3. **`registerCustom(...)`**: Allows registering custom networks with custom parameters for Etherscan contract verifications.
 
-6. **`registerZksync(...)`**: A specialized method for registering zkSync networks with additional parameters which specified for zksync network.
+4. **`registerZksync(...)`**: A specialized method for registering zkSync networks with additional parameters which specified for zksync network.
 
-7. **`registerAll()`**: Registers multiple standard networks using environment variables for configuration.
+5. **`registerAll()`**: Registers multiple standard networks using environment variables for configuration.
 
 ## Predefined environment variable names and their format
 1. **`rpc`**
-   
+
    `<NETWORK_NAME>_RPC_URL` - RPC configuration string of network with `<NETWORK_NAME>`.
 
    Format:
@@ -51,9 +49,9 @@ This class is your go-to assistant for setting up various blockchain networks fo
 2. **`private key`**
 
    `PRIVATE_KEY` - The Common private key used for all networks.
-   
+
    `<NETWORK_NAME>_PRIVATE_KEY>` - The private key used for the specific network with `<NETWORK_NAME>`.
-   
+
    Format:
    - 32 bytes of the private key represented as a 64-character hex string without the 0x prefix
    - Examples:
