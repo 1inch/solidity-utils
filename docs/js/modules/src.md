@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[src/permit.ts:30](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L30)
+[src/permit.ts:30](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L30)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[src/permit.ts:15](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L15)
+[src/permit.ts:15](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L15)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[src/permit.ts:22](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L22)
+[src/permit.ts:22](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L22)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[src/permit.ts:11](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L11)
+[src/permit.ts:11](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L11)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 #### Defined in
 
-[src/prelude.ts:4](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/prelude.ts#L4)
+[src/prelude.ts:4](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/prelude.ts#L4)
 
 ___
 
@@ -115,7 +115,7 @@ ___
 
 #### Defined in
 
-[src/permit.ts:12](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L12)
+[src/permit.ts:12](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L12)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 #### Defined in
 
-[src/permit.ts:13](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L13)
+[src/permit.ts:13](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L13)
 
 ## expect
 
@@ -157,7 +157,7 @@ or if the actual value deviates from the expected by more than the specified rel
 
 #### Defined in
 
-[src/expect.ts:15](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/expect.ts#L15)
+[src/expect.ts:15](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/expect.ts#L15)
 
 ## permit
 
@@ -205,7 +205,7 @@ Constructs structured data for EIP-2612 permit function, including types, domain
 
 #### Defined in
 
-[src/permit.ts:97](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L97)
+[src/permit.ts:97](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L97)
 
 ___
 
@@ -255,7 +255,7 @@ Prepares structured data similar to the Dai permit function, including types, do
 
 #### Defined in
 
-[src/permit.ts:129](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L129)
+[src/permit.ts:129](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L129)
 
 ___
 
@@ -284,7 +284,7 @@ Compresses a permit function call to a shorter format based on its type.
 
 #### Defined in
 
-[src/permit.ts:308](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L308)
+[src/permit.ts:308](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L308)
 
 ___
 
@@ -310,7 +310,7 @@ Trims the method selector from transaction data, removing the first 8 characters
 
 #### Defined in
 
-[src/permit.ts:58](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L58)
+[src/permit.ts:58](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L58)
 
 ___
 
@@ -339,7 +339,7 @@ Decompresses a compressed permit function call back to its original full format.
 
 #### Defined in
 
-[src/permit.ts:357](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L357)
+[src/permit.ts:357](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L357)
 
 ___
 
@@ -368,7 +368,7 @@ Generates a domain separator for EIP-712 structured data using the provided para
 
 #### Defined in
 
-[src/permit.ts:72](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L72)
+[src/permit.ts:72](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L72)
 
 ___
 
@@ -401,7 +401,7 @@ Generates a permit signature for ERC20 tokens with EIP-2612 standard.
 
 #### Defined in
 
-[src/permit.ts:172](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L172)
+[src/permit.ts:172](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L172)
 
 ___
 
@@ -434,7 +434,7 @@ Creates a permit for spending tokens on Permit2 standard contracts.
 
 #### Defined in
 
-[src/permit.ts:214](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L214)
+[src/permit.ts:214](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L214)
 
 ___
 
@@ -467,7 +467,7 @@ Generates a Dai-like permit signature for tokens.
 
 #### Defined in
 
-[src/permit.ts:256](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L256)
+[src/permit.ts:256](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L256)
 
 ___
 
@@ -487,7 +487,7 @@ Ensures contract code is set for a given address and returns a contract instance
 
 #### Defined in
 
-[src/permit.ts:152](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L152)
+[src/permit.ts:152](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L152)
 
 ___
 
@@ -513,7 +513,7 @@ Removes the '0x' prefix from a string. If no '0x' prefix is found, returns the o
 
 #### Defined in
 
-[src/permit.ts:44](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L44)
+[src/permit.ts:44](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L44)
 
 ___
 
@@ -540,7 +540,7 @@ Concatenates a target address with data, trimming the '0x' prefix from the data.
 
 #### Defined in
 
-[src/permit.ts:295](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/permit.ts#L295)
+[src/permit.ts:295](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/permit.ts#L295)
 
 ## prelude
 
@@ -566,7 +566,7 @@ Converts an Ether amount represented as a string into its Wei equivalent as a bi
 
 #### Defined in
 
-[src/prelude.ts:26](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/prelude.ts#L26)
+[src/prelude.ts:26](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/prelude.ts#L26)
 
 ## profileEVM
 
@@ -588,7 +588,7 @@ Default configuration options for the `gasspectEVM` function to analyze gas usag
 
 #### Defined in
 
-[src/profileEVM.ts:11](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/profileEVM.ts#L11)
+[src/profileEVM.ts:11](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/profileEVM.ts#L11)
 
 ___
 
@@ -618,7 +618,7 @@ Analyzes gas usage by operations within a transaction, applying filters and form
 
 #### Defined in
 
-[src/profileEVM.ts:141](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/profileEVM.ts#L141)
+[src/profileEVM.ts:141](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/profileEVM.ts#L141)
 
 ___
 
@@ -647,7 +647,7 @@ Profiles EVM execution by counting occurrences of specified instructions in a tr
 
 #### Defined in
 
-[src/profileEVM.ts:112](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/profileEVM.ts#L112)
+[src/profileEVM.ts:112](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/profileEVM.ts#L112)
 
 ## utils
 
@@ -675,7 +675,7 @@ Counts the occurrences of specified EVM instructions in a transaction's executio
 
 #### Defined in
 
-[src/utils.ts:207](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/utils.ts#L207)
+[src/utils.ts:207](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/utils.ts#L207)
 
 ___
 
@@ -701,7 +701,7 @@ Deploys a contract with optional Etherscan verification.
 
 #### Defined in
 
-[src/utils.ts:40](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/utils.ts#L40)
+[src/utils.ts:40](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/utils.ts#L40)
 
 ___
 
@@ -728,7 +728,7 @@ Deploys a contract given a name and optional constructor parameters.
 
 #### Defined in
 
-[src/utils.ts:104](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/utils.ts#L104)
+[src/utils.ts:104](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/utils.ts#L104)
 
 ___
 
@@ -757,7 +757,7 @@ Deploys a contract from bytecode, useful for testing and deployment of minimal p
 
 #### Defined in
 
-[src/utils.ts:121](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/utils.ts#L121)
+[src/utils.ts:121](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/utils.ts#L121)
 
 ___
 
@@ -783,7 +783,7 @@ Corrects the ECDSA signature 'v' value according to Ethereum's standard.
 
 #### Defined in
 
-[src/utils.ts:173](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/utils.ts#L173)
+[src/utils.ts:173](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/utils.ts#L173)
 
 ___
 
@@ -810,7 +810,7 @@ Signs a message with a given signer and fixes the signature format.
 
 #### Defined in
 
-[src/utils.ts:192](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/utils.ts#L192)
+[src/utils.ts:192](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/utils.ts#L192)
 
 ___
 
@@ -834,7 +834,7 @@ Advances the blockchain time to a specific timestamp for testing purposes.
 
 #### Defined in
 
-[src/utils.ts:91](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/utils.ts#L91)
+[src/utils.ts:91](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/utils.ts#L91)
 
 ___
 
@@ -871,4 +871,4 @@ It could be used recursively for multiple tokens via specific `txPromise` functi
 
 #### Defined in
 
-[src/utils.ts:146](https://github.com/1inch/solidity-utils/blob/3ce5fd8/src/utils.ts#L146)
+[src/utils.ts:146](https://github.com/1inch/solidity-utils/blob/3a51d5d/src/utils.ts#L146)
