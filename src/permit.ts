@@ -36,6 +36,7 @@ export const DaiLikePermit = [
 ];
 
 /**
+ * @category permit
  * @dev Removes the '0x' prefix from a string. If no '0x' prefix is found, returns the original string.
  * @param bigNumber The number (as a bigint or string) from which to remove the '0x' prefix.
  * @return The string without the '0x' prefix.
@@ -49,6 +50,7 @@ export function trim0x(bigNumber: bigint | string): string {
 }
 
 /**
+ * @category permit
  * @dev Trims the method selector from transaction data, removing the first 8 characters (4 bytes of hexable string) after '0x' prefix.
  * @param data The transaction data string from which to trim the selector.
  * @return The trimmed selector string.
@@ -59,6 +61,7 @@ export function cutSelector(data: string): string {
 }
 
 /**
+ * @category permit
  * @dev Generates a domain separator for EIP-712 structured data using the provided parameters.
  * @param name The user readable name of EIP-712 domain.
  * @param version The version of the EIP-712 domain.
@@ -79,6 +82,7 @@ export function domainSeparator(name: string, version: string, chainId: string, 
 }
 
 /**
+ * @category permit
  * @dev Constructs structured data for EIP-2612 permit function, including types, domain, and message with details about the permit.
  * @param name The user readable name of signing EIP-712 domain
  * @param version The version of the signing EIP-712 domain.
@@ -109,6 +113,7 @@ export function buildData(
 }
 
 /**
+ * @category permit
  * @dev Prepares structured data similar to the Dai permit function, including types, domain, and message with permit details.
  * @param name The user readable name of signing EIP-712 domain
  * @param version The version of the signing EIP-712 domain.
@@ -140,6 +145,7 @@ export function buildDataLikeDai(
 }
 
 /**
+ * @category permit
  * @dev Ensures contract code is set for a given address and returns a contract instance.
  * @return The contract instance of IPermit2.
  */
@@ -151,6 +157,7 @@ export async function permit2Contract() {
 }
 
 /**
+ * @category permit
  * @notice Generates a permit signature for ERC20 tokens with EIP-2612 standard.
  * @param owner The wallet or signer issuing the permit.
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
@@ -192,6 +199,7 @@ export async function getPermit(
 }
 
 /**
+ * @category permit
  * @notice Creates a permit for spending tokens on Permit2 standard contracts.
  * @param owner The wallet or signer issuing the permit.
  * @param token The address of the token for which the permit is creates.
@@ -233,6 +241,7 @@ export async function getPermit2(
 }
 
 /**
+ * @category permit
  * @notice Generates a Dai-like permit signature for tokens.
  * @param holder The wallet or signer issuing the permit.
  * @param permitContract The contract object with ERC20PermitLikeDai type and token address for which the permit creating.
@@ -277,6 +286,7 @@ export async function getPermitLikeDai(
 }
 
 /**
+ * @category permit
  * @notice Concatenates a target address with data, trimming the '0x' prefix from the data.
  * @param target The target address or value to prepend.
  * @param data The data string to be concatenated after trimming.
@@ -287,6 +297,7 @@ export function withTarget(target: bigint | string, data: bigint | string): stri
 }
 
 /**
+ * @category permit
  * @notice Compresses a permit function call to a shorter format based on its type.
  *   Type         | EIP-2612 | DAI | Permit2
  *   Uncompressed |    224   | 256 | 352
@@ -335,6 +346,7 @@ export function compressPermit(permit: string): string {
 }
 
 /**
+ * @category permit
  * @notice Decompresses a compressed permit function call back to its original full format.
  * @param permit The compressed permit function call string.
  * @param token The token address involved in the permit (for Permit2 type).

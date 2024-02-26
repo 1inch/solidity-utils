@@ -76,6 +76,8 @@
     "solidity-docgen": "0.5.17",
     "ts-node": "10.9.2",
     "typechain": "8.3.2",
+    "typedoc": "0.25.8",
+    "typedoc-plugin-markdown": "3.17.1",
     "typescript": "5.3.3"
   },
   "bin": {

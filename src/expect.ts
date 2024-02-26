@@ -1,6 +1,7 @@
 import { Assertion, AssertionError, assert, expect, config, should } from 'chai';
 
 /**
+ * @category expect
  * @dev Asserts that two values are roughly equal within a specified relative difference.
  * This function is useful for cases where precision issues might cause direct comparisons to fail.
  * @param expected The expected value as a string, number, or bigint.

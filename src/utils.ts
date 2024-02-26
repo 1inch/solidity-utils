@@ -23,6 +23,7 @@ interface DeployContractOptions {
 }
 
 /**
+ * @category utils
  * @notice Deploys a contract with optional Etherscan verification.
  * @param contractName Name of the contract to deploy.
  * @param constructorArgs Arguments for the contract's constructor.
@@ -83,6 +84,7 @@ export async function deployAndGetContract({
 }
 
 /**
+ * @category utils
  * @notice Advances the blockchain time to a specific timestamp for testing purposes.
  * @param seconds Target time in seconds or string format to increase to.
  */
@@ -93,6 +95,7 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
 }
 
 /**
+ * @category utils
  * @notice Deploys a contract given a name and optional constructor parameters.
  * @param name The contract name.
  * @param parameters Constructor parameters for the contract.
@@ -106,6 +109,7 @@ export async function deployContract(name: string, parameters: Array<BigNumberis
 }
 
 /**
+ * @category utils
  * @notice Deploys a contract from bytecode, useful for testing and deployment of minimal proxies.
  * @param abi Contract ABI.
  * @param bytecode Contract bytecode.
@@ -129,6 +133,7 @@ type Token = {
 type TrackReceivedTokenAndTxResult = [bigint, ContractTransactionReceipt | TrackReceivedTokenAndTxResult];
 
 /**
+ * @category utils
  * @notice Tracks token balance changes and transaction receipts for specified wallet addresses during test scenarios.
  * It could be used recursively for multiple tokens via specific `txPromise` function.
  * @param provider JSON RPC provider or custom provider object.
@@ -160,6 +165,7 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
 }
 
 /**
+ * @category utils
  * @notice Corrects the ECDSA signature 'v' value according to Ethereum's standard.
  * @param signature The original signature string.
  * @returns The corrected signature string.
@@ -177,6 +183,7 @@ export function fixSignature(signature: string): string {
 }
 
 /**
+ * @category utils
  * @notice Signs a message with a given signer and fixes the signature format.
  * @param signer Signer object or wallet instance.
  * @param messageHex The message to sign, in hex format.
@@ -190,6 +197,7 @@ export async function signMessage(
 }
 
 /**
+ * @category utils
  * @notice Counts the occurrences of specified EVM instructions in a transaction's execution trace.
  * @param provider JSON RPC provider or custom provider object.
  * @param txHash Transaction hash to analyze.
