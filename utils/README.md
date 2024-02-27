@@ -19,6 +19,11 @@ Add to `package.json` file solidity compiler version (add version you use), soli
 "docify": "npx solidity-utils-docify"
 ```
 
+You can set output directory with ENV variable:
+```
+"docify": "DOCGEN_OUTPUT_DIR=./docs npx solidity-utils-docify"
+```
+
 ...
 
 #### Dependencies list (imports-list)
