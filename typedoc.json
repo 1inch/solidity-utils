@@ -6,4 +6,5 @@
   "excludeInternal": true,
   "entryPoints": ["./src/index.ts", "./hardhat-setup/index.ts"],
   "plugin": ["typedoc-plugin-markdown"],
+  "githubPages": false,
 }
