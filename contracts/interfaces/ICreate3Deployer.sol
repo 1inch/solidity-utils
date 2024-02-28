@@ -8,7 +8,7 @@ pragma solidity ^0.8.0;
  */
 interface ICreate3Deployer {
     /**
-     * @notice Deploys a contract using CREATE2 with a given salt and bytecode.
+     * @notice Deploys a contract using CREATE3 with a given salt and bytecode.
      * @param salt Unique value to create deterministic address.
      * @param code Contract bytecode to deploy.
      * @return Address of the deployed contract.
