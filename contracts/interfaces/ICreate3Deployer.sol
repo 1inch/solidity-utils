@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 /**
  * @title ICreate3Deployer
- * @dev Interface for deploying contracts with deterministic addresses via CREATE2.
+ * @dev Interface for deploying contracts with deterministic addresses via CREATE3.
  */
 interface ICreate3Deployer {
     /**
