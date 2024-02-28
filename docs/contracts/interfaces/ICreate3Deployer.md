@@ -4,7 +4,7 @@
 ICreate3Deployer
 
 
-Interface for deploying contracts with deterministic addresses via CREATE2.
+Interface for deploying contracts with deterministic addresses via CREATE3.
 
 
 ## Functions
@@ -15,7 +15,7 @@ function deploy(
   bytes code
 ) external returns (address)
 ```
-Deploys a contract using CREATE2 with a given salt and bytecode.
+Deploys a contract using CREATE3 with a given salt and bytecode.
 
 
 #### Parameters:
