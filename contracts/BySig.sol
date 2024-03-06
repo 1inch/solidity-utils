@@ -31,19 +31,19 @@ abstract contract BySig is Context, EIP712 {
     mapping(address => mapping(bytes4 => uint256)) private _bySigSelectorNonces;
     mapping(address => mapping(uint256 => uint256)) private _bySigUniqueNonces;
 
-    function bySigAccountNonces(address account) external view returns(uint256) {
+    function bySigAccountNonces(address account) public view returns(uint256) {
         return _bySigAccountNonces[account];
     }
 
-    function bySigSelectorNonces(address account, bytes4 selector) external view returns(uint256) {
+    function bySigSelectorNonces(address account, bytes4 selector) public view returns(uint256) {
         return _bySigSelectorNonces[account][selector];
     }
 
-    function bySigUniqueNonces(address account, uint256 nonce) external view returns(bool) {
+    function bySigUniqueNonces(address account, uint256 nonce) public view returns(bool) {
         return (_bySigUniqueNonces[account][nonce >> 8] & (1 << (nonce & 0xff))) != 0;
     }
 
-    function bySigUniqueNoncesSlot(address account, uint256 nonce) external view returns(uint256) {
+    function bySigUniqueNoncesSlot(address account, uint256 nonce) public view returns(uint256) {
         return _bySigUniqueNonces[account][nonce >> 8];
     }
 
@@ -69,7 +69,7 @@ abstract contract BySig is Context, EIP712 {
         _msgSenders.pop();
     }
 
-    function sponsoredCall(address token, uint256 amount, bytes calldata data) external payable returns(bytes memory ret) {
+    function sponsoredCall(address token, uint256 amount, bytes calldata data) public payable returns(bytes memory ret) {
         ret = address(this).functionDelegateCall(data);
         _chargeSigner(_msgSender(), msg.sender, token, amount);
     }
@@ -85,15 +85,15 @@ abstract contract BySig is Context, EIP712 {
     function _chargeSigner(address signer, address relayer, address token, uint256 amount) internal virtual;
 
 
-    function useBySigAccountNonce(uint32 advance) external {
+    function useBySigAccountNonce(uint32 advance) public {
         _bySigAccountNonces[_msgSender()] += advance;
     }
 
-    function useBySigSelectorNonce(bytes4 selector, uint32 advance) external {
+    function useBySigSelectorNonce(bytes4 selector, uint32 advance) public {
         _bySigSelectorNonces[_msgSender()][selector] += advance;
     }
 
-    function useBySigUniqueNonce(uint256 nonce) external {
+    function useBySigUniqueNonce(uint256 nonce) public {
         _bySigUniqueNonces[_msgSender()][nonce >> 8] |= 1 << (nonce & 0xff);
     }
 
