@@ -3,7 +3,7 @@ const SOLC_NPM_NAME = 'solc';
 const BASE_DIR = 'docgen';
 const SCRIPT_DIR = __dirname;
 const INPUT_DIR = 'contracts';
-const OUTPUT_DIR = `${BASE_DIR}/docs`;
+const OUTPUT_DIR = process.env.DOCGEN_OUTPUT_DIR || `${BASE_DIR}/docs`;
 const HELPERS_PATH = `${SCRIPT_DIR}/solidity-docgen-helpers.js`;
 
 const fs = require('fs');
