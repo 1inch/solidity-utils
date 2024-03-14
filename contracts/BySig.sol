@@ -69,21 +69,20 @@ abstract contract BySig is Context, EIP712 {
         _msgSenders.pop();
     }
 
-    function sponsoredCall(address token, uint256 amount, bytes calldata data) public payable returns(bytes memory ret) {
+    function sponsoredCall(address token, uint256 amount, bytes calldata data, bytes calldata extraData) public payable returns(bytes memory ret) {
         ret = address(this).functionDelegateCall(data);
-        _chargeSigner(_msgSender(), msg.sender, token, amount);
+        _chargeSigner(_msgSender(), msg.sender, token, amount, extraData);
     }
 
     // Override this method to implement sponsored call accounting
     // Example imeplementation:
     //
-    // function _chargeSigner(address signer, address relayer, address token, uint256 amount) internal override {
+    // function _chargeSigner(address signer, address relayer, address token, uint256 amount, bytes calldata extraData) internal override {
     //     balances[token][signer] -= amount;
     //     balances[token][relayer] += amount;
     // }
     //
-    function _chargeSigner(address signer, address relayer, address token, uint256 amount) internal virtual;
-
+    function _chargeSigner(address signer, address relayer, address token, uint256 amount, bytes calldata extraData) internal virtual;
 
     function useBySigAccountNonce(uint32 advance) public {
         _bySigAccountNonces[_msgSender()] += advance;
