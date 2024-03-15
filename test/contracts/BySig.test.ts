@@ -1,4 +1,5 @@
-import { constants, expect } from '../../src/prelude';
+import { constants } from '../../src/prelude';
+import { expect } from '../../src/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 import { NonceType, buildBySigTraits } from './BySigTraits.test';
@@ -133,7 +134,7 @@ describe('BySig', function () {
             // await expect(token.bySig(alice, sig, '0x')).to.be.revertedWithCustomError(token, 'WrongNonce');
         });
 
-        it.only('should work', async function () {
+        it('should work for transfer method', async function () {
             const { addrs: { alice, bob }, token } = await loadFixture(deployAddressArrayMock);
             await token.mint(bob.address, 1000);
 
@@ -146,9 +147,11 @@ describe('BySig', function () {
                 { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
                 signedCall
             );
-            await token.bySig(bob, signedCall, signature);
-            // expect(await token.balanceOf(bob.address)).to.be.equal(900);
-            // expect(await token.balanceOf(alice.address)).to.be.equal('100');
+            await expect(token.bySig(bob, signedCall, signature))
+                .to.emit(token, 'Transfer')
+                .withArgs(bob.address, alice.address, 100);
+            expect(await token.balanceOf(bob)).to.be.equal(900);
+            expect(await token.balanceOf(alice)).to.be.equal(100);
         });
     });
 
