@@ -21,7 +21,7 @@ contract TokenWithBySig is TokenMock, BySig {
         return block.chainid;
     }
 
-    function _chargeSigner(address signer, address relayer, address token, uint256 amount) internal override {
+    function _chargeSigner(address signer, address relayer, address token, uint256 amount, bytes calldata /* extraData */) internal override {
         emit ChargedSigner(signer, relayer, token, amount);
     }
 }

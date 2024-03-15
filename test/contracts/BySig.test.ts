@@ -1,7 +1,7 @@
 import { constants, expect } from '../../src/prelude';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
-import { NonceType, buildBySigTraits } from './BySigTrairs.test';
+import { NonceType, buildBySigTraits } from './BySigTraits.test';
 
 function hashBySig(name: string, version: string, chainId: bigint, verifyingContract: string, sig: SignedCallStruct): string {
     const domain = { name, version, chainId, verifyingContract };
@@ -131,6 +131,24 @@ describe('BySig', function () {
             //     data: '0x',
             // }
             // await expect(token.bySig(alice, sig, '0x')).to.be.revertedWithCustomError(token, 'WrongNonce');
+        });
+
+        it.only('should work', async function () {
+            const { addrs: { alice, bob }, token } = await loadFixture(deployAddressArrayMock);
+            await token.mint(bob.address, 1000);
+
+            const signedCall = {
+                traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
+                data: token.interface.encodeFunctionData('transfer', [alice.address, 100]),
+            };
+            const signature = await bob.signTypedData(
+                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
+                signedCall
+            );
+            await token.bySig(bob, signedCall, signature);
+            // expect(await token.balanceOf(bob.address)).to.be.equal(900);
+            // expect(await token.balanceOf(alice.address)).to.be.equal('100');
         });
     });
 
