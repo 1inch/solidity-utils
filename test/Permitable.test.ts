@@ -1,5 +1,5 @@
 import { expect } from '../src/expect';
-import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermit2, getPermitLikeDai, permit2Contract, cutSelector } from '../src/permit';
+import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermit2, getPermitLikeDai, getPermitLikeUSDC, permit2Contract, cutSelector } from '../src/permit';
 import { constants } from '../src/prelude';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
@@ -19,14 +19,18 @@ describe('Permitable', function () {
         const PermitableMockFactory = await ethers.getContractFactory('PermitableMock');
         const ERC20PermitMockFactory = await ethers.getContractFactory('ERC20PermitMock');
         const DaiLikePermitMockFactory = await ethers.getContractFactory('DaiLikePermitMock');
+        const USDCLikePermitMockFactory = await ethers.getContractFactory('USDCLikePermitMock');
         const SafeERC20Factory = await ethers.getContractFactory('SafeERC20');
+        const IsValidSignatureMockFactory = await ethers.getContractFactory('ERC1271WalletMock');
 
         const chainId = Number((await ethers.provider.getNetwork()).chainId);
         const permitableMock = await PermitableMockFactory.deploy();
         const erc20PermitMock = await ERC20PermitMockFactory.deploy('USDC', 'USDC', signer1, 100n);
         const daiLikePermitMock = await DaiLikePermitMockFactory.deploy('DAI', 'DAI', signer1, 100n);
+        const usdcLikePermitMock = await USDCLikePermitMockFactory.deploy('USDCP', 'USDCP', signer1, 100n);
         const safeERC20 = await SafeERC20Factory.attach(permitableMock);
-        return { permitableMock, erc20PermitMock, daiLikePermitMock, safeERC20, chainId };
+        const isValidSignatureMock = await IsValidSignatureMockFactory.deploy(signer1);
+        return { permitableMock, erc20PermitMock, daiLikePermitMock, usdcLikePermitMock, safeERC20, isValidSignatureMock, chainId };
     }
 
     it('should be permitted for IERC20Permit', async function () {
@@ -174,41 +178,18 @@ describe('Permitable', function () {
         );
     });
 
-    it('should be wrong permit length', async function () {
-        const { permitableMock, erc20PermitMock, safeERC20, chainId } = await loadFixture(deployTokens);
+    it('should be permitted for IERC7597Permit', async function () {
+        const { permitableMock, usdcLikePermitMock, isValidSignatureMock, chainId } = await loadFixture(deployTokens);
 
-        const name = await erc20PermitMock.name();
-        const nonce = await erc20PermitMock.nonces(signer1);
-        const data = buildData(
-            name,
-            '1',
-            chainId,
-            await erc20PermitMock.getAddress(),
-            signer1.address,
-            signer2.address,
-            value.toString(),
-            nonce.toString(),
+        const owner = await isValidSignatureMock.getAddress();
+
+        const permit = await getPermitLikeUSDC(
+            owner, signer1, usdcLikePermitMock, '1', chainId, await permitableMock.getAddress(), value.toString()
         );
-        const signature = await signer1.signTypedData(data.domain, data.types, data.message);
-        const { v, r, s } = ethers.Signature.from(signature);
 
-        const permit =
-            '0x' +
-            cutSelector(
-                erc20PermitMock.interface.encodeFunctionData('permit', [
-                    signer1.address,
-                    signer1.address,
-                    value,
-                    defaultDeadline,
-                    v,
-                    r,
-                    s,
-                ]),
-            ).substring(64);
+        await permitableMock.mockPermit(usdcLikePermitMock, permit);
 
-        await expect(permitableMock.mockPermit(erc20PermitMock, permit)).to.be.revertedWithCustomError(
-            safeERC20,
-            'SafePermitBadLength',
-        );
+        expect(await usdcLikePermitMock.nonces(owner)).to.be.equal(1);
+        expect(await usdcLikePermitMock.allowance(owner, permitableMock)).to.be.equal(value);
     });
 });
