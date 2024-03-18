@@ -229,8 +229,38 @@ describe('BySig', function () {
             expect(await token.balanceOf(carol)).to.be.equal(100);
         });
 
-        it.skip('should work recursively for sponsored call', async function () {
-            // TODO: ...
+        it('should work recursively for sponsored call', async function () {
+            const { addrs: { alice, bob, carol }, token } = await loadFixture(deployAddressArrayMock);
+
+            // Bob sign for Carol
+            const approveData = token.interface.encodeFunctionData('approve', [carol.address, 100]);
+            const bobSignedCall = {
+                traits: buildBySigTraits({ relayer: carol.address, deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
+                data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', approveData, '0x']),
+            };
+            const bobSignature = await bob.signTypedData(
+                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
+                bobSignedCall
+            );
+
+            // Carol sign for Alice
+            const carolSigByData = token.interface.encodeFunctionData('bySig', [bob.address, bobSignedCall, bobSignature]);
+            const carolSignedCall = {
+                traits: buildBySigTraits({ relayer: alice.address, deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
+                data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', carolSigByData, '0x']),
+            };
+            const carolSignature = await carol.signTypedData(
+                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
+                carolSignedCall
+            );
+
+            expect(await token.allowance(bob.address, carol.address)).to.be.equal(0);
+            await expect(token.bySig(carol, carolSignedCall, carolSignature))
+                .to.emit(token, 'ChargedSigner')
+                .withArgs(bob.address, alice.address, token.target, '0');
+            expect(await token.allowance(bob.address, carol.address)).to.be.equal(100);
         });
     });
 });
