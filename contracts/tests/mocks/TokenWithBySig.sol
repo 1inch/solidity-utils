@@ -8,6 +8,8 @@ import { TokenMock } from "../../mocks/TokenMock.sol";
 import { BySig } from "../../BySig.sol";
 
 contract TokenWithBySig is TokenMock, BySig {
+    error WrongToken();
+
     event ChargedSigner(address signer, address relayer, address token, uint256 amount);
 
     // solhint-disable-next-line no-empty-blocks
@@ -22,6 +24,8 @@ contract TokenWithBySig is TokenMock, BySig {
     }
 
     function _chargeSigner(address signer, address relayer, address token, uint256 amount, bytes calldata /* extraData */) internal override {
+        if (token != address(this)) revert WrongToken();
+        _transfer(signer, relayer, amount);
         emit ChargedSigner(signer, relayer, token, amount);
     }
 }

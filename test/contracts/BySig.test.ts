@@ -125,13 +125,36 @@ describe('BySig', function () {
         });
 
         it('should revert with wrong Unique nonce', async function () {
-            // const { addrs: {alice}, token } = await loadFixture(deployAddressArrayMock);
-            // await token.useBySigUniqueNonce(100);
-            // const sig = {
-            //     traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Unique, nonce: 99 }),
-            //     data: '0x',
-            // }
-            // await expect(token.bySig(alice, sig, '0x')).to.be.revertedWithCustomError(token, 'WrongNonce');
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
+            await token.useBySigUniqueNonce(100);
+            const sig = {
+                traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Unique, nonce: 100 }),
+                data: '0x',
+            };
+            await expect(token.bySig(alice, sig, '0x')).to.be.revertedWithCustomError(token, 'WrongNonce');
+        });
+
+        it('should revert with wrong signature when no data', async function () {
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
+            const sig = {
+                traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Unique, nonce: 0 }),
+                data: '0x',
+            };
+            await expect(token.bySig(alice, sig, '0x')).to.be.revertedWithCustomError(token, 'WrongSignature');
+        });
+
+        it('should revert with wrong signature', async function () {
+            const { addrs: { alice, bob }, token } = await loadFixture(deployAddressArrayMock);
+            const signedCall = {
+                traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
+                data: token.interface.encodeFunctionData('transfer', [alice.address, 100]),
+            };
+            const signature = await alice.signTypedData(
+                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
+                signedCall
+            );
+            await expect(token.bySig(bob, signedCall, signature)).to.be.revertedWithCustomError(token, 'WrongSignature');
         });
 
         it('should work for transfer method', async function () {
@@ -153,6 +176,17 @@ describe('BySig', function () {
             expect(await token.balanceOf(bob)).to.be.equal(900);
             expect(await token.balanceOf(alice)).to.be.equal(100);
         });
-    });
 
+        it.skip('should make approve for sponsored call', async function () {
+            // TODO: ...
+        });
+
+        it.skip('should work recursively', async function () {
+            // TODO: ...
+        });
+
+        it.skip('should work recursively for sponsored call', async function () {
+            // TODO: ...
+        });
+    });
 });
