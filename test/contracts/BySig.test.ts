@@ -177,8 +177,26 @@ describe('BySig', function () {
             expect(await token.balanceOf(alice)).to.be.equal(100);
         });
 
-        it.skip('should make approve for sponsored call', async function () {
-            // TODO: ...
+        it('should make approve for sponsored call', async function () {
+            const { addrs: { alice, bob }, token } = await loadFixture(deployAddressArrayMock);
+            await token.mint(bob.address, 1000);
+
+            const approveData = token.interface.encodeFunctionData('approve', [alice.address, 100]);
+            const signedCall = {
+                traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
+                data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', approveData, '0x']),
+            };
+            const signature = await bob.signTypedData(
+                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
+                signedCall
+            );
+
+            expect(await token.allowance(bob.address, alice.address)).to.be.equal(0);
+            await expect(token.bySig(bob, signedCall, signature))
+                .to.emit(token, 'ChargedSigner')
+                .withArgs(bob.address, alice.address, token.target, '0');
+            expect(await token.allowance(bob.address, alice.address)).to.be.equal(100);
         });
 
         it.skip('should work recursively', async function () {
