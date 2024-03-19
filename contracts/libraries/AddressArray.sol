@@ -10,7 +10,7 @@ library AddressArray {
 
     /// @dev Data struct containing raw mapping.
     struct Data {
-        mapping(uint256 => uint256) _raw;
+        uint256[1 << 32] _raw;
     }
 
     /// @dev Length of array.
