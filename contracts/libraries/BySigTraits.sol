@@ -5,7 +5,8 @@ pragma solidity ^0.8.0;
 library BySigTraits {
     error WrongNonceType();
 
-    // 8 bits for type (2 highest bits actually)
+    // 2 bits for type
+    // 6 bits reserved for future use
     // 40 bits for deadline
     // 80 bits for relayer address lower bits
     // 128 bits for nonce value
