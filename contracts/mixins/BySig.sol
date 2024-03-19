@@ -5,9 +5,9 @@ pragma solidity ^0.8.0;
 import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
-import { ECDSA } from "./libraries/ECDSA.sol";
-import { BySigTraits } from "./libraries/BySigTraits.sol";
-import { AddressArray } from "./libraries/AddressArray.sol";
+import { ECDSA } from "../libraries/ECDSA.sol";
+import { BySigTraits } from "../libraries/BySigTraits.sol";
+import { AddressArray } from "../libraries/AddressArray.sol";
 
 abstract contract BySig is Context, EIP712 {
     using Address for address;
