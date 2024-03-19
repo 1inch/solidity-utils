@@ -35,8 +35,8 @@ library BySigTraits {
     }
 
     function isRelayerAllowed(Value traits, address relayer) internal pure returns(bool) {
-        uint256 lowerBits = (Value.unwrap(traits) >> _RELAYER_BIT_SHIFT) & _RELAYER_BIT_MASK;
-        return lowerBits == 0 || (uint160(relayer) & _RELAYER_BIT_MASK) == lowerBits;
+        uint256 relayerBits = (Value.unwrap(traits) >> _RELAYER_BIT_SHIFT) & _RELAYER_BIT_MASK;
+        return relayerBits == 0 || (uint160(relayer) & _RELAYER_BIT_MASK) == relayerBits;
     }
 
     function nonce(Value traits) internal pure returns(uint256) {
