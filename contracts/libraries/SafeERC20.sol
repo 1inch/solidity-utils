@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import "../interfaces/IDaiLikePermit.sol";
 import "../interfaces/IPermit2.sol";
+import "../interfaces/IERC7597Permit.sol";
 import "../interfaces/IWETH.sol";
 import "../libraries/RevertReasonForwarder.sol";
 
@@ -301,6 +302,7 @@ library SafeERC20 {
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
         bytes4 permit2Selector = IPermit2.permit.selector;
+        bytes4 erc7597PermitSelector = IERC7597Permit.permit.selector;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
 
@@ -389,10 +391,12 @@ library SafeERC20 {
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
                 success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
             }
-            // Unknown
+            // Dynamic length
             default {
-                mstore(ptr, _PERMIT_LENGTH_ERROR)
-                revert(ptr, 4)
+                mstore(ptr, erc7597PermitSelector)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                // IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
+                success := call(gas(), token, 0, ptr, add(permit.length, 4), 0, 0)
             }
         }
     }

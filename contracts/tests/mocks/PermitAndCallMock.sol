@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../PermitAndCall.sol";
+import "../../mixins/PermitAndCall.sol";
 
 contract PermitAndCallMock is PermitAndCall {
     event FooCalled();
