@@ -1,8 +1,9 @@
-import { constants, ether, expect } from '../../src/prelude';
+import { constants, ether } from '../../src/prelude';
+import { expect } from '../../src/expect';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import hre, { ethers } from 'hardhat';
-import { Signature, TypedDataDomain } from 'ethers';
+import { Signature, TypedDataDomain, ContractTransactionReceipt } from 'ethers';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { countInstructions, trackReceivedTokenAndTx } from '../../src/utils';
 import {
@@ -187,17 +188,19 @@ describe('SafeERC20', function () {
 
     describe('safeBalanceOf', function () {
         it('should be cheaper than balanceOf', async function () {
-            const { wrapper } = await loadFixture(deployERC20WithSafeBalance);
+            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+                const { wrapper } = await loadFixture(deployERC20WithSafeBalance);
 
-            const tx = await wrapper.balanceOf.populateTransaction(owner);
-            const response = await owner.sendTransaction(tx);
-            const gasUsed = (await response.wait())!.gasUsed;
-            const safeTx = await wrapper.safeBalanceOf.populateTransaction(owner);
-            const safeRequest = await owner.sendTransaction(safeTx);
-            const safeGasUsed = (await safeRequest.wait())!.gasUsed;
+                const tx = await wrapper.balanceOf.populateTransaction(owner);
+                const response = await owner.sendTransaction(tx);
+                const gasUsed = (await response.wait())!.gasUsed;
+                const safeTx = await wrapper.safeBalanceOf.populateTransaction(owner);
+                const safeRequest = await owner.sendTransaction(safeTx);
+                const safeGasUsed = (await safeRequest.wait())!.gasUsed;
 
-            expect(gasUsed).gt(safeGasUsed);
-            console.log(`balanceOf:safeBalanceOf gasUsed - ${gasUsed.toString()}:${safeGasUsed.toString()}`);
+                expect(gasUsed).gt(safeGasUsed);
+                console.log(`balanceOf:safeBalanceOf gasUsed - ${gasUsed.toString()}:${safeGasUsed.toString()}`);
+            }
         });
     });
 
@@ -297,7 +300,7 @@ describe('SafeERC20', function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETH);
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.deposit({ value: ether('1') }),
-            );
+            ) as [bigint, ContractTransactionReceipt];
             expect(received).to.be.equal(ether('1'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
@@ -308,9 +311,9 @@ describe('SafeERC20', function () {
 
         it('should be cheap on deposit 0 tokens', async function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETH);
-            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
+            const tx = (await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.deposit(),
-            );
+            ))[1] as ContractTransactionReceipt;
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 0, 0, 1,
@@ -331,7 +334,7 @@ describe('SafeERC20', function () {
             const spenderBalanceBefore = await ethers.provider.getBalance(spender);
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.withdrawTo(ether('0.5'), spender),
-            );
+            ) as [bigint, ContractTransactionReceipt];
             expect(received).to.be.equal(-ether('0.5'));
             expect(await ethers.provider.getBalance(spender)).to.be.equal(spenderBalanceBefore + ether('0.5'));
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
@@ -343,9 +346,9 @@ describe('SafeERC20', function () {
 
         it('should be cheap on withdrawTo to self', async function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETHAndDeposit);
-            const [, tx] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
+            const tx = (await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.withdrawTo(ether('0.5'), wrapper),
-            );
+            ))[1] as ContractTransactionReceipt;
             if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
                 expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
                     0, 2,

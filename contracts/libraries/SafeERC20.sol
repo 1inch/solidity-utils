@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import "../interfaces/IDaiLikePermit.sol";
 import "../interfaces/IPermit2.sol";
+import "../interfaces/IERC7597Permit.sol";
 import "../interfaces/IWETH.sol";
 import "../libraries/RevertReasonForwarder.sol";
 
@@ -34,6 +35,8 @@ library SafeERC20 {
     /**
      * @notice Fetches the balance of a specific ERC20 token held by an account.
      * Consumes less gas then regular `ERC20.balanceOf`.
+     * @dev Note that the implementation does not perform dirty bits cleaning, so it is the
+     * responsibility of the caller to make sure that the higher 96 bits of the `account` parameter are clean.
      * @param token The IERC20 token contract for which the balance will be fetched.
      * @param account The address of the account whose token balance will be fetched.
      * @return tokenBalance The balance of the specified ERC20 token held by the account.
@@ -61,6 +64,8 @@ library SafeERC20 {
      * @notice Attempts to safely transfer tokens from one address to another.
      * @dev If permit2 is true, uses the Permit2 standard; otherwise uses the standard ERC20 transferFrom.
      * Either requires `true` in return data, or requires target to be smart-contract and empty return data.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `from` and `to` parameters are clean.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param from The address from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
@@ -84,6 +89,8 @@ library SafeERC20 {
     /**
      * @notice Attempts to safely transfer tokens from one address to another using the ERC20 standard.
      * @dev Either requires `true` in return data, or requires target to be smart-contract and empty return data.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `from` and `to` parameters are clean.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param from The address from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
@@ -121,6 +128,8 @@ library SafeERC20 {
     /**
      * @notice Attempts to safely transfer tokens from one address to another using the Permit2 standard.
      * @dev Either requires `true` in return data, or requires target to be smart-contract and empty return data.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `from` and `to` parameters are clean.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param from The address from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
@@ -154,6 +163,8 @@ library SafeERC20 {
     /**
      * @notice Attempts to safely transfer tokens to another address.
      * @dev Either requires `true` in return data, or requires target to be smart-contract and empty return data.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `to` parameter are clean.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
      * @param value The amount of tokens to transfer.
@@ -171,6 +182,8 @@ library SafeERC20 {
     /**
      * @notice Attempts to approve a spender to spend a certain amount of tokens.
      * @dev If `approve(from, to, amount)` fails, it tries to set the allowance to zero, and retries the `approve` call.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `spender` parameter are clean.
      * @param token The IERC20 token contract on which the call will be made.
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to be spent.
@@ -194,6 +207,8 @@ library SafeERC20 {
      * @notice Safely increases the allowance of a spender.
      * @dev Increases with safe math check. Checks if the increased allowance will overflow, if yes, then it reverts the transaction.
      * Then uses `forceApprove` to increase the allowance.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `spender` parameter are clean.
      * @param token The IERC20 token contract on which the call will be made.
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to increase the allowance by.
@@ -212,6 +227,8 @@ library SafeERC20 {
      * @notice Safely decreases the allowance of a spender.
      * @dev Decreases with safe math check. Checks if the decreased allowance will underflow, if yes, then it reverts the transaction.
      * Then uses `forceApprove` to increase the allowance.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `spender` parameter are clean.
      * @param token The IERC20 token contract on which the call will be made.
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to decrease the allowance by.
@@ -241,6 +258,8 @@ library SafeERC20 {
      * @notice Attempts to execute the `permit` function on the provided token with custom owner and spender parameters.
      * Permit type is determined automatically based on permit calldata (IERC20Permit, IDaiLikePermit, and IPermit2).
      * @dev Wraps `tryPermit` function and forwards revert reason if permit fails.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `owner` and `spender` parameters are clean.
      * @param token The IERC20 token to execute the permit function on.
      * @param owner The owner of the tokens for which the permit is made.
      * @param spender The spender allowed to spend the tokens by the permit.
@@ -270,6 +289,8 @@ library SafeERC20 {
      * gas efficiency considerations; as the unlimited expiration period is likely to be the most common scenario, and
      * zeros are cheaper to pass in terms of gas cost. Thus, callers should increment the expiration or deadline by one
      * before invocation for optimized performance.
+     * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
+     * the caller to make sure that the higher 96 bits of the `owner` and `spender` parameters are clean.
      * @param token The address of the ERC20 token on which to call the permit function.
      * @param owner The owner of the tokens. This address should have signed the off-chain permit.
      * @param spender The address which will be approved for transfer of tokens.
@@ -281,6 +302,7 @@ library SafeERC20 {
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
         bytes4 permit2Selector = IPermit2.permit.selector;
+        bytes4 erc7597PermitSelector = IERC7597Permit.permit.selector;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
 
@@ -369,10 +391,12 @@ library SafeERC20 {
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
                 success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
             }
-            // Unknown
+            // Dynamic length
             default {
-                mstore(ptr, _PERMIT_LENGTH_ERROR)
-                revert(ptr, 4)
+                mstore(ptr, erc7597PermitSelector)
+                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                // IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
+                success := call(gas(), token, 0, ptr, add(permit.length, 4), 0, 0)
             }
         }
     }
@@ -423,8 +447,9 @@ library SafeERC20 {
             assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                 mstore(0, selector)
                 if iszero(call(gas(), weth, amount, 0, 4, 0, 0)) {
-                    returndatacopy(0, 0, returndatasize())
-                    revert(0, returndatasize())
+                    let ptr := mload(0x40)
+                    returndatacopy(ptr, 0, returndatasize())
+                    revert(ptr, returndatasize())
                 }
             }
         }

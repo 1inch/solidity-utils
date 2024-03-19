@@ -1,9 +1,8 @@
-import { expect } from '../src/prelude';
+import { expect } from '../src/expect';
+import { defaultDeadline, Permit, DaiLikePermit, trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { defaultDeadline, Permit, DaiLikePermit } from '../src/permit';
-import { trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit';
 
 describe('Permit library', function () {
     let signer1: SignerWithAddress;

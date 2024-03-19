@@ -1,4 +1,4 @@
-import { expect } from './prelude';
+import { Assertion, AssertionError, assert, expect, config, should } from 'chai';
 
 export function assertRoughlyEqualValues(
     expected: string | number | bigint,
@@ -24,3 +24,6 @@ export function assertRoughlyEqualValues(
         expect(actualBN).to.be.equal(expectedBN, `${actual} != ${expected} with ${relativeDiff} precision`);
     }
 }
+
+// chai
+export { Assertion, AssertionError, assert, expect, config, should };
