@@ -34,7 +34,7 @@ library AddressArray {
     function get(Data storage self) internal view returns (address[] memory output) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let lengthAndFirst := sload(self.offset)
+            let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
 
@@ -47,7 +47,7 @@ library AddressArray {
             let ptr := add(output, 0x20)
             mstore(ptr, fst)
             for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
-                let item := sload(add(self.offset, i))
+                let item := sload(add(self.slot, i))
                 mstore(add(ptr, mul(0x20, i)), item)
             }
         }
@@ -59,7 +59,7 @@ library AddressArray {
         bool exception;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let lengthAndFirst := sload(self.offset)
+            let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
 
@@ -71,7 +71,7 @@ library AddressArray {
             let ptr := add(output, 0x20)
             mstore(ptr, fst)
             for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
-                let item := and(sload(add(self.offset, i)), _ADDRESS_MASK)
+                let item := and(sload(add(self.slot, i)), _ADDRESS_MASK)
                 mstore(add(ptr, mul(0x20, i)), item)
             }
         }
@@ -82,16 +82,16 @@ library AddressArray {
     function push(Data storage self, address account) internal returns (uint256 res) {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let lengthAndFirst := sload(self.offset)
+            let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
 
             switch len
             case 0 {
-                sstore(self.offset, or(or(account, _ONE_LENGTH), _ZERO_ADDRESS))
+                sstore(self.slot, or(or(account, _ONE_LENGTH), _ZERO_ADDRESS))
             }
             default {
-                sstore(self.offset, add(lengthAndFirst, _ONE_LENGTH))
-                sstore(add(self.offset, len), or(account, _ZERO_ADDRESS))
+                sstore(self.slot, add(lengthAndFirst, _ONE_LENGTH))
+                sstore(add(self.slot, len), or(account, _ZERO_ADDRESS))
             }
             res := add(len, 1)
         }
@@ -102,7 +102,7 @@ library AddressArray {
         bool exception;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let lengthAndFirst := sload(self.offset)
+            let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
 
             switch len
@@ -110,12 +110,12 @@ library AddressArray {
                 exception := true
             }
             case 1 {
-                res := and(sload(self.offset), _ADDRESS_MASK)
-                sstore(self.offset, _ZERO_ADDRESS)
+                res := and(sload(self.slot), _ADDRESS_MASK)
+                sstore(self.slot, _ZERO_ADDRESS)
             }
             default {
-                res := and(sload(add(self.offset, sub(len, 1))), _ADDRESS_MASK)
-                sstore(self.offset, sub(lengthAndFirst, _ONE_LENGTH))
+                res := and(sload(add(self.slot, sub(len, 1))), _ADDRESS_MASK)
+                sstore(self.slot, sub(lengthAndFirst, _ONE_LENGTH))
             }
         }
         if (exception) revert PopFromEmptyArray();
@@ -126,7 +126,7 @@ library AddressArray {
         bool exception;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            let lengthAndFirst := sload(self.offset)
+            let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
 
@@ -136,10 +136,10 @@ library AddressArray {
 
             switch index
             case 0 {
-                sstore(self.offset, or(xor(lengthAndFirst, fst), account))
+                sstore(self.slot, or(xor(lengthAndFirst, fst), account))
             }
             default {
-                sstore(add(self.offset, index), or(account, _ZERO_ADDRESS))
+                sstore(add(self.slot, index), or(account, _ZERO_ADDRESS))
             }
         }
         if (exception) revert IndexOutOfBounds();
@@ -149,7 +149,7 @@ library AddressArray {
     function erase(Data storage self) internal {
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
-            sstore(self.offset, _ADDRESS_MASK)
+            sstore(self.slot, _ADDRESS_MASK)
         }
     }
 }
