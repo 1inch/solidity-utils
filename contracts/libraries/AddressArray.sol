@@ -20,20 +20,14 @@ library AddressArray {
     }
 
     /// @dev Length of array.
-    function length(Data storage self) internal view returns (uint256 res) {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
-            res := shr(_LENGTH_OFFSET, and(sload(self.offset), _LENGTH_MASK))
-        }
+    function length(Data storage self) internal view returns (uint256) {
+        return (self._raw[0] & _LENGTH_MASK) >> _LENGTH_OFFSET;
     }
 
     /// @dev Returns data item from `self` storage at `i`.
-    function at(Data storage self, uint256 i) internal view returns (address res) {
+    function at(Data storage self, uint256 i) internal view returns (address) {
         if (i >= 1 << 32) revert IndexOutOfBounds();
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
-            res := and(sload(add(self.offset, i)), _ADDRESS_MASK)
-        }
+        return address(uint160(self._raw[i] & _ADDRESS_MASK));
     }
 
     /// @dev Returns list of addresses from storage `self`.
