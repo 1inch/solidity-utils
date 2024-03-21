@@ -48,7 +48,7 @@ library AddressArray {
                 let ptr := add(output, 0x20)
                 mstore(ptr, fst)
                 for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
-                    let item := sload(add(self.slot, i))
+                    let item := and(sload(add(self.slot, i)), _ADDRESS_MASK)
                     mstore(add(ptr, mul(0x20, i)), item)
                 }
             }
