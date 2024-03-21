@@ -21,6 +21,10 @@ contract AddressSetMock {
         return AddressSet.contains(_self, item);
     }
 
+    function get() external view returns (address[] memory) {
+        return AddressSet.get(_self);
+    }
+
     function add(address item) external returns (bool) {
         return AddressSet.add(_self, item);
     }

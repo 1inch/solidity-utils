@@ -37,6 +37,16 @@ library AddressSet {
         return index != 0 && index != _NULL_INDEX;
     }
 
+    /// @dev Returns list of addresses from storage `s`.
+    function get(Data storage s) internal view returns (address[] memory) {
+        return s.items.get();
+    }
+
+    /// @dev Puts list of addresses from `s` storage into `output` array.
+    function get(Data storage s, address[] memory input) internal view returns (address[] memory) {
+        return s.items.get(input);
+    }
+
     /// @dev Adds `item` into storage `s` and returns true if successful.
     function add(Data storage s, address item) internal returns (bool) {
         uint256 index = s.lookup[item];
@@ -56,7 +66,7 @@ library AddressSet {
         }
 
         address lastItem = s.items.popGet();
-        if (index < s.items.length()) {
+        if (index < s.items.length() + 1) {
             unchecked {
                 s.items.set(index - 1, lastItem);
                 s.lookup[lastItem] = index;
