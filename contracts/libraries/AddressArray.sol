@@ -92,7 +92,7 @@ library AddressArray {
 
             switch len
             case 0 {
-                sstore(self.slot, or(or(account, _ONE_LENGTH), _ZERO_ADDRESS))
+                sstore(self.slot, or(account, _ONE_LENGTH))
             }
             default {
                 sstore(self.slot, add(lengthAndFirst, _ONE_LENGTH))
@@ -115,7 +115,7 @@ library AddressArray {
                 exception := true
             }
             case 1 {
-                res := and(sload(self.slot), _ADDRESS_MASK)
+                res := and(lengthAndFirst, _ADDRESS_MASK)
                 sstore(self.slot, _ZERO_ADDRESS)
             }
             default {
