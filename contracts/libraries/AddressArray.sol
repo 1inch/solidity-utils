@@ -43,12 +43,14 @@ library AddressArray {
             mstore(0x40, add(output, mul(0x20, add(1, len))))
             mstore(output, len)
 
-            // Copy first element and the rest in loop
-            let ptr := add(output, 0x20)
-            mstore(ptr, fst)
-            for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
-                let item := sload(add(self.slot, i))
-                mstore(add(ptr, mul(0x20, i)), item)
+            if len {
+                // Copy first element and then the rest in a loop
+                let ptr := add(output, 0x20)
+                mstore(ptr, fst)
+                for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
+                    let item := sload(add(self.slot, i))
+                    mstore(add(ptr, mul(0x20, i)), item)
+                }
             }
         }
     }
@@ -63,16 +65,19 @@ library AddressArray {
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
 
-            if gt(len, mload(input)) {
+            switch gt(len, mload(input))
+            case 1 {
                 exception := true
-            }
-
-            // Copy first element and the rest in loop
-            let ptr := add(output, 0x20)
-            mstore(ptr, fst)
-            for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
-                let item := and(sload(add(self.slot, i)), _ADDRESS_MASK)
-                mstore(add(ptr, mul(0x20, i)), item)
+            } default {
+                if len {
+                    // Copy first element and then the rest in a loop
+                    let ptr := add(output, 0x20)
+                    mstore(ptr, fst)
+                    for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
+                        let item := and(sload(add(self.slot, i)), _ADDRESS_MASK)
+                        mstore(add(ptr, mul(0x20, i)), item)
+                    }
+                }
             }
         }
         if (exception) revert OutputArrayTooSmall();
