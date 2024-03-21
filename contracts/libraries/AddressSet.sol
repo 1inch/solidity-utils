@@ -66,7 +66,7 @@ library AddressSet {
         }
 
         address lastItem = s.items.popGet();
-        if (index < s.items.length() + 1) {
+        if (lastItem != item) {
             unchecked {
                 s.items.set(index - 1, lastItem);
                 s.lookup[lastItem] = index;
