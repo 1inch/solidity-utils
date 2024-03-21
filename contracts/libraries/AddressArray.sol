@@ -58,29 +58,27 @@ library AddressArray {
     /// @dev Puts list of addresses from `self` storage into `output` array.
     function get(Data storage self, address[] memory input) internal view returns (address[] memory output) {
         output = input;
-        bool exception;
+        bytes4 err = OutputArrayTooSmall.selector;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
 
-            switch gt(len, mload(input))
-            case 1 {
-                exception := true
-            } default {
-                if len {
-                    // Copy first element and then the rest in a loop
-                    let ptr := add(output, 0x20)
-                    mstore(ptr, fst)
-                    for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
-                        let item := and(sload(add(self.slot, i)), _ADDRESS_MASK)
-                        mstore(add(ptr, mul(0x20, i)), item)
-                    }
+            if gt(len, mload(input)) {
+                mstore(0, err)
+                revert(0, 4)
+            }
+            if len {
+                // Copy first element and then the rest in a loop
+                let ptr := add(output, 0x20)
+                mstore(ptr, fst)
+                for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
+                    let item := and(sload(add(self.slot, i)), _ADDRESS_MASK)
+                    mstore(add(ptr, mul(0x20, i)), item)
                 }
             }
         }
-        if (exception) revert OutputArrayTooSmall();
     }
 
     /// @dev Array push back `account` operation on storage `self`.
@@ -104,7 +102,7 @@ library AddressArray {
 
     /// @dev Array pop back operation for storage `self`.
     function pop(Data storage self) internal returns(address res) {
-        bool exception;
+        bytes4 err = PopFromEmptyArray.selector;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
@@ -112,7 +110,8 @@ library AddressArray {
 
             switch len
             case 0 {
-                exception := true
+                mstore(0, err)
+                revert(0, 4)
             }
             case 1 {
                 res := and(lengthAndFirst, _ADDRESS_MASK)
@@ -123,12 +122,11 @@ library AddressArray {
                 sstore(self.slot, sub(lengthAndFirst, _ONE_LENGTH))
             }
         }
-        if (exception) revert PopFromEmptyArray();
     }
 
     /// @dev Set element for storage `self` at `index` to `account`.
     function set(Data storage self, uint256 index, address account) internal {
-        bool exception;
+        bytes4 err = IndexOutOfBounds.selector;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
@@ -136,7 +134,8 @@ library AddressArray {
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
 
             if iszero(lt(index, len)) {
-                exception := true
+                mstore(0, err)
+                revert(0, 4)
             }
 
             switch index
@@ -147,7 +146,6 @@ library AddressArray {
                 sstore(add(self.slot, index), or(account, _ZERO_ADDRESS))
             }
         }
-        if (exception) revert IndexOutOfBounds();
     }
 
     /// @dev Erase length of the array
