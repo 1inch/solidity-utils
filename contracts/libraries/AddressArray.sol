@@ -101,7 +101,29 @@ library AddressArray {
     }
 
     /// @dev Array pop back operation for storage `self`.
-    function pop(Data storage self) internal returns(address res) {
+    function pop(Data storage self) internal {
+        bytes4 err = PopFromEmptyArray.selector;
+        /// @solidity memory-safe-assembly
+        assembly { // solhint-disable-line no-inline-assembly
+            let lengthAndFirst := sload(self.slot)
+            let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
+
+            switch len
+            case 0 {
+                mstore(0, err)
+                revert(0, 4)
+            }
+            case 1 {
+                sstore(self.slot, _ZERO_ADDRESS)
+            }
+            default {
+                sstore(self.slot, sub(lengthAndFirst, _ONE_LENGTH))
+            }
+        }
+    }
+
+    /// @dev Array pop back operation for storage `self` that returns popped element.
+    function popGet(Data storage self) internal returns(address res) {
         bytes4 err = PopFromEmptyArray.selector;
         /// @solidity memory-safe-assembly
         assembly { // solhint-disable-line no-inline-assembly

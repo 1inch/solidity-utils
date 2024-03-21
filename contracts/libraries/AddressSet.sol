@@ -55,7 +55,7 @@ library AddressSet {
             return false;
         }
 
-        address lastItem = s.items.pop();
+        address lastItem = s.items.popGet();
         if (index < s.items.length()) {
             unchecked {
                 s.items.set(index - 1, lastItem);
