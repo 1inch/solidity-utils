@@ -9,6 +9,8 @@ import { ECDSA } from "../libraries/ECDSA.sol";
 import { BySigTraits } from "../libraries/BySigTraits.sol";
 import { AddressArray } from "../libraries/AddressArray.sol";
 
+/// @title Mixin that provides signature-based accessibility to every external method of the smart contract.
+/// @dev Inherit your contract from this mixin and use `_msgSender()` instead of `msg.sender` everywhere.
 abstract contract BySig is Context, EIP712 {
     using Address for address;
     using BySigTraits for BySigTraits.Value;

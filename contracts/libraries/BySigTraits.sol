@@ -18,12 +18,12 @@ library BySigTraits {
         Unique
     }
 
-    uint256 constant public TYPE_BIT_SHIFT = 254;
-    uint256 constant public DEADLINE_BIT_SHIFT = 208;
-    uint256 constant public DEADLINE_BIT_MASK = (1 << 40) - 1;
-    uint256 constant public RELAYER_BIT_SHIFT = 128;
-    uint256 constant public RELAYER_BIT_MASK = (1 << 80) - 1;
-    uint256 constant public NONCE_MASK = (1 << 128) - 1;
+    uint256 constant internal TYPE_BIT_SHIFT = 254;
+    uint256 constant internal DEADLINE_BIT_SHIFT = 208;
+    uint256 constant internal DEADLINE_BIT_MASK = (1 << 40) - 1;
+    uint256 constant internal RELAYER_BIT_SHIFT = 128;
+    uint256 constant internal RELAYER_BIT_MASK = (1 << 80) - 1;
+    uint256 constant internal NONCE_MASK = (1 << 128) - 1;
 
     function nonceType(Value traits) internal pure returns(NonceType) {
         uint256 _type = Value.unwrap(traits) >> TYPE_BIT_SHIFT;
