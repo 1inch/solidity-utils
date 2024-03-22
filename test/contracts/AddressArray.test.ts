@@ -191,4 +191,18 @@ describe('AddressArray', function () {
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer3.address]);
         });
     });
+
+    describe('multiple add/remove', function () {
+        it('should add and remove multiple times', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            await addressArrayMock.push(signer2);
+            await addressArrayMock.pop();
+            await addressArrayMock.pop();
+            await addressArrayMock.push(signer1);
+            await addressArrayMock.push(signer2);
+            await addressArrayMock.pop();
+            await addressArrayMock.pop();
+        });
+    });
 });

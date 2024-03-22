@@ -145,4 +145,18 @@ describe('AddressSet', function () {
             expect(await addressSetMock.get()).to.be.deep.equal([signer2.address]);
         });
     });
+
+    describe('multiple add/remove', function () {
+        it('should add and remove multiple times', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            await addressSetMock.remove(signer2);
+            await addressSetMock.remove(signer1);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            await addressSetMock.remove(signer2);
+            await addressSetMock.remove(signer1);
+        });
+    });
 });
