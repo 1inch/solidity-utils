@@ -4,7 +4,7 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 import { NonceType, buildBySigTraits } from './BySigTraits.test';
 
-function hashBySig(name: string, version: string, chainId: bigint, verifyingContract: string, sig: Record<string, any>): string {
+function hashBySig(name: string, version: string, chainId: bigint, verifyingContract: string, sig: Record<string, any>): string { // eslint-disable-line @typescript-eslint/no-explicit-any
     const domain = { name, version, chainId, verifyingContract };
     const types = {
         SignedCall: [
