@@ -13,9 +13,9 @@ import "./AddressArray.sol";
 library AddressSet {
     using AddressArray for AddressArray.Data;
 
-    /** @dev Data struct from AddressArray.Data items
-     * and lookup mapping address => index in data array.
-     */
+    uint256 internal constant _NULL_INDEX = type(uint256).max;
+
+    /// @dev Data struct from AddressArray.Data items and lookup mapping address => index in data array.
     struct Data {
         AddressArray.Data items;
         mapping(address => uint256) lookup;
@@ -33,12 +33,24 @@ library AddressSet {
 
     /// @dev Returns true if storage `s` has `item`.
     function contains(Data storage s, address item) internal view returns (bool) {
-        return s.lookup[item] != 0;
+        uint256 index = s.lookup[item];
+        return index != 0 && index != _NULL_INDEX;
+    }
+
+    /// @dev Returns list of addresses from storage `s`.
+    function get(Data storage s) internal view returns (address[] memory) {
+        return s.items.get();
+    }
+
+    /// @dev Puts list of addresses from `s` storage into `output` array.
+    function get(Data storage s, address[] memory input) internal view returns (address[] memory) {
+        return s.items.get(input);
     }
 
     /// @dev Adds `item` into storage `s` and returns true if successful.
     function add(Data storage s, address item) internal returns (bool) {
-        if (s.lookup[item] > 0) {
+        uint256 index = s.lookup[item];
+        if (index != 0 && index != _NULL_INDEX) {
             return false;
         }
         s.lookup[item] = s.items.push(item);
@@ -48,18 +60,32 @@ library AddressSet {
     /// @dev Removes `item` from storage `s` and returns true if successful.
     function remove(Data storage s, address item) internal returns (bool) {
         uint256 index = s.lookup[item];
-        if (index == 0) {
+        s.lookup[item] = _NULL_INDEX;
+        if (index == 0 || index == _NULL_INDEX) {
             return false;
         }
-        if (index < s.items.length()) {
+
+        address lastItem = s.items.popGet();
+        if (lastItem != item) {
             unchecked {
-                address lastItem = s.items.at(s.items.length() - 1);
                 s.items.set(index - 1, lastItem);
                 s.lookup[lastItem] = index;
             }
         }
-        s.items.pop();
-        delete s.lookup[item];
         return true;
+    }
+
+    /// @dev Erases set from storage `s` and returns all removed items
+    function erase(Data storage s) internal returns(address[] memory items) {
+        items = s.items.get();
+        uint256 len = items.length;
+        if (len > 0) {
+            s.items.erase();
+            unchecked {
+                for (uint256 i = 0; i < len; i++) {
+                    s.lookup[items[i]] = _NULL_INDEX;
+                }
+            }
+        }
     }
 }
