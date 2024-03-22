@@ -22,12 +22,14 @@ describe('AddressArray', function () {
     describe('length', function () {
         it('should calculate length 0', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await signer1.sendTransaction(await addressArrayMock.length.populateTransaction());
             expect(await addressArrayMock.length()).to.be.equal('0');
         });
 
         it('should calculate length 1', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
+            await signer1.sendTransaction(await addressArrayMock.length.populateTransaction());
             expect(await addressArrayMock.length()).to.be.equal('1');
         });
     });
@@ -58,12 +60,14 @@ describe('AddressArray', function () {
     describe('get', function () {
         it('should get empty array', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([]);
         });
 
         it('should get array with 1 element', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address]);
         });
 
@@ -71,6 +75,7 @@ describe('AddressArray', function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address]);
         });
 
@@ -79,6 +84,7 @@ describe('AddressArray', function () {
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.push(signer3);
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address, signer3.address]);
         });
     });
@@ -119,6 +125,7 @@ describe('AddressArray', function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.pop();
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([]);
         });
 
@@ -127,6 +134,7 @@ describe('AddressArray', function () {
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.pop();
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address]);
         });
 
@@ -136,6 +144,7 @@ describe('AddressArray', function () {
             await addressArrayMock.push(signer2);
             await addressArrayMock.push(signer3);
             await addressArrayMock.pop();
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address]);
         });
 
@@ -160,6 +169,7 @@ describe('AddressArray', function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.set(0, signer2);
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer2.address]);
         });
 
@@ -168,6 +178,7 @@ describe('AddressArray', function () {
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.set(0, signer3);
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer3.address, signer2.address]);
         });
 
@@ -176,7 +187,22 @@ describe('AddressArray', function () {
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.set(1, signer3);
+            await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer3.address]);
+        });
+    });
+
+    describe('multiple add/remove', function () {
+        it('should add and remove multiple times', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            await addressArrayMock.push(signer2);
+            await addressArrayMock.pop();
+            await addressArrayMock.pop();
+            await addressArrayMock.push(signer1);
+            await addressArrayMock.push(signer2);
+            await addressArrayMock.pop();
+            await addressArrayMock.pop();
         });
     });
 });

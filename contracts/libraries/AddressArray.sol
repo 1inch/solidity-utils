@@ -23,11 +23,17 @@ library AddressArray {
      */
     error OutputArrayTooSmall();
 
+    uint256 internal constant _ZERO_ADDRESS = 0x8000000000000000000000000000000000000000000000000000000000000000; // Next tx gas optimization
+    uint256 internal constant _LENGTH_MASK  = 0x0000000000000000ffffffff0000000000000000000000000000000000000000;
+    uint256 internal constant _ADDRESS_MASK = 0x000000000000000000000000ffffffffffffffffffffffffffffffffffffffff;
+    uint256 internal constant _ONE_LENGTH   = 0x0000000000000000000000010000000000000000000000000000000000000000;
+    uint256 internal constant _LENGTH_OFFSET = 160;
+
     /**
      * @dev Struct containing the raw mapping used to store the addresses and the array length.
      */
     struct Data {
-        mapping(uint256 => uint256) _raw;
+        uint256[1 << 32] _raw;
     }
 
     /**
@@ -36,7 +42,7 @@ library AddressArray {
      * @return The number of addresses.
      */
     function length(Data storage self) internal view returns (uint256) {
-        return self._raw[0] >> 160;
+        return (self._raw[0] & _LENGTH_MASK) >> _LENGTH_OFFSET;
     }
 
     /**
@@ -46,65 +52,88 @@ library AddressArray {
      * @return The address stored at the specified index.
      */
     function at(Data storage self, uint256 i) internal view returns (address) {
-        return address(uint160(self._raw[i]));
+        if (i >= 1 << 32) revert IndexOutOfBounds();
+        return address(uint160(self._raw[i] & _ADDRESS_MASK));
     }
 
     /**
      * @notice Returns all addresses in the array from storage.
      * @param self The instance of the Data struct.
-     * @return arr Array containing all the addresses.
+     * @return output Array containing all the addresses.
      */
-    function get(Data storage self) internal view returns (address[] memory arr) {
-        uint256 lengthAndFirst = self._raw[0];
-        arr = new address[](lengthAndFirst >> 160);
-        _get(self, arr, lengthAndFirst);
+    function get(Data storage self) internal view returns (address[] memory output) {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            let lengthAndFirst := sload(self.slot)
+            let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
+            let fst := and(lengthAndFirst, _ADDRESS_MASK)
+
+            // Allocate array
+            output := mload(0x40)
+            mstore(0x40, add(output, mul(0x20, add(1, len))))
+            mstore(output, len)
+
+            if len {
+                // Copy first element and then the rest in a loop
+                let ptr := add(output, 0x20)
+                mstore(ptr, fst)
+                for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
+                    let item := and(sload(add(self.slot, i)), _ADDRESS_MASK)
+                    mstore(add(ptr, mul(0x20, i)), item)
+                }
+            }
+        }
     }
 
     /**
      * @notice Copies the addresses into the provided output array.
      * @param self The instance of the Data struct.
-     * @param output The array to copy the addresses into.
-     * @return The provided output array filled with addresses.
+     * @param input The array to copy the addresses into.
+     * @return output The provided output array filled with addresses.
      */
-    function get(Data storage self, address[] memory output) internal view returns (address[] memory) {
-        return _get(self, output, self._raw[0]);
-    }
+    function get(Data storage self, address[] memory input) internal view returns (address[] memory output) {
+        output = input;
+        bytes4 err = OutputArrayTooSmall.selector;
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            let lengthAndFirst := sload(self.slot)
+            let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
+            let fst := and(lengthAndFirst, _ADDRESS_MASK)
 
-    function _get(
-        Data storage self,
-        address[] memory output,
-        uint256 lengthAndFirst
-    ) private view returns (address[] memory) {
-        uint256 len = lengthAndFirst >> 160;
-        if (len > output.length) revert OutputArrayTooSmall();
-        if (len > 0) {
-            output[0] = address(uint160(lengthAndFirst));
-            unchecked {
-                for (uint256 i = 1; i < len; i++) {
-                    output[i] = address(uint160(self._raw[i]));
+            if gt(len, mload(input)) {
+                mstore(0, err)
+                revert(0, 4)
+            }
+            if len {
+                // Copy first element and then the rest in a loop
+                let ptr := add(output, 0x20)
+                mstore(ptr, fst)
+                for { let i := 1 } lt(i, len) { i:= add(i, 1) } {
+                    let item := and(sload(add(self.slot, i)), _ADDRESS_MASK)
+                    mstore(add(ptr, mul(0x20, i)), item)
                 }
             }
         }
-        return output;
     }
 
     /**
      * @notice Adds an address to the end of the array.
      * @param self The instance of the Data struct.
      * @param account The address to add.
-     * @return The new length of the array.
+     * @return res The new length of the array.
      */
-    function push(Data storage self, address account) internal returns (uint256) {
-        unchecked {
-            uint256 lengthAndFirst = self._raw[0];
-            uint256 len = lengthAndFirst >> 160;
-            if (len == 0) {
-                self._raw[0] = (1 << 160) + uint160(account);
-            } else {
-                self._raw[0] = lengthAndFirst + (1 << 160);
-                self._raw[len] = uint160(account);
+    function push(Data storage self, address account) internal returns (uint256 res) {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            let lengthAndFirst := sload(self.slot)
+            let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
+
+            switch len
+            case 0 {
+                sstore(self.slot, or(account, _ONE_LENGTH))
             }
-            return len + 1;
+            default {
+                sstore(self.slot, add(lengthAndFirst, _ONE_LENGTH))
+                sstore(add(self.slot, len), or(account, _ZERO_ADDRESS))
+            }
+            res := add(len, 1)
         }
     }
 
@@ -113,13 +142,48 @@ library AddressArray {
      * @param self The instance of the Data struct.
      */
     function pop(Data storage self) internal {
-        unchecked {
-            uint256 lengthAndFirst = self._raw[0];
-            uint256 len = lengthAndFirst >> 160;
-            if (len == 0) revert PopFromEmptyArray();
-            self._raw[len - 1] = 0;
-            if (len > 1) {
-                self._raw[0] = lengthAndFirst - (1 << 160);
+        bytes4 err = PopFromEmptyArray.selector;
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            let lengthAndFirst := sload(self.slot)
+            let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
+
+            switch len
+            case 0 {
+                mstore(0, err)
+                revert(0, 4)
+            }
+            case 1 {
+                sstore(self.slot, _ZERO_ADDRESS)
+            }
+            default {
+                sstore(self.slot, sub(lengthAndFirst, _ONE_LENGTH))
+            }
+        }
+    }
+
+    /**
+     * @notice Array pop back operation for storage `self` that returns popped element.
+     * @param self The instance of the Data struct.
+     * @return res The address that was removed from the array.
+     */
+    function popGet(Data storage self) internal returns(address res) {
+        bytes4 err = PopFromEmptyArray.selector;
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            let lengthAndFirst := sload(self.slot)
+            let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
+
+            switch len
+            case 0 {
+                mstore(0, err)
+                revert(0, 4)
+            }
+            case 1 {
+                res := and(lengthAndFirst, _ADDRESS_MASK)
+                sstore(self.slot, _ZERO_ADDRESS)
+            }
+            default {
+                res := and(sload(add(self.slot, sub(len, 1))), _ADDRESS_MASK)
+                sstore(self.slot, sub(lengthAndFirst, _ONE_LENGTH))
             }
         }
     }
@@ -130,18 +194,35 @@ library AddressArray {
      * @param index The index at which to set the address.
      * @param account The address to set at the specified index.
      */
-    function set(
-        Data storage self,
-        uint256 index,
-        address account
-    ) internal {
-        uint256 len = length(self);
-        if (index >= len) revert IndexOutOfBounds();
+    function set(Data storage self, uint256 index, address account) internal {
+        bytes4 err = IndexOutOfBounds.selector;
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            let lengthAndFirst := sload(self.slot)
+            let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
+            let fst := and(lengthAndFirst, _ADDRESS_MASK)
 
-        if (index == 0) {
-            self._raw[0] = (len << 160) | uint160(account);
-        } else {
-            self._raw[index] = uint160(account);
+            if iszero(lt(index, len)) {
+                mstore(0, err)
+                revert(0, 4)
+            }
+
+            switch index
+            case 0 {
+                sstore(self.slot, or(xor(lengthAndFirst, fst), account))
+            }
+            default {
+                sstore(add(self.slot, index), or(account, _ZERO_ADDRESS))
+            }
+        }
+    }
+
+    /**
+     * @notice Erase length of the array.
+     * @param self The instance of the Data struct.
+     */
+    function erase(Data storage self) internal {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            sstore(self.slot, _ADDRESS_MASK)
         }
     }
 }

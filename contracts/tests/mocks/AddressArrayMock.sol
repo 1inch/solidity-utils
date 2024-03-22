@@ -9,6 +9,8 @@ contract AddressArrayMock {
 
     AddressArray.Data private _self;
 
+    error PopFromEmptyArray();
+
     function length() external view returns (uint256) {
         return AddressArray.length(_self);
     }

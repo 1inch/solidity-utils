@@ -142,8 +142,21 @@ describe('AddressSet', function () {
             const isRemoved = await addressSetMock.remove.staticCall(signer1);
             await addressSetMock.remove(signer1);
             expect(isRemoved).to.be.true;
-            expect(await addressSetMock.contains(signer1)).to.be.false;
-            expect(await addressSetMock.contains(signer2)).to.be.true;
+            expect(await addressSetMock.get()).to.be.deep.equal([signer2.address]);
+        });
+    });
+
+    describe('multiple add/remove', function () {
+        it('should add and remove multiple times', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            await addressSetMock.remove(signer2);
+            await addressSetMock.remove(signer1);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            await addressSetMock.remove(signer2);
+            await addressSetMock.remove(signer1);
         });
     });
 });

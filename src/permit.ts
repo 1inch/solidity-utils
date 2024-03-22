@@ -6,7 +6,7 @@ import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { bytecode as permit2Bytecode } from './permit2.json';
-import { DaiLikePermitMock, ERC20Permit } from '../typechain-types';
+import { DaiLikePermitMock, ERC20Permit, USDCLikePermitMock } from '../typechain-types';
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -283,6 +283,37 @@ export async function getPermitLikeDai(
         [holder.address, spender, nonce, expiry, allowed, v, r, s],
     ));
     return compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), constants.ZERO_ADDRESS, holder.address, spender);
+}
+
+export async function getPermitLikeUSDC(
+    owner: string, // contract with isValidSignature function
+    signer: Wallet | SignerWithAddress,
+    permitContract: USDCLikePermitMock,
+    tokenVersion: string,
+    chainId: number,
+    spender: string,
+    value: string,
+    deadline = defaultDeadline.toString(),
+): Promise<string> {
+    const nonce = await permitContract.nonces(owner);
+    const name = await permitContract.name();
+    const data = buildData(
+        name,
+        tokenVersion,
+        chainId,
+        await permitContract.getAddress(),
+        owner,
+        spender,
+        value,
+        nonce.toString(),
+        deadline,
+    );
+
+    const signature = await signer.signTypedData(data.domain, data.types, data.message);
+    const { v, r, s } = Signature.from(signature);
+    const signatureBytes = ethers.solidityPacked(['bytes32', 'bytes32', 'uint8'], [r, s, v]);
+
+    return cutSelector(permitContract.interface.encodeFunctionData('permit(address,address,uint256,uint256,bytes)', [owner, spender, value, deadline, signatureBytes]));
 }
 
 /**
