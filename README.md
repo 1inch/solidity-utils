@@ -9,7 +9,7 @@
 [![Coverage Status](https://codecov.io/gh/1inch/solidity-utils/branch/master/graph/badge.svg?token=HJWBIVXQQA)](https://codecov.io/gh/1inch/solidity-utils)
 [![NPM Package](https://img.shields.io/npm/v/@1inch/solidity-utils.svg)](https://www.npmjs.org/package/@1inch/solidity-utils)
 
-This repository is a comprehensive toolkit designed to streamline and optimize the development, tests and management of smart contracts. This repository serves as a one-stop resource for developers working on Ethereum blockchain projects, offering a blend of Solidity contracts with various utilities and optimizations, alongside JavaScript tools for testing, documentation, and project management.
+This repository is a comprehensive toolkit designed to streamline and optimize the development, tests and management of smart contracts. This repository serves as a one-stop resource for developers working on Ethereum and EVM-compatible blockchain projects, offering a blend of Solidity contracts with various utilities and optimizations, alongside JavaScript tools for testing, documentation, and project management.
 
 ## Features
 
