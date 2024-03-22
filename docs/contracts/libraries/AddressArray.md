@@ -53,7 +53,7 @@ Retrieves the address at a specified index in the array.
 ```solidity
 function get(
   struct AddressArray.Data self
-) internal returns (address[] arr)
+) internal returns (address[] output)
 ```
 Returns all addresses in the array from storage.
 
@@ -66,14 +66,14 @@ Returns all addresses in the array from storage.
 #### Return Values:
 | Name                           | Type          | Description                                                                  |
 | :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`arr`| address[] | Array containing all the addresses.
+|`output`| address[] | Array containing all the addresses.
 
 ### get
 ```solidity
 function get(
   struct AddressArray.Data self,
-  address[] output
-) internal returns (address[])
+  address[] input
+) internal returns (address[] output)
 ```
 Copies the addresses into the provided output array.
 
@@ -82,19 +82,19 @@ Copies the addresses into the provided output array.
 | Name | Type | Description                                                          |
 | :--- | :--- | :------------------------------------------------------------------- |
 |`self` | struct AddressArray.Data | The instance of the Data struct.  
-|`output` | address[] | The array to copy the addresses into.  
+|`input` | address[] | The array to copy the addresses into.  
 
 #### Return Values:
 | Name                           | Type          | Description                                                                  |
 | :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`The`| address[] | provided output array filled with addresses.
+|`output`| address[] | The provided output array filled with addresses.
 
 ### push
 ```solidity
 function push(
   struct AddressArray.Data self,
   address account
-) internal returns (uint256)
+) internal returns (uint256 res)
 ```
 Adds an address to the end of the array.
 
@@ -108,7 +108,7 @@ Adds an address to the end of the array.
 #### Return Values:
 | Name                           | Type          | Description                                                                  |
 | :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`The`| uint256 | new length of the array.
+|`res`| uint256 | The new length of the array.
 
 ### pop
 ```solidity
@@ -124,6 +124,25 @@ Removes the last address from the array.
 | :--- | :--- | :------------------------------------------------------------------- |
 |`self` | struct AddressArray.Data | The instance of the Data struct. 
 
+
+### popGet
+```solidity
+function popGet(
+  struct AddressArray.Data self
+) internal returns (address res)
+```
+Array pop back operation for storage `self` that returns popped element.
+
+
+#### Parameters:
+| Name | Type | Description                                                          |
+| :--- | :--- | :------------------------------------------------------------------- |
+|`self` | struct AddressArray.Data | The instance of the Data struct.  
+
+#### Return Values:
+| Name                           | Type          | Description                                                                  |
+| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
+|`res`| address | The address that was removed from the array.
 
 ### set
 ```solidity
@@ -142,5 +161,20 @@ Sets the address at a specified index in the array.
 |`self` | struct AddressArray.Data | The instance of the Data struct.  
 |`index` | uint256 | The index at which to set the address.  
 |`account` | address | The address to set at the specified index. 
+
+
+### erase
+```solidity
+function erase(
+  struct AddressArray.Data self
+) internal
+```
+Erase length of the array.
+
+
+#### Parameters:
+| Name | Type | Description                                                          |
+| :--- | :--- | :------------------------------------------------------------------- |
+|`self` | struct AddressArray.Data | The instance of the Data struct. 
 
 

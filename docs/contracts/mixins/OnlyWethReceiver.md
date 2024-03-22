@@ -8,7 +8,7 @@ Abstract contract extending EthReceiver to accept only ETH deposits from a speci
 This contract ensures that only wrapped ETH (WETH) can be deposited, rejecting all other direct ETH transfers.
 
 ## Derives
-- [EthReceiver](EthReceiver.md)
+- [EthReceiver](mixins/EthReceiver.md)
 
 ## Functions
 ### constructor

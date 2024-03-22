@@ -70,6 +70,46 @@ Checks if the set contains the specified address.
 | :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
 |`True`| bool | if the set contains the address, false otherwise.
 
+### get
+```solidity
+function get(
+  struct AddressSet.Data s
+) internal returns (address[])
+```
+Returns list of addresses from storage `s`.
+
+
+#### Parameters:
+| Name | Type | Description                                                          |
+| :--- | :--- | :------------------------------------------------------------------- |
+|`s` | struct AddressSet.Data | The set of addresses.  
+
+#### Return Values:
+| Name                           | Type          | Description                                                                  |
+| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
+|`The`| address[] | array of addresses stored in `s`.
+
+### get
+```solidity
+function get(
+  struct AddressSet.Data s,
+  address[] input
+) internal returns (address[])
+```
+Puts list of addresses from `s` storage into `output` array.
+
+
+#### Parameters:
+| Name | Type | Description                                                          |
+| :--- | :--- | :------------------------------------------------------------------- |
+|`s` | struct AddressSet.Data | The set of addresses.  
+|`input` | address[] | 
+
+#### Return Values:
+| Name                           | Type          | Description                                                                  |
+| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
+|`The`| address[] | provided output array filled with addresses.
+
 ### add
 ```solidity
 function add(
@@ -111,4 +151,23 @@ Removes an address from the set if it exists.
 | Name                           | Type          | Description                                                                  |
 | :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
 |`True`| bool | if the address was removed from the set, false if it was not found.
+
+### erase
+```solidity
+function erase(
+  struct AddressSet.Data s
+) internal returns (address[] items)
+```
+Erases set from storage `s`.
+
+
+#### Parameters:
+| Name | Type | Description                                                          |
+| :--- | :--- | :------------------------------------------------------------------- |
+|`s` | struct AddressSet.Data | The set of addresses.  
+
+#### Return Values:
+| Name                           | Type          | Description                                                                  |
+| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
+|`items`| address[] | All removed items.
 
