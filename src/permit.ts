@@ -35,6 +35,12 @@ export const DaiLikePermit = [
     { name: 'allowed', type: 'bool' },
 ];
 
+/**
+ * @category permit
+ * @dev Removes the '0x' prefix from a string. If no '0x' prefix is found, returns the original string.
+ * @param bigNumber The number (as a bigint or string) from which to remove the '0x' prefix.
+ * @return The string without the '0x' prefix.
+ */
 export function trim0x(bigNumber: bigint | string): string {
     const s = bigNumber.toString();
     if (s.startsWith('0x')) {
@@ -43,11 +49,26 @@ export function trim0x(bigNumber: bigint | string): string {
     return s;
 }
 
+/**
+ * @category permit
+ * @dev Trims the method selector from transaction data, removing the first 8 characters (4 bytes of hexable string) after '0x' prefix.
+ * @param data The transaction data string from which to trim the selector.
+ * @return The trimmed selector string.
+ */
 export function cutSelector(data: string): string {
     const hexPrefix = '0x';
     return hexPrefix + data.substring(hexPrefix.length + 8);
 }
 
+/**
+ * @category permit
+ * @dev Generates a domain separator for EIP-712 structured data using the provided parameters.
+ * @param name The user readable name of EIP-712 domain.
+ * @param version The version of the EIP-712 domain.
+ * @param chainId The unique identifier for the blockchain network.
+ * @param verifyingContract The Ethereum address of the contract that will verify the signature. This ties the signature to a specific contract.
+ * @return The domain separator as a hex string.
+ */
 export function domainSeparator(name: string, version: string, chainId: string, verifyingContract: string): string {
     return (
         '0x' +
@@ -60,6 +81,19 @@ export function domainSeparator(name: string, version: string, chainId: string, 
     );
 }
 
+/**
+ * @category permit
+ * @dev Constructs structured data for EIP-2612 permit function, including types, domain, and message with details about the permit.
+ * @param name The user readable name of signing EIP-712 domain
+ * @param version The version of the signing EIP-712 domain.
+ * @param chainId The unique identifier for the blockchain network.
+ * @param verifyingContract The Ethereum address of the contract that will verify the signature. This ties the signature to a specific contract.
+ * @param owner The Ethereum address of the token owner granting permission to spend tokens on their behalf.
+ * @param spender The Ethereum address of the party being granted permission to spend tokens on behalf of the owner.
+ * @param value The amount of tokens the spender is permitted to spend.
+ * @param nonce An arbitrary number used once to prevent replay attacks. Typically, this is the number of transactions sent by the owner.
+ * @param deadline The timestamp until which the permit is valid. This provides a window of time in which the permit can be used.
+ */
 export function buildData(
     name: string,
     version: string,
@@ -78,6 +112,20 @@ export function buildData(
     } as const;
 }
 
+/**
+ * @category permit
+ * @dev Prepares structured data similar to the Dai permit function, including types, domain, and message with permit details.
+ * @param name The user readable name of signing EIP-712 domain
+ * @param version The version of the signing EIP-712 domain.
+ * @param chainId The unique identifier for the blockchain network.
+ * @param verifyingContract The Ethereum address of the contract that will verify the signature. This ties the signature to a specific contract.
+ * @param holder The address of the token holder who is giving permission, establishing the source of the funds.
+ * @param spender The address allowed to spend tokens on behalf of the holder, essentially the recipient of the permit.
+ * @param nonce An arbitrary number used once to prevent replay attacks. Typically, this is the number of transactions sent by the owner.
+ * @param allowed A boolean indicating whether the spender is allowed to spend the tokens, providing a clear permit status.
+ * @param expiry The time until which the permit is valid, offering a window during which the spender can use the permit.
+ * @return Structured data prepared for a Dai-like permit function.
+ */
 export function buildDataLikeDai(
     name: string,
     version: string,
@@ -96,6 +144,11 @@ export function buildDataLikeDai(
     } as const;
 }
 
+/**
+ * @category permit
+ * @dev Ensures contract code is set for a given address and returns a contract instance.
+ * @return The contract instance of IPermit2.
+ */
 export async function permit2Contract() {
     if ((await ethers.provider.getCode(PERMIT2_ADDRESS)) === '0x') {
         await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, permit2Bytecode]);
@@ -103,8 +156,18 @@ export async function permit2Contract() {
     return ethers.getContractAt('IPermit2', PERMIT2_ADDRESS);
 }
 
-/*
+/**
+ * @category permit
+ * @notice Generates a permit signature for ERC20 tokens with EIP-2612 standard.
+ * @param owner The wallet or signer issuing the permit.
  * @param permitContract The contract object with ERC20Permit type and token address for which the permit creating.
+ * @param tokenVersion The version of the token's EIP-712 domain.
+ * @param chainId The unique identifier for the blockchain network.
+ * @param spender The address allowed to spend the tokens.
+ * @param value The amount of tokens the spender is allowed to use.
+ * @param deadline Time until when the permit is valid.
+ * @param compact Indicates if the permit should be compressed.
+ * @return A signed permit string.
  */
 export async function getPermit(
     owner: Wallet | SignerWithAddress,
@@ -135,8 +198,18 @@ export async function getPermit(
     return compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), constants.ZERO_ADDRESS, owner.address, spender);
 }
 
-/*
- * @param permit2Contract The contract object for Permit2 Uniswap contract.
+/**
+ * @category permit
+ * @notice Creates a permit for spending tokens on Permit2 standard contracts.
+ * @param owner The wallet or signer issuing the permit.
+ * @param token The address of the token for which the permit is creates.
+ * @param chainId The unique identifier for the blockchain network.
+ * @param spender The address allowed to spend the tokens.
+ * @param amount The amount of tokens the spender is allowed to use.
+ * @param compact Indicates if the permit should be compressed.
+ * @param expiration The time until when the permit is valid for Permit2.
+ * @param sigDeadline Deadline for the signature to be considered valid.
+ * @return A signed permit string specific to Permit2 contracts.
  */
 export async function getPermit2(
     owner: Wallet | SignerWithAddress,
@@ -167,8 +240,18 @@ export async function getPermit2(
     return compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), token, owner.address, spender);
 }
 
-/*
+/**
+ * @category permit
+ * @notice Generates a Dai-like permit signature for tokens.
+ * @param holder The wallet or signer issuing the permit.
  * @param permitContract The contract object with ERC20PermitLikeDai type and token address for which the permit creating.
+ * @param tokenVersion The version of the token's EIP-712 domain.
+ * @param chainId The unique identifier for the blockchain network.
+ * @param spender The address allowed to spend the tokens.
+ * @param allowed Boolean indicating whether the spender is allowed to spend.
+ * @param expiry Time until when the permit is valid.
+ * @param compact Indicates if the permit should be compressed.
+ * @return A signed permit string in Dai-like format.
  */
 export async function getPermitLikeDai(
     holder: Wallet | SignerWithAddress,
@@ -225,7 +308,7 @@ export async function getPermitLikeUSDC(
         nonce.toString(),
         deadline,
     );
-    
+
     const signature = await signer.signTypedData(data.domain, data.types, data.message);
     const { v, r, s } = Signature.from(signature);
     const signatureBytes = ethers.solidityPacked(['bytes32', 'bytes32', 'uint8'], [r, s, v]);
@@ -233,14 +316,26 @@ export async function getPermitLikeUSDC(
     return cutSelector(permitContract.interface.encodeFunctionData('permit(address,address,uint256,uint256,bytes)', [owner, spender, value, deadline, signatureBytes]));
 }
 
+/**
+ * @category permit
+ * @notice Concatenates a target address with data, trimming the '0x' prefix from the data.
+ * @param target The target address or value to prepend.
+ * @param data The data string to be concatenated after trimming.
+ * @return A concatenated string of target and data.
+ */
 export function withTarget(target: bigint | string, data: bigint | string): string {
     return target.toString() + trim0x(data);
 }
 
-// Type | EIP-2612 | DAI | Permit2
-// Uncompressed | 224 | 256 | 352
-// Compressed | 100 | 72 | 96
-
+/**
+ * @category permit
+ * @notice Compresses a permit function call to a shorter format based on its type.
+ *   Type         | EIP-2612 | DAI | Permit2
+ *   Uncompressed |    224   | 256 | 352
+ *   Compressed   |    100   |  72 | 96
+ * @param permit The full permit function call string.
+ * @return A compressed permit string.
+ */
 export function compressPermit(permit: string): string {
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
     switch (permit.length) {
@@ -281,6 +376,15 @@ export function compressPermit(permit: string): string {
     }
 }
 
+/**
+ * @category permit
+ * @notice Decompresses a compressed permit function call back to its original full format.
+ * @param permit The compressed permit function call string.
+ * @param token The token address involved in the permit (for Permit2 type).
+ * @param owner The owner address involved in the permit.
+ * @param spender The spender address involved in the permit.
+ * @return The decompressed permit function call string.
+ */
 export function decompressPermit(permit: string, token: string, owner: string, spender: string): string {
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
     switch (permit.length) {

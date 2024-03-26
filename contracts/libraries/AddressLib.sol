@@ -5,7 +5,8 @@ pragma solidity ^0.8.0;
 type Address is uint256;
 
 /**
-* @dev Library for working with addresses encoded as uint256 values, which can include flags in the highest bits.
+* @notice AddressLib
+* @notice Library for working with addresses encoded as uint256 values, which can include flags in the highest bits.
 */
 library AddressLib {
     uint256 private constant _LOW_160_BIT_MASK = (1 << 160) - 1;

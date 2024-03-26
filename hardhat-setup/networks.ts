@@ -2,13 +2,25 @@ import dotenv from 'dotenv';
 import { ChainConfig } from '@nomicfoundation/hardhat-verify/src/types';
 import { Network, NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
 
+/** @internal */
 export type Etherscan = { apiKey: {[key: string]: string}, customChains: ChainConfig[] };
 
+/**
+ * @category Hardhat-Setup
+ * @notice A helper method to get the network name from the command line arguments.
+ * @returns The network name.
+ */
 export function getNetwork(): string {
     const index = process.argv.findIndex((arg) => arg === '--network') + 1;
     return index !== 0 ? process.argv[index] : 'unknown';
 }
 
+/**
+ * @category Hardhat-Setup
+ * @notice A helper method to parse RPC configuration strings. Checks that the string is in the expected format.
+ * @param envRpc The RPC configuration string to parse.
+ * @returns An object containing the RPC URL and optional auth key HTTP header.
+ */
 export function parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: string } {
     const [ url, authKeyHttpHeader, overflow ] = envRpc.split('|');
     if (overflow || url === '') {
@@ -17,6 +29,12 @@ export function parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: 
     return { url, authKeyHttpHeader };
 }
 
+/**
+ * @category Hardhat-Setup
+ * @notice A helper method to reset the Hardhat network to the local network or to a fork.
+ * @param network The Hardhat network object.
+ * @param networkName The name of the network to reset to.
+ */
 export async function resetHardhatNetworkFork(network: Network, networkName: string) {
     if (networkName.toLowerCase() === 'hardhat') {
         await network.provider.request({ // reset to local network
@@ -37,6 +55,11 @@ export async function resetHardhatNetworkFork(network: Network, networkName: str
     }
 }
 
+/**
+ * @category Hardhat-Setup
+ * @notice The Network class is a helper class to register networks and Etherscan API keys.
+ * See the [README](https://github.com/1inch/solidity-utils/tree/master/hardhat-setup/README.md) for usage.
+ */
 export class Networks {
     networks: NetworksUserConfig = {};
     etherscan: Etherscan = { apiKey: {}, customChains: [] };

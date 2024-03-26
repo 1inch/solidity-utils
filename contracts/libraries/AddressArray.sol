@@ -2,10 +2,25 @@
 
 pragma solidity ^0.8.0;
 
-/// @title Library that implements address array on mapping, stores array length at 0 index.
+/**
+ * @title AddressArray
+ * @notice Implements a dynamic array of addresses using a mapping for storage efficiency, with the array length stored at index 0.
+ * @dev This library provides basic functionalities such as push, pop, set, and retrieval of addresses in a storage-efficient manner.
+ */
 library AddressArray {
+    /**
+     * @dev Error thrown when attempting to access an index outside the bounds of the array.
+     */
     error IndexOutOfBounds();
+
+    /**
+     * @dev Error thrown when attempting to pop an element from an empty array.
+     */
     error PopFromEmptyArray();
+
+    /**
+     * @dev Error thrown when the output array provided for getting the list of addresses is too small.
+     */
     error OutputArrayTooSmall();
 
     uint256 internal constant _ZERO_ADDRESS = 0x8000000000000000000000000000000000000000000000000000000000000000; // Next tx gas optimization
@@ -14,26 +29,40 @@ library AddressArray {
     uint256 internal constant _ONE_LENGTH   = 0x0000000000000000000000010000000000000000000000000000000000000000;
     uint256 internal constant _LENGTH_OFFSET = 160;
 
-    /// @dev Data struct containing raw mapping.
+    /**
+     * @dev Struct containing the raw mapping used to store the addresses and the array length.
+     */
     struct Data {
         uint256[1 << 32] _raw;
     }
 
-    /// @dev Length of array.
+    /**
+     * @notice Returns the number of addresses stored in the array.
+     * @param self The instance of the Data struct.
+     * @return The number of addresses.
+     */
     function length(Data storage self) internal view returns (uint256) {
         return (self._raw[0] & _LENGTH_MASK) >> _LENGTH_OFFSET;
     }
 
-    /// @dev Returns data item from `self` storage at `i`.
+    /**
+     * @notice Retrieves the address at a specified index in the array.
+     * @param self The instance of the Data struct.
+     * @param i The index to retrieve the address from.
+     * @return The address stored at the specified index.
+     */
     function at(Data storage self, uint256 i) internal view returns (address) {
         if (i >= 1 << 32) revert IndexOutOfBounds();
         return address(uint160(self._raw[i] & _ADDRESS_MASK));
     }
 
-    /// @dev Returns list of addresses from storage `self`.
+    /**
+     * @notice Returns all addresses in the array from storage.
+     * @param self The instance of the Data struct.
+     * @return output Array containing all the addresses.
+     */
     function get(Data storage self) internal view returns (address[] memory output) {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
@@ -55,12 +84,16 @@ library AddressArray {
         }
     }
 
-    /// @dev Puts list of addresses from `self` storage into `output` array.
+    /**
+     * @notice Copies the addresses into the provided output array.
+     * @param self The instance of the Data struct.
+     * @param input The array to copy the addresses into.
+     * @return output The provided output array filled with addresses.
+     */
     function get(Data storage self, address[] memory input) internal view returns (address[] memory output) {
         output = input;
         bytes4 err = OutputArrayTooSmall.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
@@ -81,10 +114,14 @@ library AddressArray {
         }
     }
 
-    /// @dev Array push back `account` operation on storage `self`.
+    /**
+     * @notice Adds an address to the end of the array.
+     * @param self The instance of the Data struct.
+     * @param account The address to add.
+     * @return res The new length of the array.
+     */
     function push(Data storage self, address account) internal returns (uint256 res) {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
 
@@ -100,11 +137,13 @@ library AddressArray {
         }
     }
 
-    /// @dev Array pop back operation for storage `self`.
+    /**
+     * @notice Removes the last address from the array.
+     * @param self The instance of the Data struct.
+     */
     function pop(Data storage self) internal {
         bytes4 err = PopFromEmptyArray.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
 
@@ -122,11 +161,14 @@ library AddressArray {
         }
     }
 
-    /// @dev Array pop back operation for storage `self` that returns popped element.
+    /**
+     * @notice Array pop back operation for storage `self` that returns popped element.
+     * @param self The instance of the Data struct.
+     * @return res The address that was removed from the array.
+     */
     function popGet(Data storage self) internal returns(address res) {
         bytes4 err = PopFromEmptyArray.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
 
@@ -146,11 +188,15 @@ library AddressArray {
         }
     }
 
-    /// @dev Set element for storage `self` at `index` to `account`.
+    /**
+     * @notice Sets the address at a specified index in the array.
+     * @param self The instance of the Data struct.
+     * @param index The index at which to set the address.
+     * @param account The address to set at the specified index.
+     */
     function set(Data storage self, uint256 index, address account) internal {
         bytes4 err = IndexOutOfBounds.selector;
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let lengthAndFirst := sload(self.slot)
             let len := shr(_LENGTH_OFFSET, and(lengthAndFirst, _LENGTH_MASK))
             let fst := and(lengthAndFirst, _ADDRESS_MASK)
@@ -170,10 +216,12 @@ library AddressArray {
         }
     }
 
-    /// @dev Erase length of the array
+    /**
+     * @notice Erase length of the array.
+     * @param self The instance of the Data struct.
+     */
     function erase(Data storage self) internal {
-        /// @solidity memory-safe-assembly
-        assembly { // solhint-disable-line no-inline-assembly
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             sstore(self.slot, _ADDRESS_MASK)
         }
     }

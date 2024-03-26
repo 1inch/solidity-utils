@@ -3,7 +3,8 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title A library for operating on bytes storage slices.
+ * @title BytesStorage
+ * @notice A library for operating on bytes storage slices.
  */
 library BytesStorage {
     error OutOfBounds();
