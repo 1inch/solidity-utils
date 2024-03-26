@@ -4,7 +4,12 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 import { NonceType, buildBySigTraits } from './BySigTraits.test';
 
-function hashBySig(name: string, version: string, chainId: bigint, verifyingContract: string, sig: Record<string, any>): string { // eslint-disable-line @typescript-eslint/no-explicit-any
+interface SignedCallStruct {
+    traits: bigint;
+    data: string;
+}
+
+function hashBySig(name: string, version: string, chainId: bigint, verifyingContract: string, sig: SignedCallStruct): string {
     const domain = { name, version, chainId, verifyingContract };
     const types = {
         SignedCall: [
@@ -82,7 +87,7 @@ describe('BySig', function () {
             const sig = {
                 traits: buildBySigTraits(),
                 data: '0x',
-            } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+            };
             expect(await token.hashBySig(sig)).to.be.equal(hashBySig(await token.name(), eip712Version, await token.getChainId(), await token.getAddress(), sig));
         });
     });
