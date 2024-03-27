@@ -39,7 +39,7 @@
     "@nomicfoundation/hardhat-ethers": "3.0.5",
     "@nomicfoundation/hardhat-network-helpers": "1.0.10",
     "@nomicfoundation/hardhat-verify": "2.0.4",
-    "@openzeppelin/contracts": "5.0.1",
+    "@openzeppelin/contracts": "5.0.2",
     "@uniswap/permit2-sdk": "1.2.0",
     "chai": "4.4.0",
     "dotenv": "16.4.3",
