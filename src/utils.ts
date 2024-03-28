@@ -222,7 +222,7 @@ export async function countInstructions(
 
 /**
  * @category utils
- * @dev Retrieves the current USD price of ETH or another specified native token.
+ * @notice Retrieves the current USD price of ETH or another specified native token.
  * This helper function is designed for use in test environments to maintain stability against market fluctuations.
  * It fetches the current price of ETH (or a specified native token for side chains) in USD from the Coinbase API to
  * ensure that tests remain stable and unaffected by significant market price fluctuations when token price is
