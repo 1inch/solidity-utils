@@ -47,7 +47,8 @@
     "ethers": "6.11.0",
     "hardhat": "2.19.5",
     "hardhat-deploy": "0.11.45",
-    "mocha-chai-jest-snapshot": "1.1.4"
+    "mocha-chai-jest-snapshot": "1.1.4",
+    "node-fetch": "2.7.0"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "2.0.4",
