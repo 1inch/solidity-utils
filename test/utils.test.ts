@@ -1,5 +1,5 @@
 import { ether, time, constants } from '../src/prelude';
-import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode } from '../src/utils';
+import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode, getEthPrice } from '../src/utils';
 import { expect } from '../src/expect';
 import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
@@ -214,5 +214,19 @@ describe('utils', function () {
             expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
             expect(await token.name()).to.be.eq(tokenName);
         }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
+    });
+
+    describe('getEthPrice', function () {
+        it('should return ETH price', async function () {
+            expect(await getEthPrice()).to.be.gt(0);
+        });
+
+        it('should return BNB price', async function () {
+            expect(await getEthPrice('BNB')).to.be.gt(0);
+        });
+
+        it('should throw error with incorrect token symbol', async function () {
+            await expect(getEthPrice('INVALID_SYMBOL')).to.be.rejectedWith('Failed to parse price from Coinbase API');
+        });
     });
 });
