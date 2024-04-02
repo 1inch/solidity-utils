@@ -5,7 +5,7 @@ PermitAndCall
 
 
 Abstract contract to support permit and action execution in a single transaction.
-Allows tokens that implement EIP-2612 permits, DAI-like permits and Permit2 to be approved and spent in a single transaction.
+Allows tokens that implement EIP-2612 permits, DAI-like permits, USDC-like permits and Permit2 to be approved and spent in a single transaction.
 
 
 ## Functions
