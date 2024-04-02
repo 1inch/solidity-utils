@@ -2,16 +2,14 @@
 
 pragma solidity ^0.8.25;
 
-import "../CheapEthSender.sol";
+import "../mixins/SelfdestructEthSender.sol";
 
-contract CheapEthSenderMock is CheapEthSender {
+contract SelfdestructEthSenderMock is SelfdestructEthSender {
     error ETHTransferFailed();
 
-    function alive() external pure returns(uint256) {
-        return 1;
-    }
+    receive() external payable {}
 
-    function sendEthers(address payable receiver) external payable {
+    function transferBalance(address payable receiver) external payable {
         // solhint-disable-next-line avoid-low-level-calls
         (bool success, ) = receiver.call{value: address(this).balance}("");
         if (!success) revert ETHTransferFailed();
