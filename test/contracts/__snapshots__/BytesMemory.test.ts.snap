@@ -2,8 +2,8 @@
 
 exports[`BytesMemoryMock Gas usage slice 1`] = `22433n`;
 
-exports[`BytesMemoryMock Gas usage unwrap 32 bytes 1`] = `23012n`;
+exports[`BytesMemoryMock Gas usage unwrap 32 bytes 1`] = `22919n`;
 
-exports[`BytesMemoryMock Gas usage unwrap 33 bytes 1`] = `23363n`;
+exports[`BytesMemoryMock Gas usage unwrap 33 bytes 1`] = `23196n`;
 
-exports[`BytesMemoryMock Gas usage unwrap 64 bytes 1`] = `23726n`;
+exports[`BytesMemoryMock Gas usage unwrap 64 bytes 1`] = `23559n`;
