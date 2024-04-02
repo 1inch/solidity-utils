@@ -1,6 +1,7 @@
 import '@nomicfoundation/hardhat-ethers';  // required to populate the HardhatRuntimeEnvironment with ethers
 import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
+import fetch from 'node-fetch';
 import { BaseContract, BigNumberish, BytesLike, Contract, ContractTransactionReceipt, ContractTransactionResponse, JsonRpcProvider, Signer, Wallet } from 'ethers';
 import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
 
@@ -217,4 +218,30 @@ export async function countInstructions(
     return instructions.map((instr) => {
         return str.split('"' + instr.toUpperCase() + '"').length - 1;
     });
+}
+
+/**
+ * @category utils
+ * @notice Retrieves the current USD price of ETH or another specified native token.
+ * This helper function is designed for use in test environments to maintain stability against market fluctuations.
+ * It fetches the current price of ETH (or a specified native token for side chains) in USD from the Coinbase API to
+ * ensure that tests remain stable and unaffected by significant market price fluctuations when token price is
+ * important part of test.
+ * @param nativeTokenSymbol The symbol of the native token for which the price is being fetched, defaults to 'ETH'.
+ * @return The price of the specified native token in USD, scaled by 1e18 to preserve precision.
+ */
+export async function getEthPrice(nativeTokenSymbol: string = 'ETH'): Promise<bigint> {
+    type CoinbaseResponse = {
+        data: {
+            amount: string;
+        };
+    };
+    const response = await fetch(`https://api.coinbase.com/v2/prices/${nativeTokenSymbol}-USD/spot`);
+    let amount: bigint = 0n;
+    try {
+        amount = BigInt(parseFloat((await response.json() as CoinbaseResponse).data.amount) * 1e18);
+    } catch {
+        throw new Error('Failed to parse price from Coinbase API');
+    }
+    return amount;
 }
