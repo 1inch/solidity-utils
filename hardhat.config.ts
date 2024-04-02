@@ -2,7 +2,6 @@ import '@typechain/hardhat';
 import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
 import 'hardhat-gas-reporter';
-import 'hardhat-tracer';
 import 'hardhat-deploy';
 import '@nomicfoundation/hardhat-verify';
 require('solidity-coverage'); // require because no TS typings available
@@ -23,13 +22,13 @@ const { networks, etherscan } = new Networks();
 
 const config: HardhatUserConfig = {
     solidity: {
-        version: '0.8.23',
+        version: '0.8.25',
         settings: {
             optimizer: {
                 enabled: true,
                 runs: 1000000,
             },
-            evmVersion: (networks[getNetwork()] as HardhatNetworkUserConfig)?.hardfork || 'shanghai',
+            evmVersion: (networks[getNetwork()] as HardhatNetworkUserConfig)?.hardfork || 'cancun',
             viaIR: true,
         },
     },

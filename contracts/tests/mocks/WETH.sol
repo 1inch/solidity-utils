@@ -26,6 +26,7 @@ contract WETH {
     }
 
     function withdraw(uint256 wad) public {
+        // solhint-disable-next-line gas-custom-errors
         require(balanceOf[msg.sender] >= wad, "Not enough balance");
         balanceOf[msg.sender] -= wad;
         payable(msg.sender).transfer(wad);
@@ -50,9 +51,11 @@ contract WETH {
         public
         returns (bool)
     {
+        // solhint-disable-next-line gas-custom-errors
         require(balanceOf[src] >= wad, "Not enough balance");
 
         if (src != msg.sender && allowance[src][msg.sender] != type(uint).max) {
+            // solhint-disable-next-line gas-custom-errors
             require(allowance[src][msg.sender] >= wad, "Not enough allowance");
             allowance[src][msg.sender] -= wad;
         }
