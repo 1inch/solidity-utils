@@ -4,6 +4,7 @@ import '@nomicfoundation/hardhat-chai-matchers';
 import 'hardhat-gas-reporter';
 import 'hardhat-deploy';
 import '@nomicfoundation/hardhat-verify';
+import 'solidity-docgen';
 require('solidity-coverage'); // require because no TS typings available
 import dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
@@ -42,6 +43,12 @@ const config: HardhatUserConfig = {
     },
     typechain: {
         target: 'ethers-v6',
+    },
+    docgen: {
+        outputDir: 'docs/contracts',
+        templates: 'utils/templates',
+        pages: 'files',
+        exclude: ['mocks', 'tests'],
     },
 };
 

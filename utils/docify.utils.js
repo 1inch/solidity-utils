@@ -1,25 +1,12 @@
 #!/usr/bin/env node
-const SOLC_NPM_NAME = 'solc';
 const BASE_DIR = 'docs';
-const SCRIPT_DIR = __dirname;
-const INPUT_DIR = 'contracts';
 const OUTPUT_DIR = process.env.DOCGEN_OUTPUT_DIR || `${BASE_DIR}/contracts`;
-const HELPERS_PATH = `${SCRIPT_DIR}/solidity-docgen-helpers.js`;
 
 const fs = require('fs');
 const path = require('path');
-const spawn = require('cross-spawn');
 
 function getFileNameWithoutExtension (fileName) {
     return fileName.substr(0, fileName.lastIndexOf('.'));
-}
-
-function runProcess (name, args) {
-    console.log(`running ${name} with args ${JSON.stringify(args)}`);
-    const result = spawn.sync(name, args, { stdio: ['inherit', 'inherit', 'pipe'] });
-    if (result.stderr.length > 0) {
-        throw new Error(result.stderr);
-    }
 }
 
 function getReadmes (targetPath) {
@@ -108,23 +95,5 @@ function removeUnwantedDocs () {
     }
 }
 
-const solidityDocgenArgs = [
-    'solidity-docgen',
-    '-i',
-    INPUT_DIR,
-    '-o',
-    OUTPUT_DIR,
-    '--solc-module',
-    SOLC_NPM_NAME,
-    '--solc-settings',
-    JSON.stringify({ optimizer: { enabled: false } }),
-    '--templates',
-    SCRIPT_DIR,
-    '--helpers',
-    HELPERS_PATH,
-];
-
-fs.rmSync(OUTPUT_DIR, { force: true, recursive: true });
-runProcess('npx', solidityDocgenArgs);
 generateGitbookFiles();
 removeUnwantedDocs();
