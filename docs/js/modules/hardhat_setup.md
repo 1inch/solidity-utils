@@ -32,7 +32,7 @@ A helper method to get the network name from the command line arguments.
 
 #### Defined in
 
-[hardhat-setup/networks.ts:13](https://github.com/1inch/solidity-utils/blob/a4f31a6/hardhat-setup/networks.ts#L13)
+[hardhat-setup/networks.ts:13](https://github.com/1inch/solidity-utils/blob/c062712/hardhat-setup/networks.ts#L13)
 
 ___
 
@@ -63,7 +63,7 @@ A helper method to parse RPC configuration strings. Checks that the string is in
 
 #### Defined in
 
-[hardhat-setup/networks.ts:24](https://github.com/1inch/solidity-utils/blob/a4f31a6/hardhat-setup/networks.ts#L24)
+[hardhat-setup/networks.ts:24](https://github.com/1inch/solidity-utils/blob/c062712/hardhat-setup/networks.ts#L24)
 
 ___
 
@@ -88,4 +88,4 @@ A helper method to reset the Hardhat network to the local network or to a fork.
 
 #### Defined in
 
-[hardhat-setup/networks.ts:38](https://github.com/1inch/solidity-utils/blob/a4f31a6/hardhat-setup/networks.ts#L38)
+[hardhat-setup/networks.ts:38](https://github.com/1inch/solidity-utils/blob/c062712/hardhat-setup/networks.ts#L38)
