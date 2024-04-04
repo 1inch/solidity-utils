@@ -1,7 +1,5 @@
-# RevertReasonParser
 
-
-RevertReasonParser
+## RevertReasonParser
 
 Library that allows to parse unsuccessful arbitrary calls revert reasons.
 See https://solidity.readthedocs.io/en/latest/control-structures.html#revert for details.
@@ -10,29 +8,39 @@ if structured reverts appear in the future.
 
 All unsuccessful parsings get encoded as Unknown(data) string
 
+### Functions list
+- [parse(data, prefix) internal](#parse)
 
+### Errors list
+- [InvalidRevertReason() ](#invalidrevertreason)
 
-## Functions
+### Functions
 ### parse
+
 ```solidity
-function parse(
-  bytes data,
-  string prefix
-) internal returns (string)
+function parse(bytes data, string prefix) internal pure returns (string)
 ```
 
-Parses revert reason from failed calls, returning it with a `prefix`.
-Handles standard `Error(string)` and `Panic(uint256)` formats, defaulting to `Unknown(data)` for unrecognized patterns.
+_Parses revert reason from failed calls, returning it with a `prefix`.
+Handles standard `Error(string)` and `Panic(uint256)` formats, defaulting to `Unknown(data)` for unrecognized patterns._
 
+#### Parameters
 
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`data` | bytes | The revert data to parse.  
-|`prefix` | string | String to add before the parsed reason for context.  
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| data | bytes | The revert data to parse. |
+| prefix | string | String to add before the parsed reason for context. |
 
-#### Return Values:
-| Name                           | Type          | Description                                                                  |
-| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`The`| string | formatted revert reason.
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+[0] | string | The formatted revert reason. |
+
+### Errors
+### InvalidRevertReason
+
+```solidity
+error InvalidRevertReason()
+```
 

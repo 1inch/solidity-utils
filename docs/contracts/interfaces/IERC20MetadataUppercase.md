@@ -1,38 +1,36 @@
-# IERC20MetadataUppercase
 
+## IERC20MetadataUppercase
 
-IERC20MetadataUppercase
+_Interface for ERC20 token metadata with uppercase naming convention._
 
+### Functions list
+- [NAME() external](#name)
+- [SYMBOL() external](#symbol)
 
-Interface for ERC20 token metadata with uppercase naming convention.
-
-
-## Functions
+### Functions
 ### NAME
+
 ```solidity
-function NAME(
-) external returns (string)
+function NAME() external view returns (string)
 ```
 Gets the token name.
 
+#### Return Values
 
-
-#### Return Values:
-| Name                           | Type          | Description                                                                  |
-| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`Token`| string | name.
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+[0] | string | Token name. |
 
 ### SYMBOL
+
 ```solidity
-function SYMBOL(
-) external returns (string)
+function SYMBOL() external view returns (string)
 ```
 Gets the token symbol.
 
+#### Return Values
 
-
-#### Return Values:
-| Name                           | Type          | Description                                                                  |
-| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`Token`| string | symbol.
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+[0] | string | Token symbol. |
 

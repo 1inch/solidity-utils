@@ -1,67 +1,61 @@
-# BySigTraits
 
+## BySigTraits
 
+### Types list
+- [Value](#value)
+- [NonceType](#noncetype)
 
+### Functions list
+- [nonceType(traits) internal](#noncetype)
+- [deadline(traits) internal](#deadline)
+- [isRelayerAllowed(traits, relayer) internal](#isrelayerallowed)
+- [nonce(traits) internal](#nonce)
 
+### Errors list
+- [WrongNonceType() ](#wrongnoncetype)
 
+### Types
+### Value
 
+### NonceType
 
-## Functions
-### nonceType
 ```solidity
-function nonceType(
-  BySigTraits.Value traits
-) internal returns (enum BySigTraits.NonceType)
+enum NonceType {
+  Account,
+  Selector,
+  Unique
+}
 ```
 
+### Functions
+### nonceType
 
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`traits` | BySigTraits.Value | 
-
+```solidity
+function nonceType(BySigTraits.Value traits) internal pure returns (enum BySigTraits.NonceType)
+```
 
 ### deadline
+
 ```solidity
-function deadline(
-  BySigTraits.Value traits
-) internal returns (uint256)
+function deadline(BySigTraits.Value traits) internal pure returns (uint256)
 ```
-
-
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`traits` | BySigTraits.Value | 
-
 
 ### isRelayerAllowed
+
 ```solidity
-function isRelayerAllowed(
-  BySigTraits.Value traits,
-  address relayer
-) internal returns (bool)
+function isRelayerAllowed(BySigTraits.Value traits, address relayer) internal pure returns (bool)
 ```
-
-
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`traits` | BySigTraits.Value | 
-|`relayer` | address | 
-
 
 ### nonce
+
 ```solidity
-function nonce(
-  BySigTraits.Value traits
-) internal returns (uint256)
+function nonce(BySigTraits.Value traits) internal pure returns (uint256)
 ```
 
+### Errors
+### WrongNonceType
 
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`traits` | BySigTraits.Value | 
-
+```solidity
+error WrongNonceType()
+```
 

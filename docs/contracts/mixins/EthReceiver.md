@@ -1,30 +1,40 @@
-# EthReceiver
 
+## EthReceiver
 
-EthReceiver
+_Abstract contract for rejecting direct ETH transfers from EOAs.
+Implements a custom error and logic to reject ETH deposits from non-contract addresses._
 
+### Functions list
+- [receive() external](#receive)
+- [_receive() internal](#_receive)
 
-Abstract contract for rejecting direct ETH transfers from EOAs.
-Implements a custom error and logic to reject ETH deposits from non-contract addresses.
+### Errors list
+- [EthDepositRejected() ](#ethdepositrejected)
 
-
-## Functions
+### Functions
 ### receive
+
 ```solidity
-function receive(
-) external
+receive() external payable
 ```
 
-External payable function to receive ETH, automatically rejects deposits from EOAs.
-
+_External payable function to receive ETH, automatically rejects deposits from EOAs._
 
 ### _receive
+
 ```solidity
-function _receive(
-) internal
+function _receive() internal virtual
 ```
 
-Internal function containing the logic to reject ETH deposits.
-Can be overridden by derived contracts for specific behaviors while maintaining the base rejection mechanism.
+_Internal function containing the logic to reject ETH deposits.
+Can be overridden by derived contracts for specific behaviors while maintaining the base rejection mechanism._
 
+### Errors
+### EthDepositRejected
+
+```solidity
+error EthDepositRejected()
+```
+
+_Error thrown when an ETH deposit from an EOA is attempted._
 

@@ -1,31 +1,13 @@
-# IERC7597Permit
 
+## IERC7597Permit
 
+### Functions list
+- [permit(owner, spender, value, deadline, signature) external](#permit)
 
-
-
-
-
-## Functions
+### Functions
 ### permit
+
 ```solidity
-function permit(
-  address owner,
-  address spender,
-  uint256 value,
-  uint256 deadline,
-  bytes signature
-) external
+function permit(address owner, address spender, uint256 value, uint256 deadline, bytes signature) external
 ```
-
-
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`owner` | address | 
-|`spender` | address | 
-|`value` | uint256 | 
-|`deadline` | uint256 | 
-|`signature` | bytes | 
-
 

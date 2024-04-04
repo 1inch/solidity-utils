@@ -1,38 +1,34 @@
-# OnlyWethReceiver
 
+## OnlyWethReceiver
 
-OnlyWethReceiver
+_Abstract contract extending EthReceiver to accept only ETH deposits from a specified WETH contract.
+This contract ensures that only wrapped ETH (WETH) can be deposited, rejecting all other direct ETH transfers._
 
+### Functions list
+- [constructor(weth) internal](#constructor)
+- [_receive() internal](#_receive)
 
-Abstract contract extending EthReceiver to accept only ETH deposits from a specified WETH contract.
-This contract ensures that only wrapped ETH (WETH) can be deposited, rejecting all other direct ETH transfers.
-
-## Derives
-- [EthReceiver](mixins/EthReceiver.md)
-
-## Functions
+### Functions
 ### constructor
+
 ```solidity
-function constructor(
-  address weth
-) internal
+constructor(address weth) internal
 ```
 
-Sets the WETH contract address during construction.
+_Sets the WETH contract address during construction._
 
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`weth` | address | Address of the WETH contract. 
+#### Parameters
 
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| weth | address | Address of the WETH contract. |
 
 ### _receive
+
 ```solidity
-function _receive(
-) internal
+function _receive() internal virtual
 ```
 
-Overrides _receive to restrict ETH transfers solely to the WETH contract.
-Reverts with EthDepositRejected if ETH is sent from any other address.
-
+_Overrides _receive to restrict ETH transfers solely to the WETH contract.
+Reverts with EthDepositRejected if ETH is sent from any other address._
 

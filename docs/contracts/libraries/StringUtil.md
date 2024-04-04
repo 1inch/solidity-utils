@@ -1,69 +1,71 @@
-# StringUtil
 
+## StringUtil
 
-StringUtil
+_Library with gas-efficient string operations._
 
+### Functions list
+- [toHex(value) internal](#tohex)
+- [toHex(value) internal](#tohex)
+- [toHex(data) internal](#tohex)
 
-Library with gas-efficient string operations.
-
-
-## Functions
+### Functions
 ### toHex
+
 ```solidity
-function toHex(
-  uint256 value
-) internal returns (string)
+function toHex(uint256 value) internal pure returns (string)
 ```
 Converts a uint256 value to its hexadecimal string representation.
 
+#### Parameters
 
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`value` | uint256 | The uint256 value to convert.  
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| value | uint256 | The uint256 value to convert. |
 
-#### Return Values:
-| Name                           | Type          | Description                                                                  |
-| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`The`| string | hexadecimal string representation of the input value.
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+[0] | string | The hexadecimal string representation of the input value. |
 
 ### toHex
+
 ```solidity
-function toHex(
-  address value
-) internal returns (string)
+function toHex(address value) internal pure returns (string)
 ```
 Converts an address to its hexadecimal string representation.
 
+#### Parameters
 
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`value` | address | The address to convert.  
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| value | address | The address to convert. |
 
-#### Return Values:
-| Name                           | Type          | Description                                                                  |
-| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`The`| string | hexadecimal string representation of the input address.
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+[0] | string | The hexadecimal string representation of the input address. |
 
 ### toHex
+
 ```solidity
-function toHex(
-  bytes data
-) internal returns (string result)
+function toHex(bytes data) internal pure returns (string result)
 ```
 
-Converts arbitrary bytes to their hexadecimal string representation.
+_Converts arbitrary bytes to their hexadecimal string representation.
 This is an assembly adaptation of highly optimized toHex16 code by Mikhail Vladimirov.
-Reference: https://stackoverflow.com/a/69266989
+Reference: https://stackoverflow.com/a/69266989_
 
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`data` | bytes | The bytes to be converted to hexadecimal string.  
+#### Parameters
 
-#### Return Values:
-| Name                           | Type          | Description                                                                  |
-| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`result`| string | The hexadecimal string representation of the input bytes.
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| data | bytes | The bytes to be converted to hexadecimal string. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+result | string | The hexadecimal string representation of the input bytes. |
 

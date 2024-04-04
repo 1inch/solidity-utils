@@ -1,32 +1,20 @@
-# SelfdestructEthSender
 
+## SelfdestructEthSender
 
+### Functions list
+- [constructor() internal](#constructor)
+- [stopAndTransferBalance(receiver) external](#stopandtransferbalance)
 
-
-
-
-
-## Functions
+### Functions
 ### constructor
+
 ```solidity
-function constructor(
-) internal
+constructor() internal
 ```
-
-
-
 
 ### stopAndTransferBalance
+
 ```solidity
-function stopAndTransferBalance(
-  address payable receiver
-) external
+function stopAndTransferBalance(address payable receiver) external
 ```
-
-
-#### Parameters:
-| Name | Type | Description                                                          |
-| :--- | :--- | :------------------------------------------------------------------- |
-|`receiver` | address payable | 
-
 
