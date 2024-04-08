@@ -14,7 +14,6 @@ abstract contract SelfdestructEthSender {
      * @dev Initializes the contract, verifying compatibility with the Cancun EVM upgrade through transient storage support check.
      */
     constructor() {
-        // tload is done to verify that the EVM is cancun-compatible
         // solhint-disable-next-line no-inline-assembly
         assembly ("memory-safe") {
             pop(tload(0))
