@@ -3,6 +3,7 @@ import { ether } from '../../src/prelude';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
+import { SelfdestructEthSenderMock } from '../../typechain-types';
 
 describe('SelfdestructEthSender', function () {
     let signer0: SignerWithAddress;
@@ -14,7 +15,7 @@ describe('SelfdestructEthSender', function () {
 
     async function deployMocks() {
         const EthSender = await ethers.getContractFactory('SelfdestructEthSenderMock');
-        const ethSender = await EthSender.deploy();
+        const ethSender: SelfdestructEthSenderMock = await EthSender.deploy();
 
         return { ethSender };
     }

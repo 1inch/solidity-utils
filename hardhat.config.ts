@@ -37,9 +37,6 @@ const config: HardhatUserConfig = {
     gasReporter: {
         enabled: true,
     },
-    tracer: {
-        enableAllOpcodes: true,
-    },
     typechain: {
         target: 'ethers-v6',
     },
