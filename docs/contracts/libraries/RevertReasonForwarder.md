@@ -1,35 +1,34 @@
-# RevertReasonForwarder
 
-
-RevertReasonForwarder
+## RevertReasonForwarder
 
 Provides utilities for forwarding and retrieving revert reasons from failed external calls.
 
+### Functions list
+- [reRevert() internal](#rerevert)
+- [reReason() internal](#rereason)
 
-
-## Functions
+### Functions
 ### reRevert
+
 ```solidity
-function reRevert(
-) internal
+function reRevert() internal pure
 ```
 
-Forwards the revert reason from the latest external call.
-This method allows propagating the revert reason of a failed external call to the caller.
-
+_Forwards the revert reason from the latest external call.
+This method allows propagating the revert reason of a failed external call to the caller._
 
 ### reReason
+
 ```solidity
-function reReason(
-) internal returns (bytes reason)
+function reReason() internal pure returns (bytes reason)
 ```
 
-Retrieves the revert reason from the latest external call.
-This method enables capturing the revert reason of a failed external call for inspection or processing.
+_Retrieves the revert reason from the latest external call.
+This method enables capturing the revert reason of a failed external call for inspection or processing._
 
+#### Return Values
 
-#### Return Values:
-| Name                           | Type          | Description                                                                  |
-| :----------------------------- | :------------ | :--------------------------------------------------------------------------- |
-|`reason`| bytes | The latest external call revert reason.
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+reason | bytes | The latest external call revert reason. |
 

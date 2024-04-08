@@ -1,0 +1,73 @@
+{{>common}}
+
+{{#if types}}
+{{h 2}} Types list
+{{#each types}}
+- [{{name}}](#{{lower name}})
+{{/each}}
+{{/if}}
+
+{{#if functions}}
+{{h 2}} Functions list
+{{#each functions}}
+{{>signature}}
+{{/each}}
+{{/if}}
+
+{{#if events}}
+{{h 2}} Events list
+{{#each events}}
+{{>signature}}
+{{/each}}
+{{/if}}
+
+{{#if errors}}
+{{h 2}} Errors list
+{{#each errors}}
+{{>signature}}
+{{/each}}
+{{/if}}
+
+{{#if types}}
+{{h 2}} Types
+{{#hsection}}
+{{#each types}}
+{{>item}}
+{{/each}}
+{{/hsection}}
+{{/if}}
+
+{{#if functions}}
+{{h 2}} Functions
+{{#hsection}}
+{{#each functions}}
+{{>function}}
+{{/each}}
+{{/hsection}}
+{{/if}}
+
+{{#if events}}
+{{h 2}} Events
+{{#hsection}}
+{{#each events}}
+{{>common}}
+{{/each}}
+{{/hsection}}
+{{/if}}
+
+{{#if errors}}
+{{h 2}} Errors
+{{#hsection}}
+{{#each errors}}
+{{>common}}
+{{/each}}
+{{/hsection}}
+{{/if}}
+
+{{!--
+{{#each items}}
+{{#hsection}}
+{{>item}}
+{{/hsection}}
+{{/each}}
+--}}
