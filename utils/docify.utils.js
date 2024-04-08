@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const BASE_DIR = 'docs';
-const OUTPUT_DIR = process.env.DOCGEN_OUTPUT_DIR || `${BASE_DIR}/contracts`;
+const OUTPUT_DIR = process.env.DOCGEN_OUTPUT_DIR || `${BASE_DIR}`;
 
 const fs = require('fs');
 const path = require('path');

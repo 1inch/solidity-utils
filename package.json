@@ -5,7 +5,8 @@
   "types": "dist/src/index.d.ts",
   "exports": {
     ".": "./dist/src/index.js",
-    "./hardhat-setup": "./dist/hardhat-setup/index.js"
+    "./hardhat-setup": "./dist/hardhat-setup/index.js",
+    "./docgen": "./dist/docgen/index.js"
   },
   "repository": {
     "type": "git",
@@ -14,10 +15,10 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf artifacts cache coverage contracts/hardhat-dependency-compiler dist typechain-types",
-    "build": "yarn typechain && cti src hardhat-setup -b && tsc -p tsconfig.publish.json",
+    "build": "yarn typechain && cti src hardhat-setup docgen -b && tsc -p tsconfig.publish.json",
     "prepack": "yarn clean && yarn build",
     "coverage": "hardhat coverage",
-    "docgen": "yarn hardhat docgen; npx solidity-utils-docify && npx typedoc --options typedoc.json",
+    "docgen": "yarn hardhat docgen; npx solidity-utils-docify; npx typedoc --options typedoc.json",
     "docgen:ts": "npx typedoc --options typedoc.json",
     "docgen:sol": "yarn hardhat docgen; npx solidity-utils-docify",
     "format": "yarn format-ts && yarn format-sol",
