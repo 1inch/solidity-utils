@@ -282,7 +282,7 @@ library SafeERC20 {
 
     /**
      * @notice The function attempts to call the permit function on a given ERC20 token.
-     * @dev The function is designed to support a variety of permit functions, namely: IERC20Permit, IDaiLikePermit, and IPermit2.
+     * @dev The function is designed to support a variety of permit functions, namely: IERC20Permit, IDaiLikePermit, IERC7597Permit and IPermit2.
      * It accommodates both Compact and Full formats of these permit types.
      * Please note, it is expected that the `expiration` parameter for the compact Permit2 and the `deadline` parameter
      * for the compact Permit are to be incremented by one before invoking this function. This approach is motivated by

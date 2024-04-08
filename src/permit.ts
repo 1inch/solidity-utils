@@ -285,8 +285,21 @@ export async function getPermitLikeDai(
     return compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), constants.ZERO_ADDRESS, holder.address, spender);
 }
 
+/**
+ * @category permit
+ * @notice Generates a ERC-7597 permit signature for tokens.
+ * @param owner Contract with isValidSignature function.
+ * @param signer The wallet or signer issuing the permit.
+ * @param permitContract The contract object with ERC7597Permit type and token address for which the permit creating.
+ * @param tokenVersion The version of the token's EIP-712 domain.
+ * @param chainId The unique identifier for the blockchain network.
+ * @param spender The address allowed to spend the tokens.
+ * @param value The amount of tokens the spender is allowed to use.
+ * @param deadline Time until when the permit is valid.
+ * @return A signed permit string in ERC7597Permit format.
+ */
 export async function getPermitLikeUSDC(
-    owner: string, // contract with isValidSignature function
+    owner: string,
     signer: Wallet | SignerWithAddress,
     permitContract: USDCLikePermitMock,
     tokenVersion: string,
