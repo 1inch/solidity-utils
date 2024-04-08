@@ -22,7 +22,9 @@ abstract contract SelfdestructEthSender {
     }
 
     /**
-     * @notice Self-destruct contract, transferring the entire ETH balance of the contract to the specified address.
+     * @notice Makes the selfdestruct call, transferring the entire ETH balance of the contract to the specified address.
+     * Due to EIP-6780 chnges selfdestruct will destroy the contract only if it was created in the same transaction.
+     * In other cases it will stop the execution and transfer all the ETH balance saving about 1700 gas comparing to trivial transfer.
      * @param receiver The recipient address of the contract's ETH balance.
      */
     function stopAndTransferBalance(address payable receiver) external {
