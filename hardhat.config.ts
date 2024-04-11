@@ -45,7 +45,7 @@ const config: HardhatUserConfig = {
         outputDir: 'docs/contracts',
         templates: 'utils/templates',
         pages: 'files',
-        exclude: ['mocks', 'tests'],
+        exclude: ['tests'],
     },
 };
 
