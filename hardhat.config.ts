@@ -43,7 +43,7 @@ const config: HardhatUserConfig = {
     },
     docgen: {
         outputDir: 'docs/contracts',
-        templates: 'utils/templates',
+        templates: 'docgen/templates',
         pages: 'files',
         exclude: ['tests'],
     },
