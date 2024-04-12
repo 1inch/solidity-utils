@@ -1,11 +1,12 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "exports": {
     ".": "./dist/src/index.js",
-    "./hardhat-setup": "./dist/hardhat-setup/index.js"
+    "./hardhat-setup": "./dist/hardhat-setup/index.js",
+    "./docgen": "./dist/docgen/index.js"
   },
   "repository": {
     "type": "git",
@@ -14,12 +15,12 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf artifacts cache coverage contracts/hardhat-dependency-compiler dist typechain-types",
-    "build": "yarn typechain && cti src hardhat-setup -b && tsc -p tsconfig.publish.json",
+    "build": "yarn typechain && cti src hardhat-setup docgen -b && tsc -p tsconfig.publish.json",
     "prepack": "yarn clean && yarn build",
     "coverage": "hardhat coverage",
-    "docgen": "yarn hardhat docgen; npx solidity-utils-docify && npx typedoc --options typedoc.json",
+    "docgen": "yarn hardhat docgen && npx typedoc --options typedoc.json; npx solidity-utils-docify",
     "docgen:ts": "npx typedoc --options typedoc.json",
-    "docgen:sol": "yarn hardhat docgen; npx solidity-utils-docify",
+    "docgen:sol": "yarn hardhat docgen",
     "format": "yarn format-ts && yarn format-sol",
     "format-ts": "prettier '**/*.ts' --write",
     "format-sol": "prettier '**/*.sol' --write",

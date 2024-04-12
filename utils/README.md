@@ -5,18 +5,18 @@
 Generates documentation in markdown format from natspec docs
 
 ##### Usage
-Add to `package.json` file solidity compiler version (add version you use), solidity-docgen (0.5, 0.6 is unstable) util and shortcut to run command
+Add to `package.json` file solidity compiler version (add version you use), solidity-docgen 0.6 util and shortcut to run command
 
 `devDependencies` section
 
 ```
 "solc": "0.8.23",
-"solidity-docgen": "0.5.17",
+"solidity-docgen": "0.6.0-beta.36",
 ```
 
 `scripts` section
 ```
-"docify": "npx solidity-utils-docify"
+"docify": "yarn hardhat docgen; npx solidity-utils-docify"
 ```
 
 You can set output directory with ENV variable:
@@ -24,7 +24,25 @@ You can set output directory with ENV variable:
 "docify": "DOCGEN_OUTPUT_DIR=./docs npx solidity-utils-docify"
 ```
 
+Then set appopriate settings for docgen in `hardhat.config.js` file
+
+```JavaScript
+require('solidity-docgen');
+
+// You can use 1inch templates built-in templates
+const { oneInchTemplates } = require('@1inch/solidity-utils/docgen');
+
+module.exports = {
 ...
+    docgen: {
+        outputDir: "docs", // Can be omitted, docs used by default
+        templates: oneInchTemplates(), // 1inch templates
+        pages: 'files', // Doc output format for 1inch templates
+        exclude: ['mocks', 'test'], // Directories to exclude from generation
+    }
+}
+
+```
 
 #### Dependencies list (imports-list)
 
