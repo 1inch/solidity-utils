@@ -101,6 +101,7 @@
     "contracts/*.sol",
     "contracts/interfaces",
     "contracts/libraries",
+    "contracts/mixins",
     "contracts/mocks"
   ]
 }
