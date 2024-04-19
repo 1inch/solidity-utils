@@ -146,7 +146,7 @@ export class Networks {
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
         this.registerZksync('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL, 'mainnet', process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey);
         this.registerZksync('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL, process.env.ZKSYNC_LOCAL_ETH_NETWORK, process.env.ZKSYNC_PRIVATE_KEY || privateKey);
-        this.registerZksync('zksyncTest', 280, process.env.ZKSYNC_TEST_RPC_URL, 'goerli', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, process.env.ZKSYNC_TEST_VERIFY_URL);
+        this.registerZksync('zksyncTest', 300, process.env.ZKSYNC_TEST_RPC_URL, 'sepolia', process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, process.env.ZKSYNC_TEST_VERIFY_URL);
         return { networks: this.networks, etherscan: this.etherscan };
     }
 }
