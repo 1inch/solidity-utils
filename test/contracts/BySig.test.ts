@@ -1,7 +1,7 @@
 import { constants } from '../../src/prelude';
 import { expect } from '../../src/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { ethers, getChainId } from 'hardhat';
 import { NonceType, buildBySigTraits } from './BySigTraits.test';
 
 interface SignedCallStruct {
@@ -88,7 +88,7 @@ describe('BySig', function () {
                 traits: buildBySigTraits(),
                 data: '0x',
             };
-            expect(await token.hashBySig(sig)).to.be.equal(hashBySig(await token.name(), eip712Version, await token.getChainId(), await token.getAddress(), sig));
+            expect(await token.hashBySig(sig)).to.be.equal(hashBySig(await token.name(), eip712Version, BigInt(await getChainId()), await token.getAddress(), sig));
         });
     });
 
@@ -158,7 +158,7 @@ describe('BySig', function () {
                 data: token.interface.encodeFunctionData('transfer', [alice.address, 100]),
             };
             const signature = await alice.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { name: 'Token', version: '1', chainId: await getChainId(), verifyingContract: await token.getAddress() },
                 { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
                 signedCall
             );
@@ -172,7 +172,7 @@ describe('BySig', function () {
                 data: token.interface.encodeFunctionData('transfer', [alice.address, 100]),
             };
             const signature = await bob.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { name: 'Token', version: '1', chainId: await getChainId(), verifyingContract: await token.getAddress() },
                 { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
                 signedCall
             );
@@ -191,7 +191,7 @@ describe('BySig', function () {
                 data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', approveData, '0x']),
             };
             const signature = await bob.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { name: 'Token', version: '1', chainId: await getChainId(), verifyingContract: await token.getAddress() },
                 { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
                 signedCall
             );
@@ -211,7 +211,7 @@ describe('BySig', function () {
                 data: token.interface.encodeFunctionData('transfer', [carol.address, 100]),
             };
             const bobSignature = await bob.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { name: 'Token', version: '1', chainId: await getChainId(), verifyingContract: await token.getAddress() },
                 { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
                 bobSignedCall
             );
@@ -222,7 +222,7 @@ describe('BySig', function () {
                 data: token.interface.encodeFunctionData('bySig', [bob.address, bobSignedCall, bobSignature]),
             };
             const carolSignature = await carol.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { name: 'Token', version: '1', chainId: await getChainId(), verifyingContract: await token.getAddress() },
                 { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
                 carolSignedCall
             );
@@ -244,7 +244,7 @@ describe('BySig', function () {
                 data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', approveData, '0x']),
             };
             const bobSignature = await bob.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { name: 'Token', version: '1', chainId: await getChainId(), verifyingContract: await token.getAddress() },
                 { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
                 bobSignedCall
             );
@@ -256,7 +256,7 @@ describe('BySig', function () {
                 data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', carolSigByData, '0x']),
             };
             const carolSignature = await carol.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
+                { name: 'Token', version: '1', chainId: await getChainId(), verifyingContract: await token.getAddress() },
                 { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
                 carolSignedCall
             );

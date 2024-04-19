@@ -19,10 +19,6 @@ contract TokenWithBySig is TokenMock, BySig {
         return BySig._msgSender();
     }
 
-    function getChainId() external view returns (uint256) {
-        return block.chainid;
-    }
-
     function _chargeSigner(address signer, address relayer, address token, uint256 amount, bytes calldata /* extraData */) internal override {
         if (token != address(this)) revert WrongToken();
         _transfer(signer, relayer, amount);

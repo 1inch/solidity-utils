@@ -2,7 +2,7 @@ import { constants, ether } from '../../src/prelude';
 import { expect } from '../../src/expect';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import hre, { ethers } from 'hardhat';
+import hre, { ethers, getChainId } from 'hardhat';
 import { Signature, TypedDataDomain, ContractTransactionReceipt } from 'ethers';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import { countInstructions, trackReceivedTokenAndTx } from '../../src/utils';
@@ -88,7 +88,7 @@ describe('SafeERC20', function () {
         const wrapper = await SafeERC20Wrapper.deploy(token);
         await wrapper.waitForDeployment();
 
-        const chainId = await token.getChainId();
+        const chainId = await getChainId();
 
         const domain = {
             name: 'ERC20PermitNoRevertMock',

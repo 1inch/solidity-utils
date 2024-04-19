@@ -143,10 +143,6 @@ contract ERC20PermitNoRevertMock is
     ERC20("ERC20PermitNoRevertMock", "ERC20PermitNoRevertMock"),
     ERC20Permit("ERC20PermitNoRevertMock")
 {
-    function getChainId() external view returns (uint256) {
-        return block.chainid;
-    }
-
     function permitThatMayRevert(
         address owner,
         address spender,
