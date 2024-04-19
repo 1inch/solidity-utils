@@ -125,7 +125,17 @@ abstract contract BySig is Context, EIP712 {
         if (!ECDSA.recoverOrIsValidSignature(signer, hashBySig(sig), signature)) revert WrongSignature();
 
         _msgSenders.push(signer);
-        ret = address(this).functionDelegateCall(sig.data);
+        bytes calldata data = sig.data;
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            let ptr := mload(0x40)
+            calldatacopy(ptr, data.offset, data.length)
+            pop(delegatecall(gas(), address(), ptr, data.length, 0, 0))
+
+            ret := ptr
+            mstore(ret, returndatasize())
+            returndatacopy(add(ret, 0x20), 0, returndatasize())
+            mstore(0x40, add(ret, add(0x20, returndatasize())))
+        }
         _msgSenders.pop();
     }
 
