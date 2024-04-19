@@ -9,6 +9,7 @@ import { BySig } from "../../mixins/BySig.sol";
 
 contract TokenWithBySig is TokenMock, BySig {
     error WrongToken();
+    error SpecialRevertError();
 
     event ChargedSigner(address signer, address relayer, address token, uint256 amount);
 
@@ -17,6 +18,10 @@ contract TokenWithBySig is TokenMock, BySig {
 
     function _msgSender() internal view override(Context, BySig) returns (address) {
         return BySig._msgSender();
+    }
+
+    function methodWithRevert() public pure {
+        revert SpecialRevertError();
     }
 
     function _chargeSigner(address signer, address relayer, address token, uint256 amount, bytes calldata /* extraData */) internal override {

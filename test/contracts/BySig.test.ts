@@ -183,6 +183,21 @@ describe('BySig', function () {
             expect(await token.balanceOf(alice)).to.be.equal(100);
         });
 
+        it('should not work reply tx if it\'s already reverted', async function () {
+            const { addrs: { bob }, token } = await loadFixture(deployAddressArrayMock);
+            const signedCall = {
+                traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
+                data: token.interface.encodeFunctionData('methodWithRevert', []),
+            };
+            const signature = await bob.signTypedData(
+                { name: 'Token', version: '1', chainId: await getChainId(), verifyingContract: await token.getAddress() },
+                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
+                signedCall
+            );
+            await token.bySig(bob, signedCall, signature);
+            await expect(token.bySig(bob, signedCall, signature)).to.be.revertedWithCustomError(token, 'WrongNonce');
+        });
+
         it('should make approve for sponsored call', async function () {
             const { addrs: { alice, bob }, token } = await loadFixture(deployAddressArrayMock);
             const approveData = token.interface.encodeFunctionData('approve', [alice.address, 100]);
