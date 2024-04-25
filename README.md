@@ -19,7 +19,7 @@ This repository is a comprehensive toolkit designed to streamline and optimize t
 
 - **[Configuration and Management](https://github.com/1inch/solidity-utils/blob/master/docs/js/modules/hardhat_setup.md)**: Tools for setting up Hardhat network configurations and managing project settings efficiently.
 
-- **[Solidity Contracts and Libraries](https://github.com/1inch/solidity-utils/blob/master/docs/contracts/SUMMARY.md)**: Frequently used smart contracts, libraries, and interfaces aimed at providing reusable code for common use cases, alongside optimizations to improve contract efficiency.
+- **[Solidity Contracts and Libraries](https://github.com/1inch/solidity-utils/blob/master/docs/SUMMARY.md)**: Frequently used smart contracts, libraries, and interfaces aimed at providing reusable code for common use cases, alongside optimizations to improve contract efficiency.
 
 ## Contributing
 

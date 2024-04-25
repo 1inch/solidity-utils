@@ -2,8 +2,16 @@ import dotenv from 'dotenv';
 import { ChainConfig } from '@nomicfoundation/hardhat-verify/src/types';
 import { Network, NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
 
-/** @internal */
-export type Etherscan = { apiKey: {[key: string]: string}, customChains: ChainConfig[] };
+/**
+ * @category Hardhat-Setup
+ * @notice Configuration type for managing Etherscan integration in Hardhat setups.
+ * @param apiKey Dictionary of API keys for accessing Etherscan, indexed by network name.
+ * @param customChains Array of custom blockchain network configurations.
+ */
+export type Etherscan = {
+    apiKey: {[key: string]: string},
+    customChains: ChainConfig[],
+};
 
 /**
  * @category Hardhat-Setup
