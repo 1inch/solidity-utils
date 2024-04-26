@@ -18,7 +18,7 @@
     "build": "yarn typechain && cti src hardhat-setup docgen -b && tsc -p tsconfig.publish.json",
     "prepack": "yarn clean && yarn build",
     "coverage": "hardhat coverage",
-    "docgen": "yarn docify:sol && yarn docify:ts",
+    "docgen": "yarn docgen:sol && yarn docgen:ts",
     "docgen:ts": "npx typedoc --options typedoc.json 2>&1 | grep -v \"typechain-types\"",
     "docgen:sol": "yarn hardhat docgen; npx solidity-utils-docify",
     "format": "yarn format-ts && yarn format-sol",
