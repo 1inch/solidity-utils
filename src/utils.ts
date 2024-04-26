@@ -7,7 +7,23 @@ import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
 
 import { constants } from './prelude';
 
-interface DeployContractOptions {
+/**
+ * @category utils
+ * @notice Options for deployment methods.
+ * @param contractName Name of the contract to deploy.
+ * @param constructorArgs Arguments for the contract's constructor.
+ * @param deployments Deployment facilitator object from Hardhat.
+ * @param deployer Wallet deploying the contract.
+ * @param deploymentName Optional custom name for deployment.
+ * @param skipVerify Skips Etherscan verification if true.
+ * @param skipIfAlreadyDeployed Avoids redeployment if contract already deployed.
+ * @param gasPrice Gas strategy option.
+ * @param maxPriorityFeePerGas Gas strategy option.
+ * @param maxFeePerGas Gas strategy option.
+ * @param log Toggles deployment logging.
+ * @param waitConfirmations Number of confirmations to wait based on network. Ussually it's need for waiting before Etherscan verification.
+ */
+export interface DeployContractOptions {
     contractName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructorArgs?: any[];
@@ -26,32 +42,31 @@ interface DeployContractOptions {
 /**
  * @category utils
  * @notice Deploys a contract with optional Etherscan verification.
- * @param contractName Name of the contract to deploy.
- * @param constructorArgs Arguments for the contract's constructor.
- * @param deployments Deployment facilitator object from Hardhat.
- * @param deployer Address deploying the contract.
- * @param deploymentName Optional custom name for deployment; defaults to contract name.
- * @param skipVerify Skips Etherscan verification if true.
- * @param skipIfAlreadyDeployed Avoids redeployment if contract already deployed.
- * @param gasPrice, maxPriorityFeePerGas, maxFeePerGas Gas strategy options.
- * @param log Toggles deployment logging.
- * @param waitConfirmations Number of confirmations to wait based on network. Ussually it's need for waiting before Etherscan verification.
+ * @param options Deployment options. Default values:
+ *    - deploymentName: contractName
+ *    - skipVerify: false
+ *    - skipIfAlreadyDeployed: true
+ *    - log: true
+ *    - waitConfirmations: 1 on dev chains, 6 on others
  * @returns The deployed contract instance.
  */
-export async function deployAndGetContract({
-    contractName,
-    constructorArgs,
-    deployments,
-    deployer,
-    deploymentName = contractName,
-    skipVerify = false,
-    skipIfAlreadyDeployed = true,
-    gasPrice,
-    maxPriorityFeePerGas,
-    maxFeePerGas,
-    log = true,
-    waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1 : 6,
-}: DeployContractOptions): Promise<Contract> {
+export async function deployAndGetContract(options: DeployContractOptions): Promise<Contract> {
+    // Set default values for options
+    const {
+        contractName,
+        constructorArgs,
+        deployments,
+        deployer,
+        deploymentName = contractName,
+        skipVerify = false,
+        skipIfAlreadyDeployed = true,
+        gasPrice,
+        maxPriorityFeePerGas,
+        maxFeePerGas,
+        log = true,
+        waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1 : 6,
+    } = options;
+
     /**
      * Deploys contract and tries to verify it on Etherscan if requested.
      * @remarks
@@ -126,12 +141,27 @@ export async function deployContractFromBytecode(abi: any[], bytecode: BytesLike
     return instance;
 }
 
-type Token = {
+/**
+ * @category utils
+ * Represents the interface for a token, providing methods to fetch its balance and address.
+ * This type is used in `trackReceivedTokenAndTx` method.
+ * @param balanceOf Method which retrieves the balance of the specified address.
+ * @param getAddress Method which retrieves the token contract's address.
+ */
+export type Token = {
     balanceOf: (address: string) => Promise<bigint>;
     getAddress: () => Promise<string>;
 }
 
-type TrackReceivedTokenAndTxResult = [bigint, ContractTransactionReceipt | TrackReceivedTokenAndTxResult];
+/**
+ * @category utils
+ * @notice Represents a tuple containing a token quantity and either a transaction receipt or a recursive instance of the same tuple type.
+ * This type is used in `trackReceivedTokenAndTx` method to track token transfers and their transaction receipts in a nested structure,
+ * allowing for handling of complex scenarios like chained or batched transactions and tracking several tokens.
+ *  - result[0]: The amount of the token received.
+ *  - result[1]: The transaction receipt or another nested token tracking result.
+ */
+export type TrackReceivedTokenAndTxResult = [bigint, ContractTransactionReceipt | TrackReceivedTokenAndTxResult];
 
 /**
  * @category utils

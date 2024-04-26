@@ -47,17 +47,17 @@ See the [README](https://github.com/1inch/solidity-utils/tree/master/hardhat-set
 
 #### Defined in
 
-[hardhat-setup/networks.ts:67](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L67)
+[hardhat-setup/networks.ts:75](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L75)
 
 ## Properties
 
 ### etherscan
 
-• **etherscan**: `Etherscan`
+• **etherscan**: [`Etherscan`](../modules/hardhat_setup.md#etherscan)
 
 #### Defined in
 
-[hardhat-setup/networks.ts:65](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L65)
+[hardhat-setup/networks.ts:73](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L73)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:64](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L64)
+[hardhat-setup/networks.ts:72](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L72)
 
 ## Methods
 
@@ -93,7 +93,7 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:88](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L88)
+[hardhat-setup/networks.ts:96](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L96)
 
 ___
 
@@ -107,12 +107,12 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `etherscan` | `Etherscan` |
+| `etherscan` | [`Etherscan`](../modules/hardhat_setup.md#etherscan) |
 | `networks` | `NetworksUserConfig` |
 
 #### Defined in
 
-[hardhat-setup/networks.ts:131](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L131)
+[hardhat-setup/networks.ts:139](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L139)
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:105](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L105)
+[hardhat-setup/networks.ts:113](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L113)
 
 ___
 
@@ -165,4 +165,4 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:112](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L112)
+[hardhat-setup/networks.ts:120](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L120)

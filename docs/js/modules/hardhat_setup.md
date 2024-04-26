@@ -8,6 +8,10 @@
 
 - [Networks](../classes/hardhat_setup.Networks.md)
 
+### Type Aliases
+
+- [Etherscan](hardhat_setup.md#etherscan)
+
 ### Functions
 
 - [getNetwork](hardhat_setup.md#getnetwork)
@@ -15,6 +19,35 @@
 - [resetHardhatNetworkFork](hardhat_setup.md#resethardhatnetworkfork)
 
 ## Hardhat-Setup
+
+### Etherscan
+
+Ƭ **Etherscan**: `Object`
+
+**`Notice`**
+
+Configuration type for managing Etherscan integration in Hardhat setups.
+
+**`Param`**
+
+Dictionary of API keys for accessing Etherscan, indexed by network name.
+
+**`Param`**
+
+Array of custom blockchain network configurations.
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `apiKey` | \{ `[key: string]`: `string`;  } |
+| `customChains` | `ChainConfig`[] |
+
+#### Defined in
+
+[hardhat-setup/networks.ts:11](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L11)
+
+___
 
 ### getNetwork
 
@@ -32,7 +65,7 @@ A helper method to get the network name from the command line arguments.
 
 #### Defined in
 
-[hardhat-setup/networks.ts:13](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L13)
+[hardhat-setup/networks.ts:21](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L21)
 
 ___
 
@@ -63,7 +96,7 @@ A helper method to parse RPC configuration strings. Checks that the string is in
 
 #### Defined in
 
-[hardhat-setup/networks.ts:24](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L24)
+[hardhat-setup/networks.ts:32](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L32)
 
 ___
 
@@ -88,4 +121,4 @@ A helper method to reset the Hardhat network to the local network or to a fork.
 
 #### Defined in
 
-[hardhat-setup/networks.ts:38](https://github.com/1inch/solidity-utils/blob/5a4227e/hardhat-setup/networks.ts#L38)
+[hardhat-setup/networks.ts:46](https://github.com/1inch/solidity-utils/blob/cdb7d95/hardhat-setup/networks.ts#L46)
