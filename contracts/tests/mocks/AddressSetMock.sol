@@ -17,6 +17,10 @@ contract AddressSetMock {
         return AddressSet.at(_self, index);
     }
 
+    function unsafeAt(uint256 index) external view returns (address) {
+        return AddressSet.unsafeAt(_self, index);
+    }
+
     function contains(address item) external view returns (bool) {
         return AddressSet.contains(_self, item);
     }

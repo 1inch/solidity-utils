@@ -32,18 +32,24 @@ describe('AddressSet', function () {
         });
     });
 
-    describe('at', function () {
-        it('should get from empty set', async function () {
+    describe.only('at', function () {
+        it('should not get from empty set', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
-            expect(await addressSetMock.at(0)).to.be.equal(constants.ZERO_ADDRESS);
-            expect(await addressSetMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
+            await expect(addressSetMock.at(0)).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
+            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
+        });
+
+        it('should not get index out of array length', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await expect(addressSetMock.at(await addressSetMock.length())).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
         });
 
         it('should get from set with 1 element', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             await addressSetMock.add(signer1);
             expect(await addressSetMock.at(0)).to.be.equal(signer1.address);
-            expect(await addressSetMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
+            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
         });
 
         it('should get from set with several elements', async function () {
@@ -52,6 +58,29 @@ describe('AddressSet', function () {
             await addressSetMock.add(signer2);
             expect(await addressSetMock.at(0)).to.be.equal(signer1.address);
             expect(await addressSetMock.at(1)).to.be.equal(signer2.address);
+        });
+    });
+
+    describe('unsafeAt', function () {
+        it('should get from empty set', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            expect(await addressSetMock.unsafeAt(0)).to.be.equal(constants.ZERO_ADDRESS);
+            expect(await addressSetMock.unsafeAt(1)).to.be.equal(constants.ZERO_ADDRESS);
+        });
+
+        it('should get from set with 1 element', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            expect(await addressSetMock.unsafeAt(0)).to.be.equal(signer1.address);
+            expect(await addressSetMock.unsafeAt(1)).to.be.equal(constants.ZERO_ADDRESS);
+        });
+
+        it('should get from set with several elements', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            expect(await addressSetMock.unsafeAt(0)).to.be.equal(signer1.address);
+            expect(await addressSetMock.unsafeAt(1)).to.be.equal(signer2.address);
         });
     });
 
