@@ -10,6 +10,7 @@ Utilizes the AddressArray library for underlying data storage.
 ### Functions list
 - [length(s) internal](#length)
 - [at(s, index) internal](#at)
+- [unsafeAt(s, index) internal](#unsafeat)
 - [contains(s, item) internal](#contains)
 - [get(s) internal](#get)
 - [get(s, input) internal](#get)
@@ -56,6 +57,26 @@ Determines the number of addresses in the set.
 function at(struct AddressSet.Data s, uint256 index) internal view returns (address)
 ```
 Retrieves the address at a specified index in the set.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| s | struct AddressSet.Data | The set of addresses. |
+| index | uint256 | The index of the address to retrieve. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+[0] | address | The address at the specified index. |
+
+### unsafeAt
+
+```solidity
+function unsafeAt(struct AddressSet.Data s, uint256 index) internal view returns (address)
+```
+Retrieves the address at a specified index in the set without bounds checking.
 
 #### Parameters
 

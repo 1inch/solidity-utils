@@ -11,6 +11,7 @@ _This library provides basic functionalities such as push, pop, set, and retriev
 ### Functions list
 - [length(self) internal](#length)
 - [at(self, i) internal](#at)
+- [unsafeAt(self, i) internal](#unsafeat)
 - [get(self) internal](#get)
 - [get(self, input) internal](#get)
 - [push(self, account) internal](#push)
@@ -61,6 +62,26 @@ Returns the number of addresses stored in the array.
 function at(struct AddressArray.Data self, uint256 i) internal view returns (address)
 ```
 Retrieves the address at a specified index in the array.
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| self | struct AddressArray.Data | The instance of the Data struct. |
+| i | uint256 | The index to retrieve the address from. |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+[0] | address | The address stored at the specified index. |
+
+### unsafeAt
+
+```solidity
+function unsafeAt(struct AddressArray.Data self, uint256 i) internal view returns (address)
+```
+Retrieves the address at a specified index in the array without bounds checking.
 
 #### Parameters
 
