@@ -43,6 +43,16 @@ library AddressSet {
     }
 
     /**
+     * @notice Retrieves the address at a specified index in the set without bounds checking.
+     * @param s The set of addresses.
+     * @param index The index of the address to retrieve.
+     * @return The address at the specified index.
+     */
+    function unsafeAt(Data storage s, uint256 index) internal view returns (address) {
+        return s.items.unsafeAt(index);
+    }
+
+    /**
      * @notice Checks if the set contains the specified address.
      * @param s The set of addresses.
      * @param item The address to check for.
