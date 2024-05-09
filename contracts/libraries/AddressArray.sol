@@ -46,7 +46,7 @@ library AddressArray {
     }
 
     /**
-     * @notice Retrieves the address at a specified index in the array.
+     * @notice Retrieves the address at a specified index in the array. Reverts if the index is out of bounds.
      * @param self The instance of the Data struct.
      * @param i The index to retrieve the address from.
      * @return The address stored at the specified index.

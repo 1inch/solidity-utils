@@ -61,7 +61,7 @@ Returns the number of addresses stored in the array.
 ```solidity
 function at(struct AddressArray.Data self, uint256 i) internal view returns (address)
 ```
-Retrieves the address at a specified index in the array.
+Retrieves the address at a specified index in the array. Reverts if the index is out of bounds.
 
 #### Parameters
 

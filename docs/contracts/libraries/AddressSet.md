@@ -56,7 +56,7 @@ Determines the number of addresses in the set.
 ```solidity
 function at(struct AddressSet.Data s, uint256 index) internal view returns (address)
 ```
-Retrieves the address at a specified index in the set.
+Retrieves the address at a specified index in the set. Reverts if the index is out of bounds.
 
 #### Parameters
 

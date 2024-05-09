@@ -33,7 +33,7 @@ library AddressSet {
     }
 
     /**
-     * @notice Retrieves the address at a specified index in the set.
+     * @notice Retrieves the address at a specified index in the set. Reverts if the index is out of bounds.
      * @param s The set of addresses.
      * @param index The index of the address to retrieve.
      * @return The address at the specified index.
