@@ -35,17 +35,22 @@ describe('AddressArray', function () {
     });
 
     describe('at', function () {
-        it('should get from empty array', async function () {
+        it('should not get from empty array', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
-            expect(await addressArrayMock.at(0)).to.be.equal(constants.ZERO_ADDRESS);
-            expect(await addressArrayMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
+            await expect(addressArrayMock.at(0)).to.be.revertedWithCustomError(addressArrayMock, 'IndexOutOfBounds');
+        });
+
+        it('should not get index out of array length', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            await expect(addressArrayMock.at(await addressArrayMock.length())).to.be.revertedWithCustomError(addressArrayMock, 'IndexOutOfBounds');
         });
 
         it('should get from array with 1 element', async function () {
             const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             expect(await addressArrayMock.at(0)).to.be.equal(signer1.address);
-            expect(await addressArrayMock.at(1)).to.be.equal(constants.ZERO_ADDRESS);
+            await expect(addressArrayMock.at(1)).to.be.revertedWithCustomError(addressArrayMock, 'IndexOutOfBounds');
         });
 
         it('should get from array with several elements', async function () {
@@ -54,6 +59,29 @@ describe('AddressArray', function () {
             await addressArrayMock.push(signer2);
             expect(await addressArrayMock.at(0)).to.be.equal(signer1.address);
             expect(await addressArrayMock.at(1)).to.be.equal(signer2.address);
+        });
+    });
+
+    describe('unsafeAt', function () {
+        it('should get from empty array', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            expect(await addressArrayMock.unsafeAt(0)).to.be.equal(constants.ZERO_ADDRESS);
+            expect(await addressArrayMock.unsafeAt(1)).to.be.equal(constants.ZERO_ADDRESS);
+        });
+
+        it('should get from array with 1 element', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            expect(await addressArrayMock.unsafeAt(0)).to.be.equal(signer1.address);
+            expect(await addressArrayMock.unsafeAt(1)).to.be.equal(constants.ZERO_ADDRESS);
+        });
+
+        it('should get from array with several elements', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            await addressArrayMock.push(signer2);
+            expect(await addressArrayMock.unsafeAt(0)).to.be.equal(signer1.address);
+            expect(await addressArrayMock.unsafeAt(1)).to.be.equal(signer2.address);
         });
     });
 

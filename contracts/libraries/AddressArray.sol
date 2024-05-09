@@ -46,12 +46,23 @@ library AddressArray {
     }
 
     /**
-     * @notice Retrieves the address at a specified index in the array.
+     * @notice Retrieves the address at a specified index in the array. Reverts if the index is out of bounds.
      * @param self The instance of the Data struct.
      * @param i The index to retrieve the address from.
      * @return The address stored at the specified index.
      */
     function at(Data storage self, uint256 i) internal view returns (address) {
+        if (length(self) <= i) revert IndexOutOfBounds();
+        return address(uint160(self._raw[i] & _ADDRESS_MASK));
+    }
+
+    /**
+     * @notice Retrieves the address at a specified index in the array without bounds checking.
+     * @param self The instance of the Data struct.
+     * @param i The index to retrieve the address from.
+     * @return The address stored at the specified index.
+     */
+    function unsafeAt(Data storage self, uint256 i) internal view returns (address) {
         if (i >= 1 << 32) revert IndexOutOfBounds();
         return address(uint160(self._raw[i] & _ADDRESS_MASK));
     }

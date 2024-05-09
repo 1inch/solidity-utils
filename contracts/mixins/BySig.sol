@@ -197,7 +197,7 @@ abstract contract BySig is Context, EIP712 {
         if (length == 0) {
             return super._msgSender();
         }
-        return _msgSenders.at(length - 1);
+        return _msgSenders.unsafeAt(length - 1);
     }
 
     function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool) {

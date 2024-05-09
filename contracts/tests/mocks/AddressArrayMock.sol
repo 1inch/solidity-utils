@@ -19,6 +19,10 @@ contract AddressArrayMock {
         return AddressArray.at(_self, i);
     }
 
+    function unsafeAt(uint256 i) external view returns (address) {
+        return AddressArray.unsafeAt(_self, i);
+    }
+
     function get() external view returns (address[] memory arr) {
         return AddressArray.get(_self);
     }
