@@ -32,7 +32,7 @@ describe('AddressSet', function () {
         });
     });
 
-    describe.only('at', function () {
+    describe('at', function () {
         it('should not get from empty set', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             await expect(addressSetMock.at(0)).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
