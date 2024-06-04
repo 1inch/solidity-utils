@@ -32,7 +32,7 @@ describe('BySigTraits', function () {
 
         it('should revert with unsupported nonce', async function () {
             const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
-            const value = buildBySigTraits({ nonceType: 3 });
+            const value = buildBySigTraits({ nonceType: 3 as NonceType });
             await expect(bySigTraitsMock.nonceType(value)).to.be.revertedWithCustomError(bySigTraitsMock, 'WrongNonceType');
         });
     });
