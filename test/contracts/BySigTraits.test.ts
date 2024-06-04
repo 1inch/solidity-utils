@@ -2,37 +2,7 @@ import { constants } from '../../src/prelude';
 import { expect } from '../../src/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
-
-export const NonceType = {
-    Account: 0,
-    Selector: 1,
-    Unique: 2,
-};
-
-export function buildBySigTraits({
-    nonceType = 0,
-    deadline = 0,
-    relayer = constants.ZERO_ADDRESS.toString(),
-    nonce = 0,
-} = {}): bigint {
-    if (nonceType > 3) {
-        throw new Error('Wrong nonce type, it should be less than 4');
-    }
-    if (deadline > 0xffffffffff) {
-        throw new Error('Wrong deadline, it should be less than 0xffffffff');
-    }
-    if (relayer.length > 42) {
-        throw new Error('Wrong relayer address, it should be less than 42 symbols');
-    }
-    if (nonce > 0xffffffffffffffffffffffffffffffffn) {
-        throw new Error('Wrong nonce, it should not be more than 128 bits');
-    }
-
-    return (BigInt(nonceType) << 254n) +
-            (BigInt(deadline) << 208n) +
-            ((BigInt(relayer) & 0xffffffffffffffffffffn) << 128n) +
-            BigInt(nonce);
-}
+import { NonceType, buildBySigTraits } from '../../src/bySig';
 
 describe('BySigTraits', function () {
     async function deployAddressArrayMock() {
