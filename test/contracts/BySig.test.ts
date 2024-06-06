@@ -2,34 +2,19 @@ import { constants } from '../../src/prelude';
 import { expect } from '../../src/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
-import { NonceType, buildBySigTraits } from './BySigTraits.test';
-
-interface SignedCallStruct {
-    traits: bigint;
-    data: string;
-}
-
-function hashBySig(name: string, version: string, chainId: bigint, verifyingContract: string, sig: SignedCallStruct): string {
-    const domain = { name, version, chainId, verifyingContract };
-    const types = {
-        SignedCall: [
-            { name: 'traits', type: 'uint256' },
-            { name: 'data', type: 'bytes' },
-        ],
-    };
-    return ethers.TypedDataEncoder.hash(domain, types, sig);
-}
+import { NonceType, buildBySigTraits, hashBySig, signSignedCall } from '../../src/bySig';
 
 describe('BySig', function () {
     async function deployAddressArrayMock() {
         const [alice, bob, carol] = await ethers.getSigners();
-        const eip712Version = '1';
+        const version = '1';
+        const name = 'Token';
         const TokenWithBySig = await ethers.getContractFactory('TokenWithBySig');
-        const token = await TokenWithBySig.deploy('Token', 'TKN', eip712Version);
+        const token = await TokenWithBySig.deploy(name, 'TKN', version);
 
         await token.mint(bob.address, 1000);
 
-        return { addrs: { alice, bob, carol }, token, eip712Version };
+        return { addrs: { alice, bob, carol }, token, eip712: { name, version } };
     }
 
     describe('bySigAccountNonces and useBySigAccountNonce', function () {
@@ -83,12 +68,12 @@ describe('BySig', function () {
 
     describe('hashBySig', function () {
         it('should return correct hash', async function () {
-            const { token, eip712Version } = await loadFixture(deployAddressArrayMock);
+            const { token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
             const sig = {
                 traits: buildBySigTraits(),
                 data: '0x',
             };
-            expect(await token.hashBySig(sig)).to.be.equal(hashBySig(await token.name(), eip712Version, await token.getChainId(), await token.getAddress(), sig));
+            expect(await token.hashBySig(sig)).to.be.equal(hashBySig(name, version, await token.getChainId(), await token.getAddress(), sig));
         });
     });
 
@@ -152,30 +137,22 @@ describe('BySig', function () {
         });
 
         it('should revert with wrong signature', async function () {
-            const { addrs: { alice, bob }, token } = await loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
             const signedCall = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('transfer', [alice.address, 100]),
             };
-            const signature = await alice.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
-                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
-                signedCall
-            );
+            const signature = await signSignedCall(name, version, await token.getChainId(), await token.getAddress(), alice, signedCall);
             await expect(token.bySig(bob, signedCall, signature)).to.be.revertedWithCustomError(token, 'WrongSignature');
         });
 
         it('should work for transfer method', async function () {
-            const { addrs: { alice, bob }, token } = await loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
             const signedCall = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('transfer', [alice.address, 100]),
             };
-            const signature = await bob.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
-                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
-                signedCall
-            );
+            const signature = await signSignedCall(name, version, await token.getChainId(), await token.getAddress(), bob, signedCall);
             await expect(token.bySig(bob, signedCall, signature))
                 .to.emit(token, 'Transfer')
                 .withArgs(bob.address, alice.address, 100);
@@ -184,17 +161,13 @@ describe('BySig', function () {
         });
 
         it('should make approve for sponsored call', async function () {
-            const { addrs: { alice, bob }, token } = await loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
             const approveData = token.interface.encodeFunctionData('approve', [alice.address, 100]);
             const signedCall = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', approveData, '0x']),
             };
-            const signature = await bob.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
-                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
-                signedCall
-            );
+            const signature = await signSignedCall(name, version, await token.getChainId(), await token.getAddress(), bob, signedCall);
             expect(await token.allowance(bob.address, alice.address)).to.be.equal(0);
             await expect(token.bySig(bob, signedCall, signature))
                 .to.emit(token, 'ChargedSigner')
@@ -203,29 +176,21 @@ describe('BySig', function () {
         });
 
         it('should work recursively', async function () {
-            const { addrs: { alice, bob, carol }, token } = await loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob, carol }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
 
             // Bob sign for Carol
             const bobSignedCall = {
                 traits: buildBySigTraits({ relayer: carol.address, deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('transfer', [carol.address, 100]),
             };
-            const bobSignature = await bob.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
-                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
-                bobSignedCall
-            );
+            const bobSignature = await signSignedCall(name, version, await token.getChainId(), await token.getAddress(), bob, bobSignedCall);
 
             // Carol sign for Alice
             const carolSignedCall = {
                 traits: buildBySigTraits({ relayer: alice.address, deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('bySig', [bob.address, bobSignedCall, bobSignature]),
             };
-            const carolSignature = await carol.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
-                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
-                carolSignedCall
-            );
+            const carolSignature = await signSignedCall(name, version, await token.getChainId(), await token.getAddress(), carol, carolSignedCall);
 
             await expect(token.bySig(carol, carolSignedCall, carolSignature))
                 .to.emit(token, 'Transfer')
@@ -235,7 +200,7 @@ describe('BySig', function () {
         });
 
         it('should work recursively for sponsored call', async function () {
-            const { addrs: { alice, bob, carol }, token } = await loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob, carol }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
 
             // Bob sign for Carol
             const approveData = token.interface.encodeFunctionData('approve', [carol.address, 100]);
@@ -243,11 +208,7 @@ describe('BySig', function () {
                 traits: buildBySigTraits({ relayer: carol.address, deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', approveData, '0x']),
             };
-            const bobSignature = await bob.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
-                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
-                bobSignedCall
-            );
+            const bobSignature = await signSignedCall(name, version, await token.getChainId(), await token.getAddress(), bob, bobSignedCall);
 
             // Carol sign for Alice
             const carolSigByData = token.interface.encodeFunctionData('bySig', [bob.address, bobSignedCall, bobSignature]);
@@ -255,11 +216,7 @@ describe('BySig', function () {
                 traits: buildBySigTraits({ relayer: alice.address, deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('sponsoredCall', [await token.getAddress(), '0', carolSigByData, '0x']),
             };
-            const carolSignature = await carol.signTypedData(
-                { name: 'Token', version: '1', chainId: await token.getChainId(), verifyingContract: await token.getAddress() },
-                { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
-                carolSignedCall
-            );
+            const carolSignature = await signSignedCall(name, version, await token.getChainId(), await token.getAddress(), carol, carolSignedCall);
 
             expect(await token.allowance(bob.address, carol.address)).to.be.equal(0);
             await expect(token.bySig(carol, carolSignedCall, carolSignature))
