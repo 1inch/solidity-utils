@@ -1,11 +1,15 @@
 import { ether, time, constants } from '../src/prelude';
-import { timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx, countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode, getEthPrice } from '../src/utils';
+import {
+    timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx,
+    countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode,
+    getEthPrice, deployAndGetContractWithCreate3, saveContractWithCreate3Deployment,
+} from '../src/utils';
 import { expect } from '../src/expect';
 import hre, { deployments, ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog, ContractTransactionReceipt } from 'ethers';
-import { TokenMock, WETH } from '../typechain-types';
+import { Create3Mock, TokenMock, WETH } from '../typechain-types';
 
 describe('timeIncreaseTo', function () {
     const precision = 2;
@@ -202,7 +206,6 @@ describe('utils', function () {
     describe('deployAndGetContract', function () {
         it('should deploy new contract instance', async function () {
             const tokenName = 'SomeToken';
-            // If hardhat-deploy `deploy` function logs need to be displayed, add HARDHAT_DEPLOY_LOG = 'true' to the .env file
             const token = await deployAndGetContract({
                 contractName: 'TokenMock',
                 constructorArgs: [tokenName, 'STM'],
@@ -213,6 +216,58 @@ describe('utils', function () {
             });
             expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
             expect(await token.name()).to.be.eq(tokenName);
+        }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
+    });
+
+    describe('deployAndGetContractWithCreate3', function () {
+        it('should deploy new contract instance to the pre-known address', async function () {
+            const create3Deployer = await deployContract('Create3Mock') as Create3Mock;
+            const salt = ethers.keccak256(ethers.toUtf8Bytes('SOME SALT HERE'));
+            const tokenName = 'SomeToken';
+            const token = await deployAndGetContractWithCreate3({
+                create3Deployer: await create3Deployer.getAddress(),
+                salt,
+                contractName: 'TokenMock',
+                constructorArgs: [tokenName, 'STM'],
+                deployments,
+                skipVerify: true,
+            });
+            expect(await create3Deployer.addressOf(salt)).to.be.eq(await token.getAddress());
+            expect(await token.name()).to.be.eq(tokenName);
+            expect(await deployments.get('TokenMock')).to.deep.include({
+                address: await token.getAddress(),
+                args: [tokenName, 'STM'],
+                abi: (await hre.artifacts.readArtifact('TokenMock')).abi,
+                bytecode: (await hre.artifacts.readArtifact('TokenMock')).bytecode,
+            });
+        }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
+    });
+
+    describe('saveContractWithCreate3Deployment', function () {
+        it('should save deployment by tx hash', async function () {
+            const create3Deployer = await deployContract('Create3Mock') as Create3Mock;
+            const salt = ethers.keccak256(ethers.toUtf8Bytes('SOME SALT HERE 2'));
+            const tokenName = 'SomeToken';
+            await deployAndGetContractWithCreate3({
+                create3Deployer: await create3Deployer.getAddress(),
+                salt,
+                contractName: 'TokenMock',
+                constructorArgs: [tokenName, 'STM'],
+                deployments,
+                skipVerify: true,
+            });
+
+            await saveContractWithCreate3Deployment(
+                ethers.provider,
+                deployments,
+                'TokenMock',
+                'Test',
+                [tokenName, 'STM'],
+                salt,
+                await create3Deployer.getAddress(),
+                (await deployments.get('TokenMock'))?.transactionHash || '',
+            );
+            expect({ ...await deployments.get('Test'), numDeployments: 1 }).to.deep.include({ ...await deployments.get('TokenMock'), numDeployments: 1 });
         }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
     });
 

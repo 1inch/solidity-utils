@@ -54,6 +54,7 @@
     "node-fetch": "2.7.0"
   },
   "devDependencies": {
+    "@0xsequence/create3": "0xsequence/create3",
     "@nomicfoundation/hardhat-chai-matchers": "2.0.6",
     "@typechain/ethers-v6": "0.5.1",
     "@typechain/hardhat": "9.1.0",
