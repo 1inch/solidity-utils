@@ -41,6 +41,13 @@ export interface DeployContractOptions {
     waitConfirmations?: number;
 }
 
+/**
+ * @category utils
+ * @notice Options for deployment methods with create3. This is an extension of DeployContractOptions without `deployer` and `skipIfAlreadyDeployed`.
+ * @param txSigner Signer object to sign the deployment transaction.
+ * @param create3Deployer Address of the create3 deployer contract.
+ * @param salt Salt value for create3 deployment.
+ */
 interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer' | 'skipIfAlreadyDeployed'> {
     txSigner?: Wallet | SignerWithAddress,
     create3Deployer: string,
@@ -109,6 +116,17 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
     return await ethers.getContractAt(contractName, deployResult.address);
 }
 
+/**
+ * @category utils
+ * @notice Deploys a contract using create3 and saves the deployment information.
+ * @param options Deployment options. Default values:
+ *    - constructorArgs: []
+ *    - txSigner: first signer in the environment
+ *    - deploymentName: contractName
+ *    - skipVerify: false
+ *    - waitConfirmations: 1 on dev chains, 6 on others
+ * @returns The deployed contract instance.
+ */
 export async function deployAndGetContractWithCreate3(
     options: DeployContractOptionsWithCreate3,
 ): Promise<Contract> {
@@ -153,6 +171,20 @@ export async function deployAndGetContractWithCreate3(
     );
 }
 
+/**
+ * @category utils
+ * @notice Saves the deployment information using the deploy transaction hash.
+ * @param provider JSON RPC provider or Hardhat Ethers Provider.
+ * @param deployments Deployment facilitator object from Hardhat.
+ * @param contractName Name of the contract to deploy.
+ * @param deploymentName Optional custom name for deployment.
+ * @param constructorArgs Arguments for the contract's constructor.
+ * @param salt Salt value for create3 deployment.
+ * @param create3Deployer Address of the create3 deployer contract.
+ * @param deployTxHash Transaction hash of the create3 deployment.
+ * @param skipVerify Skips Etherscan verification if true.
+ * @returns The deployed contract instance.
+ */
 export async function saveContractWithCreate3Deployment(
     provider: JsonRpcProvider | HardhatEthersProvider,
     deployments: DeploymentsExtension,
