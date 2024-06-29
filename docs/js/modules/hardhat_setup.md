@@ -45,7 +45,7 @@ Array of custom blockchain network configurations.
 
 #### Defined in
 
-[hardhat-setup/networks.ts:11](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L11)
+[hardhat-setup/networks.ts:11](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L11)
 
 ___
 
@@ -65,7 +65,7 @@ A helper method to get the network name from the command line arguments.
 
 #### Defined in
 
-[hardhat-setup/networks.ts:21](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L21)
+[hardhat-setup/networks.ts:21](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L21)
 
 ___
 
@@ -96,7 +96,7 @@ A helper method to parse RPC configuration strings. Checks that the string is in
 
 #### Defined in
 
-[hardhat-setup/networks.ts:32](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L32)
+[hardhat-setup/networks.ts:32](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L32)
 
 ___
 
@@ -121,4 +121,4 @@ A helper method to reset the Hardhat network to the local network or to a fork.
 
 #### Defined in
 
-[hardhat-setup/networks.ts:46](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L46)
+[hardhat-setup/networks.ts:46](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L46)
