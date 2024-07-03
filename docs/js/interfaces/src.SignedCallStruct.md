@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[src/bySig.ts:51](https://github.com/1inch/solidity-utils/blob/99d1aa1/src/bySig.ts#L51)
+[src/bySig.ts:51](https://github.com/1inch/solidity-utils/blob/2e247c2/src/bySig.ts#L51)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[src/bySig.ts:50](https://github.com/1inch/solidity-utils/blob/99d1aa1/src/bySig.ts#L50)
+[src/bySig.ts:50](https://github.com/1inch/solidity-utils/blob/2e247c2/src/bySig.ts#L50)
