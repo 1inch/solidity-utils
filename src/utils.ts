@@ -8,6 +8,7 @@ import { DeployOptions, DeployResult, Deployment, DeploymentsExtension, Receipt 
 
 import { constants } from './prelude';
 import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider';
+import { ICreate3Deployer } from '../typechain-types';
 
 /**
  * @category utils
@@ -146,7 +147,7 @@ export async function deployAndGetContractWithCreate3(
         waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1 : 6,
     } = options;
 
-    const deployer = await ethers.getContractAt('ICreate3Deployer', create3Deployer);
+    const deployer = await ethers.getContractAt('ICreate3Deployer', create3Deployer) as unknown as ICreate3Deployer;
     const CustomContract = await ethers.getContractFactory(contractName);
     const deployData = (await CustomContract.getDeployTransaction(
         ...constructorArgs,
