@@ -1,11 +1,13 @@
 import '@nomicfoundation/hardhat-ethers';  // required to populate the HardhatRuntimeEnvironment with ethers
 import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
+import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import fetch from 'node-fetch';
-import { BaseContract, BigNumberish, BytesLike, Contract, ContractTransactionReceipt, ContractTransactionResponse, JsonRpcProvider, Signer, Wallet } from 'ethers';
-import { DeployOptions, DeployResult } from 'hardhat-deploy/types';
+import { BaseContract, BigNumberish, BytesLike, Contract, ContractTransactionReceipt, ContractTransactionResponse, JsonRpcProvider, Signer, TransactionReceipt, Wallet } from 'ethers';
+import { DeployOptions, DeployResult, Deployment, DeploymentsExtension, Receipt } from 'hardhat-deploy/types';
 
 import { constants } from './prelude';
+import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider';
 
 /**
  * @category utils
@@ -27,7 +29,7 @@ export interface DeployContractOptions {
     contractName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructorArgs?: any[];
-    deployments: { deploy: (name: string, options: DeployOptions) => Promise<DeployResult> },
+    deployments: DeploymentsExtension,
     deployer: string;
     deploymentName?: string;
     skipVerify?: boolean;
@@ -41,8 +43,22 @@ export interface DeployContractOptions {
 
 /**
  * @category utils
+ * @notice Options for deployment methods with create3. This is an extension of DeployContractOptions without `deployer` and `skipIfAlreadyDeployed`.
+ * @param txSigner Signer object to sign the deployment transaction.
+ * @param create3Deployer Address of the create3 deployer contract.
+ * @param salt Salt value for create3 deployment.
+ */
+interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer' | 'skipIfAlreadyDeployed'> {
+    txSigner?: Wallet | SignerWithAddress,
+    create3Deployer: string,
+    salt: string,
+}
+
+/**
+ * @category utils
  * @notice Deploys a contract with optional Etherscan verification.
  * @param options Deployment options. Default values:
+ *    - constructorArgs: []
  *    - deploymentName: contractName
  *    - skipVerify: false
  *    - skipIfAlreadyDeployed: true
@@ -54,7 +70,7 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
     // Set default values for options
     const {
         contractName,
-        constructorArgs,
+        constructorArgs = [],
         deployments,
         deployer,
         deploymentName = contractName,
@@ -86,6 +102,7 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
         log,
         waitConfirmations,
     };
+    // If hardhat-deploy `deploy` function logs need to be displayed, add HARDHAT_DEPLOY_LOG = 'true' to the .env file
     const deployResult: DeployResult = await deploy(deploymentName, deployOptions);
 
     if (!(skipVerify || constants.DEV_CHAINS.includes(hre.network.name))) {
@@ -97,6 +114,119 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
         console.log('Skipping verification');
     }
     return await ethers.getContractAt(contractName, deployResult.address);
+}
+
+/**
+ * @category utils
+ * @notice Deploys a contract using create3 and saves the deployment information.
+ * @param options Deployment options. Default values:
+ *    - constructorArgs: []
+ *    - txSigner: first signer in the environment
+ *    - deploymentName: contractName
+ *    - skipVerify: false
+ *    - waitConfirmations: 1 on dev chains, 6 on others
+ * @returns The deployed contract instance.
+ */
+export async function deployAndGetContractWithCreate3(
+    options: DeployContractOptionsWithCreate3,
+): Promise<Contract> {
+    // Set default values for options
+    const {
+        create3Deployer,
+        salt,
+        contractName,
+        constructorArgs = [],
+        deployments,
+        txSigner = (await ethers.getSigners())[0],
+        deploymentName = contractName,
+        skipVerify = false,
+        gasPrice,
+        maxPriorityFeePerGas,
+        maxFeePerGas,
+        waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1 : 6,
+    } = options;
+
+    const deployer = await ethers.getContractAt('ICreate3Deployer', create3Deployer);
+    const CustomContract = await ethers.getContractFactory(contractName);
+    const deployData = (await CustomContract.getDeployTransaction(
+        ...constructorArgs,
+    )).data;
+
+    const txn = await deployer.connect(txSigner).deploy(salt, deployData, { gasPrice, maxPriorityFeePerGas, maxFeePerGas });
+    const receipt = await txn.wait(waitConfirmations) as TransactionReceipt;
+
+    const customContractAddress = await deployer.addressOf(salt);
+    console.log(`${contractName} deployed to: ${customContractAddress}`);
+
+    return await saveContractWithCreate3Deployment(
+        txSigner.provider as JsonRpcProvider,
+        deployments,
+        contractName,
+        deploymentName,
+        constructorArgs,
+        salt,
+        create3Deployer,
+        receipt.hash,
+        skipVerify,
+    );
+}
+
+/**
+ * @category utils
+ * @notice Saves the deployment information using the deploy transaction hash.
+ * @param provider JSON RPC provider or Hardhat Ethers Provider.
+ * @param deployments Deployment facilitator object from Hardhat.
+ * @param contractName Name of the contract to deploy.
+ * @param deploymentName Optional custom name for deployment.
+ * @param constructorArgs Arguments for the contract's constructor.
+ * @param salt Salt value for create3 deployment.
+ * @param create3Deployer Address of the create3 deployer contract.
+ * @param deployTxHash Transaction hash of the create3 deployment.
+ * @param skipVerify Skips Etherscan verification if true.
+ * @returns The deployed contract instance.
+ */
+export async function saveContractWithCreate3Deployment(
+    provider: JsonRpcProvider | HardhatEthersProvider,
+    deployments: DeploymentsExtension,
+    contractName: string,
+    deploymentName: string,
+    constructorArgs: any[], // eslint-disable-line @typescript-eslint/no-explicit-any
+    salt: string,
+    create3Deployer: string,
+    deployTxHash: string,
+    skipVerify: boolean = false,
+): Promise<Contract> {
+    const deployer = await ethers.getContractAt('ICreate3Deployer', create3Deployer);
+    const contract = await deployer.addressOf(salt);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const receipt = await provider.getTransactionReceipt(deployTxHash) as {[key: string]: any};
+    if (receipt != null) {
+        // conver ethers.TransactionReceipt object to hardhat-deploy.Receipt object
+        receipt.transactionHash = receipt.hash;
+        receipt.transactionIndex = receipt.index;
+        ['provider', 'blobGasPrice', 'type', 'root', 'hash', 'index'].forEach(key => delete receipt[key]);
+    }
+
+    if (!(skipVerify || constants.DEV_CHAINS.includes(hre.network.name))) {
+        await hre.run('verify:verify', {
+            address: contract,
+            constructorArguments: constructorArgs,
+        });
+    } else {
+        console.log('Skipping verification');
+    }
+
+    const ContractArtifact = await deployments.getArtifact(contractName);
+    const ContractDeploymentData = {} as Deployment;
+    ContractDeploymentData.address = contract;
+    ContractDeploymentData.transactionHash = receipt.hash;
+    ContractDeploymentData.receipt = receipt as Receipt;
+    ContractDeploymentData.args = constructorArgs;
+    ContractDeploymentData.abi = ContractArtifact.abi;
+    ContractDeploymentData.bytecode = ContractArtifact.bytecode;
+    ContractDeploymentData.deployedBytecode = ContractArtifact.deployedBytecode;
+    await deployments.save(deploymentName, ContractDeploymentData);
+    return await ethers.getContractAt(contractName, contract);
 }
 
 /**

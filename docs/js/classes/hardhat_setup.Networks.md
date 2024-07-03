@@ -47,7 +47,7 @@ See the [README](https://github.com/1inch/solidity-utils/tree/master/hardhat-set
 
 #### Defined in
 
-[hardhat-setup/networks.ts:75](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L75)
+[hardhat-setup/networks.ts:75](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L75)
 
 ## Properties
 
@@ -57,7 +57,7 @@ See the [README](https://github.com/1inch/solidity-utils/tree/master/hardhat-set
 
 #### Defined in
 
-[hardhat-setup/networks.ts:73](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L73)
+[hardhat-setup/networks.ts:73](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L73)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:72](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L72)
+[hardhat-setup/networks.ts:72](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L72)
 
 ## Methods
 
@@ -93,7 +93,7 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:96](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L96)
+[hardhat-setup/networks.ts:96](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L96)
 
 ___
 
@@ -112,7 +112,7 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:139](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L139)
+[hardhat-setup/networks.ts:139](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L139)
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:113](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L113)
+[hardhat-setup/networks.ts:113](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L113)
 
 ___
 
@@ -165,4 +165,4 @@ ___
 
 #### Defined in
 
-[hardhat-setup/networks.ts:120](https://github.com/1inch/solidity-utils/blob/dc69769/hardhat-setup/networks.ts#L120)
+[hardhat-setup/networks.ts:120](https://github.com/1inch/solidity-utils/blob/99d1aa1/hardhat-setup/networks.ts#L120)
