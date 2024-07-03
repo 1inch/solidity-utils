@@ -46,7 +46,7 @@ export interface DeployContractOptions {
  * @category utils
  * @notice Options for deployment methods with create3. This is an extension of DeployContractOptions without `deployer` and `skipIfAlreadyDeployed`.
  * @param txSigner Signer object to sign the deployment transaction.
- * @param create3Deployer Address of the create3 deployer contract.
+ * @param create3Deployer Address of the create3 deployer contract, which related to `contracts/interfaces/ICreate3Deployer.sol`.
  * @param salt Salt value for create3 deployment.
  */
 interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer' | 'skipIfAlreadyDeployed'> {
