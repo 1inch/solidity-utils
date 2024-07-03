@@ -22,7 +22,7 @@ Enum defining types of nonces.
 
 #### Defined in
 
-[src/bySig.ts:10](https://github.com/1inch/solidity-utils/blob/99d1aa1/src/bySig.ts#L10)
+[src/bySig.ts:10](https://github.com/1inch/solidity-utils/blob/2e247c2/src/bySig.ts#L10)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 #### Defined in
 
-[src/bySig.ts:11](https://github.com/1inch/solidity-utils/blob/99d1aa1/src/bySig.ts#L11)
+[src/bySig.ts:11](https://github.com/1inch/solidity-utils/blob/2e247c2/src/bySig.ts#L11)
 
 ___
 
@@ -42,4 +42,4 @@ ___
 
 #### Defined in
 
-[src/bySig.ts:12](https://github.com/1inch/solidity-utils/blob/99d1aa1/src/bySig.ts#L12)
+[src/bySig.ts:12](https://github.com/1inch/solidity-utils/blob/2e247c2/src/bySig.ts#L12)

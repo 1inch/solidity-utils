@@ -8,6 +8,7 @@ import { DeployOptions, DeployResult, Deployment, DeploymentsExtension, Receipt 
 
 import { constants } from './prelude';
 import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider';
+import { ICreate3Deployer } from '../typechain-types';
 
 /**
  * @category utils
@@ -45,7 +46,7 @@ export interface DeployContractOptions {
  * @category utils
  * @notice Options for deployment methods with create3. This is an extension of DeployContractOptions without `deployer` and `skipIfAlreadyDeployed`.
  * @param txSigner Signer object to sign the deployment transaction.
- * @param create3Deployer Address of the create3 deployer contract.
+ * @param create3Deployer Address of the create3 deployer contract, which related to `contracts/interfaces/ICreate3Deployer.sol`.
  * @param salt Salt value for create3 deployment.
  */
 interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer' | 'skipIfAlreadyDeployed'> {
@@ -146,7 +147,7 @@ export async function deployAndGetContractWithCreate3(
         waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1 : 6,
     } = options;
 
-    const deployer = await ethers.getContractAt('ICreate3Deployer', create3Deployer);
+    const deployer = await ethers.getContractAt('ICreate3Deployer', create3Deployer) as unknown as ICreate3Deployer;
     const CustomContract = await ethers.getContractFactory(contractName);
     const deployData = (await CustomContract.getDeployTransaction(
         ...constructorArgs,
@@ -202,8 +203,8 @@ export async function saveContractWithCreate3Deployment(
     const receipt = await provider.getTransactionReceipt(deployTxHash) as {[key: string]: any};
     if (receipt != null) {
         // conver ethers.TransactionReceipt object to hardhat-deploy.Receipt object
-        receipt.transactionHash = receipt.hash;
-        receipt.transactionIndex = receipt.index;
+        receipt.transactionHash = receipt.transactionHash || receipt.hash;
+        receipt.transactionIndex = receipt.transactionIndex || receipt.index;
         ['provider', 'blobGasPrice', 'type', 'root', 'hash', 'index'].forEach(key => delete receipt[key]);
     }
 
