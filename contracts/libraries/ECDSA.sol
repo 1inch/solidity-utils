@@ -231,7 +231,7 @@ library ECDSA {
         bytes calldata signature
     ) internal view returns (bool success) {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, signature));
-        // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
+        // return success && data.length == 32 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
@@ -297,7 +297,7 @@ library ECDSA {
         bytes32 vs
     ) internal view returns (bool success) {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, abi.encodePacked(r, vs)));
-        // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
+        // return success && data.length == 32 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
@@ -329,7 +329,7 @@ library ECDSA {
         bytes32 vs
     ) internal view returns (bool success) {
         // (bool success, bytes memory data) = signer.staticcall(abi.encodeWithSelector(IERC1271.isValidSignature.selector, hash, abi.encodePacked(r, vs & ~uint256(1 << 255), uint8(vs >> 255))));
-        // return success && data.length >= 4 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
+        // return success && data.length == 32 && abi.decode(data, (bytes4)) == IERC1271.isValidSignature.selector;
         bytes4 selector = IERC1271.isValidSignature.selector;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
