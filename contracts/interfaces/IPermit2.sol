@@ -70,4 +70,15 @@ interface IPermit2 {
      * @return The packed allowance details.
      */
     function allowance(address user, address token, address spender) external view returns (PackedAllowance memory);
+
+    /**
+     * @notice Approves the spender to use up to amount of the specified token up until the expiration
+     * @param token The token to approve
+     * @param spender The spender address to approve
+     * @param amount The approved amount of the token
+     * @param expiration The timestamp at which the approval is no longer valid
+     * @dev The packed allowance also holds a nonce, which will stay unchanged in approve
+     * @dev Setting amount to type(uint160).max sets an unlimited approval
+     */
+    function approve(address token, address spender, uint160 amount, uint48 expiration) external;
 }

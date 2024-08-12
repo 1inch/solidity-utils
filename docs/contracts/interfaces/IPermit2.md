@@ -12,6 +12,7 @@ _Interface for a flexible permit system that extends ERC20 tokens to support per
 - [transferFrom(user, spender, amount, token) external](#transferfrom)
 - [permit(owner, permitSingle, signature) external](#permit)
 - [allowance(user, token, spender) external](#allowance)
+- [approve(token, spender, amount, expiration) external](#approve)
 
 ### Types
 ### PermitDetails
@@ -101,4 +102,23 @@ Retrieves the allowance details between a token owner and spender.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 [0] | struct IPermit2.PackedAllowance | The packed allowance details. |
+
+### approve
+
+```solidity
+function approve(address token, address spender, uint160 amount, uint48 expiration) external
+```
+Approves the spender to use up to amount of the specified token up until the expiration
+
+_The packed allowance also holds a nonce, which will stay unchanged in approve
+Setting amount to type(uint160).max sets an unlimited approval_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | address | The token to approve |
+| spender | address | The spender address to approve |
+| amount | uint160 | The approved amount of the token |
+| expiration | uint48 | The timestamp at which the approval is no longer valid |
 
