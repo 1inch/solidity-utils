@@ -231,6 +231,7 @@ describe('utils', function () {
                 constructorArgs: [tokenName, 'STM'],
                 deployments,
                 skipVerify: true,
+                skipIfAlreadyDeployed: false,
             });
             expect(await create3Deployer.addressOf(salt)).to.be.eq(await token.getAddress());
             expect(await token.name()).to.be.eq(tokenName);
@@ -240,6 +241,29 @@ describe('utils', function () {
                 abi: (await hre.artifacts.readArtifact('TokenMock')).abi,
                 bytecode: (await hre.artifacts.readArtifact('TokenMock')).bytecode,
             });
+        }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
+
+        it('should skip if set skipIfAlreadyDeployed', async function () {
+            const create3Deployer = await deployContract('Create3Mock') as Create3Mock;
+            const salt = ethers.keccak256(ethers.toUtf8Bytes('SOME SALT HERE'));
+            const tokenName = 'SomeToken';
+            const token1 = await deployAndGetContractWithCreate3({
+                create3Deployer: await create3Deployer.getAddress(),
+                salt,
+                contractName: 'TokenMock',
+                constructorArgs: [tokenName, 'STM'],
+                deployments,
+                skipVerify: true,
+            });
+            const token2 = await deployAndGetContractWithCreate3({
+                create3Deployer: await create3Deployer.getAddress(),
+                salt,
+                contractName: 'TokenMock',
+                constructorArgs: [tokenName, 'STM'],
+                deployments,
+                skipVerify: true,
+            });
+            expect(await token1.getAddress()).to.be.eq(await token2.getAddress());
         }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
     });
 
@@ -255,6 +279,7 @@ describe('utils', function () {
                 constructorArgs: [tokenName, 'STM'],
                 deployments,
                 skipVerify: true,
+                skipIfAlreadyDeployed: false,
             });
 
             await saveContractWithCreate3Deployment(
