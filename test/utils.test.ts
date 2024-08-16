@@ -254,6 +254,7 @@ describe('utils', function () {
                 constructorArgs: [tokenName, 'STM'],
                 deployments,
                 skipVerify: true,
+                skipIfAlreadyDeployed: false,
             });
             const token2 = await deployAndGetContractWithCreate3({
                 create3Deployer: await create3Deployer.getAddress(),
@@ -262,6 +263,7 @@ describe('utils', function () {
                 constructorArgs: [tokenName, 'STM'],
                 deployments,
                 skipVerify: true,
+                skipIfAlreadyDeployed: true,
             });
             expect(await token1.getAddress()).to.be.eq(await token2.getAddress());
         }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
