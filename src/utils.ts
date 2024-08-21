@@ -49,7 +49,7 @@ export interface DeployContractOptions {
  * @param create3Deployer Address of the create3 deployer contract, which related to `contracts/interfaces/ICreate3Deployer.sol`.
  * @param salt Salt value for create3 deployment.
  */
-interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer' | 'skipIfAlreadyDeployed'> {
+interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer'> {
     txSigner?: Wallet | SignerWithAddress,
     create3Deployer: string,
     salt: string,
@@ -125,6 +125,7 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
  *    - txSigner: first signer in the environment
  *    - deploymentName: contractName
  *    - skipVerify: false
+ *    - skipIfAlreadyDeployed: true
  *    - waitConfirmations: 1 on dev chains, 6 on others
  * @returns The deployed contract instance.
  */
@@ -141,11 +142,20 @@ export async function deployAndGetContractWithCreate3(
         txSigner = (await ethers.getSigners())[0],
         deploymentName = contractName,
         skipVerify = false,
+        skipIfAlreadyDeployed = true,
         gasPrice,
         maxPriorityFeePerGas,
         maxFeePerGas,
         waitConfirmations = constants.DEV_CHAINS.includes(hre.network.name) ? 1 : 6,
     } = options;
+
+    const contractDeployment = await deployments.getOrNull(contractName);
+    if (skipIfAlreadyDeployed && contractDeployment != null &&
+        (await deployments.getArtifact(contractName)).deployedBytecode === contractDeployment.deployedBytecode
+    ) {
+        console.log(`Contract ${contractName} is already deployed at ${contractDeployment.address}`);
+        return await ethers.getContractAt(contractName, contractDeployment.address);
+    }
 
     const deployer = await ethers.getContractAt('ICreate3Deployer', create3Deployer) as unknown as ICreate3Deployer;
     const CustomContract = await ethers.getContractFactory(contractName);
