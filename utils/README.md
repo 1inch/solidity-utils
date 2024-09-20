@@ -35,7 +35,7 @@ const { oneInchTemplates } = require('@1inch/solidity-utils/docgen');
 module.exports = {
 ...
     docgen: {
-        outputDir: "docs", // Can be omitted, docs used by default
+        outputDir: 'docs', // Can be omitted, docs used by default
         templates: oneInchTemplates(), // 1inch templates
         pages: 'files', // Doc output format for 1inch templates
         exclude: ['mocks', 'test'], // Directories to exclude from generation
