@@ -1,4 +1,4 @@
-import { Assertion, AssertionError, assert, expect, config, should } from 'chai';
+import { Assertion, assert, expect, config, should } from 'chai';
 
 /**
  * @category expect
@@ -38,4 +38,4 @@ export function assertRoughlyEqualValues(
 }
 
 // chai
-export { Assertion, AssertionError, assert, expect, config, should };
+export { Assertion, assert, expect, config, should };
