@@ -5,7 +5,7 @@ import 'hardhat-gas-reporter';
 import 'hardhat-deploy';
 import '@nomicfoundation/hardhat-verify';
 import 'solidity-docgen';
-require('solidity-coverage'); // require because no TS typings available
+import 'solidity-coverage';
 import dotenv from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 import { HardhatNetworkUserConfig } from 'hardhat/types';

@@ -5,6 +5,8 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 import { encodeBytes32String, getAddress } from 'ethers';
 
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+
 describe('UniERC20', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;

@@ -4,6 +4,8 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+
 describe('AddressSet', function () {
     let signer1: SignerWithAddress;
     let signer2: SignerWithAddress;

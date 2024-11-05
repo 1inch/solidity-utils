@@ -5,6 +5,8 @@ import { ethers } from 'hardhat';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { getBytes, concat, Signature, hashMessage, HDNodeWallet, keccak256, toUtf8Bytes } from 'ethers';
 
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+
 describe('ECDSA', function () {
     let account: SignerWithAddress;
     let randomAccount: HDNodeWallet;
