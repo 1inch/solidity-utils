@@ -15,11 +15,11 @@ This repository is a comprehensive toolkit designed to streamline and optimize t
 
 - **[Development and Testing](https://github.com/1inch/solidity-utils/blob/master/docs/js/modules/src.md)**: The tools and utilities provided in this section are designed to aid in the development and testing of smart contracts. They help avoid the duplication of helper methods across different repositories by centralizing commonly used functions and scripts. This not only streamlines the development process but also ensures that the latest versions of these helpers are readily available and consistently used throughout your projects. Leveraging these utilities can significantly enhance efficiency and maintainability of your smart contract code.
 
-- **[Documentation and Utilities](https://github.com/1inch/solidity-utils/blob/master/utils/README.md)**: A suite of functionalities for generating documentation and additional utilities to enhance development workflow.
-
 - **[Configuration and Management](https://github.com/1inch/solidity-utils/blob/master/docs/js/modules/hardhat_setup.md)**: Tools for setting up Hardhat network configurations and managing project settings efficiently.
 
 - **[Solidity Contracts and Libraries](https://github.com/1inch/solidity-utils/blob/master/docs/SUMMARY.md)**: Frequently used smart contracts, libraries, and interfaces aimed at providing reusable code for common use cases, alongside optimizations to improve contract efficiency.
+
+- **[Documentation Templates](https://github.com/1inch/solidity-utils/blob/master/docgen/README.md)**: Templates for Documentation Generator docgen.
 
 ## Contributing
 
