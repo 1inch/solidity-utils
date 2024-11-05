@@ -4,7 +4,10 @@ import { BigNumberish, BytesLike } from 'ethers';
 import hre, { ethers } from 'hardhat';
 import chai from 'chai';
 import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
-chai.use(jestSnapshotPlugin());
+
+if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+    chai.use(jestSnapshotPlugin());
+}
 
 describe('StringUtil', function () {
     const uint256TestValue = '0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF';

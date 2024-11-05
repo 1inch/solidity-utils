@@ -4,7 +4,10 @@ import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import hre, { ethers } from 'hardhat';
 import chai from 'chai';
 import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
-chai.use(jestSnapshotPlugin());
+
+if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+    chai.use(jestSnapshotPlugin());
+}
 
 describe('BytesMemoryMock', function () {
     const bytes = '0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
