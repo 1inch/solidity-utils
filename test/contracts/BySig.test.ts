@@ -78,6 +78,15 @@ describe('BySig', function () {
     });
 
     describe('bySig', function () {
+        it('should return false for an invalid nonce type', async function () {
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
+            const sig = {
+                traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Invalid, nonce: 0 }),
+                data: '0x',
+            };
+            await expect(token.bySig(alice, sig, '0x')).to.be.revertedWithCustomError(token, 'WrongNonceType');
+        });
+
         it('should revert after traits deadline', async function () {
             const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             const sig = {
