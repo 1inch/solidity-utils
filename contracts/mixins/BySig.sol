@@ -200,7 +200,7 @@ abstract contract BySig is Context, EIP712 {
         return _msgSenders.unsafeAt(length - 1);
     }
 
-    function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool) {
+    function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool isUseNonce) {
         BySigTraits.NonceType nonceType = traits.nonceType();
         uint256 nonce = traits.nonce();
         if (nonceType == BySigTraits.NonceType.Account) {
@@ -215,6 +215,5 @@ abstract contract BySig is Context, EIP712 {
             map[nonce >> 8] |= 1 << (nonce & 0xff);
             return cache != map[nonce >> 8];
         }
-        return false;
     }
 }
