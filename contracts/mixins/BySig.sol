@@ -200,16 +200,14 @@ abstract contract BySig is Context, EIP712 {
         return _msgSenders.unsafeAt(length - 1);
     }
 
-    function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool isUseNonce) {
+    function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool) {
         BySigTraits.NonceType nonceType = traits.nonceType();
         uint256 nonce = traits.nonce();
         if (nonceType == BySigTraits.NonceType.Account) {
             return nonce == _bySigAccountNonces[signer]++;
-        }
-        if (nonceType == BySigTraits.NonceType.Selector) {
+        } else if (nonceType == BySigTraits.NonceType.Selector) {
             return nonce == _bySigSelectorNonces[signer][bytes4(data)]++;
-        }
-        if (nonceType == BySigTraits.NonceType.Unique) {
+        } else { // nonceType == BySigTraits.NonceType.Unique
             mapping(uint256 => uint256) storage map = _bySigUniqueNonces[signer];
             uint256 cache = map[nonce >> 8];
             map[nonce >> 8] |= 1 << (nonce & 0xff);
