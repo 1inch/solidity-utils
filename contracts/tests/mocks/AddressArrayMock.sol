@@ -27,6 +27,10 @@ contract AddressArrayMock {
         return AddressArray.get(_self);
     }
 
+    function getAndProvideArr(address[] memory providedArr) external view returns (address[] memory, address[] memory) {
+        return (AddressArray.get(_self, providedArr), providedArr);
+    }
+
     function push(address account) external returns (uint256) {
         return AddressArray.push(_self, account);
     }
@@ -37,5 +41,9 @@ contract AddressArrayMock {
 
     function set(uint256 index, address account) external {
         AddressArray.set(_self, index, account);
+    }
+
+    function erase() external {
+        AddressArray.erase(_self);
     }
 }

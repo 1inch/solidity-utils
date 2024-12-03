@@ -29,11 +29,19 @@ contract AddressSetMock {
         return AddressSet.get(_self);
     }
 
+    function getAndProvideSet(address[] memory providedArr) external view returns (address[] memory, address[] memory) {
+        return (AddressSet.get(_self, providedArr), providedArr);
+    }
+
     function add(address item) external returns (bool) {
         return AddressSet.add(_self, item);
     }
 
     function remove(address item) external returns (bool) {
         return AddressSet.remove(_self, item);
+    }
+
+    function erase() external {
+        AddressSet.erase(_self);
     }
 }

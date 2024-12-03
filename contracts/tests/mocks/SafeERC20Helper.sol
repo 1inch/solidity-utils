@@ -128,9 +128,23 @@ contract ERC20ThroughZeroApprove {
     error NonZeroToNonZeroApprove();
 
     mapping(address => mapping(address => uint256)) private _allowances;
+    bool private _failAfterZeroReset;
+    bool private _failFlag; // shows that last approve was failed and test should fail
+
+    function setFailAfterZeroReset(bool fail) external {
+        _failAfterZeroReset = fail;
+    }
+
+    function setFailFlag(bool fail) external {
+        _failAfterZeroReset = fail;
+    }
 
     function approve(address to, uint256 amount) external {
         if (_allowances[msg.sender][to] != 0 && amount != 0) revert NonZeroToNonZeroApprove();
+        if (_failFlag) revert NonZeroToNonZeroApprove();
+        if (_failAfterZeroReset && amount == 0) {
+            _failFlag = true;
+        }
         _allowances[msg.sender][to] = amount;
     }
 

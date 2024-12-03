@@ -10,6 +10,7 @@ export enum NonceType {
     Account,    // Nonce for account
     Selector,   // Nonce for selector
     Unique,     // Nonce for unique
+    Invalid,    // Invalid Type
 }
 
 /**

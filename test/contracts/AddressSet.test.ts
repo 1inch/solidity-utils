@@ -86,6 +86,51 @@ describe('AddressSet', function () {
         });
     });
 
+    describe('get', function () {
+        it('should get empty array', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            expect(await addressSetMock.get()).to.be.deep.equal([]);
+        });
+
+        it('should get array with 1 element', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            expect(await addressSetMock.get()).to.be.deep.equal([signer1.address]);
+        });
+
+        it('should get array with 2 elements', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            expect(await addressSetMock.get()).to.be.deep.equal([signer1.address, signer2.address]);
+        });
+
+        it('should get from array with 3 elements', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            await addressSetMock.add(signer3);
+            expect(await addressSetMock.get()).to.be.deep.equal([signer1.address, signer2.address, signer3.address]);
+        });
+
+        it('should get array with 2 elements and copies the addresses into the provided input array', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            expect(await addressSetMock.getAndProvideSet([constants.ZERO_ADDRESS, constants.ZERO_ADDRESS])).to.be.deep.equal([
+                [signer1.address, signer2.address],
+                [signer1.address, signer2.address],
+            ]);
+        });
+
+        it('should reverted because provided input array size is too small', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            await expect(addressSetMock.getAndProvideSet([])).to.be.revertedWithCustomError(await ethers.getContractFactory('AddressArray'), 'OutputArrayTooSmall');
+        });
+    });
+
     describe('contains', function () {
         it('should not contain in empty set', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
@@ -188,6 +233,40 @@ describe('AddressSet', function () {
             await addressSetMock.add(signer2);
             await addressSetMock.remove(signer2);
             await addressSetMock.remove(signer1);
+        });
+    });
+
+    describe('erase', function () {
+        it('should not change empty array', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            const arrayBefore = await addressSetMock.get();
+            await addressSetMock.erase();
+            expect(await addressSetMock.get()).to.be.deep.equal(arrayBefore);
+        });
+
+        it('should reset non-zero array length', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            expect(await addressSetMock.length()).to.be.not.equal('0');
+            await addressSetMock.erase();
+            expect(await addressSetMock.length()).to.be.deep.equal('0');
+        });
+
+        it('should reset non-zero array', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            expect(await addressSetMock.get()).to.be.not.deep.equal([]);
+            await addressSetMock.erase();
+            expect(await addressSetMock.get()).to.be.deep.equal([]);
+        });
+
+        it('should not return item from array after reset', async function () {
+            const { addressSetMock } = await loadFixture(deployAddressSetMock);
+            await addressSetMock.add(signer1);
+            await addressSetMock.add(signer2);
+            expect(await addressSetMock.get()).to.be.deep.equal([signer1.address, signer2.address]);
+            await addressSetMock.erase();
+            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(await ethers.getContractFactory('AddressArray'), 'IndexOutOfBounds');
         });
     });
 });

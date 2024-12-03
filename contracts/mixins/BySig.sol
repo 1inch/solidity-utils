@@ -205,16 +205,13 @@ abstract contract BySig is Context, EIP712 {
         uint256 nonce = traits.nonce();
         if (nonceType == BySigTraits.NonceType.Account) {
             return nonce == _bySigAccountNonces[signer]++;
-        }
-        if (nonceType == BySigTraits.NonceType.Selector) {
+        } else if (nonceType == BySigTraits.NonceType.Selector) {
             return nonce == _bySigSelectorNonces[signer][bytes4(data)]++;
-        }
-        if (nonceType == BySigTraits.NonceType.Unique) {
+        } else { // nonceType == BySigTraits.NonceType.Unique
             mapping(uint256 => uint256) storage map = _bySigUniqueNonces[signer];
             uint256 cache = map[nonce >> 8];
             map[nonce >> 8] |= 1 << (nonce & 0xff);
             return cache != map[nonce >> 8];
         }
-        return false;
     }
 }

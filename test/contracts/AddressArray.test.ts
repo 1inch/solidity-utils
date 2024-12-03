@@ -115,6 +115,24 @@ describe('AddressArray', function () {
             await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address, signer3.address]);
         });
+
+        it('should get array with 2 elements and copies the addresses into the provided input array', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            await addressArrayMock.push(signer2);
+            await signer1.sendTransaction(await addressArrayMock.getAndProvideArr.populateTransaction([constants.ZERO_ADDRESS, constants.ZERO_ADDRESS]));
+            expect(await addressArrayMock.getAndProvideArr([constants.ZERO_ADDRESS, constants.ZERO_ADDRESS])).to.be.deep.equal([
+                [signer1.address, signer2.address],
+                [signer1.address, signer2.address],
+            ]);
+        });
+
+        it('should reverted because provided input array size is too small', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            await addressArrayMock.push(signer2);
+            await expect(addressArrayMock.getAndProvideArr([])).to.be.revertedWithCustomError(await ethers.getContractFactory('AddressArray'), 'OutputArrayTooSmall');
+        });
     });
 
     describe('push', function () {
@@ -231,6 +249,40 @@ describe('AddressArray', function () {
             await addressArrayMock.push(signer2);
             await addressArrayMock.pop();
             await addressArrayMock.pop();
+        });
+    });
+
+    describe('erase', function () {
+        it('should not change empty array', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            const arrayBefore = await addressArrayMock.get();
+            await addressArrayMock.erase();
+            expect(await addressArrayMock.get()).to.be.deep.equal(arrayBefore);
+        });
+
+        it('should reset non-zero array length', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            expect(await addressArrayMock.length()).to.be.not.equal('0');
+            await addressArrayMock.erase();
+            expect(await addressArrayMock.length()).to.be.deep.equal('0');
+        });
+
+        it('should reset non-zero array', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            expect(await addressArrayMock.get()).to.be.not.deep.equal([]);
+            await addressArrayMock.erase();
+            expect(await addressArrayMock.get()).to.be.deep.equal([]);
+        });
+
+        it('should not return item from array after reset', async function () {
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
+            await addressArrayMock.push(signer1);
+            await addressArrayMock.push(signer2);
+            expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address]);
+            await addressArrayMock.erase();
+            await expect(addressArrayMock.at(1)).to.be.revertedWithCustomError(await ethers.getContractFactory('AddressArray'), 'IndexOutOfBounds');
         });
     });
 });
