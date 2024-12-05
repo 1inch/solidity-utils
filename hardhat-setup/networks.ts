@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { ChainConfig } from '@nomicfoundation/hardhat-verify/src/types';
-import { Network, NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
+import { HardhatNetworkAccountsUserConfig, Network, NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
 
 /**
  * @category Hardhat-Setup
@@ -72,7 +72,7 @@ export class Networks {
     networks: NetworksUserConfig = {};
     etherscan: Etherscan = { apiKey: {}, customChains: [] };
 
-    constructor(useHardhat: boolean = true, forkingNetworkName?: string, saveHardhatDeployments: boolean = false, forkingAccounts?: [{ privateKey: string, balance: string }]) {
+    constructor(useHardhat: boolean = true, forkingNetworkName?: string, saveHardhatDeployments: boolean = false, forkingAccounts?: HardhatNetworkAccountsUserConfig) {
         dotenv.config();
 
         if (useHardhat || forkingNetworkName) {
