@@ -83,7 +83,7 @@ export class Networks {
                 saveDeployments: saveHardhatDeployments,
             };
             if (forkingAccounts) {
-                this.networks.hardhat.accounts = forkingAccounts;
+                this.networks.hardhat!.accounts = forkingAccounts;
             }
         }
 
