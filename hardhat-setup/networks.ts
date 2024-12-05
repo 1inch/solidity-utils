@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { ChainConfig } from '@nomicfoundation/hardhat-verify/src/types';
-import { Network, NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
+import { HardhatNetworkAccountsUserConfig, Network, NetworkUserConfig, NetworksUserConfig } from 'hardhat/types';
 
 /**
  * @category Hardhat-Setup
@@ -72,7 +72,7 @@ export class Networks {
     networks: NetworksUserConfig = {};
     etherscan: Etherscan = { apiKey: {}, customChains: [] };
 
-    constructor(useHardhat: boolean = true, forkingNetworkName?: string, saveHardhatDeployments: boolean = false) {
+    constructor(useHardhat: boolean = true, forkingNetworkName?: string, saveHardhatDeployments: boolean = false, forkingAccounts?: HardhatNetworkAccountsUserConfig) {
         dotenv.config();
 
         if (useHardhat || forkingNetworkName) {
@@ -82,6 +82,9 @@ export class Networks {
                 // @ts-ignore
                 saveDeployments: saveHardhatDeployments,
             };
+            if (forkingAccounts) {
+                this.networks.hardhat!.accounts = forkingAccounts;
+            }
         }
 
         if (forkingNetworkName) {
@@ -150,7 +153,7 @@ export class Networks {
         this.register('aurora', 1313161554, process.env.AURORA_RPC_URL, process.env.AURORA_PRIVATE_KEY || privateKey, 'aurora', process.env.AURORA_ETHERSCAN_KEY);
         this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', process.env.BASE_ETHERSCAN_KEY);
         this.registerCustom('klaytn', 8217, process.env.KLAYTN_RPC_URL, process.env.KLAYTN_PRIVATE_KEY || privateKey, process.env.KLAYTN_ETHERSCAN_KEY, 'https://scope.klaytn.com/', 'https://scope.klaytn.com/'); // eslint-disable-line max-len
-        this.registerCustom('linea_mainnet', 59144, process.env.LINEA_RPC_URL, process.env.LINEA_PRIVATE_KEY || privateKey, process.env.LINEA_ETHERSCAN_KEY, 'https://api.lineascan.build/api', 'https://lineascan.build/', 'london'); // eslint-disable-line max-len
+        this.registerCustom('linea', 59144, process.env.LINEA_RPC_URL, process.env.LINEA_PRIVATE_KEY || privateKey, process.env.LINEA_ETHERSCAN_KEY, 'https://api.lineascan.build/api', 'https://lineascan.build/', 'london'); // eslint-disable-line max-len
         this.registerZksync('zksync', 324, process.env.ZKSYNC_RPC_URL, 'mainnet', process.env.ZKSYNC_PRIVATE_KEY || privateKey, process.env.ZKSYNC_VERIFY_URL);
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
         this.registerZksync('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL, 'mainnet', process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey);
