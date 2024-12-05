@@ -72,7 +72,7 @@ export class Networks {
     networks: NetworksUserConfig = {};
     etherscan: Etherscan = { apiKey: {}, customChains: [] };
 
-    constructor(useHardhat: boolean = true, forkingNetworkName?: string, saveHardhatDeployments: boolean = false) {
+    constructor(useHardhat: boolean = true, forkingNetworkName?: string, saveHardhatDeployments: boolean = false, forkingAccounts?: [{ privateKey: string, balance: string }]) {
         dotenv.config();
 
         if (useHardhat || forkingNetworkName) {
@@ -82,6 +82,9 @@ export class Networks {
                 // @ts-ignore
                 saveDeployments: saveHardhatDeployments,
             };
+            if (forkingAccounts) {
+                this.networks.hardhat.accounts = forkingAccounts;
+            }
         }
 
         if (forkingNetworkName) {
