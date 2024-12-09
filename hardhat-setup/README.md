@@ -8,7 +8,7 @@ This class is your go-to assistant for setting up various blockchain networks fo
 
 ## Methods:
 
-1. **`constructor(useHardhat: boolean, forkingNetworkName?: string, saveHardhatDeployments: boolean)`**: Initializes the class. It can set up a Hardhat network, including Hardhad forking, and determines whether to save deployments files.
+1. **`constructor(useHardhat: boolean, forkingNetworkName?: string, saveHardhatDeployments: boolean, forkingAccounts?: HardhatNetworkAccountsUserConfig)`**: Initializes the class. It can set up a Hardhat network, including Hardhad forking, and determines whether to save deployments files.
 
    **Constructor Parameters**
 
@@ -23,6 +23,10 @@ This class is your go-to assistant for setting up various blockchain networks fo
     - **`saveHardhatDeployments`** (default: `false`):
 
       Decides whether to save deployment files in the Hardhat environment. If `true`, saves deployment details such as contract addresses in json file, useful for tracking and referencing in subsequent testing or deployments.
+
+    - **`forkingAccounts`** (optional):
+
+      Specifies the configuration for accounts used during Hardhat network forking. If provided, it allows customization of private keys, balances, and other account properties for the forked network simulation. If omitted, default accounts will be used.
 
 2. **`register(...)`**: Registers a new network with specified parameters, such as the RPC URL, private key, and Etherscan keys.
 
