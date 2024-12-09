@@ -15,10 +15,11 @@ export enum NonceType {
 
 /**
  * Builds traits for {bySig} contract by combining params.
- * @param nonceType The type of nonce to use. Default is NonceType.Account.
- * @param deadline The deadline for the message. Default is 0.
- * @param relayer The relayer address. Default is the zero address.
- * @param nonce The nonce. Default is 0.
+ * @param params An object containing the following properties:
+ * - `nonceType` The type of nonce to use. Default is `NonceType.Account`.
+ * - `deadline` The deadline for the message. Default is `0`.
+ * - `relayer` The relayer address. Default is the zero address.
+ * - `nonce` The nonce. Default is `0`.
  * @returns A bigint representing the combined traits.
  * @throws Error if provided with invalid parameters.
  */

@@ -12,7 +12,7 @@ import { ICreate3Deployer } from '../typechain-types';
 
 /**
  * @category utils
- * @notice Options for deployment methods.
+ * Options for deployment methods.
  * @param contractName Name of the contract to deploy.
  * @param constructorArgs Arguments for the contract's constructor.
  * @param deployments Deployment facilitator object from Hardhat.
@@ -44,12 +44,12 @@ export interface DeployContractOptions {
 
 /**
  * @category utils
- * @notice Options for deployment methods with create3. This is an extension of DeployContractOptions without `deployer` and `skipIfAlreadyDeployed`.
+ * Options for deployment methods with create3. This is an extension of DeployContractOptions without `deployer` and `skipIfAlreadyDeployed`.
  * @param txSigner Signer object to sign the deployment transaction.
  * @param create3Deployer Address of the create3 deployer contract, which related to `contracts/interfaces/ICreate3Deployer.sol`.
  * @param salt Salt value for create3 deployment.
  */
-interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer'> {
+export interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer'> {
     txSigner?: Wallet | SignerWithAddress,
     create3Deployer: string,
     salt: string,
@@ -57,7 +57,7 @@ interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, '
 
 /**
  * @category utils
- * @notice Deploys a contract with optional Etherscan verification.
+ * Deploys a contract with optional Etherscan verification.
  * @param options Deployment options. Default values:
  *    - constructorArgs: []
  *    - deploymentName: contractName
@@ -119,7 +119,7 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
 
 /**
  * @category utils
- * @notice Deploys a contract using create3 and saves the deployment information.
+ * Deploys a contract using create3 and saves the deployment information.
  * @param options Deployment options. Default values:
  *    - constructorArgs: []
  *    - txSigner: first signer in the environment
@@ -184,7 +184,7 @@ export async function deployAndGetContractWithCreate3(
 
 /**
  * @category utils
- * @notice Saves the deployment information using the deploy transaction hash.
+ * Saves the deployment information using the deploy transaction hash.
  * @param provider JSON RPC provider or Hardhat Ethers Provider.
  * @param deployments Deployment facilitator object from Hardhat.
  * @param contractName Name of the contract to deploy.
@@ -242,7 +242,7 @@ export async function saveContractWithCreate3Deployment(
 
 /**
  * @category utils
- * @notice Advances the blockchain time to a specific timestamp for testing purposes.
+ * Advances the blockchain time to a specific timestamp for testing purposes.
  * @param seconds Target time in seconds or string format to increase to.
  */
 export async function timeIncreaseTo(seconds: number | string): Promise<void> {
@@ -253,7 +253,7 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
 
 /**
  * @category utils
- * @notice Deploys a contract given a name and optional constructor parameters.
+ * Deploys a contract given a name and optional constructor parameters.
  * @param name The contract name.
  * @param parameters Constructor parameters for the contract.
  * @returns The deployed contract instance.
@@ -267,7 +267,7 @@ export async function deployContract(name: string, parameters: Array<BigNumberis
 
 /**
  * @category utils
- * @notice Deploys a contract from bytecode, useful for testing and deployment of minimal proxies.
+ * Deploys a contract from bytecode, useful for testing and deployment of minimal proxies.
  * @param abi Contract ABI.
  * @param bytecode Contract bytecode.
  * @param parameters Constructor parameters.
@@ -296,17 +296,17 @@ export type Token = {
 
 /**
  * @category utils
- * @notice Represents a tuple containing a token quantity and either a transaction receipt or a recursive instance of the same tuple type.
+ * Represents a tuple containing a token quantity and either a transaction receipt or a recursive instance of the same tuple type.
  * This type is used in `trackReceivedTokenAndTx` method to track token transfers and their transaction receipts in a nested structure,
  * allowing for handling of complex scenarios like chained or batched transactions and tracking several tokens.
- *  - result[0]: The amount of the token received.
- *  - result[1]: The transaction receipt or another nested token tracking result.
+ *  - `result[0]`: The amount of the token received.
+ *  - `result[1]`: The transaction receipt or another nested token tracking result.
  */
 export type TrackReceivedTokenAndTxResult = [bigint, ContractTransactionReceipt | TrackReceivedTokenAndTxResult];
 
 /**
  * @category utils
- * @notice Tracks token balance changes and transaction receipts for specified wallet addresses during test scenarios.
+ * Tracks token balance changes and transaction receipts for specified wallet addresses during test scenarios.
  * It could be used recursively for multiple tokens via specific `txPromise` function.
  * @param provider JSON RPC provider or custom provider object.
  * @param token Token contract instance or ETH address constants.
@@ -338,7 +338,7 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
 
 /**
  * @category utils
- * @notice Corrects the ECDSA signature 'v' value according to Ethereum's standard.
+ * Corrects the ECDSA signature 'v' value according to Ethereum's standard.
  * @param signature The original signature string.
  * @returns The corrected signature string.
  */
@@ -356,7 +356,7 @@ export function fixSignature(signature: string): string {
 
 /**
  * @category utils
- * @notice Signs a message with a given signer and fixes the signature format.
+ * Signs a message with a given signer and fixes the signature format.
  * @param signer Signer object or wallet instance.
  * @param messageHex The message to sign, in hex format.
  * @returns The signed message string.
@@ -370,7 +370,7 @@ export async function signMessage(
 
 /**
  * @category utils
- * @notice Counts the occurrences of specified EVM instructions in a transaction's execution trace.
+ * Counts the occurrences of specified EVM instructions in a transaction's execution trace.
  * @param provider JSON RPC provider or custom provider object.
  * @param txHash Transaction hash to analyze.
  * @param instructions Array of EVM instructions (opcodes) to count.
@@ -393,7 +393,7 @@ export async function countInstructions(
 
 /**
  * @category utils
- * @notice Retrieves the current USD price of ETH or another specified native token.
+ * Retrieves the current USD price of ETH or another specified native token.
  * This helper function is designed for use in test environments to maintain stability against market fluctuations.
  * It fetches the current price of ETH (or a specified native token for side chains) in USD from the Coinbase API to
  * ensure that tests remain stable and unaffected by significant market price fluctuations when token price is

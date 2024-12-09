@@ -3,7 +3,7 @@ import { JsonRpcProvider } from 'ethers';
 
 /**
  * @category profileEVM
- * @dev Default configuration options for the `gasspectEVM` function to analyze gas usage in EVM transactions.
+ * Default configuration options for the `gasspectEVM` function to analyze gas usage in EVM transactions.
  * @property minOpGasCost The minimal gas cost of operations to be returned in the analysis. Defaults to 300, filtering out less costly operations for clarity.
  * @property args Boolean indicating whether to return the arguments of each operation in the analysis. Defaults to `false`, omitting arguments for simplicity.
  * @property res Boolean indicating whether to return the results of each operation in the analysis. Defaults to `false`, omitting results to focus on gas usage.
@@ -102,7 +102,7 @@ function _normalizeOp(ops: Op[], i: number): void {
 
 /**
  * @category profileEVM
- * @notice Profiles EVM execution by counting occurrences of specified instructions in a transaction's execution trace.
+ * Profiles EVM execution by counting occurrences of specified instructions in a transaction's execution trace.
  * @param provider An Ethereum provider capable of sending custom RPC requests.
  * @param txHash The hash of the transaction to profile.
  * @param instruction An array of EVM instructions (opcodes) to count within the transaction's execution trace.
@@ -130,7 +130,7 @@ export async function profileEVM(
 
 /**
  * @category profileEVM
- * @notice Performs gas analysis on EVM transactions, highlighting operations that exceed a specified gas cost.
+ * Performs gas analysis on EVM transactions, highlighting operations that exceed a specified gas cost.
  * Analyzes gas usage by operations within a transaction, applying filters and formatting based on options.
  * @param provider The Ethereum JSON RPC provider or any custom provider with a `send` method.
  * @param txHash Transaction hash to analyze.
