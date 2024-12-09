@@ -19,7 +19,7 @@ export { time };
 
 /**
  * @category prelude
- * @notice Converts an Ether amount represented as a string into its Wei equivalent as a bigint.
+ * Converts an Ether amount represented as a string into its Wei equivalent as a bigint.
  * @param n The amount of Ether to convert, specified as a string.
  * @return The equivalent amount in Wei as a bigint.
  */

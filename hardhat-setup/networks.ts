@@ -4,7 +4,7 @@ import { HardhatNetworkAccountsUserConfig, Network, NetworkUserConfig, NetworksU
 
 /**
  * @category Hardhat-Setup
- * @notice Configuration type for managing Etherscan integration in Hardhat setups.
+ * Configuration type for managing Etherscan integration in Hardhat setups.
  * @param apiKey Dictionary of API keys for accessing Etherscan, indexed by network name.
  * @param customChains Array of custom blockchain network configurations.
  */
@@ -15,7 +15,7 @@ export type Etherscan = {
 
 /**
  * @category Hardhat-Setup
- * @notice A helper method to get the network name from the command line arguments.
+ * A helper method to get the network name from the command line arguments.
  * @returns The network name.
  */
 export function getNetwork(): string {
@@ -25,7 +25,7 @@ export function getNetwork(): string {
 
 /**
  * @category Hardhat-Setup
- * @notice A helper method to parse RPC configuration strings. Checks that the string is in the expected format.
+ * A helper method to parse RPC configuration strings. Checks that the string is in the expected format.
  * @param envRpc The RPC configuration string to parse.
  * @returns An object containing the RPC URL and optional auth key HTTP header.
  */
@@ -39,7 +39,7 @@ export function parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: 
 
 /**
  * @category Hardhat-Setup
- * @notice A helper method to reset the Hardhat network to the local network or to a fork.
+ * A helper method to reset the Hardhat network to the local network or to a fork.
  * @param network The Hardhat network object.
  * @param networkName The name of the network to reset to.
  */
@@ -65,7 +65,7 @@ export async function resetHardhatNetworkFork(network: Network, networkName: str
 
 /**
  * @category Hardhat-Setup
- * @notice The Network class is a helper class to register networks and Etherscan API keys.
+ * The Network class is a helper class to register networks and Etherscan API keys.
  * See the [README](https://github.com/1inch/solidity-utils/tree/master/hardhat-setup/README.md) for usage.
  */
 export class Networks {
