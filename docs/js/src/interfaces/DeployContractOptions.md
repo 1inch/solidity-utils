@@ -52,7 +52,7 @@ Toggles deployment logging.
 
 ## Param
 
-Number of confirmations to wait based on network. Ussually it's need for waiting before Etherscan verification.
+Number of confirmations to wait based on network. Usually it's need for waiting before Etherscan verification.
 
 ## Properties
 
