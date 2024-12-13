@@ -24,7 +24,7 @@ import { ICreate3Deployer } from '../typechain-types';
  * @param maxPriorityFeePerGas Gas strategy option.
  * @param maxFeePerGas Gas strategy option.
  * @param log Toggles deployment logging.
- * @param waitConfirmations Number of confirmations to wait based on network. Ussually it's need for waiting before Etherscan verification.
+ * @param waitConfirmations Number of confirmations to wait based on network. Usually it's need for waiting before Etherscan verification.
  */
 export interface DeployContractOptions {
     contractName: string;

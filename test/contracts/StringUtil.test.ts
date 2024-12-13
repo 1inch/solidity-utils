@@ -103,7 +103,7 @@ describe('StringUtil', function () {
 
         it('Compare gas usage very long byte array', () => compareGasBytes(veryLongArray));
 
-        it('Compare gas usage extremly long byte array', () => compareGasBytes(extremelyLongArray));
+        it('Compare gas usage extremely long byte array', () => compareGasBytes(extremelyLongArray));
 
         it('Compare gas usage empty bytes', () => compareGasBytes(emptyBytes));
 
