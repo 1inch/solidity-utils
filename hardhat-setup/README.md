@@ -32,8 +32,6 @@ This class is your go-to assistant for setting up various blockchain networks fo
 
 3. **`registerCustom(...)`**: Allows registering custom networks with custom parameters for Etherscan contract verifications.
 
-4. **`registerZksync(...)`**: A specialized method for registering zkSync networks with additional parameters which specified for zksync network.
-
 5. **`registerAll()`**: Registers multiple standard networks using environment variables for configuration.
 
 ## Predefined environment variable names and their format
