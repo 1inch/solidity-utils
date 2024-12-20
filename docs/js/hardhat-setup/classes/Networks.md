@@ -28,7 +28,7 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:75](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L75)
+[hardhat-setup/networks.ts:75](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L75)
 
 ## Properties
 
@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:73](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L73)
+[hardhat-setup/networks.ts:73](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L73)
 
 ***
 
@@ -48,13 +48,13 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:72](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L72)
+[hardhat-setup/networks.ts:72](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L72)
 
 ## Methods
 
 ### register()
 
-> **register**(`name`, `chainId`, `rpc`?, `privateKey`?, `etherscanNetworkName`?, `etherscanKey`?, `hardfork`?): `void`
+> **register**(`name`, `chainId`, `rpc`?, `privateKey`?, `etherscanNetworkName`?, `etherscanKey`?, `hardfork`?, `l1Network`?): `void`
 
 #### Parameters
 
@@ -72,13 +72,15 @@
 
 • **hardfork?**: `string` = `'shanghai'`
 
+• **l1Network?**: `string`
+
 #### Returns
 
 `void`
 
 #### Defined in
 
-[hardhat-setup/networks.ts:99](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L99)
+[hardhat-setup/networks.ts:99](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L99)
 
 ***
 
@@ -100,7 +102,7 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:142](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L142)
+[hardhat-setup/networks.ts:124](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L124)
 
 ***
 
@@ -132,34 +134,4 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:116](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L116)
-
-***
-
-### registerZksync()
-
-> **registerZksync**(`name`, `chainId`, `rpc`?, `ethNetwork`?, `privateKey`?, `verifyURL`?, `hardfork`?): `void`
-
-#### Parameters
-
-• **name**: `string`
-
-• **chainId**: `number`
-
-• **rpc?**: `string`
-
-• **ethNetwork?**: `string`
-
-• **privateKey?**: `string`
-
-• **verifyURL?**: `string`
-
-• **hardfork?**: `string` = `'paris'`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[hardhat-setup/networks.ts:123](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L123)
+[hardhat-setup/networks.ts:117](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L117)
