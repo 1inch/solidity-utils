@@ -19,6 +19,6 @@ Executes a permit for an ERC20 token and then a specified action in a single tra
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| permit | bytes | ERC20 token address (20 bytes) concatinated with the permit data, allowing this contract to spend the token. Format: [token address (20 bytes)][permit data] |
+| permit | bytes | ERC20 token address (20 bytes) concatenated with the permit data, allowing this contract to spend the token. Format: [token address (20 bytes)][permit data] |
 | action | bytes | The data representing the action to be executed after the permit. |
 

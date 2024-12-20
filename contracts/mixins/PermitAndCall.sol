@@ -15,7 +15,7 @@ abstract contract PermitAndCall {
 
     /**
      * @notice Executes a permit for an ERC20 token and then a specified action in a single transaction.
-     * @param permit ERC20 token address (20 bytes) concatinated with the permit data, allowing this contract to spend the token.
+     * @param permit ERC20 token address (20 bytes) concatenated with the permit data, allowing this contract to spend the token.
      * Format: [token address (20 bytes)][permit data]
      * @param action The data representing the action to be executed after the permit.
      */
