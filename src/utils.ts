@@ -212,7 +212,7 @@ export async function saveContractWithCreate3Deployment(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const receipt = await provider.getTransactionReceipt(deployTxHash) as {[key: string]: any};
     if (receipt != null) {
-        // conver ethers.TransactionReceipt object to hardhat-deploy.Receipt object
+        // convert ethers.TransactionReceipt object to hardhat-deploy.Receipt object
         receipt.transactionHash = receipt.transactionHash || receipt.hash;
         receipt.transactionIndex = receipt.transactionIndex || receipt.index;
         ['provider', 'blobGasPrice', 'type', 'root', 'hash', 'index'].forEach(key => delete receipt[key]);
