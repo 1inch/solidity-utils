@@ -442,15 +442,13 @@ library SafeERC20 {
      * @param amount The amount of Ether to deposit into the IWETH contract.
      */
     function safeDeposit(IWETH weth, uint256 amount) internal {
-        if (amount > 0) {
-            bytes4 selector = IWETH.deposit.selector;
-            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-                mstore(0, selector)
-                if iszero(call(gas(), weth, amount, 0, 4, 0, 0)) {
-                    let ptr := mload(0x40)
-                    returndatacopy(ptr, 0, returndatasize())
-                    revert(ptr, returndatasize())
-                }
+        bytes4 selector = IWETH.deposit.selector;
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            mstore(0, selector)
+            if iszero(call(gas(), weth, amount, 0, 4, 0, 0)) {
+                let ptr := mload(0x40)
+                returndatacopy(ptr, 0, returndatasize())
+                revert(ptr, returndatasize())
             }
         }
     }
