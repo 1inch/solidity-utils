@@ -111,7 +111,7 @@ library SafeERC20 {
             mstore(add(data, 0x04), from)
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
-            success := call(gas(), token, 0, data, 100, 0x0, 0x20)
+            success := call(gas(), token, 0, data, 0x64, 0x0, 0x20)
             if success {
                 switch returndatasize()
                 case 0 {
@@ -167,14 +167,14 @@ library SafeERC20 {
      * the caller to make sure that the higher 96 bits of the `to` parameter are clean.
      * @param token The IERC20 token contract from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
-     * @param value The amount of tokens to transfer.
+     * @param amount The amount of tokens to transfer.
      */
     function safeTransfer(
         IERC20 token,
         address to,
-        uint256 value
+        uint256 amount
     ) internal {
-        if (!_makeCall(token, token.transfer.selector, to, value)) {
+        if (!_makeCall(token, token.transfer.selector, to, amount)) {
             revert SafeTransferFailed();
         }
     }
@@ -442,15 +442,13 @@ library SafeERC20 {
      * @param amount The amount of Ether to deposit into the IWETH contract.
      */
     function safeDeposit(IWETH weth, uint256 amount) internal {
-        if (amount > 0) {
-            bytes4 selector = IWETH.deposit.selector;
-            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-                mstore(0, selector)
-                if iszero(call(gas(), weth, amount, 0, 4, 0, 0)) {
-                    let ptr := mload(0x40)
-                    returndatacopy(ptr, 0, returndatasize())
-                    revert(ptr, returndatasize())
-                }
+        bytes4 selector = IWETH.deposit.selector;
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            mstore(0, selector)
+            if iszero(call(gas(), weth, amount, 0, 4, 0, 0)) {
+                let ptr := mload(0x40)
+                returndatacopy(ptr, 0, returndatasize())
+                revert(ptr, returndatasize())
             }
         }
     }
