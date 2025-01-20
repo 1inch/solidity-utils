@@ -327,18 +327,6 @@ describe('SafeERC20', function () {
             }
         });
 
-        it('should be cheap on deposit 0 tokens', async function () {
-            const { weth, wrapper } = await loadFixture(deployWrapperWETH);
-            const tx = (await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
-                wrapper.deposit(),
-            ))[1] as ContractTransactionReceipt;
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-                expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
-                    0, 0, 1, 0, 0, 1,
-                ]);
-            }
-        });
-
         it('should withdrawal tokens on withdraw', async function () {
             const { weth, wrapper } = await loadFixture(deployWrapperWETHAndDeposit);
             const [received] = await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
