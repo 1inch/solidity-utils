@@ -29,6 +29,7 @@ library SafeERC20 {
 
     // Uniswap Permit2 address
     address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
+    address private constant _PERMIT2_ZKSYNC = 0x0000000000225e31D15943971F47aD3022F714Fa;
     bytes4 private constant _PERMIT_LENGTH_ERROR = 0x68275857;  // SafePermitBadLength.selector
     uint256 private constant _RAW_CALL_GAS_LIMIT = 5000;
 
@@ -142,6 +143,7 @@ library SafeERC20 {
         uint256 amount
     ) internal {
         if (amount > type(uint160).max) revert Permit2TransferAmountTooHigh();
+        address permit2 = _getPermit2Address();
         bytes4 selector = IPermit2.transferFrom.selector;
         bool success;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
@@ -152,9 +154,9 @@ library SafeERC20 {
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
             mstore(add(data, 0x64), token)
-            success := call(gas(), _PERMIT2, 0, data, 0x84, 0x0, 0x0)
+            success := call(gas(), permit2, 0, data, 0x84, 0x0, 0x0)
             if success {
-                success := gt(extcodesize(_PERMIT2), 0)
+                success := gt(extcodesize(permit2), 0)
             }
         }
         if (!success) revert SafeTransferFromFailed();
@@ -298,6 +300,7 @@ library SafeERC20 {
      * @return success A boolean indicating whether the permit call was successful.
      */
     function tryPermit(IERC20 token, address owner, address spender, bytes calldata permit) internal returns(bool success) {
+        address permit2 = _getPermit2Address();
         // load function selectors for different permit standards
         bytes4 permitSelector = IERC20Permit.permit.selector;
         bytes4 daiPermitSelector = IDaiLikePermit.permit.selector;
@@ -382,14 +385,14 @@ library SafeERC20 {
                 calldatacopy(add(ptr, 0x124), add(permit.offset, 0x20), 0x20) // store r      = copy permit.offset 0x20..0x3f
                 calldatacopy(add(ptr, 0x144), add(permit.offset, 0x40), 0x20) // store vs     = copy permit.offset 0x40..0x5f
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
+                success := call(gas(), permit2, 0, ptr, 0x164, 0, 0)
             }
             // IPermit2
             case 352 {
                 mstore(ptr, permit2Selector)
                 calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
+                success := call(gas(), permit2, 0, ptr, 0x164, 0, 0)
             }
             // Dynamic length
             default {
@@ -488,6 +491,27 @@ library SafeERC20 {
                     returndatacopy(ptr, 0, returndatasize())
                     revert(ptr, returndatasize())
                 }
+            }
+        }
+    }
+
+    function _getPermit2Address() private view returns (address permit2) {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            switch chainid()
+            case 324 { // zksync mainnet
+                permit2 := _PERMIT2_ZKSYNC
+            }
+            case 300 { // zksync testnet
+                permit2 := _PERMIT2_ZKSYNC
+            }
+            case 260 { // zksync fork network
+                permit2 := _PERMIT2_ZKSYNC
+            }
+            case 270 { // zksync local network
+                permit2 := _PERMIT2_ZKSYNC
+            }
+            default {
+                permit2 := _PERMIT2
             }
         }
     }
