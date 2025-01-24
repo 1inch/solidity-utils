@@ -1,0 +1,44 @@
+name: CREATE_RELEASE
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from package.json
+        id: package_version
+        run: echo "VERSION=$(jq -r .version package.json)" >> $GITHUB_ENV
+
+      - name: Check for changelog entry
+        id: changelog
+        run: |
+          VERSION=${{ env.VERSION }}
+          echo "Searching for version: $VERSION in CHANGELOG.md"
+
+          NOTES=$(awk "/\/${VERSION//./\\.} \(/ {print; flag=1; next} /^solidity-utils\// {flag=0} flag" CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            echo "❌ No changelog entry found for version $VERSION"
+            echo "Use: yarn changelog"
+            exit 1
+          fi
+
+          echo "::set-output name=notes::$NOTES"
+        shell: bash
+
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: Release ${{ env.VERSION }}
+          body: ${{ steps.changelog.outputs.notes }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
