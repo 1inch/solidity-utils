@@ -414,12 +414,12 @@ describe('SafeERC20', function () {
             const { permit2Mock } = await deployPermit2Mock();
             const code = await ethers.provider.getCode(permit2Mock);
             await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, code]);
-            await wrapper.transferFromUniversal(true);
+            await wrapper.transferFromUniversal(PERMIT2_ADDRESS);
         });
 
         it("doesn't revert on transferFromUniversal, no permit2", async function () {
             const { wrapper } = await loadFixture(fixture);
-            await wrapper.transferFromUniversal(false);
+            await wrapper.transferFromUniversal(constants.ZERO_ADDRESS);
         });
 
         describe('approvals', function () {

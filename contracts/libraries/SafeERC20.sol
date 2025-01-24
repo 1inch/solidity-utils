@@ -27,8 +27,6 @@ library SafeERC20 {
     error SafePermitBadLength();
     error Permit2TransferAmountTooHigh();
 
-    // Uniswap Permit2 address
-    address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
     bytes4 private constant _PERMIT_LENGTH_ERROR = 0x68275857;  // SafePermitBadLength.selector
     uint256 private constant _RAW_CALL_GAS_LIMIT = 5000;
 
@@ -70,17 +68,18 @@ library SafeERC20 {
      * @param from The address from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
      * @param amount The amount of tokens to transfer.
-     * @param permit2 If true, uses the Permit2 standard for the transfer; otherwise uses the standard ERC20 transferFrom.
+     * @param permit2 Uniswap Permit2 contract address. If non zero address, uses the Permit2 standard for the transfer;
+     * otherwise uses the standard ERC20 transferFrom.
      */
     function safeTransferFromUniversal(
         IERC20 token,
         address from,
         address to,
         uint256 amount,
-        bool permit2
+        address permit2
     ) internal {
-        if (permit2) {
-            safeTransferFromPermit2(token, from, to, amount);
+        if (permit2 != address(0)) {
+            safeTransferFromPermit2(token, from, to, amount, permit2);
         } else {
             safeTransferFrom(token, from, to, amount);
         }
@@ -134,12 +133,14 @@ library SafeERC20 {
      * @param from The address from which the tokens will be transferred.
      * @param to The address to which the tokens will be transferred.
      * @param amount The amount of tokens to transfer.
+     * @param permit2 Uniswap Permit2 contract address.
      */
     function safeTransferFromPermit2(
         IERC20 token,
         address from,
         address to,
-        uint256 amount
+        uint256 amount,
+        address permit2
     ) internal {
         if (amount > type(uint160).max) revert Permit2TransferAmountTooHigh();
         bytes4 selector = IPermit2.transferFrom.selector;
@@ -152,9 +153,9 @@ library SafeERC20 {
             mstore(add(data, 0x24), to)
             mstore(add(data, 0x44), amount)
             mstore(add(data, 0x64), token)
-            success := call(gas(), _PERMIT2, 0, data, 0x84, 0x0, 0x0)
+            success := call(gas(), permit2, 0, data, 0x84, 0x0, 0x0)
             if success {
-                success := gt(extcodesize(_PERMIT2), 0)
+                success := gt(extcodesize(permit2), 0)
             }
         }
         if (!success) revert SafeTransferFromFailed();
@@ -364,32 +365,34 @@ library SafeERC20 {
                 success := call(gas(), token, 0, ptr, 0x104, 0, 0)
             }
             // Compact IPermit2
-            case 96 {
-                // Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
+            case 116 {
+                // PERMIT2_ADDRESS | Compact IPermit2.permit(uint160 amount, uint32 expiration, uint32 nonce, uint32 sigDeadline, uint256 r, uint256 vs)
                 mstore(ptr, permit2Selector)  // store selector
                 mstore(add(ptr, 0x04), owner) // store owner
                 mstore(add(ptr, 0x24), token) // store token
 
-                calldatacopy(add(ptr, 0x50), permit.offset, 0x14)             // store amount = copy permit.offset 0x00..0x13
+                let permit2 := shr(96, calldataload(permit.offset))             // get permit2 address from permit.offset 0x00..0x13
+                calldatacopy(add(ptr, 0x50), add(permit.offset, 0x14), 0x14)    // store amount = copy permit.offset 0x14..0x27
                 // and(0xffffffffffff, ...) - conversion to uint48
-                mstore(add(ptr, 0x64), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x14))), 1))) // store expiration = ((permit.offset 0x14..0x17 - 1) & 0xffffffffffff)
-                mstore(add(ptr, 0x84), shr(224, calldataload(add(permit.offset, 0x18)))) // store nonce = copy permit.offset 0x18..0x1b
+                mstore(add(ptr, 0x64), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x28))), 1))) // store expiration = ((permit.offset 0x28..0x2B - 1) & 0xffffffffffff)
+                mstore(add(ptr, 0x84), shr(224, calldataload(add(permit.offset, 0x2C)))) // store nonce = copy permit.offset 0x2C..0x2F
                 mstore(add(ptr, 0xa4), spender)                               // store spender
                 // and(0xffffffffffff, ...) - conversion to uint48
-                mstore(add(ptr, 0xc4), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x1c))), 1))) // store sigDeadline = ((permit.offset 0x1c..0x1f - 1) & 0xffffffffffff)
+                mstore(add(ptr, 0xc4), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x30))), 1))) // store sigDeadline = ((permit.offset 0x30..0x33 - 1) & 0xffffffffffff)
                 mstore(add(ptr, 0xe4), 0x100)                                 // store offset = 256
                 mstore(add(ptr, 0x104), 0x40)                                 // store length = 64
-                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x20), 0x20) // store r      = copy permit.offset 0x20..0x3f
-                calldatacopy(add(ptr, 0x144), add(permit.offset, 0x40), 0x20) // store vs     = copy permit.offset 0x40..0x5f
+                calldatacopy(add(ptr, 0x124), add(permit.offset, 0x34), 0x20) // store r      = copy permit.offset 0x34..0x53
+                calldatacopy(add(ptr, 0x144), add(permit.offset, 0x54), 0x20) // store vs     = copy permit.offset 0x54..0x73
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
+                success := call(gas(), permit2, 0, ptr, 0x164, 0, 0)
             }
-            // IPermit2
-            case 352 {
+            // PERMIT2_ADDRESS | IPermit2
+            case 372 {
                 mstore(ptr, permit2Selector)
-                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                let permit2 := shr(96, calldataload(permit.offset))             // get permit2 address from permit.offset 0x00..0x13
+                calldatacopy(add(ptr, 0x04), add(permit.offset, 0x14), sub(permit.length, 0x14)) // copy permit calldata
                 // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), _PERMIT2, 0, ptr, 0x164, 0, 0)
+                success := call(gas(), permit2, 0, ptr, 0x164, 0, 0)
             }
             // Dynamic length
             default {

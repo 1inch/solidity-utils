@@ -11,6 +11,7 @@ import { DaiLikePermitMock, ERC20Permit, USDCLikePermitMock } from '../typechain
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
 export const defaultDeadlinePermit2 = constants.MAX_UINT48;
+export const PERMIT2_ADDRESS_ZKSYNC = '0x0000000000225e31D15943971F47aD3022F714Fa';
 
 export const EIP712Domain = [
     { name: 'name', type: 'string' },
@@ -147,13 +148,15 @@ export function buildDataLikeDai(
 /**
  * @category permit
  * Ensures contract code is set for a given address and returns a contract instance.
+ * @param network The network name for which the contract instance is required.
  * @return The contract instance of IPermit2.
  */
-export async function permit2Contract() {
-    if ((await ethers.provider.getCode(PERMIT2_ADDRESS)) === '0x') {
-        await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, permit2Bytecode]);
+export async function permit2Contract(network?: string) {
+    const permit2Address = network?.toLowerCase() === 'zksync' ? PERMIT2_ADDRESS_ZKSYNC : PERMIT2_ADDRESS;
+    if ((await ethers.provider.getCode(permit2Address)) === '0x') {
+        await ethers.provider.send('hardhat_setCode', [permit2Address, permit2Bytecode]);
     }
-    return ethers.getContractAt('IPermit2', PERMIT2_ADDRESS);
+    return ethers.getContractAt('IPermit2', permit2Address);
 }
 
 /**
@@ -220,8 +223,9 @@ export async function getPermit2(
     compact = false,
     expiration = defaultDeadlinePermit2,
     sigDeadline = defaultDeadlinePermit2,
+    network?: string,
 ): Promise<string> {
-    const permitContract = await permit2Contract();
+    const permitContract = await permit2Contract(network);
     const nonce = (await permitContract.allowance(owner, token, spender)).nonce;
     const details = {
         token,
@@ -237,7 +241,8 @@ export async function getPermit2(
     const data = AllowanceTransfer.getPermitData(permitSingle, await permitContract.getAddress(), chainId);
     const sig = Signature.from(await owner.signTypedData(data.domain as TypedDataDomain, data.types, data.values));
     const permitCall = cutSelector(permitContract.interface.encodeFunctionData('permit', [owner.address, permitSingle, sig.r + trim0x(sig.yParityAndS)]));
-    return compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), token, owner.address, spender);
+    return await permitContract.getAddress()
+        + trim0x(compact ? compressPermit(permitCall) : decompressPermit(compressPermit(permitCall), token, owner.address, spender));
 }
 
 /**

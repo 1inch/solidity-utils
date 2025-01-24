@@ -208,7 +208,7 @@ contract SafeERC20Wrapper {
         _token.safeTransferFrom(address(0), address(0), 0);
     }
 
-    function transferFromUniversal(bool permit2) external {
+    function transferFromUniversal(address permit2) external {
         _token.safeTransferFromUniversal(address(0), address(0), 0, permit2);
     }
 

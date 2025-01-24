@@ -120,7 +120,6 @@ describe('Permitable', function () {
         const permitContract = await permit2Contract();
         const permit = await getPermit2(signer1, await daiLikePermitMock.getAddress(), chainId, signer2.address, constants.MAX_UINT128);
         await permitableMock.mockPermit(daiLikePermitMock, permit);
-
         const allowance = await permitContract.allowance(signer1, daiLikePermitMock, signer2);
         expect(allowance.amount).to.equal(constants.MAX_UINT128);
         expect(allowance.nonce).to.equal(1);
