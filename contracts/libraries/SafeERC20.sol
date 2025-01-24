@@ -507,9 +507,6 @@ library SafeERC20 {
             case 260 { // zksync fork network
                 permit2 := _PERMIT2_ZKSYNC
             }
-            case 270 { // zksync local network
-                permit2 := _PERMIT2_ZKSYNC
-            }
             default {
                 permit2 := _PERMIT2
             }
