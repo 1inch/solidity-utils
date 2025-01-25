@@ -100,7 +100,8 @@
     "contracts/libraries",
     "contracts/mixins",
     "contracts/mocks",
-    "docgen/templates"
+    "docgen/templates",
+    "changelog/*.hbs"
   ],
   "auto-changelog": {
     "output": "CHANGELOG.md",
