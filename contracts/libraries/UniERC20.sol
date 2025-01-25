@@ -23,7 +23,6 @@ library UniERC20 {
     error ToIsNotThis();
     error ETHTransferFailed();
 
-    uint256 private constant _RAW_CALL_GAS_LIMIT = 5000;
     IERC20 private constant _ETH_ADDRESS = IERC20(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
     IERC20 private constant _ZERO_ADDRESS = IERC20(address(0));
 
@@ -66,7 +65,7 @@ library UniERC20 {
             if (isETH(token)) {
                 if (address(this).balance < amount) revert InsufficientBalance();
                 // solhint-disable-next-line avoid-low-level-calls
-                (bool success, ) = to.call{value: amount, gas: _RAW_CALL_GAS_LIMIT}("");
+                (bool success, ) = to.call{value: amount}("");
                 if (!success) revert ETHTransferFailed();
             } else {
                 token.safeTransfer(to, amount);
@@ -97,7 +96,7 @@ library UniERC20 {
                     // Return remainder if exist
                     unchecked {
                         // solhint-disable-next-line avoid-low-level-calls
-                        (bool success, ) = from.call{value: msg.value - amount, gas: _RAW_CALL_GAS_LIMIT}("");
+                        (bool success, ) = from.call{value: msg.value - amount}("");
                         if (!success) revert ETHTransferFailed();
                     }
                 }

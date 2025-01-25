@@ -30,7 +30,6 @@ library SafeERC20 {
     // Uniswap Permit2 address
     address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
     bytes4 private constant _PERMIT_LENGTH_ERROR = 0x68275857;  // SafePermitBadLength.selector
-    uint256 private constant _RAW_CALL_GAS_LIMIT = 5000;
 
     /**
      * @notice Fetches the balance of a specific ERC20 token held by an account.
@@ -483,7 +482,7 @@ library SafeERC20 {
         safeWithdraw(weth, amount);
         if (to != address(this)) {
             assembly ("memory-safe") {  // solhint-disable-line no-inline-assembly
-                if iszero(call(_RAW_CALL_GAS_LIMIT, to, amount, 0, 0, 0, 0)) {
+                if iszero(call(gas(), to, amount, 0, 0, 0, 0)) {
                     let ptr := mload(0x40)
                     returndatacopy(ptr, 0, returndatasize())
                     revert(ptr, returndatasize())
