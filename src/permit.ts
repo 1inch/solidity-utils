@@ -153,12 +153,12 @@ export function buildDataLikeDai(
  */
 export function permit2Address(chainId?: number): string {
     switch (chainId) {
-        case 324: // zksync mainnet
-        case 300: // zksync testnet
-        case 260: // zksync fork network
-            return PERMIT2_ADDRESS_ZKSYNC;
-        default:
-            return PERMIT2_ADDRESS;
+    case 324: // zksync mainnet
+    case 300: // zksync testnet
+    case 260: // zksync fork network
+        return PERMIT2_ADDRESS_ZKSYNC;
+    default:
+        return PERMIT2_ADDRESS;
     }
 }
 
