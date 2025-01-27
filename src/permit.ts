@@ -11,6 +11,7 @@ import { DaiLikePermitMock, ERC20Permit, USDCLikePermitMock } from '../typechain
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
 export const defaultDeadlinePermit2 = constants.MAX_UINT48;
+export const PERMIT2_ADDRESS_ZKSYNC = '0x0000000000225e31D15943971F47aD3022F714Fa';
 
 export const EIP712Domain = [
     { name: 'name', type: 'string' },
@@ -146,14 +147,33 @@ export function buildDataLikeDai(
 
 /**
  * @category permit
+ * Returns the Permit2 contract address for the specified chain.
+ * @param chainId The ID of the blockchain network (optional).
+ * @return The corresponding Permit2 address.
+ */
+export function permit2Address(chainId?: number): string {
+    switch (chainId) {
+        case 324: // zksync mainnet
+        case 300: // zksync testnet
+        case 260: // zksync fork network
+            return PERMIT2_ADDRESS_ZKSYNC;
+        default:
+            return PERMIT2_ADDRESS;
+    }
+}
+
+/**
+ * @category permit
  * Ensures contract code is set for a given address and returns a contract instance.
+ * @param chainId The ID of the blockchain network (optional).
  * @return The contract instance of IPermit2.
  */
-export async function permit2Contract() {
-    if ((await ethers.provider.getCode(PERMIT2_ADDRESS)) === '0x') {
-        await ethers.provider.send('hardhat_setCode', [PERMIT2_ADDRESS, permit2Bytecode]);
+export async function permit2Contract(chainId?: number) {
+    const permit2addr = permit2Address(chainId);
+    if ((await ethers.provider.getCode(permit2addr)) === '0x') {
+        await ethers.provider.send('hardhat_setCode', [permit2addr, permit2Bytecode]);
     }
-    return ethers.getContractAt('IPermit2', PERMIT2_ADDRESS);
+    return ethers.getContractAt('IPermit2', permit2addr);
 }
 
 /**
