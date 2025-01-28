@@ -20,7 +20,8 @@ jobs:
           VERSION=${{ env.VERSION }}
           echo "Searching for version: $VERSION in CHANGELOG.md"
 
-          NOTES=$(awk "/\/${VERSION//./\\.} \(/ {print; flag=1; next} /^solidity-utils\// {flag=0} flag" CHANGELOG.md)
+          CHANGELOG_OUTPUT=$(npx auto-changelog --stdout)
+          NOTES=$(echo "$CHANGELOG_OUTPUT" | awk "/\/${VERSION//./\\.} \(/ {print; flag=1; next} /^solidity-utils\// {flag=0} flag")
 
           if [ -z "$NOTES" ]; then
             echo "❌ No changelog entry found for version $VERSION"
