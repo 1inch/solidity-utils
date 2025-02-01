@@ -218,15 +218,6 @@ export async function saveContractWithCreate3Deployment(
         ['provider', 'blobGasPrice', 'type', 'root', 'hash', 'index'].forEach(key => delete receipt[key]);
     }
 
-    if (!(skipVerify || constants.DEV_CHAINS.includes(hre.network.name))) {
-        await hre.run('verify:verify', {
-            address: contract,
-            constructorArguments: constructorArgs,
-        });
-    } else {
-        console.log('Skipping verification');
-    }
-
     const ContractArtifact = await deployments.getArtifact(contractName);
     const ContractDeploymentData = {} as Deployment;
     ContractDeploymentData.address = contract;
@@ -237,6 +228,16 @@ export async function saveContractWithCreate3Deployment(
     ContractDeploymentData.bytecode = ContractArtifact.bytecode;
     ContractDeploymentData.deployedBytecode = ContractArtifact.deployedBytecode;
     await deployments.save(deploymentName, ContractDeploymentData);
+
+    if (!(skipVerify || constants.DEV_CHAINS.includes(hre.network.name))) {
+        await hre.run('verify:verify', {
+            address: contract,
+            constructorArguments: constructorArgs,
+        });
+    } else {
+        console.log('Skipping verification');
+    }
+
     return await ethers.getContractAt(contractName, contract);
 }
 
