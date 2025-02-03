@@ -1,0 +1,16 @@
+Change Log
+==========
+
+{{#each releases}}
+solidity-utils/{{version}} ({{date}})
+---------------------------------
+
+{{#each merges}}
+  - {{message}} ([#{{id}}]({{href}}){{#if commit.hash}}; [{{commit.shorthash}}]({{commit.href}}){{/if}}).
+{{/each}}
+
+{{#each commits}}
+  - {{message}} ([{{shorthash}}]({{href}})).
+{{/each}}
+
+{{/each}}
