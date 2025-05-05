@@ -49,7 +49,7 @@
     "dotenv": "16.4.5",
     "ethereumjs-util": "7.1.5",
     "ethers": "6.13.4",
-    "hardhat": "2.22.15",
+    "hardhat": "2.23.0",
     "hardhat-deploy": "0.14.0",
     "mocha-chai-jest-snapshot": "1.1.6",
     "node-fetch": "2.7.0"

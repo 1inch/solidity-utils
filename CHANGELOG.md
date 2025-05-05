@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+solidity-utils/6.4.0 (2025-02-03)
+---------------------------------
+
+- [SC-1427] Add Change Log and CI for release  ([#175](https://github.com/1inch/solidity-utils/pull/175); [e34a821](https://github.com/1inch/solidity-utils/commit/e34a821cb45eb47e6db53305381100850a1525ea)).
+- [SC-1426] Permit2 for zksync ([#174](https://github.com/1inch/solidity-utils/pull/174); [8ce00fb](https://github.com/1inch/solidity-utils/commit/8ce00fbab103e27f50e66b0974bf0dd66439f290)).
+- [SC-1426] Add `permit2address` method and patch `permit2Contract` method with `chainId` ([#178](https://github.com/1inch/solidity-utils/pull/178); [877c01f](https://github.com/1inch/solidity-utils/commit/877c01f6de0186877bcbc1f1f4e75e12d9e1b431)).
+- [SC-1435] Fix Create3 deployment saving on contract source code verification failure ([#179](https://github.com/1inch/solidity-utils/pull/179); [28eaa1a](https://github.com/1inch/solidity-utils/commit/28eaa1a78413c03d96f3333a96f8b34d710a9c0b)).
+- [SC-1428] Fix dependabot issues ([#177](https://github.com/1inch/solidity-utils/pull/177); [b799f40](https://github.com/1inch/solidity-utils/commit/b799f406b83d32f3cd48977cb5996cfd79846bb1)).
+- [SC-1387] Remove gas usage limitation by using all available gas ([#176](https://github.com/1inch/solidity-utils/pull/176); [5bdc603](https://github.com/1inch/solidity-utils/commit/5bdc603395bae1b6923ce72f865b728cb6b6ad43)).
+
 solidity-utils/6.3.2 (2025-01-22)
 ---------------------------------
 
