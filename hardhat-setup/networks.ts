@@ -81,14 +81,6 @@ export class Networks {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 saveDeployments: saveHardhatDeployments,
-                chains: {
-                    43114: { // TODO: remove after hardhat fix issue since 2.22.3, https://github.com/NomicFoundation/hardhat/pull/6170
-                        hardforkHistory: {
-                            shanghai: 11404279,
-                            cancun: 41263126,
-                        },
-                    },
-                },
             };
             if (forkingAccounts) {
                 this.networks.hardhat!.accounts = forkingAccounts;

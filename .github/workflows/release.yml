@@ -9,6 +9,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+      - run: yarn
+      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Fetch tags from git history
+        run: git fetch --unshallow --tags
 
       - name: Extract version from package.json
         id: package_version
@@ -20,16 +29,21 @@ jobs:
           VERSION=${{ env.VERSION }}
           echo "Searching for version: $VERSION in CHANGELOG.md"
 
-          CHANGELOG_OUTPUT=$(npx auto-changelog --stdout)
+          CHANGELOG_OUTPUT=$(yarn changelog --stdout)
           NOTES=$(echo "$CHANGELOG_OUTPUT" | awk "/\/${VERSION//./\\.} \(/ {print; flag=1; next} /^solidity-utils\// {flag=0} flag")
 
+          echo "$NOTES"
+
           if [ -z "$NOTES" ]; then
-            echo "❌ No changelog entry found for version $VERSION"
-            echo "Use: yarn changelog"
+            echo "❌ No changelog entry found for version $VERSION. Check the version tag is exist."
             exit 1
           fi
 
-          echo "::set-output name=notes::$NOTES"
+          {
+            echo "notes<<EOF"
+            printf "%s\n" "$NOTES"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
         shell: bash
 
 
