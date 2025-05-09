@@ -137,6 +137,7 @@ export class Networks {
         this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', process.env.BASE_ETHERSCAN_KEY);
         this.registerCustom('klaytn', 8217, process.env.KLAYTN_RPC_URL, process.env.KLAYTN_PRIVATE_KEY || privateKey, process.env.KLAYTN_ETHERSCAN_KEY, 'https://scope.klaytn.com/', 'https://scope.klaytn.com/');
         this.registerCustom('linea', 59144, process.env.LINEA_RPC_URL, process.env.LINEA_PRIVATE_KEY || privateKey, process.env.LINEA_ETHERSCAN_KEY, 'https://api.lineascan.build/api', 'https://lineascan.build/', 'london');
+        this.registerCustom('sonic', 146, process.env.SONIC_RPC_URL, process.env.SONIC_PRIVATE_KEY || privateKey, process.env.SONIC_ETHERSCAN_KEY, 'https://api.sonicscan.org/api', 'https://sonicscan.org/', 'shanghai');
         this.register('zksync', 324, process.env.ZKSYNC_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksyncmainnet', process.env.ZKSYNC_ETHERSCAN_KEY, 'paris', 'mainnet');
         this.register('zksyncTest', 300, process.env.ZKSYNC_TEST_RPC_URL, process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, 'zksyncsepolia', process.env.ZKSYNC_TEST_ETHERSCAN_KEY, 'paris', 'sepolia');
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
