@@ -3,6 +3,7 @@ import {
     timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx,
     countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode,
     getEthPrice, deployAndGetContractWithCreate3, saveContractWithCreate3Deployment,
+    getAccountsWithCode,
 } from '../src/utils';
 import { expect } from '../src/expect';
 import hre, { deployments, ethers } from 'hardhat';
@@ -309,6 +310,31 @@ describe('utils', function () {
 
         it('should throw error with incorrect token symbol', async function () {
             await expect(getEthPrice('INVALID_SYMBOL')).to.be.rejectedWith('Failed to parse price from Coinbase API');
+        });
+    });
+
+    describe('getAccountsWithCode', function () {
+        it('should return accounts without bytecode by default', async function () {
+            const accounts = await getAccountsWithCode();
+            for (let i = 0; i < 10; i++) {
+                expect(await ethers.provider.getCode(accounts[i].address)).to.be.eq('0x');
+            }
+        });
+
+        it('should return accounts with the same specific bytecode', async function () {
+            const specificBytecode = '0x123456789a';
+            const accounts = await getAccountsWithCode(specificBytecode);
+            for (let i = 0; i < 10; i++) {
+                expect(await ethers.provider.getCode(accounts[i].address)).to.be.eq(specificBytecode);
+            }
+        });
+
+        it('should return specific accounts with specific bytecode', async function () {
+            const specificBytecodes = [, '0x1234',, '0x5678']; // eslint-disable-line no-sparse-arrays
+            const accounts = await getAccountsWithCode([, '0x1234',, '0x5678']); // eslint-disable-line no-sparse-arrays
+            for (let i = 0; i < 10; i++) {
+                expect(await ethers.provider.getCode(accounts[i].address)).to.be.eq(specificBytecodes[i] ? specificBytecodes[i] : '0x');
+            }
         });
     });
 });

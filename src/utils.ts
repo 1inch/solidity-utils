@@ -3,7 +3,7 @@ import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import fetch from 'node-fetch';
-import { BaseContract, BigNumberish, BytesLike, Contract, ContractTransactionReceipt, ContractTransactionResponse, JsonRpcProvider, Signer, TransactionReceipt, Wallet } from 'ethers';
+import { BaseContract, BigNumberish, BytesLike, Contract, ContractTransactionReceipt, ContractTransactionResponse, isBytesLike, JsonRpcProvider, Signer, TransactionReceipt, Wallet } from 'ethers';
 import { DeployOptions, DeployResult, Deployment, DeploymentsExtension, Receipt } from 'hardhat-deploy/types';
 
 import { constants } from './prelude';
@@ -416,4 +416,31 @@ export async function getEthPrice(nativeTokenSymbol: string = 'ETH'): Promise<bi
         throw new Error('Failed to parse price from Coinbase API');
     }
     return amount;
+}
+
+/**
+ * @category utils
+ * Sets custom bytecode for local test accounts and returns them as signers.
+ * This helper is intended for test environments (e.g., Hardhat) where deploying or modifying contract code
+ * at known addresses is required. It allows setting the same or different bytecode for multiple accounts.
+ *
+ * Primarily useful for ensuring accounts start with empty code. For example, with the introduction of EIP-7702
+ * on some networks, default accounts (like the first few returned by `ethers.getSigners()`) may already have
+ * forwarding contracts deployed to them, which can break assumptions in tests.
+ *
+ * @param code A single bytecode (applied to all accounts) or an array of bytecodes (one per account). Defaults to '0x'.
+ * @return A list of signers (accounts) with the specified code applied.
+ */
+export async function getAccountsWithCode(code: BytesLike|Array<BytesLike|undefined> = '0x'): Promise<SignerWithAddress[]> {
+    const accounts = await ethers.getSigners();
+    for (let i = 0; i < accounts.length; i++) {
+        const newAccountCode = isBytesLike(code)
+            ? code
+            : (code[i] ? code[i] : '0x');
+        await hre.network.provider.request({
+            method: 'hardhat_setCode',
+            params: [accounts[i].address, newAccountCode],
+        });
+    }
+    return accounts;
 }
