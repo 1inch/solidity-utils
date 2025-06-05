@@ -4,6 +4,18 @@ import { HardhatNetworkAccountsUserConfig, Network, NetworksUserConfig } from 'h
 
 /**
  * @category Hardhat-Setup
+ * Loads environment variables into process.env using the dotenv package.
+ * By default, loads variables from a `.env` file in the project root.
+ * You can provide custom options (e.g. a different path or encoding) via the `options` parameter.
+ * @param options Optional configuration object for dotenv (e.g. `{ path: '.env.local' }`).
+ * @see https://github.com/motdotla/dotenv#config
+ */
+export function loadEnv(options?: dotenv.DotenvConfigOptions): void {
+    dotenv.config(options);
+}
+
+/**
+ * @category Hardhat-Setup
  * Configuration type for managing Etherscan integration in Hardhat setups.
  * @param apiKey Dictionary of API keys for accessing Etherscan, indexed by network name.
  * @param customChains Array of custom blockchain network configurations.
@@ -72,8 +84,16 @@ export class Networks {
     networks: NetworksUserConfig = {};
     etherscan: Etherscan = { apiKey: {}, customChains: [] };
 
-    constructor(useHardhat: boolean = true, forkingNetworkName?: string, saveHardhatDeployments: boolean = false, forkingAccounts?: HardhatNetworkAccountsUserConfig) {
-        dotenv.config();
+    constructor(
+        useHardhat: boolean = true,
+        forkingNetworkName?: string,
+        saveHardhatDeployments: boolean = false,
+        forkingAccounts?: HardhatNetworkAccountsUserConfig,
+        autoLoadEnv: boolean = true
+    ) {
+        if (autoLoadEnv) {
+            loadEnv();
+        }
 
         if (useHardhat || forkingNetworkName) {
             this.networks.hardhat = {
@@ -88,7 +108,12 @@ export class Networks {
         }
 
         if (forkingNetworkName) {
-            const { url, authKeyHttpHeader } = parseRpcEnv(process.env[`${forkingNetworkName.toUpperCase()}_RPC_URL`] || '');
+            const forkRpcKey = `${forkingNetworkName.toUpperCase()}_RPC_URL`;
+            const forkRpcEnv = process.env[forkRpcKey];
+            if (!forkRpcEnv) {
+                throw new Error(`Missing required environment variable '${forkRpcKey}'. Did you forget to call loadEnv() or set autoLoadEnv to true?`);
+            }
+            const { url, authKeyHttpHeader } = parseRpcEnv(forkRpcEnv || '');
             this.networks.hardhat!.forking = {
                 url,
                 httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
