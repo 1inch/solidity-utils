@@ -49,13 +49,12 @@
     "dotenv": "16.4.5",
     "ethereumjs-util": "7.1.5",
     "ethers": "6.13.4",
-    "hardhat": "2.23.0",
     "hardhat-deploy": "0.14.0",
     "mocha-chai-jest-snapshot": "1.1.6",
     "node-fetch": "2.7.0"
   },
   "devDependencies": {
-    "@0xsequence/create3": "0xsequence/create3",
+    "@0xsequence/create3": "github:0xsequence/create3",
     "@nomicfoundation/hardhat-chai-matchers": "2.0.8",
     "@typechain/ethers-v6": "0.5.1",
     "@typechain/hardhat": "9.1.0",
@@ -72,6 +71,7 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-n": "17.12.0",
     "eslint-plugin-promise": "7.1.0",
+    "hardhat": "^2.24.2",
     "hardhat-gas-reporter": "2.2.1",
     "prettier": "3.3.3",
     "prettier-plugin-solidity": "1.4.1",
@@ -107,5 +107,10 @@
     "output": "CHANGELOG.md",
     "template": "./changelog/changelog-template.hbs",
     "commitLimit": 0
-  }
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "keywords": []
 }
