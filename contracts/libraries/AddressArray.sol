@@ -30,7 +30,7 @@ library AddressArray {
     uint256 internal constant _LENGTH_OFFSET = 160;
 
     /**
-     * @dev Struct containing the raw mapping used to store the addresses and the array length.
+     * @dev Internal data structure representing a packed array of addresses with embedded length info.
      */
     struct Data {
         uint256[1 << 32] _raw;
