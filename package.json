@@ -107,5 +107,8 @@
     "output": "CHANGELOG.md",
     "template": "./changelog/changelog-template.hbs",
     "commitLimit": 0
+  },
+  "resolutions": {
+    "elliptic": "^6.5.7"
   }
 }
