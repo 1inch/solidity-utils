@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 /**
  * @title AddressArray
- * @notice Implements a dynamic array of addresses using a mapping for storage efficiency, with the array length stored at index 0.
+ * @notice Implements a storage-efficient dynamic array of addresses, with the length encoded in the first storage slot.
  * @dev This library provides basic functionalities such as push, pop, set, and retrieval of addresses in a storage-efficient manner.
  */
 library AddressArray {
@@ -30,7 +30,7 @@ library AddressArray {
     uint256 internal constant _LENGTH_OFFSET = 160;
 
     /**
-     * @dev Struct containing the raw mapping used to store the addresses and the array length.
+     * @dev Internal address array where the first element encodes both the length and the first address value.
      */
     struct Data {
         uint256[1 << 32] _raw;
