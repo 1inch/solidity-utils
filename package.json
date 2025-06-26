@@ -36,7 +36,15 @@
     "test:us": "UPDATE_SNAPSHOT=1 yarn test:ci",
     "typecheck": "tsc --noEmit --skipLibCheck",
     "typechain": "hardhat typechain",
-    "changelog": "npx auto-changelog"
+    "changelog": "npx auto-changelog",
+    "forge:test": "forge test --match-path \"test-foundry/*\"",
+    "forge:test:gas": "forge test --match-path \"test-foundry/*\" --gas-report",
+    "forge:test:coverage": "forge coverage --match-path \"test-foundry/*\"",
+    "test:foundry": "forge test --match-path \"test-foundry/*\"",
+    "forge:snapshot": "forge snapshot",
+    "forge:snapshot:check": "forge snapshot --check",
+    "test:all": "npm run test && npm run forge:test",
+    "test:ci:all": "npm run test:ci && npm run forge:test"
   },
   "dependencies": {
     "@metamask/eth-sig-util": "8.0.0",

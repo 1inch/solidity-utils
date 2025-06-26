@@ -29,6 +29,24 @@ jobs:
       - run: yarn typechain
       - run: yarn test:ci
 
+  test-foundry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+      - run: yarn
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+      - name: Run Foundry tests
+        run: npm run test:foundry
+
   coverage:
     runs-on: ubuntu-latest
     steps:

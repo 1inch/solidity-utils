@@ -11,3 +11,7 @@ typechain-types
 .idea
 .DS_Store
 *.log
+
+# Foundry
+out/
+forge-cache/
