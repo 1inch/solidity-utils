@@ -65,6 +65,25 @@ contract USDCLikePermitMock is ERC20Permit {
         bytes32 digest,
         bytes memory signature
     ) internal view returns (bool) {
+        // First check if it's an EOA signature
+        if (signature.length == 65) {
+            bytes32 r;
+            bytes32 s;
+            uint8 v;
+
+            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+                r := mload(add(signature, 0x20))
+                s := mload(add(signature, 0x40))
+                v := byte(0, mload(add(signature, 0x60)))
+            }
+
+            address recovered = ecrecover(digest, v, r, s);
+            if (recovered == signer) {
+                return true;
+            }
+        }
+
+        // If not a valid EOA signature, try ERC-1271
         (bool success, bytes memory result) = signer.staticcall(
             abi.encodeWithSelector(
                 IERC1271.isValidSignature.selector,
