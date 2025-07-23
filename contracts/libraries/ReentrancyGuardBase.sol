@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import { ReentrancyGuard, ReentrancyGuardLib } from "./ReentrancyGuard.sol";
 
-contract ReentrancyGuardBase {
+abstract contract ReentrancyGuardBase {
     using ReentrancyGuardLib for ReentrancyGuard;
 
     ReentrancyGuard private _lock;
