@@ -7,7 +7,7 @@ import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "../libraries/ECDSA.sol";
 import { BySigTraits } from "../libraries/BySigTraits.sol";
-import { AddressArray } from "../libraries/AddressArray.sol";
+import { TransientArray } from "../libraries/TransientArray.sol";
 
 /**
  * @title BySig
@@ -17,7 +17,7 @@ import { AddressArray } from "../libraries/AddressArray.sol";
 abstract contract BySig is Context, EIP712 {
     using Address for address;
     using BySigTraits for BySigTraits.Value;
-    using AddressArray for AddressArray.Data;
+    using TransientArray for TransientArray.Address;
 
     /// @notice Emitted when the nonce used for a call is incorrect.
     error WrongNonce();
@@ -47,7 +47,7 @@ abstract contract BySig is Context, EIP712 {
     bytes32 constant public SIGNED_CALL_TYPEHASH = keccak256("SignedCall(uint256 traits,bytes data)");
 
     // Various nonces used for signature verification and replay protection.
-    AddressArray.Data /* transient */ private _msgSenders;
+    TransientArray.Address /* transient */ private _msgSenders;
     mapping(address => uint256) private _bySigAccountNonces;
     mapping(address => mapping(bytes4 => uint256)) private _bySigSelectorNonces;
     mapping(address => mapping(uint256 => uint256)) private _bySigUniqueNonces;
