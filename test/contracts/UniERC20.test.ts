@@ -38,11 +38,26 @@ describe('UniERC20', function () {
             expect(await wrapper.balanceOf(signer2)).to.be.equal(100);
         });
 
+        it('uni safe transfer', async function () {
+            const { wrapper, token } = await loadFixture(deployMocks);
+            await token.transfer(wrapper, 100);
+            await wrapper.safeTransfer(signer2, 100);
+            expect(await wrapper.balanceOf(signer2)).to.be.equal(100);
+        });
+
         it('uni transfer from', async function () {
             const { wrapper, token } = await loadFixture(deployMocks);
             await token.transfer(signer2, 100);
             await token.connect(signer2).approve(wrapper, 100);
             await wrapper.transferFrom(signer2, signer3, 100);
+            expect(await wrapper.balanceOf(signer3)).to.be.equal(100);
+        });
+
+        it('uni safe transfer from', async function () {
+            const { wrapper, token } = await loadFixture(deployMocks);
+            await token.transfer(signer2, 100);
+            await token.connect(signer2).approve(wrapper, 100);
+            await wrapper.safeTransferFrom(signer2, signer3, 100);
             expect(await wrapper.balanceOf(signer3)).to.be.equal(100);
         });
 
@@ -260,7 +275,7 @@ describe('UniERC20', function () {
         it('uni safe transferFrom, success', async function () {
             const { wrapper, receiver } = await loadFixture(deployMocks);
             const balBefore = await wrapper.balanceOf(wrapper);
-            await receiver.safeTransfer(wrapper, 100, { value: 100 });
+            await receiver.safeTransfer(wrapper, 100, { value: 101n });
             const balAfter = await wrapper.balanceOf(wrapper);
             expect(balAfter - balBefore).to.be.equal(100);
         });

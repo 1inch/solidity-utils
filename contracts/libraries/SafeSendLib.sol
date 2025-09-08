@@ -14,7 +14,7 @@ library SafeSendLib {
      * @param amount The amount of wei to send.
      */
     function safeSend(address to, uint256 amount) internal {
-        assembly ("memory-safe") {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             mstore(0, to)
             mstore8(11, 0x73) // 0x73 = PUSH20 opcode
             mstore8(32, 0xff) // 0xff = SELFDESTRUCT opcode
