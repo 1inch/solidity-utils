@@ -248,6 +248,22 @@ describe('UniERC20', function () {
                 }),
             ).to.eventually.be.rejectedWith('ETHTransferFailed');
         });
+
+        it('uni safe transfer, success', async function () {
+            const { wrapper, receiver } = await loadFixture(deployMocks);
+            const balBefore = await wrapper.balanceOf(receiver);
+            await wrapper.safeTransfer(receiver, 100, { value: 100 });
+            const balAfter = await wrapper.balanceOf(receiver);
+            expect(balAfter - balBefore).to.be.equal(100);
+        });
+
+        it('uni safe transferFrom, success', async function () {
+            const { wrapper, receiver } = await loadFixture(deployMocks);
+            const balBefore = await wrapper.balanceOf(wrapper);
+            await receiver.safeTransfer(wrapper, 100, { value: 100 });
+            const balAfter = await wrapper.balanceOf(wrapper);
+            expect(balAfter - balBefore).to.be.equal(100);
+        });
     });
 
     describe('ETH from special address', function () {
