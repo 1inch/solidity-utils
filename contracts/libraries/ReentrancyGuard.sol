@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.24; // tload/tstore are available since 0.8.24
 
 import { TransientLock, TransientLockLib } from "./TransientLock.sol";
 
@@ -22,7 +22,7 @@ import { TransientLock, TransientLockLib } from "./TransientLock.sol";
 abstract contract ReentrancyGuard {
     using TransientLockLib for TransientLock;
 
-    error MissingNonReentrantModifier();
+    error MissingNonReentrantModifier(bytes4 selector);
 
     TransientLock private _lock;
 
@@ -33,7 +33,7 @@ abstract contract ReentrancyGuard {
     }
 
     modifier onlyNonReentrantCall {
-        if (!_inNonReentrantCall()) revert MissingNonReentrantModifier();
+        if (!_inNonReentrantCall()) revert MissingNonReentrantModifier(msg.sig);
         _;
     }
 
@@ -44,7 +44,7 @@ abstract contract ReentrancyGuard {
     }
 
     modifier onlyNonReentrantCallLock(TransientLock storage lock) {
-        if (!lock.isLocked()) revert MissingNonReentrantModifier();
+        if (!lock.isLocked()) revert MissingNonReentrantModifier(msg.sig);
         _;
     }
 

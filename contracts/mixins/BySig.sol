@@ -2,19 +2,19 @@
 
 pragma solidity ^0.8.0;
 
-import { Context } from "@openzeppelin/contracts/utils/Context.sol";
 import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { EIP712 } from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import { ECDSA } from "../libraries/ECDSA.sol";
 import { BySigTraits } from "../libraries/BySigTraits.sol";
 import { TransientArray } from "../libraries/TransientArray.sol";
+import { MsgSender } from "../libraries/MsgSender.sol";
 
 /**
  * @title BySig
  * @notice Mixin that provides signature-based accessibility to every external method of the smart contract.
  * @dev Inherit your contract from this mixin and use `_msgSender()` instead of `msg.sender` everywhere.
  */
-abstract contract BySig is Context, EIP712 {
+abstract contract BySig is MsgSender, EIP712 {
     using Address for address;
     using BySigTraits for BySigTraits.Value;
     using TransientArray for TransientArray.Address;
@@ -47,7 +47,6 @@ abstract contract BySig is Context, EIP712 {
     bytes32 constant public SIGNED_CALL_TYPEHASH = keccak256("SignedCall(uint256 traits,bytes data)");
 
     // Various nonces used for signature verification and replay protection.
-    TransientArray.Address /* transient */ private _msgSenders;
     mapping(address => uint256) private _bySigAccountNonces;
     mapping(address => mapping(bytes4 => uint256)) private _bySigSelectorNonces;
     mapping(address => mapping(uint256 => uint256)) private _bySigUniqueNonces;
@@ -124,9 +123,10 @@ abstract contract BySig is Context, EIP712 {
         if (!_useNonce(signer, sig.traits, sig.data)) revert WrongNonce();
         if (!ECDSA.recoverOrIsValidSignature(signer, hashBySig(sig), signature)) revert WrongSignature();
 
-        _msgSenders.push(signer);
+        bytes4 selector = bytes4(sig.data);
+        _msgSenderPush(msg.sender, selector, signer);
         ret = address(this).functionDelegateCall(sig.data);
-        _msgSenders.pop();
+        _msgSenderPop(msg.sender, selector, signer);
     }
 
     /**
@@ -141,7 +141,10 @@ abstract contract BySig is Context, EIP712 {
      * @return ret Result of the executed call.
      */
     function sponsoredCall(address token, uint256 amount, bytes calldata data, bytes calldata extraData) public payable returns(bytes memory ret) {
+        _msgSenderPush(msg.sender, bytes4(data), _msgSender());
         ret = address(this).functionDelegateCall(data);
+        _msgSenderPop(msg.sender, bytes4(data), _msgSender());
+
         _chargeSigner(_msgSender(), msg.sender, token, amount, extraData);
     }
 
@@ -186,18 +189,6 @@ abstract contract BySig is Context, EIP712 {
      */
     function useBySigUniqueNonce(uint256 nonce) public {
         _bySigUniqueNonces[_msgSender()][nonce >> 8] |= 1 << (nonce & 0xff);
-    }
-
-    /**
-     * @dev Returns the address of the message sender, replacing the traditional `msg.sender` with a potentially signed sender.
-     * @return The address of the message sender.
-     */
-    function _msgSender() internal view override virtual returns (address) {
-        uint256 length = _msgSenders.length();
-        if (length == 0) {
-            return super._msgSender();
-        }
-        return _msgSenders.unsafeAt(length - 1);
     }
 
     function _useNonce(address signer, BySigTraits.Value traits, bytes calldata data) private returns(bool) {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.24; // tload/tstore are available since 0.8.24
 
 struct tuint256 { // solhint-disable-line contract-name-camelcase
     uint256 _raw;
