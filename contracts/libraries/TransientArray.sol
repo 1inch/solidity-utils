@@ -89,7 +89,7 @@ library TransientArray {
         if (!success) revert TransientArray_EmptyArrayPop();
 
         ret = self._items[newLength].tload();
-        delete self._items[newLength];
+        self._items[newLength].tstore(0);
         self._length.tstore(newLength);
     }
 
@@ -135,7 +135,7 @@ library TransientArray {
         if (!success) revert TransientArray_EmptyArrayPop();
 
         ret = self._items[newLength].tload();
-        delete self._items[newLength];
+        self._items[newLength].tstore(address(0));
         self._length.tstore(newLength);
     }
 
@@ -181,7 +181,7 @@ library TransientArray {
         if (!success) revert TransientArray_EmptyArrayPop();
 
         ret = self._items[newLength].tload();
-        delete self._items[newLength];
+        self._items[newLength].tstore(bytes32(0));
         self._length.tstore(newLength);
     }
 }
