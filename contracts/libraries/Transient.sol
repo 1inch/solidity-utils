@@ -63,13 +63,12 @@ library TransientLib {
     }
 
     function inc(tuint256 storage self, bytes4 exception) internal returns (uint256 incremented) {
-        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            incremented := add(tload(self.slot), 1)
-            if iszero(incremented) {
+        incremented = unsafeInc(self);
+        if (incremented == 0) {
+            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                 mstore(0, exception)
                 revert(0, 4)
             }
-            tstore(self.slot, incremented)
         }
     }
 
@@ -85,14 +84,12 @@ library TransientLib {
     }
 
     function dec(tuint256 storage self, bytes4 exception) internal returns (uint256 decremented) {
-        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            let original := tload(self.slot)
-            if iszero(original) {
+        decremented = unsafeDec(self);
+        if (decremented == type(uint256).max) {
+            assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                 mstore(0, exception)
                 revert(0, 4)
             }
-            decremented := sub(original, 1)
-            tstore(self.slot, decremented)
         }
     }
 
@@ -131,4 +128,3 @@ library TransientLib {
         }
     }
 }
-
