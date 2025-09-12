@@ -42,7 +42,7 @@ library TransientSet {
 
     struct Uint256 {
         TransientArray.Uint256 _items;
-        mapping(uint256 => tuint256) _lookup; // stored as ~index, similar to +1 but unchecked math
+        mapping(uint256 => tuint256) _lookup;
     }
 
     function length(Uint256 storage set) internal view returns (uint256) {
@@ -66,8 +66,8 @@ library TransientSet {
     }
 
     function add(Uint256 storage set, uint256 item) internal returns (bool) {
-        uint256 index = ~set._lookup[item].tload();
-        if (index != 0) {
+        uint256 index = set._lookup[item].tload();
+        if (index == 0) {
             return false;
         }
         set._lookup[item].tstore(set._items.push(item));
@@ -75,12 +75,12 @@ library TransientSet {
     }
 
     function remove(Uint256 storage set, uint256 item) internal returns (bool) {
-        uint256 index = ~set._lookup[item].tload();
-        set._lookup[item].tstore(0);
+        uint256 index = set._lookup[item].tload();
         if (index == 0) {
             return false;
         }
 
+        set._lookup[item].tstore(0);
         uint256 lastItem = set._items.pop();
         if (lastItem != item) {
             unchecked {
@@ -95,7 +95,7 @@ library TransientSet {
 
     struct Address {
         TransientArray.Address _items;
-        mapping(address => tuint256) _lookup; // stored as ~index, similar to +1 but unchecked math
+        mapping(address => tuint256) _lookup;
     }
 
     function length(Address storage set) internal view returns (uint256) {
@@ -119,7 +119,7 @@ library TransientSet {
     }
 
     function add(Address storage set, address item) internal returns (bool) {
-        uint256 index = ~set._lookup[item].tload();
+        uint256 index = set._lookup[item].tload();
         if (index != 0) {
             return false;
         }
@@ -128,7 +128,7 @@ library TransientSet {
     }
 
     function remove(Address storage set, address item) internal returns (bool) {
-        uint256 index = ~set._lookup[item].tload();
+        uint256 index = set._lookup[item].tload();
         set._lookup[item].tstore(0);
         if (index == 0) {
             return false;
@@ -148,7 +148,7 @@ library TransientSet {
 
     struct Bytes32 {
         TransientArray.Bytes32 _items;
-        mapping(bytes32 => tuint256) _lookup; // stored as ~index, similar to +1 but unchecked math
+        mapping(bytes32 => tuint256) _lookup; // stored as index, similar to +1 but unchecked math
     }
 
     function length(Bytes32 storage set) internal view returns (uint256) {
@@ -172,7 +172,7 @@ library TransientSet {
     }
 
     function add(Bytes32 storage set, bytes32 item) internal returns (bool) {
-        uint256 index = ~set._lookup[item].tload();
+        uint256 index = set._lookup[item].tload();
         if (index != 0) {
             return false;
         }
@@ -181,7 +181,7 @@ library TransientSet {
     }
 
     function remove(Bytes32 storage set, bytes32 item) internal returns (bool) {
-        uint256 index = ~set._lookup[item].tload();
+        uint256 index = set._lookup[item].tload();
         set._lookup[item].tstore(0);
         if (index == 0) {
             return false;
