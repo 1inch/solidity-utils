@@ -141,11 +141,12 @@ abstract contract BySig is MsgSender, EIP712 {
      * @return ret Result of the executed call.
      */
     function sponsoredCall(address token, uint256 amount, bytes calldata data, bytes calldata extraData) public payable returns(bytes memory ret) {
-        _msgSenderPush(msg.sender, bytes4(data), _msgSender());
+        address sender = _msgSender();
+        _msgSenderPush(msg.sender, bytes4(data), sender);
         ret = address(this).functionDelegateCall(data);
-        _msgSenderPop(msg.sender, bytes4(data), _msgSender());
+        _msgSenderPop(msg.sender, bytes4(data), sender);
 
-        _chargeSigner(_msgSender(), msg.sender, token, amount, extraData);
+        _chargeSigner(sender, msg.sender, token, amount, extraData);
     }
 
     /**
