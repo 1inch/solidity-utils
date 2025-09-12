@@ -67,7 +67,7 @@ library TransientSet {
 
     function add(Uint256 storage set, uint256 item) internal returns (bool) {
         uint256 index = set._lookup[item].tload();
-        if (index == 0) {
+        if (index != 0) {
             return false;
         }
         set._lookup[item].tstore(set._items.push(item));
@@ -129,11 +129,11 @@ library TransientSet {
 
     function remove(Address storage set, address item) internal returns (bool) {
         uint256 index = set._lookup[item].tload();
-        set._lookup[item].tstore(0);
         if (index == 0) {
             return false;
         }
 
+        set._lookup[item].tstore(0);
         address lastItem = set._items.pop();
         if (lastItem != item) {
             unchecked {
@@ -182,11 +182,11 @@ library TransientSet {
 
     function remove(Bytes32 storage set, bytes32 item) internal returns (bool) {
         uint256 index = set._lookup[item].tload();
-        set._lookup[item].tstore(0);
         if (index == 0) {
             return false;
         }
 
+        set._lookup[item].tstore(0);
         bytes32 lastItem = set._items.pop();
         if (lastItem != item) {
             unchecked {
