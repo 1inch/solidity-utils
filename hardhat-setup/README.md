@@ -4,7 +4,7 @@ This class is your go-to assistant for setting up various blockchain networks fo
 
 ## Key Components:
 1. **`networks` Property**: Stores configurations for all registered networks.
-2. **`etherscan` Property**: Keeps Etherscan API keys for all registered networks for contract verify process with Etherscan explorers.
+2. **`etherscan` Property**: Keeps Etherscan API key and Custom chains data for all registered networks for contract verify process with Etherscan-like explorer.
 
 ## Methods:
 
@@ -30,7 +30,7 @@ This class is your go-to assistant for setting up various blockchain networks fo
 
 2. **`register(...)`**: Registers a new network with specified parameters, such as the RPC URL, private key, and Etherscan keys.
 
-3. **`registerCustom(...)`**: Allows registering custom networks with custom parameters for Etherscan contract verifications.
+3. **`registerCustom(...)`**: Allows registering custom networks with custom parameters for Etherscan-like explorer contract verifications.
 
 5. **`registerAll()`**: Registers multiple standard networks using environment variables for configuration.
 
@@ -62,11 +62,11 @@ This class is your go-to assistant for setting up various blockchain networks fo
 
 3. **`etherscan key`**
 
-   `<NETWORK_NAME>_ETHERSCAN_KEY` - The Etherscan's key to verify contracts for the specific network with `<NETWORK_NAME>`.
+   `ETHERSCAN_API_KEY` - The Etherscan's API v2 key to verify contracts for any network Etherscan-like explorer supported.
 
    Format:
-   - Just a string with Etherscan API KEY
-   - Example: `MAINNET_ETHERSCAN_KEY=UFAPYWUQYZMR1NTER4G0BKB52WIOE6LKD9`
+   - Just a string with Etherscan API v2 KEY
+   - Example: `ETHERSCAN_API_KEY=UFAPYWUQYZMR1NTER4G0BKB52WIOE6LKD9`
 
 4. **`eth network in zksync`**
 

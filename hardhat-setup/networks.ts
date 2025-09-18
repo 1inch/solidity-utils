@@ -17,11 +17,11 @@ export function loadEnv(options?: dotenv.DotenvConfigOptions): void {
 /**
  * @category Hardhat-Setup
  * Configuration type for managing Etherscan integration in Hardhat setups.
- * @param apiKey Dictionary of API keys for accessing Etherscan, indexed by network name.
+ * @param apiKey The API key for accessing the Etherscan API v2 (used for all networks).
  * @param customChains Array of custom blockchain network configurations.
  */
 export type Etherscan = {
-    apiKey: {[key: string]: string},
+    apiKey: string,
     customChains: ChainConfig[],
 };
 
@@ -82,7 +82,7 @@ export async function resetHardhatNetworkFork(network: Network, networkName: str
  */
 export class Networks {
     networks: NetworksUserConfig = {};
-    etherscan: Etherscan = { apiKey: {}, customChains: [] };
+    etherscan: Etherscan = { apiKey: '', customChains: [] };
 
     constructor(
         useHardhat: boolean = true,
@@ -132,7 +132,9 @@ export class Networks {
                 hardfork,
                 ...(l1Network && { ethNetwork: l1Network, zksync: true }),
             };
-            this.etherscan.apiKey[etherscanNetworkName] = etherscanKey;
+            if (etherscanKey) {
+                this.etherscan.apiKey = etherscanKey;
+            }
             console.log(`Network '${name}' registered`);
         } else {
             console.log(`Network '${name}' not registered`);
@@ -148,21 +150,22 @@ export class Networks {
 
     registerAll(): { networks: NetworksUserConfig, etherscan: Etherscan } {
         const privateKey = process.env.PRIVATE_KEY;
+        const etherscanApiKey = process.env.ETHERSCAN_API_KEY;
         /* eslint-disable max-len */
-        this.register('mainnet', 1, process.env.MAINNET_RPC_URL, process.env.MAINNET_PRIVATE_KEY || privateKey, 'mainnet', process.env.MAINNET_ETHERSCAN_KEY);
-        this.register('bsc', 56, process.env.BSC_RPC_URL, process.env.BSC_PRIVATE_KEY || privateKey, 'bsc', process.env.BSC_ETHERSCAN_KEY);
-        this.register('sepolia', 11155111, process.env.SEPOLIA_RPC_URL, process.env.SEPOLIA_PRIVATE_KEY || privateKey, 'sepolia', process.env.SEPOLIA_ETHERSCAN_KEY);
-        this.register('optimistic', 10, process.env.OPTIMISTIC_RPC_URL, process.env.OPTIMISTIC_PRIVATE_KEY || privateKey, 'optimisticEthereum', process.env.OPTIMISTIC_ETHERSCAN_KEY);
-        this.register('matic', 137, process.env.MATIC_RPC_URL, process.env.MATIC_PRIVATE_KEY || privateKey, 'polygon', process.env.MATIC_ETHERSCAN_KEY);
-        this.register('arbitrum', 42161, process.env.ARBITRUM_RPC_URL, process.env.ARBITRUM_PRIVATE_KEY || privateKey, 'arbitrumOne', process.env.ARBITRUM_ETHERSCAN_KEY);
-        this.register('xdai', 100, process.env.XDAI_RPC_URL, process.env.XDAI_PRIVATE_KEY || privateKey, 'xdai', process.env.XDAI_ETHERSCAN_KEY);
-        this.register('avax', 43114, process.env.AVAX_RPC_URL, process.env.AVAX_PRIVATE_KEY || privateKey, 'avalanche', process.env.AVAX_ETHERSCAN_KEY, 'paris');
-        this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', process.env.BASE_ETHERSCAN_KEY);
-        this.registerCustom('linea', 59144, process.env.LINEA_RPC_URL, process.env.LINEA_PRIVATE_KEY || privateKey, process.env.LINEA_ETHERSCAN_KEY, 'https://api.lineascan.build/api', 'https://lineascan.build/', 'london');
-        this.registerCustom('sonic', 146, process.env.SONIC_RPC_URL, process.env.SONIC_PRIVATE_KEY || privateKey, process.env.SONIC_ETHERSCAN_KEY, 'https://api.sonicscan.org/api', 'https://sonicscan.org/', 'shanghai');
-        this.registerCustom('unichain', 130, process.env.UNICHAIN_RPC_URL, process.env.UNICHAIN_PRIVATE_KEY || privateKey, process.env.UNICHAIN_ETHERSCAN_KEY, 'https://api.uniscan.xyz/api', 'https://uniscan.xyz/', 'shanghai');
-        this.register('zksync', 324, process.env.ZKSYNC_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksyncmainnet', process.env.ZKSYNC_ETHERSCAN_KEY, 'paris', 'mainnet');
-        this.register('zksyncTest', 300, process.env.ZKSYNC_TEST_RPC_URL, process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, 'zksyncsepolia', process.env.ZKSYNC_TEST_ETHERSCAN_KEY, 'paris', 'sepolia');
+        this.register('mainnet', 1, process.env.MAINNET_RPC_URL, process.env.MAINNET_PRIVATE_KEY || privateKey, 'mainnet', etherscanApiKey);
+        this.register('bsc', 56, process.env.BSC_RPC_URL, process.env.BSC_PRIVATE_KEY || privateKey, 'bsc', etherscanApiKey);
+        this.register('sepolia', 11155111, process.env.SEPOLIA_RPC_URL, process.env.SEPOLIA_PRIVATE_KEY || privateKey, 'sepolia', etherscanApiKey);
+        this.register('optimistic', 10, process.env.OPTIMISTIC_RPC_URL, process.env.OPTIMISTIC_PRIVATE_KEY || privateKey, 'optimisticEthereum', etherscanApiKey);
+        this.register('matic', 137, process.env.MATIC_RPC_URL, process.env.MATIC_PRIVATE_KEY || privateKey, 'polygon', etherscanApiKey);
+        this.register('arbitrum', 42161, process.env.ARBITRUM_RPC_URL, process.env.ARBITRUM_PRIVATE_KEY || privateKey, 'arbitrumOne', etherscanApiKey);
+        this.register('xdai', 100, process.env.XDAI_RPC_URL, process.env.XDAI_PRIVATE_KEY || privateKey, 'xdai', etherscanApiKey);
+        this.register('avax', 43114, process.env.AVAX_RPC_URL, process.env.AVAX_PRIVATE_KEY || privateKey, 'avalanche', etherscanApiKey, 'paris');
+        this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', etherscanApiKey);
+        this.register('linea', 59144, process.env.LINEA_RPC_URL, process.env.LINEA_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.lineascan.build/api', 'https://lineascan.build/', 'london');
+        this.register('sonic', 146, process.env.SONIC_RPC_URL, process.env.SONIC_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.sonicscan.org/api', 'https://sonicscan.org/', 'shanghai');
+        this.register('unichain', 130, process.env.UNICHAIN_RPC_URL, process.env.UNICHAIN_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.uniscan.xyz/api', 'https://uniscan.xyz/', 'shanghai');
+        this.register('zksync', 324, process.env.ZKSYNC_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksyncmainnet', etherscanApiKey, 'paris', 'mainnet');
+        this.register('zksyncTest', 300, process.env.ZKSYNC_TEST_RPC_URL, process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, 'zksyncsepolia', etherscanApiKey, 'paris', 'sepolia');
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
         this.register('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL, process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey, 'zksyncfork', 'none', 'paris', process.env.ZKSYNC_LOCAL_ETH_NETWORK || 'mainnet');
         this.register('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksynclocal', 'none', 'paris', process.env.ZKSYNC_LOCAL_ETH_NETWORK);
