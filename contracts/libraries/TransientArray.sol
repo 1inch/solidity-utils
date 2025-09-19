@@ -1,0 +1,187 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.24; // tload/tstore are available since 0.8.24
+
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { TransientLib, tuint256, taddress, tbytes32 } from "./Transient.sol";
+
+/// @dev Library for managing transient dynamic arrays (TSTORE, TLOAD) of different types (uint256, address, bytes32).
+/// ```solidity
+/// contract MagicProtocol {
+///     using TransientArray for TransientArray.Uint256;
+///
+///     TransientArray.Uint256 private myArray;
+///
+///     function cook(uint256 value) external {
+///         myArray.push(value);
+///         require(myArray._length() == 1, "Array should not be empty after push");
+///         require(myArray.at(0) == value, "Value at index 0 does not match pushed value");
+///
+///         uint256 poppedValue = myArray.pop();
+///         require(poppedValue == value, "Popped value does not match pushed value");
+///         require(myArray._length() == 0, "Array should be empty after pop");
+///     }
+/// }
+/// ```
+library TransientArray {
+    using Math for uint256;
+    using TransientLib for tuint256;
+    using TransientLib for taddress;
+    using TransientLib for tbytes32;
+
+    error TransientArray_IndexOutOfBounds();
+    error TransientArray_EmptyArrayPop();
+
+    struct Uint256 {
+        tuint256 _length;
+        mapping(uint256 => tuint256) _items;
+    }
+
+    struct Address {
+        tuint256 _length;
+        mapping(uint256 => taddress) _items;
+    }
+
+    struct Bytes32 {
+        tuint256 _length;
+        mapping(uint256 => tbytes32) _items;
+    }
+
+    // Functions for Uint256
+
+    function length(Uint256 storage self) internal view returns (uint256) {
+        return self._length.tload();
+    }
+
+    function at(Uint256 storage self, uint256 index) internal view returns (uint256) {
+        if (index >= self._length.tload()) revert TransientArray_IndexOutOfBounds();
+        return self._items[index].tload();
+    }
+
+    function unsafeAt(Uint256 storage self, uint256 index) internal view returns (uint256) {
+        return self._items[index].tload();
+    }
+
+    function get(Uint256 storage self) internal view returns (uint256[] memory array) {
+        uint256 len = self._length.tload();
+        array = new uint256[](len);
+        for (uint256 i = 0; i < len; i++) {
+            array[i] = self._items[i].tload();
+        }
+    }
+
+    function set(Uint256 storage self, uint256 index, uint256 value) internal {
+        if (index >= self._length.tload()) revert TransientArray_IndexOutOfBounds();
+        self._items[index].tstore(value);
+    }
+
+    function push(Uint256 storage self, uint256 value) internal returns (uint256 newLength) {
+        uint256 nextElementIndex = self._length.tload();
+        self._items[nextElementIndex].tstore(value);
+        unchecked {
+            newLength = nextElementIndex + 1;
+            self._length.tstore(newLength);
+        }
+    }
+
+    function pop(Uint256 storage self) internal returns (uint256 ret) {
+        (bool success, uint256 newLength) = self._length.tload().trySub(1);
+        if (!success) revert TransientArray_EmptyArrayPop();
+
+        ret = self._items[newLength].tload();
+        self._items[newLength].tstore(0);
+        self._length.tstore(newLength);
+    }
+
+    // Functions for Address
+
+    function length(Address storage self) internal view returns (uint256) {
+        return self._length.tload();
+    }
+
+    function at(Address storage self, uint256 index) internal view returns (address) {
+        if (index >= self._length.tload()) revert TransientArray_IndexOutOfBounds();
+        return self._items[index].tload();
+    }
+
+    function unsafeAt(Address storage self, uint256 index) internal view returns (address) {
+        return self._items[index].tload();
+    }
+
+    function get(Address storage self) internal view returns (address[] memory array) {
+        uint256 len = self._length.tload();
+        array = new address[](len);
+        for (uint256 i = 0; i < len; i++) {
+            array[i] = self._items[i].tload();
+        }
+    }
+
+    function set(Address storage self, uint256 index, address value) internal {
+        if (index >= self._length.tload()) revert TransientArray_IndexOutOfBounds();
+        self._items[index].tstore(value);
+    }
+
+    function push(Address storage self, address value) internal returns (uint256 newLength) {
+        uint256 nextElementIndex = self._length.tload();
+        self._items[nextElementIndex].tstore(value);
+        unchecked {
+            newLength = nextElementIndex + 1;
+            self._length.tstore(newLength);
+        }
+    }
+
+    function pop(Address storage self) internal returns (address ret) {
+        (bool success, uint256 newLength) = self._length.tload().trySub(1);
+        if (!success) revert TransientArray_EmptyArrayPop();
+
+        ret = self._items[newLength].tload();
+        self._items[newLength].tstore(address(0));
+        self._length.tstore(newLength);
+    }
+
+    // Functions for Bytes32
+
+    function length(Bytes32 storage self) internal view returns (uint256) {
+        return self._length.tload();
+    }
+
+    function at(Bytes32 storage self, uint256 index) internal view returns (bytes32) {
+        if (index >= self._length.tload()) revert TransientArray_IndexOutOfBounds();
+        return self._items[index].tload();
+    }
+
+    function unsafeAt(Bytes32 storage self, uint256 index) internal view returns (bytes32) {
+        return self._items[index].tload();
+    }
+
+    function get(Bytes32 storage self) internal view returns (bytes32[] memory array) {
+        uint256 len = self._length.tload();
+        array = new bytes32[](len);
+        for (uint256 i = 0; i < len; i++) {
+            array[i] = self._items[i].tload();
+        }
+    }
+
+    function set(Bytes32 storage self, uint256 index, bytes32 value) internal {
+        if (index >= self._length.tload()) revert TransientArray_IndexOutOfBounds();
+        self._items[index].tstore(value);
+    }
+
+    function push(Bytes32 storage self, bytes32 value) internal returns (uint256 newLength) {
+        uint256 nextElementIndex = self._length.tload();
+        self._items[nextElementIndex].tstore(value);
+        unchecked {
+            newLength = nextElementIndex + 1;
+            self._length.tstore(newLength);
+        }
+    }
+
+    function pop(Bytes32 storage self) internal returns (bytes32 ret) {
+        (bool success, uint256 newLength) = self._length.tload().trySub(1);
+        if (!success) revert TransientArray_EmptyArrayPop();
+
+        ret = self._items[newLength].tload();
+        self._items[newLength].tstore(bytes32(0));
+        self._length.tstore(newLength);
+    }
+}
