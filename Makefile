@@ -1,4 +1,9 @@
+# Conditionally include .env or .env.automation based on OPS_LAUNCH_MODE
+ifeq ($(OPS_LAUNCH_MODE),auto)
+-include .env.automation
+else
 -include .env
+endif
 
 CURRENT_DIR=$(shell pwd)
 ENV_FILE=$(CURRENT_DIR)/.env
