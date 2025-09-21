@@ -4,6 +4,7 @@ ifeq ($(OPS_LAUNCH_MODE),auto)
 else
 -include .env
 endif
+export
 
 OPS_NETWORK:=$(subst ",,$(OPS_NETWORK))
 OPS_CHAIN_ID:=$(subst ",,$(OPS_CHAIN_ID))
