@@ -5,6 +5,16 @@ else
 -include .env
 endif
 
+OPS_NETWORK:=$(subst ",,$(OPS_NETWORK))
+OPS_CHAIN_ID:=$(subst ",,$(OPS_CHAIN_ID))
+OPS_REG_TYPE:=$(subst ",,$(OPS_REG_TYPE))
+OPS_ETHERSCAN_NETWORK_NAME:=$(subst ",,$(OPS_ETHERSCAN_NETWORK_NAME))
+OPS_API_URL:=$(subst ",,$(OPS_API_URL))
+OPS_BROWSER_URL:=$(subst ",,$(OPS_BROWSER_URL))
+OPS_HARDFORK:=$(subst ",,$(OPS_HARDFORK))
+OPS_L1_NETWORK:=$(subst ",,$(OPS_L1_NETWORK))
+OPS_SOLIDITY_UTILS_VERSION:=$(subst ",,$(OPS_SOLIDITY_UTILS_VERSION))
+
 CURRENT_DIR=$(shell pwd)
 ENV_FILE=$(CURRENT_DIR)/.env
 NETWORKS_FILE=$(CURRENT_DIR)/hardhat-setup/networks.ts
@@ -49,7 +59,7 @@ install-utils:
 			brew install yarn wget
 
 install-dependencies:
-			yarn install
+			yarn
 
 run:
 		@{ \
@@ -115,80 +125,15 @@ update-networks:
 update-ver:
 		@sed -i '' 's/"version": .*"/"version": '\"$(OPS_VERSION)\"'/g' $(PACKAGE_FILE)
 
-show-env:
-		@echo "Environment variables to set:"
-		@echo "$(REGOP_ENV_RPC_URL)"
-		@echo "$(REGOP_ENV_PK)"
-		@echo "$(REGOP_ENV_ETHERSCAN_KEY)"
-		@echo "Add these to your .env file."
-		@echo "Example:"
-		@echo "$(REGOP_ENV_RPC_URL)=<your_rpc_url>"
-		@echo "$(REGOP_ENV_PK)=<your_private_key>"
-		@echo "$(REGOP_ENV_ETHERSCAN_KEY)=<your_etherscan_key>"
-		@echo "Make sure to keep your private key secure and not share it publicly."
-
-update-env:
-		@{ \
-		for secret in $(REGOP_ENV_RPC_URL) $(REGOP_ENV_PK) $(REGOP_ENV_ETHERSCAN_KEY); do \
-			if grep -q "$$secret" $(ENV_FILE); then \
-				echo "$$secret secret already exists!"; \
-			else \
-				echo "\n$$secret=" >> $(ENV_FILE); \
-			fi \
-		done \
-		}
-
-clean:
-		rm -f $(CHAIN_ID_FILE)
-
-launch-hh-node:
-		@{ \
-		if [ -z "$(NODE_RPC)" ]; then \
-			echo "NODE_RPC is not set!"; \
-			exit 1; \
-		fi; \
-		echo "Launching Hardhat node with RPC: $(NODE_RPC)"; \
-		npx hardhat node --fork $(NODE_RPC) --vvvv --full-trace; \
-		}
-
-git-latest-tag:
-		@git describe --abbrev=0
-
-git-checkout:
-		@git checkout -b feature/$(OPS_NETWORK)
-
-git-push:
-		@git add .
-		@git commit -m "added $(OPS_NETWORK) network"
-		@git push origin feature/$(OPS_NETWORK)
-
-env-example:
-	@{ \
-	echo 'OPS_REG_TYPE=' >> .env.example; \
-	echo 'OPS_NETWORK=mainnet' >> .env.example; \
-	echo 'OPS_CHAIN_ID=1' >> .env.example; \
-	echo 'OPS_ETHERSCAN_NETWORK_NAME=mainnet' >> .env.example; \
-	echo 'OPS_API_URL=' >> .env.example; \
-	echo 'OPS_BROWSER_URL=' >> .env.example; \
-	echo 'OPS_HARDFORK=' >> .env.example; \
-	echo 'OPS_L1_NETWORK=' >> .env.example; \
-	echo 'OPS_VERSION=6.6.0' >> .env.example; \
-	}
-
 help:
-		@echo "Available commands:"
-		@echo "  make install                - Install dependencies and utilities"
-		@echo "  make run                    - Run the setup for the specified network"
-		@echo "  make show-chain-config-info - Show chain config info for the specified network"
-		@echo "  make update-networks        - Update networks file with the specified network"
-		@echo "  make update-ver             - Update package version"
-		@echo "  make show-env               - Show environment variables to set"
-		@echo "  make update-env             - Update .env file with required environment variables"
-		@echo "  make launch-hh-node         - Launch Hardhat node with specified RPC"
-		@echo "  make git-latest-tag         - Get the latest git tag"
-		@echo "  make git-checkout           - Checkout a new branch for the feature"
-		@echo "  make git-push               - Push changes to the remote repository"
-		@echo "  make env-example            - Create an example .env file"
-		@echo "  make help                   - Show this help message"
+	@echo "Available targets:"
+	@echo "  install              Install utilities and dependencies"
+	@echo "  install-utils        Install required utilities (yarn, wget)"
+	@echo "  install-dependencies Install project dependencies with yarn"
+	@echo "  run                  Run setup for the specified network"
+	@echo "  show-chain-config    Show chain ID for the specified network"
+	@echo "  update-networks      Add network configuration to networks.ts"
+	@echo "  update-ver           Update version in package.json"
+	@echo "  help                 Show this help message"
 
-.PHONY: install install-utils install-dependencies run show-chain-config update-networks update-ver show-env update-env launch-hh-node git-latest-tag git-checkout git-push env-example help
+.PHONY: install install-utils install-dependencies run show-chain-config update-networks update-ver help
