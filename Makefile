@@ -119,7 +119,7 @@ update-networks:
 		}
 
 update-ver:
-		@npm version minor
+		@npm version minor --force
 
 help:
 	@echo "Available targets:"

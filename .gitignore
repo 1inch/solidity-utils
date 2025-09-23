@@ -12,3 +12,4 @@ typechain-types
 .DS_Store
 *.log
 .env*
+*.tgz
