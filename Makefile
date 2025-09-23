@@ -14,7 +14,6 @@ OPS_API_URL:=$(subst ",,$(OPS_API_URL))
 OPS_BROWSER_URL:=$(subst ",,$(OPS_BROWSER_URL))
 OPS_HARDFORK:=$(subst ",,$(OPS_HARDFORK))
 OPS_L1_NETWORK:=$(subst ",,$(OPS_L1_NETWORK))
-OPS_SOLIDITY_UTILS_VERSION:=$(subst ",,$(OPS_SOLIDITY_UTILS_VERSION))
 
 CURRENT_DIR=$(shell pwd)
 ENV_FILE=$(CURRENT_DIR)/.env
@@ -72,11 +71,7 @@ run:
 			echo "Please set OPS_CHAIN_ID environment variable!"; \
 			exit 1; \
 		fi; \
-		if [ -z "$(OPS_VERSION)" ]; then \
-			echo "Please set OPS_VERSION environment variable!"; \
-			exit 1; \
-		fi; \
-		echo "Running setup for network: $(OPS_NETWORK) with chain ID: $(OPS_CHAIN_ID) and version: $(OPS_VERSION)"; \
+		echo "Running setup for network: $(OPS_NETWORK) with chain ID: $(OPS_CHAIN_ID):"; \
 		make update-networks; \
 		make update-ver; \
 		echo "Setup completed successfully!"; \
@@ -124,7 +119,7 @@ update-networks:
 		}
 
 update-ver:
-		@sed -i '' 's/"version": .*"/"version": '\"$(OPS_VERSION)\"'/g' $(PACKAGE_FILE)
+		@npm version minor
 
 help:
 	@echo "Available targets:"
