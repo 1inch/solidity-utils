@@ -171,6 +171,7 @@ export class Networks {
         this.register('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksynclocal', 'none', 'paris', process.env.ZKSYNC_LOCAL_ETH_NETWORK);
         
         // [[AUTOMATION]]
+		this.register('localhost', 31337, process.env.LOCALHOST_RPC_URL, process.env.LOCALHOST_PRIVATE_KEY || privateKey, 'mainnet', process.env.LOCALHOST_ETHERSCAN_KEY);
         
         /* eslint-enable max-len */
         return { networks: this.networks, etherscan: this.etherscan };
