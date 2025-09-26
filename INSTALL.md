@@ -1,5 +1,3 @@
-
-
 ## CONTRACTS DEPLOYMENT
 
 For automatic deployment, we use `make` and Makefiles. The Makefile manages the deployment and configuration of various smart contracts and helpers, including targets for installing dependencies, deploying contracts, and managing environment variables.
@@ -7,30 +5,29 @@ For automatic deployment, we use `make` and Makefiles. The Makefile manages the 
 ## QUICK START
 
 1. Run `make install`
-2. Run `make env-example` → creates `.env.example`
-3. Move `.env.example` to `.env` and fill in values. 
-For getting OPS_CHAIN_ID you should fill in OPS_NETWORK value, and run `make show-chain-config`. Follow instructions in terminal.
-For getting current OPS_VERSION you can use `make git-latest-tag`. Use this value to define the new OPS_VERSION.
-4. **Optional only for local Hardhat node**: Run `NODE_RPC=[PUT_HERE_THE_RPC_URL_FOR_FORKING] make launch-hh-node`
-5. Run `make run`
-6. Run `make show-env` and follow instructions.
-7. **Optional** Run `make git-checkout` for new branch creation
-8. **Optional** RUN `make git-push` for pushing to origin
+2. Create `.env` file with the following variables:
+   - Set OPS_NETWORK (e.g., mainnet, goerli, unichain)
+   - Set OPS_CHAIN_ID (use `make show-chain-config` to find the chain ID for your network)
+   - Set OPS_REG_TYPE if using custom networks
+   - Set other optional variables as needed
+3. Run `make run`
 
 ## ENVIRONMENT VARIABLES
+
+The Makefile supports loading environment variables from either `.env` or `.env.automation` based on the `OPS_LAUNCH_MODE` environment variable:
+- If `OPS_LAUNCH_MODE=auto`, it loads `.env.automation`
+- Otherwise, it loads `.env`
 
 | Variable                   | Description                                         |
 |----------------------------|-----------------------------------------------------|
 | OPS_REG_TYPE               | Registration type (e.g., custom)                    |
-| OPS_NETWORK                | Network name (e.g., mainnet, goerli)                |
-| OPS_CHAIN_ID               | Chain ID for the network                            |
+| OPS_NETWORK                | Network name (e.g., mainnet, goerli) - REQUIRED     |
+| OPS_CHAIN_ID               | Chain ID for the network - REQUIRED                 |
 | OPS_ETHERSCAN_NETWORK_NAME | (Optional) Etherscan network name (e.g., mainnet)   |
 | OPS_API_URL                | (Optional) Custom API URL for the network           |
 | OPS_BROWSER_URL            | (Optional) Custom browser URL for the network       |
 | OPS_HARDFORK               | (Optional) Hardfork to use (e.g., london)           |
 | OPS_L1_NETWORK             | (Optional) L1 network name                          |
-| OPS_VERSION                | Project version                                     |
-| NODE_RPC                   | (Optional) RPC URL for forking Hardhat node         |
 
 ### Example of .env file for custom network config:
 
@@ -43,7 +40,6 @@ OPS_API_URL=https://api.uniscan.xyz/api
 OPS_BROWSER_URL=https://uniscan.xyz/
 OPS_HARDFORK=shanghai
 OPS_L1_NETWORK=
-OPS_VERSION=6.7.0
 ```
 
 ### Example of .env file for mainnet:
@@ -57,27 +53,36 @@ OPS_API_URL=
 OPS_BROWSER_URL=
 OPS_HARDFORK=
 OPS_L1_NETWORK=
-OPS_VERSION=6.7.0
 ```
 
 ## MAKEFILE TARGETS
 
 Here is a list of Makefile targets you can use by running `make <target-name>` in the terminal:
-- install - install project dependencies and utils.
-- install-utils - Installs required system utilities (yarn, wget) using Homebrew.
-- install-dependencies - Installs project dependencies using yarn.
-- run - Runs the setup for the specified network, updating network and version info.
-- show-chain-config - Downloads and displays chain ID information for the specified network.
-- update-networks - Adds the specified network configuration to the networks file if not present.
-- update-ver - Updates the version field in package.json to the specified version.
-- show-env - Displays the required environment variables for the selected network.
-- update-env - Appends required environment variable keys to the .env file if missing.
-- launch-hh-node - Launches a Hardhat node, optionally forking from a specified RPC.
-- git-latest-tag - Shows the latest git tag in the repository.
-- git-checkout - Creates and checks out a new git branch for the specified network.
-- git-push - Commits and pushes changes to the remote feature branch for the network.
-- env-example - Generates an example .env file with all required variables.
-- help - Prints a summary of available make targets and their descriptions.
+
+- `install` - Installs utilities and project dependencies (runs install-utils and install-dependencies).
+- `install-utils` - Installs required system utilities (yarn, wget) using Homebrew.
+- `install-dependencies` - Installs project dependencies using yarn.
+- `run` - Runs the setup for the specified network. Validates that OPS_NETWORK and OPS_CHAIN_ID are set, then updates network configuration and increments version.
+- `show-chain-config` - Downloads chain configuration from Hardhat and ChainList to help find the chain ID for your network.
+- `update-networks` - Adds the specified network configuration to hardhat-setup/networks.ts if it doesn't already exist.
+- `update-ver` - Increments the minor version in package.json using npm version minor.
+- `help` - Shows all available make targets with descriptions.
+
+## NETWORK CONFIGURATION
+
+The Makefile automatically generates network registration code based on your environment variables:
+
+For standard networks:
+```typescript
+this.register("networkName", chainId, process.env.NETWORKNAME_RPC_URL, process.env.NETWORKNAME_PRIVATE_KEY || privateKey, process.env.NETWORKNAME_ETHERSCAN_KEY);
+```
+
+For custom networks:
+```typescript
+this.registerCustom("networkName", chainId, process.env.NETWORKNAME_RPC_URL, process.env.NETWORKNAME_PRIVATE_KEY || privateKey, process.env.NETWORKNAME_ETHERSCAN_KEY, "apiUrl", "browserUrl");
+```
+
+The environment variable names are automatically generated from the network name by converting to uppercase and replacing camelCase with underscores (e.g., `unichain` becomes `UNICHAIN_`, `baseMainnet` becomes `BASE_MAINNET_`).
 
 ## TODO 
 
