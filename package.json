@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "6.6.2",
+  "version": "6.7.0",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "exports": {
@@ -108,9 +108,7 @@
     "template": "./changelog/changelog-template.hbs",
     "commitLimit": 0
   },
-  "directories": {
-    "doc": "docs",
-    "test": "test"
-  },
-  "keywords": []
+  "resolutions": {
+    "elliptic": "^6.5.7"
+  }
 }
