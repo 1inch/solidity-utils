@@ -161,6 +161,7 @@ export class Networks {
         this.register('xdai', 100, process.env.XDAI_RPC_URL, process.env.XDAI_PRIVATE_KEY || privateKey, 'xdai', etherscanApiKey);
         this.register('avax', 43114, process.env.AVAX_RPC_URL, process.env.AVAX_PRIVATE_KEY || privateKey, 'avalanche', etherscanApiKey, 'paris');
         this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', etherscanApiKey);
+        this.register('baseSepolia', 84532, process.env.BASESEPOLIA_RPC_URL, process.env.BASESEPOLIA_PRIVATE_KEY || privateKey, 'baseSepolia', etherscanApiKey);
         this.registerCustom('linea', 59144, process.env.LINEA_RPC_URL, process.env.LINEA_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.lineascan.build/api', 'https://lineascan.build/', 'london');
         this.registerCustom('sonic', 146, process.env.SONIC_RPC_URL, process.env.SONIC_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.sonicscan.org/api', 'https://sonicscan.org/', 'shanghai');
         this.registerCustom('unichain', 130, process.env.UNICHAIN_RPC_URL, process.env.UNICHAIN_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.uniscan.xyz/api', 'https://uniscan.xyz/', 'shanghai');
