@@ -20,7 +20,7 @@ ENV_FILE=$(CURRENT_DIR)/.env
 NETWORKS_FILE=$(CURRENT_DIR)/hardhat-setup/networks.ts
 PACKAGE_FILE=$(CURRENT_DIR)/package.json
 PREFIX=$(shell echo "$(OPS_NETWORK)" | sed -r 's/([a-z0-9])([A-Z])/\1_\2/g' | tr '[:lower:]' '[:upper:]')
-REGOP_PREFIX=\t\tthis.register
+REGOP_PREFIX=        this.register
 
 ifeq ($(OPS_REG_TYPE),custom)
 	REGOP_TYPE=Custom
@@ -49,7 +49,7 @@ endif
 REGOP_ENV_PREFIX=process.env.
 REGOP_ENV_RPC_URL=$(PREFIX)_RPC_URL
 REGOP_ENV_PK=$(PREFIX)_PRIVATE_KEY
-REGOP_ENV_ETHERSCAN_KEY=$(PREFIX)_ETHERSCAN_KEY
+REGOP_ENV_ETHERSCAN_KEY=etherscanApiKey
 
 REGOP=$(REGOP_PREFIX)$(REGOP_TYPE)(\"$(OPS_NETWORK)\", $(OPS_CHAIN_ID), $(REGOP_ENV_PREFIX)$(REGOP_ENV_RPC_URL), $(REGOP_ENV_PREFIX)$(REGOP_ENV_PK) || privateKey$(REGOP_ETHERSCAN_NETWORK_NAME), $(REGOP_ENV_PREFIX)$(REGOP_ENV_ETHERSCAN_KEY)$(REGOP_API_URL)$(REGOP_BROWSER_URL)$(REGOP_HARDFORK)$(REGOP_L1_NETWORK));
 
@@ -112,9 +112,11 @@ update-networks:
 			echo "Network already exists!"; \
 		else \
 			echo "Adding network $(OPS_NETWORK) with chain ID $(OPS_CHAIN_ID) to $(NETWORKS_FILE)"; \
-			echo "The next network configuration will be added to $(NETWORK_FILE): $(REGOP)"; \
-			awk '1;/\[\[AUTOMATION\]\]/{print "$(REGOP)"}' $(NETWORKS_FILE) > $(NETWORKS_FILE).tmp; \
-			sed -i '' 's/"/'\''/g' $(NETWORKS_FILE).tmp && mv $(NETWORKS_FILE).tmp $(NETWORKS_FILE); \
+			echo "The next network configuration will be added to $(NETWORKS_FILE): $(REGOP)"; \
+			tmpfile=$$(mktemp); \
+			awk '1;/\[\[AUTOMATION\]\]/{print "$(REGOP)"}' $(NETWORKS_FILE) > $$tmpfile; \
+			sed -i '' 's/"/'\''/g' $$tmpfile; \
+			mv $$tmpfile $(NETWORKS_FILE); \
 		fi; \
 		}
 
