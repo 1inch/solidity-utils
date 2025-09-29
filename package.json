@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "6.7.1",
+  "version": "6.7.2",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "exports": {
@@ -49,7 +49,6 @@
     "dotenv": "16.4.5",
     "ethereumjs-util": "7.1.5",
     "ethers": "6.13.4",
-    "hardhat": "2.23.0",
     "hardhat-deploy": "0.14.0",
     "mocha-chai-jest-snapshot": "1.1.6",
     "node-fetch": "2.7.0"
@@ -72,6 +71,7 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-n": "17.12.0",
     "eslint-plugin-promise": "7.1.0",
+    "hardhat": "2.23.0",
     "hardhat-gas-reporter": "2.2.1",
     "prettier": "3.3.3",
     "prettier-plugin-solidity": "1.4.1",

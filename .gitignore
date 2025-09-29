@@ -11,3 +11,5 @@ typechain-types
 .idea
 .DS_Store
 *.log
+.env*
+*.tgz
