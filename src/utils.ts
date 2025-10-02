@@ -9,6 +9,8 @@ import { DeployOptions, DeployResult, Deployment, DeploymentsExtension, Receipt 
 import { constants } from './prelude';
 import { HardhatEthersProvider } from '@nomicfoundation/hardhat-ethers/internal/hardhat-ethers-provider';
 import { ICreate3Deployer } from '../typechain-types';
+import { StrictBaseContract } from './types-utils';
+import { Abi, AbiParametersToPrimitiveTypes } from 'abitype';
 
 /**
  * @category utils
@@ -252,6 +254,16 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
     await time.increaseTo(seconds);
 }
 
+export type DeployContractParameters<abi extends Abi = Abi> =
+    AbiParametersToPrimitiveTypes<
+        Extract<abi[number], { type: 'constructor' }>['inputs']
+    >;
+
+export type DeployContractReturn<abi extends Abi = Abi> = Promise<
+    BaseContract & {
+        deploymentTransaction(): ContractTransactionResponse;
+    } & Omit<StrictBaseContract<abi>, keyof BaseContract>
+>;
 /**
  * @category utils
  * Deploys a contract given a name and optional constructor parameters.
@@ -259,8 +271,8 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
  * @param parameters Constructor parameters for the contract.
  * @returns The deployed contract instance.
  */
-export async function deployContract(name: string, parameters: Array<BigNumberish> = []) : Promise<BaseContract> {
-    const ContractFactory = await ethers.getContractFactory(name);
+export async function deployContract<abi extends Abi = Abi>(name: string, parameters: DeployContractParameters<abi>): DeployContractReturn<abi> {
+    const ContractFactory = await ethers.getContractFactory<unknown[], StrictBaseContract<abi>>(name);
     const instance = await ContractFactory.deploy(...parameters);
     await instance.waitForDeployment();
     return instance;
