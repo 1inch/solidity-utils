@@ -73,7 +73,6 @@ run:
 		fi; \
 		echo "Running setup for network: $(OPS_NETWORK) with chain ID: $(OPS_CHAIN_ID):"; \
 		make update-networks; \
-		make update-ver; \
 		echo "Setup completed successfully!"; \
 		}
 
@@ -117,11 +116,12 @@ update-networks:
 			awk '1;/\[\[AUTOMATION\]\]/{print "$(REGOP)"}' $(NETWORKS_FILE) > $$tmpfile; \
 			sed -i '' 's/"/'\''/g' $$tmpfile; \
 			mv $$tmpfile $(NETWORKS_FILE); \
+			npm version minor --force; \
 		fi; \
 		}
 
 update-ver:
-		@npm version minor --force
+		@npm version minor --force; \
 
 help:
 	@echo "Available targets:"
