@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import { TransientLock, TransientLockLib } from "./TransientLock.sol";
+import { TransientLock, TransientLockLib } from "../libraries/TransientLock.sol";
 
 /**
  * @title ReentrancyGuard
