@@ -42,6 +42,17 @@ describe('Transient', function () {
                 // Note: Each call is separate transaction, so always starts from 0
                 expect(await mock.inc.staticCall()).to.equal(1n);
             });
+
+            it('should revert on overflow (when incremented == 0)', async function () {
+                const { mock } = await loadFixture(deployTransientMock);
+                await expect(mock.incFromMaxValue()).to.be.reverted;
+            });
+
+            it('should revert with custom exception on overflow', async function () {
+                const { mock } = await loadFixture(deployTransientMock);
+                const customSelector = '0xdeadbeef';
+                await expect(mock.incFromMaxValueWithException(customSelector)).to.be.reverted;
+            });
         });
 
         describe('dec', function () {

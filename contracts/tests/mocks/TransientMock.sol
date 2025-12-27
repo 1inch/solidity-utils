@@ -53,6 +53,17 @@ contract TransientMock {
         return _storage.uintValue.initAndAdd(initialValue, toAdd);
     }
 
+    // Overflow test: store max value then increment
+    function incFromMaxValue() external returns (uint256) {
+        _storage.uintValue.tstore(type(uint256).max);
+        return _storage.uintValue.inc();
+    }
+
+    function incFromMaxValueWithException(bytes4 exception) external returns (uint256) {
+        _storage.uintValue.tstore(type(uint256).max);
+        return _storage.uintValue.inc(exception);
+    }
+
     // taddress functions
     function tloadAddress() external view returns (address) {
         return _storage.addressValue.tload();

@@ -71,4 +71,49 @@ describe('ReentrancyGuard', function () {
             expect(await mock.counter()).to.equal(2n);
         });
     });
+
+    describe('nonReentrantLock modifier (custom lock)', function () {
+        it('should allow normal function call with custom lock', async function () {
+            const { mock } = await loadFixture(deployReentrancyGuardMock);
+            await mock.protectedIncrementWithCustomLock();
+            expect(await mock.counter()).to.equal(1n);
+        });
+
+        it('should allow multiple sequential calls with custom lock', async function () {
+            const { mock } = await loadFixture(deployReentrancyGuardMock);
+            await mock.protectedIncrementWithCustomLock();
+            await mock.protectedIncrementWithCustomLock();
+            await mock.protectedIncrementWithCustomLock();
+            expect(await mock.counter()).to.equal(3n);
+        });
+
+        it('should prevent reentrancy attack with custom lock', async function () {
+            const { mock, attacker } = await loadFixture(deployReentrancyGuardMock);
+
+            await expect(mock.protectedIncrementWithCustomLockAndCall(await attacker.getAddress()))
+                .to.be.revertedWithCustomError(mock, 'UnexpectedLock');
+        });
+
+        it('should have independent locks (custom vs built-in)', async function () {
+            const { mock } = await loadFixture(deployReentrancyGuardMock);
+            // Both should work as they use different locks
+            await mock.protectedIncrement();
+            await mock.protectedIncrementWithCustomLock();
+            expect(await mock.counter()).to.equal(2n);
+        });
+    });
+
+    describe('onlyNonReentrantCallLock modifier (custom lock)', function () {
+        it('should allow call within custom lock context', async function () {
+            const { mock } = await loadFixture(deployReentrancyGuardMock);
+            await mock.callOnlyInProtectedContextCustomLock();
+            expect(await mock.counter()).to.equal(1n);
+        });
+
+        it('should revert when called outside custom lock context', async function () {
+            const { mock } = await loadFixture(deployReentrancyGuardMock);
+            await expect(mock.callOnlyInProtectedContextCustomLockWithoutGuard())
+                .to.be.revertedWithCustomError(mock, 'MissingNonReentrantModifier');
+        });
+    });
 });
