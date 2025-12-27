@@ -22,7 +22,7 @@ library CalldataPtrLib {
      * @return ptr The packed CalldataPtr containing offset in upper 128 bits and length in lower 128 bits.
      */
     function from(bytes calldata data) internal pure returns (CalldataPtr ptr) {
-        assembly ("memory-safe") {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             ptr := or(shl(128, data.offset), data.length)
         }
     }
@@ -33,7 +33,7 @@ library CalldataPtrLib {
      * @return data The calldata bytes referenced by the pointer.
      */
     function toBytes(CalldataPtr ptr) internal pure returns (bytes calldata data) {
-        assembly ("memory-safe") {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             data.offset := shr(128, ptr)
             data.length := and(ptr, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
         }

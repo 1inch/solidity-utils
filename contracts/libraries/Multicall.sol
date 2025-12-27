@@ -15,9 +15,9 @@ contract Multicall {
      */
     function multicall(bytes[] calldata data) external {
         for (uint256 i = 0; i < data.length; i++) {
-            (bool success,) = address(this).delegatecall(data[i]);
+            (bool success,) = address(this).delegatecall(data[i]); // solhint-disable-line avoid-low-level-calls
             if (!success) {
-                assembly ("memory-safe") {
+                assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
                     let ptr := mload(0x40)
                     returndatacopy(ptr, 0, returndatasize())
                     revert(ptr, returndatasize())

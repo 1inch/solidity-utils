@@ -24,7 +24,7 @@ contract Simulator {
      * @param data The calldata to pass to the delegatee.
      */
     function simulate(address delegatee, bytes calldata data) external payable {
-        (bool success, bytes memory result) = delegatee.delegatecall(data);
+        (bool success, bytes memory result) = delegatee.delegatecall(data); // solhint-disable-line avoid-low-level-calls
         revert Simulated(delegatee, data, success, result);
     }
 }
