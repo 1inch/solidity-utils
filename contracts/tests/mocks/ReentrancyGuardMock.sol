@@ -67,25 +67,25 @@ contract ReentrancyGuardMock is ReentrancyGuard {
 }
 
 contract ReentrancyAttacker {
-    ReentrancyGuardMock public target;
+    ReentrancyGuardMock public guardTarget;
     bool public attacked;
     bool public attackedCustomLock;
 
     constructor(address _target) {
-        target = ReentrancyGuardMock(_target);
+        guardTarget = ReentrancyGuardMock(_target);
     }
 
     function attack() external {
         if (!attacked) {
             attacked = true;
-            target.protectedIncrement();
+            guardTarget.protectedIncrement();
         }
     }
 
     function attackCustomLock() external {
         if (!attackedCustomLock) {
             attackedCustomLock = true;
-            target.protectedIncrementWithCustomLock();
+            guardTarget.protectedIncrementWithCustomLock();
         }
     }
 }
