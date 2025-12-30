@@ -10,7 +10,7 @@ __metadata:
   resolution: "@0xsequence/create3@https://github.com/0xsequence/create3.git#commit=acc4703a21ec1d71dc2a99db088c4b1f467530fd"
   dependencies:
     csv-writer: "npm:^1.6.0"
-  checksum: 10c0/27c99ccd7cede5ff3bdeb0cc78173d18c8fb30f1b56eb7284cc6fa23ca3da4d8130567b98ed3552892ca28fbf53ee312fcde0c2c40bd680082e2c24180239ea6
+  checksum: 10c0/6dca38caa333cb3039ba01dec2fafb7b6a6629b99fbaff9179ef83f979c5129976726394873e8ff754d041818fd63628896c550900d299f438544a1ee320649e
   languageName: node
   linkType: hard
 
