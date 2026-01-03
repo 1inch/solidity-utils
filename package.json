@@ -1,6 +1,6 @@
 {
   "name": "@1inch/solidity-utils",
-  "version": "6.9.2",
+  "version": "6.10.0",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "exports": {
