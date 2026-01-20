@@ -3,7 +3,7 @@ import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import fetch from 'node-fetch';
-import { BaseContract, BigNumberish, BytesLike, Contract, ContractTransactionReceipt, ContractTransactionResponse, isBytesLike, JsonRpcProvider, Signer, TransactionReceipt, Wallet } from 'ethers';
+import { Abi, BaseContract, BigNumberish, BytesLike, Contract, ContractFactory, ContractTransactionReceipt, ContractTransactionResponse, isBytesLike, JsonRpcProvider, Signer, TransactionReceipt, Wallet } from 'ethers';
 import { DeployOptions, DeployResult, Deployment, DeploymentsExtension, Receipt } from 'hardhat-deploy/types';
 
 import { constants } from './prelude';
@@ -253,15 +253,33 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
 }
 
 /**
+ * Helper type for constructor parameters that allows arrays and complex types.
+ * This type is compatible with ContractFactory.deploy's expected arguments.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DeployContractParameters<abi extends Abi = Abi> = readonly any[];
+
+/**
+ * Helper type for the return type of deployContract.
+ */
+type DeployContractReturn<abi extends Abi = Abi> = BaseContract;
+
+/**
  * @category utils
  * Deploys a contract given a name and optional constructor parameters.
+ * Supports arrays and other complex types in constructor parameters (e.g., readonly number[]).
  * @param name The contract name.
  * @param parameters Constructor parameters for the contract.
  * @returns The deployed contract instance.
  */
-export async function deployContract(name: string, parameters: Array<BigNumberish> = []) : Promise<BaseContract> {
-    const ContractFactory = await ethers.getContractFactory(name);
-    const instance = await ContractFactory.deploy(...parameters);
+export async function deployContract<abi extends Abi = Abi>(
+    name: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameters: DeployContractParameters<abi> = [] as any
+): Promise<DeployContractReturn<abi>> {
+    const ContractFactoryInstance = await ethers.getContractFactory<abi>(name);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const instance = await ContractFactoryInstance.deploy(...(parameters as any));
     await instance.waitForDeployment();
     return instance;
 }
