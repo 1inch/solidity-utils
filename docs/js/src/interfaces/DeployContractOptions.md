@@ -62,7 +62,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:32](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L32)
+[src/utils.ts:32](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L32)
 
 ***
 
@@ -72,7 +72,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:30](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L30)
+[src/utils.ts:30](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L30)
 
 ***
 
@@ -82,7 +82,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:34](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L34)
+[src/utils.ts:34](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L34)
 
 ***
 
@@ -92,7 +92,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:35](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L35)
+[src/utils.ts:35](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L35)
 
 ***
 
@@ -102,7 +102,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:33](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L33)
+[src/utils.ts:33](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L33)
 
 ***
 
@@ -112,7 +112,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:38](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L38)
+[src/utils.ts:38](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L38)
 
 ***
 
@@ -122,7 +122,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:41](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L41)
+[src/utils.ts:41](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L41)
 
 ***
 
@@ -132,7 +132,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:40](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L40)
+[src/utils.ts:40](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L40)
 
 ***
 
@@ -142,7 +142,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:39](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L39)
+[src/utils.ts:39](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L39)
 
 ***
 
@@ -152,7 +152,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:37](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L37)
+[src/utils.ts:37](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L37)
 
 ***
 
@@ -162,7 +162,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:36](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L36)
+[src/utils.ts:36](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L36)
 
 ***
 
@@ -172,4 +172,4 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 #### Defined in
 
-[src/utils.ts:42](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L42)
+[src/utils.ts:42](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L42)

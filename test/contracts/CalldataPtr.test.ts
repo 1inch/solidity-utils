@@ -30,19 +30,22 @@ describe('CalldataPtr', function () {
     describe('getOffsetAndLength', function () {
         it('should return correct length for data', async function () {
             const { mock } = await loadFixture(deployCalldataPtrMock);
-            const [, length] = await mock.getOffsetAndLength(testData);
+            const result = await mock.getOffsetAndLength(testData);
+            const length = result[1];
             expect(length).to.equal(32n);
         });
 
         it('should return correct length for empty data', async function () {
             const { mock } = await loadFixture(deployCalldataPtrMock);
-            const [, length] = await mock.getOffsetAndLength('0x');
+            const result = await mock.getOffsetAndLength('0x');
+            const length = result[1];
             expect(length).to.equal(0n);
         });
 
         it('should return non-zero offset', async function () {
             const { mock } = await loadFixture(deployCalldataPtrMock);
-            const [offset] = await mock.getOffsetAndLength(testData);
+            const result = await mock.getOffsetAndLength(testData);
+            const offset = result[0];
             expect(offset).to.be.gt(0n);
         });
     });
