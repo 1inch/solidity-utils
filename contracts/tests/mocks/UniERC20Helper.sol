@@ -12,6 +12,12 @@ interface IUniERC20Wrapper {
         address to,
         uint256 amount
     ) external payable;
+
+    function safeTransferFrom(
+        address payable from,
+        address to,
+        uint256 amount
+    ) external payable;
 }
 
 contract UniERC20Wrapper {
@@ -27,12 +33,24 @@ contract UniERC20Wrapper {
         _token.uniTransfer(to, amount);
     }
 
+    function safeTransfer(address payable to, uint256 amount) external payable {
+        _token.uniSafeTransfer(to, amount);
+    }
+
     function transferFrom(
         address payable from,
         address to,
         uint256 amount
     ) external payable {
         _token.uniTransferFrom(from, to, amount);
+    }
+
+    function safeTransferFrom(
+        address payable from,
+        address to,
+        uint256 amount
+    ) external payable {
+        _token.uniSafeTransferFrom(from, to, amount);
     }
 
     function approve(address spender, uint256 amount) external {
@@ -71,6 +89,10 @@ contract ETHBadReceiver {
 
     function transfer(address to, uint256 amount) external payable {
         _wrapper.transferFrom{value: msg.value}(payable(address(this)), to, amount);
+    }
+
+    function safeTransfer(address to, uint256 amount) external payable {
+        _wrapper.safeTransferFrom{value: msg.value}(payable(address(this)), to, amount);
     }
 
     receive() external payable {
