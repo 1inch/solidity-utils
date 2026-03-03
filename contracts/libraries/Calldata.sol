@@ -67,7 +67,7 @@ library Calldata {
      * @return res The sliced calldata bytes from begin to the end.
      */
     function slice(bytes calldata calls, uint256 begin, bytes4 exception) internal pure returns (bytes calldata res) {
-        if (begin > calls.length) {
+        if (begin >= calls.length) {
             assembly ("memory-safe") {  // solhint-disable-line no-inline-assembly
                 mstore(0, exception)
                 revert(0, 4)
