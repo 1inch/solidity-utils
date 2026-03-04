@@ -1,6 +1,6 @@
 import { expect } from '../../src/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-unsafeDecimport hre, { ethers } from 'hardhat';
+import hre, { ethers } from 'hardhat';
 
 describe('Transient', function () {
     async function deployTransientMock() {
@@ -148,7 +148,7 @@ describe('Transient', function () {
             return { safe, unsafe };
         }
 
-        async function gasUsed(txPromise: Promise<any>): Promise<bigint> {
+        async function gasUsed(txPromise: Promise<ethers.ContractTransactionResponse>): Promise<bigint> {
             const tx = await txPromise;
             const receipt = await tx.wait();
             return receipt!.gasUsed;
