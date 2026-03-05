@@ -9,6 +9,7 @@ contract TransientMock {
     using TransientLib for tbytes32;
 
     struct Storage {
+        uint256 _padding;
         tuint256 uintValue;
         taddress addressValue;
         tbytes32 bytes32Value;

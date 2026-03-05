@@ -1,4 +1,5 @@
 import { expect } from '../../src/expect';
+import { executionGas } from '../../src/profileEVM';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import hre, { ethers } from 'hardhat';
 
@@ -155,54 +156,46 @@ describe('Transient', function () {
             return { safe, unsafe };
         }
 
-        async function executionGas(txPromise: Promise<ethers.ContractTransactionResponse>): Promise<number> {
-            const tx = await txPromise;
-            await tx.wait();
-            const trace = await ethers.provider.send('debug_traceTransaction', [tx.hash]);
-            const logs: { gas: number; gasCost: number }[] = trace.structLogs;
-            return logs[0].gas - logs[logs.length - 1].gas + logs[logs.length - 1].gasCost;
-        }
-
         before(function () {
             if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
         });
 
         it('tstore uint256', async function () {
             const { safe, unsafe } = await loadFixture(deployBothMocks);
-            const safeGas = await executionGas(safe.tstoreUint(42));
-            const unsafeGas = await executionGas(unsafe.tstoreUint(42));
+            const safeGas = await executionGas(ethers.provider, safe.tstoreUint(42));
+            const unsafeGas = await executionGas(ethers.provider, unsafe.tstoreUint(42));
             console.log(`        tstore uint256 — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
             expect(safeGas).to.be.gte(unsafeGas);
         });
 
         it('inc', async function () {
             const { safe, unsafe } = await loadFixture(deployBothMocks);
-            const safeGas = await executionGas(safe.inc());
-            const unsafeGas = await executionGas(unsafe.inc());
+            const safeGas = await executionGas(ethers.provider, safe.inc());
+            const unsafeGas = await executionGas(ethers.provider, unsafe.inc());
             console.log(`        inc — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
             expect(safeGas).to.be.gte(unsafeGas);
         });
 
         it('unsafeInc', async function () {
             const { safe, unsafe } = await loadFixture(deployBothMocks);
-            const safeGas = await executionGas(safe.unsafeInc());
-            const unsafeGas = await executionGas(unsafe.unsafeInc());
+            const safeGas = await executionGas(ethers.provider, safe.unsafeInc());
+            const unsafeGas = await executionGas(ethers.provider, unsafe.unsafeInc());
             console.log(`        unsafeInc — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
             expect(safeGas).to.be.gte(unsafeGas);
         });
 
         it('unsafeDec', async function () {
             const { safe, unsafe } = await loadFixture(deployBothMocks);
-            const safeGas = await executionGas(safe.unsafeDec());
-            const unsafeGas = await executionGas(unsafe.unsafeDec());
+            const safeGas = await executionGas(ethers.provider, safe.unsafeDec());
+            const unsafeGas = await executionGas(ethers.provider, unsafe.unsafeDec());
             console.log(`        unsafeDec — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
             expect(safeGas).to.be.gte(unsafeGas);
         });
 
         it('initAndAdd', async function () {
             const { safe, unsafe } = await loadFixture(deployBothMocks);
-            const safeGas = await executionGas(safe.initAndAdd(100, 5));
-            const unsafeGas = await executionGas(unsafe.initAndAdd(100, 5));
+            const safeGas = await executionGas(ethers.provider, safe.initAndAdd(100, 5));
+            const unsafeGas = await executionGas(ethers.provider, unsafe.initAndAdd(100, 5));
             console.log(`        initAndAdd — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
             expect(safeGas).to.be.gte(unsafeGas);
         });
@@ -210,8 +203,8 @@ describe('Transient', function () {
         it('tstore address', async function () {
             const { safe, unsafe } = await loadFixture(deployBothMocks);
             const addr = '0x1234567890123456789012345678901234567890';
-            const safeGas = await executionGas(safe.tstoreAddress(addr));
-            const unsafeGas = await executionGas(unsafe.tstoreAddress(addr));
+            const safeGas = await executionGas(ethers.provider, safe.tstoreAddress(addr));
+            const unsafeGas = await executionGas(ethers.provider, unsafe.tstoreAddress(addr));
             console.log(`        tstore address — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
             expect(safeGas).to.be.gte(unsafeGas);
         });
@@ -219,8 +212,8 @@ describe('Transient', function () {
         it('tstore bytes32', async function () {
             const { safe, unsafe } = await loadFixture(deployBothMocks);
             const val = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-            const safeGas = await executionGas(safe.tstoreBytes32(val));
-            const unsafeGas = await executionGas(unsafe.tstoreBytes32(val));
+            const safeGas = await executionGas(ethers.provider, safe.tstoreBytes32(val));
+            const unsafeGas = await executionGas(ethers.provider, unsafe.tstoreBytes32(val));
             console.log(`        tstore bytes32 — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
             expect(safeGas).to.be.gte(unsafeGas);
         });

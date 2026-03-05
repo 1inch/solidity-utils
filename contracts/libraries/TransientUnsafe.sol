@@ -1,8 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import "../../libraries/Transient.sol";
+import { tuint256, taddress, tbytes32 } from "./Transient.sol";
 
+/**
+ * @title TransientUnsafe
+ * @dev Library for transient storage without slot offset.
+ * Uses raw storage slots directly, saving 6 gas per access on dynamic slots (mappings).
+ * Safe for use with mappings where slots are already keccak256-hashed and cannot collide
+ * with Solidity's `transient` keyword (which does not support mappings).
+ * WARNING: Do not use for simple struct fields — use TransientLib instead to avoid
+ * potential slot collisions with native `transient` keyword variables.
+ */
 library TransientUnsafe {
     /**
      * @dev Error thrown when increment would cause overflow.

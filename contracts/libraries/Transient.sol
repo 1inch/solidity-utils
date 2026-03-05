@@ -72,7 +72,9 @@ library TransientLib {
      */
     error MathUnderflow();
 
-    //bytes32 private constant offset = keccak256(abi.encode(uint256(keccak256("TransientTest.storage.Offset")) - 1)) & ~bytes32(uint256(0xff));
+    // bytes32 private constant offset = keccak256(abi.encode(uint256(keccak256("TransientTest.storage.Offset")) - 1)) & ~bytes32(uint256(0xff));
+    // @dev: this is the offset for the transient storage slot
+    // @dev: it is required because tload uses storage slot index and it may be a collision with transient storage slots
     bytes32 private constant OFFSET = 0xb2e1616e94c4f038b21d9137633825dc3f28ecaa196ae6785bc038208b529200;
 
     // ===================== Functions for tuint256 =====================

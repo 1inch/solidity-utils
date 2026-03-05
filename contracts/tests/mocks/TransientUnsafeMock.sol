@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import "../libraries/TransientUnsafe.sol";
+import "../../libraries/TransientUnsafe.sol";
 
 contract TransientUnsafeMock {
     using TransientUnsafe for tuint256;
@@ -9,6 +9,7 @@ contract TransientUnsafeMock {
     using TransientUnsafe for tbytes32;
 
     struct Storage {
+        uint256 _padding;
         tuint256 uintValue;
         taddress addressValue;
         tbytes32 bytes32Value;
