@@ -3,7 +3,7 @@ import hre, { ethers } from 'hardhat';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import fetch from 'node-fetch';
-import { Abi, BaseContract, BigNumberish, BytesLike, Contract, ContractFactory, ContractTransactionReceipt, ContractTransactionResponse, isBytesLike, JsonRpcProvider, Signer, TransactionReceipt, Wallet } from 'ethers';
+import { Abi, BaseContract, BigNumberish, BytesLike, Contract, ContractTransactionReceipt, ContractTransactionResponse, isBytesLike, JsonRpcProvider, Signer, TransactionReceipt, Wallet } from 'ethers';
 import { DeployOptions, DeployResult, Deployment, DeploymentsExtension, Receipt } from 'hardhat-deploy/types';
 
 import { constants } from './prelude';
