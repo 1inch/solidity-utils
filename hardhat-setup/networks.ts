@@ -21,7 +21,7 @@ export function loadEnv(options?: dotenv.DotenvConfigOptions): void {
  * @param customChains Array of custom blockchain network configurations.
  */
 export type Etherscan = {
-    apiKey: string,
+    apiKey: string | { [network: string]: string },
     customChains: ChainConfig[],
 };
 
@@ -171,7 +171,27 @@ export class Networks {
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
         this.register('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL, process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey, 'zksyncfork', 'none', 'paris', process.env.ZKSYNC_LOCAL_ETH_NETWORK || 'mainnet');
         this.register('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksynclocal', 'none', 'paris', process.env.ZKSYNC_LOCAL_ETH_NETWORK);
+        this.registerCustom('cronos', 25, process.env.CRONOS_RPC_URL, process.env.CRONOS_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://explorer-api.cronos.org/mainnet/api/v2', 'https://explorer.cronos.org/', 'shanghai');
+        this.registerCustom('cronosTest', 338, process.env.CRONOS_TEST_RPC_URL, process.env.CRONOS_TEST_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://explorer-api.cronos.org/testnet/api/v2', 'https://explorer.cronos.org/testnet', 'shanghai');
         /* eslint-enable max-len */
         return { networks: this.networks, etherscan: this.etherscan };
+    }
+
+    getEtherscanConfig(network: string): Etherscan {
+        const keys: { [network: string]: string } = {};
+        switch (network) {
+        // for v1 of Etherscan API which is used for Cronos, see:
+        case 'cronos':
+        case 'cronosTest':
+            keys[network] = String(this.etherscan.apiKey);
+            return { apiKey: keys, customChains: this.etherscan.customChains };
+        // for v2 of Etherscan API which is used for other networks, see:
+        default:
+            return this.etherscan;
+        }
+    }
+
+    getNetworksConfig() {
+        return this.networks;
     }
 }

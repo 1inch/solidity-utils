@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BytesMemoryMock Gas usage slice 1`] = `22433n`;
+exports[`BytesMemoryMock Gas usage slice 1`] = `22425n`;
 
-exports[`BytesMemoryMock Gas usage unwrap 32 bytes 1`] = `22919n`;
+exports[`BytesMemoryMock Gas usage unwrap 32 bytes 1`] = `22911n`;
 
-exports[`BytesMemoryMock Gas usage unwrap 33 bytes 1`] = `23196n`;
+exports[`BytesMemoryMock Gas usage unwrap 33 bytes 1`] = `23188n`;
 
-exports[`BytesMemoryMock Gas usage unwrap 64 bytes 1`] = `23559n`;
+exports[`BytesMemoryMock Gas usage unwrap 64 bytes 1`] = `23551n`;

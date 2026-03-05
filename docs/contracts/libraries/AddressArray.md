@@ -1,7 +1,7 @@
 
 ## AddressArray
 
-Implements a dynamic array of addresses using a mapping for storage efficiency, with the array length stored at index 0.
+Implements a storage-efficient dynamic array of addresses, with the length encoded in the first storage slot.
 
 _This library provides basic functionalities such as push, pop, set, and retrieval of addresses in a storage-efficient manner._
 
@@ -28,7 +28,7 @@ _This library provides basic functionalities such as push, pop, set, and retriev
 ### Types
 ### Data
 
-_Struct containing the raw mapping used to store the addresses and the array length._
+_Internal address array where the first element encodes both the length and the first address value._
 
 ```solidity
 struct Data {

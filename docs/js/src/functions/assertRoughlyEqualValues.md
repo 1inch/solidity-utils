@@ -35,4 +35,4 @@ or if the actual value deviates from the expected by more than the specified rel
 
 ## Defined in
 
-[src/expect.ts:16](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/expect.ts#L16)
+[src/expect.ts:16](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/expect.ts#L16)

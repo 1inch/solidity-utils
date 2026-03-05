@@ -16,4 +16,4 @@ The network name.
 
 ## Defined in
 
-[hardhat-setup/networks.ts:21](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L21)
+[hardhat-setup/networks.ts:33](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L33)

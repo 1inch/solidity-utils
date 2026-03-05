@@ -23,7 +23,7 @@ const { networks, etherscan } = new Networks();
 
 const config: HardhatUserConfig = {
     solidity: {
-        version: '0.8.25',
+        version: '0.8.30',
         settings: {
             optimizer: {
                 enabled: true,

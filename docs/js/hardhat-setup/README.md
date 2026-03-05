@@ -29,6 +29,13 @@ Configuration type for managing Etherscan integration in Hardhat setups.
 - [Etherscan](type-aliases/Etherscan.md)
 
 ### Hardhat-Setup
+Loads environment variables into process.env using the dotenv package.
+By default, loads variables from a `.env` file in the project root.
+You can provide custom options (e.g. a different path or encoding) via the `options` parameter.
+
+- [loadEnv](functions/loadEnv.md)
+
+### Hardhat-Setup
 The Network class is a helper class to register networks and Etherscan API keys.
 See the [README](https://github.com/1inch/solidity-utils/tree/master/hardhat-setup/README.md) for usage.
 

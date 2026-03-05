@@ -7,7 +7,8 @@ dist
 typechain-types
 .coverage_contracts
 .coverage_artifacts
-.env
+.env*
 .idea
 .DS_Store
 *.log
+.yarn
