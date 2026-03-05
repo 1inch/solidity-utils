@@ -257,12 +257,12 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
  * This type is compatible with ContractFactory.deploy's expected arguments.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DeployContractParameters<abi extends Abi = Abi> = readonly any[];
+type DeployContractParameters = readonly any[];
 
 /**
  * Helper type for the return type of deployContract.
  */
-type DeployContractReturn<abi extends Abi = Abi> = BaseContract;
+type DeployContractReturn = BaseContract;
 
 /**
  * @category utils
@@ -275,8 +275,8 @@ type DeployContractReturn<abi extends Abi = Abi> = BaseContract;
 export async function deployContract<abi extends Abi = Abi>(
     name: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    parameters: DeployContractParameters<abi> = [] as any
-): Promise<DeployContractReturn<abi>> {
+    parameters: DeployContractParameters = [] as any
+): Promise<DeployContractReturn> {
     const ContractFactoryInstance = await ethers.getContractFactory<abi>(name);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const instance = await ContractFactoryInstance.deploy(...(parameters as any));
