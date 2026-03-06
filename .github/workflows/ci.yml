@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
+          cache: "yarn"
       - run: yarn
       - run: yarn lint
 
@@ -24,22 +24,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'yarn'
+          cache: "yarn"
       - run: yarn
       - run: yarn typechain
       - run: yarn test:ci
 
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'yarn'
-      - run: yarn
-      - run: yarn typechain
-      - run: yarn coverage
-      - uses: codecov/codecov-action@v4
-        with:
-            token: ${{ secrets.CODECOV_TOKEN }}
+  # Check disabled meanwhile we figure out how to handle codecov as company asset.
+  # https://1inch.atlassian.net/browse/ITSM-1394
+  # coverage:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: 'yarn'
+  #     - run: yarn
+  #     - run: yarn typechain
+  #     - run: yarn coverage
+  #     - uses: codecov/codecov-action@v4
+  #       with:
+  #           token: ${{ secrets.CODECOV_TOKEN }}
