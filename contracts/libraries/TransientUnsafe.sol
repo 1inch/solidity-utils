@@ -1,67 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-/**
- * @title tuint256
- * @dev Struct wrapper for uint256 to enable transient storage operations.
- */
-/// forge-lint: disable-next-line(pascal-case-struct)
-struct tuint256 { // solhint-disable-line contract-name-camelcase
-    uint256 _raw;
-}
+import { tuint256, taddress, tbytes32 } from "./Transient.sol";
 
 /**
- * @title taddress
- * @dev Struct wrapper for address to enable transient storage operations.
+ * @title TransientUnsafe
+ * @dev Library for transient storage without slot offset.
+ * Uses raw storage slots directly, saving 6 gas per access on dynamic slots (mappings).
+ * Safe for use with mappings where slots are already keccak256-hashed and cannot collide
+ * with Solidity's `transient` keyword (which does not support mappings).
+ * WARNING: Do not use for simple struct fields — use TransientLib instead to avoid
+ * potential slot collisions with native `transient` keyword variables.
  */
-/// forge-lint: disable-next-line(pascal-case-struct)
-struct taddress { // solhint-disable-line contract-name-camelcase
-    address _raw;
-}
-
-/**
- * @title tbytes32
- * @dev Struct wrapper for bytes32 to enable transient storage operations.
- */
-/// forge-lint: disable-next-line(pascal-case-struct)
-struct tbytes32 { // solhint-disable-line contract-name-camelcase
-    bytes32 _raw;
-}
-
-/**
- * @title TransientLib
- * @dev Library for drop-in replacement of uint256, address, and bytes32 with transient storage.
- * Transient storage (EIP-1153) is cleared after each transaction, providing gas-efficient
- * temporary storage for use cases like reentrancy guards.
- *
- * Example usage:
- * ```solidity
- * contract MagicProtocol {
- *     using TransientLib for tuint256;
- *
- *     error ReentrantCallDetected();
- *
- *     struct ReentrancyLock {
- *         tuint256 counter;
- *     }
- *
- *     ReentrancyLock private _lock;
- *
- *     modifier nonReentrable {
- *         require(_lock.counter.inc() == 1, ReentrantCallDetected());
- *         _;
- *         _lock.counter.dec();
- *     }
- *
- *     function someMagicFunction(...) external nonReentrable {
- *         ...
- *         target.callSomeSuspiciousFunction(...);
- *         ...
- *     }
- * }
- * ```
- */
-library TransientLib {
+library TransientUnsafe {
     /**
      * @dev Error thrown when increment would cause overflow.
      */
@@ -72,11 +23,6 @@ library TransientLib {
      */
     error MathUnderflow();
 
-    // bytes32 private constant offset = keccak256(abi.encode(uint256(keccak256("TransientTest.storage.Offset")) - 1)) & ~bytes32(uint256(0xff));
-    // @dev: this is the offset for the transient storage slot
-    // @dev: it is required because tload uses storage slot index and it may be a collision with transient storage slots
-    bytes32 private constant OFFSET = 0xb2e1616e94c4f038b21d9137633825dc3f28ecaa196ae6785bc038208b529200;
-
     // ===================== Functions for tuint256 =====================
 
     /**
@@ -86,7 +32,7 @@ library TransientLib {
      */
     function tload(tuint256 storage self) internal view returns (uint256 ret) {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            ret := tload(add(self.slot, OFFSET))
+            ret := tload(self.slot)
         }
     }
 
@@ -97,7 +43,7 @@ library TransientLib {
      */
     function tstore(tuint256 storage self, uint256 value) internal {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            tstore(add(self.slot, OFFSET), value)
+            tstore(self.slot, value)
         }
     }
 
@@ -108,7 +54,7 @@ library TransientLib {
      * @return incremented The new value after incrementing.
      */
     function inc(tuint256 storage self) internal returns (uint256 incremented) {
-        return inc(self, TransientLib.MathOverflow.selector);
+        return inc(self, TransientUnsafe.MathOverflow.selector);
     }
 
     /**
@@ -135,8 +81,8 @@ library TransientLib {
      */
     function unsafeInc(tuint256 storage self) internal returns (uint256 incremented) {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            incremented := add(tload(add(self.slot, OFFSET)), 1)
-            tstore(add(self.slot, OFFSET), incremented)
+            incremented := add(tload(self.slot), 1)
+            tstore(self.slot, incremented)
         }
     }
 
@@ -147,7 +93,7 @@ library TransientLib {
      * @return decremented The new value after decrementing.
      */
     function dec(tuint256 storage self) internal returns (uint256 decremented) {
-        return dec(self, TransientLib.MathUnderflow.selector);
+        return dec(self, TransientUnsafe.MathUnderflow.selector);
     }
 
     /**
@@ -174,8 +120,8 @@ library TransientLib {
      */
     function unsafeDec(tuint256 storage self) internal returns (uint256 decremented) {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            decremented := sub(tload(add(self.slot, OFFSET)), 1)
-            tstore(add(self.slot, OFFSET), decremented)
+            decremented := sub(tload(self.slot), 1)
+            tstore(self.slot, decremented)
         }
     }
 
@@ -204,7 +150,7 @@ library TransientLib {
      */
     function tload(taddress storage self) internal view returns (address ret) {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            ret := tload(add(self.slot, OFFSET))
+            ret := tload(self.slot)
         }
     }
 
@@ -215,7 +161,7 @@ library TransientLib {
      */
     function tstore(taddress storage self, address value) internal {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            tstore(add(self.slot, OFFSET), value)
+            tstore(self.slot, value)
         }
     }
 
@@ -228,7 +174,7 @@ library TransientLib {
      */
     function tload(tbytes32 storage self) internal view returns (bytes32 ret) {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            ret := tload(add(self.slot, OFFSET))
+            ret := tload(self.slot)
         }
     }
 
@@ -239,7 +185,7 @@ library TransientLib {
      */
     function tstore(tbytes32 storage self, bytes32 value) internal {
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            tstore(add(self.slot, OFFSET), value)
+            tstore(self.slot, value)
         }
     }
 }

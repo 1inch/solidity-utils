@@ -1,6 +1,7 @@
 import { expect } from '../../src/expect';
+import { executionGas } from '../../src/profileEVM';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import hre, { ethers } from 'hardhat';
 
 describe('Transient', function () {
     async function deployTransientMock() {
@@ -116,6 +117,105 @@ describe('Transient', function () {
             await mock.tstoreBytes32(testBytes);
             // Transient storage cleared between txs
             expect(await mock.tloadBytes32()).to.equal(ethers.ZeroHash);
+        });
+    });
+
+    describe('Offset', function () {
+        it('should have stored OFFSET equal to the computed formula', async function () {
+            const { mock } = await loadFixture(deployTransientMock);
+            const computed = await mock.computedOffset();
+            const stored = await mock.storedOffset();
+            expect(stored).to.equal(computed);
+        });
+
+        it('should match the expected hardcoded value', async function () {
+            const { mock } = await loadFixture(deployTransientMock);
+            const stored = await mock.storedOffset();
+            expect(stored).to.equal('0xb2e1616e94c4f038b21d9137633825dc3f28ecaa196ae6785bc038208b529200');
+        });
+
+        it('should match ethers-computed value', async function () {
+            const { mock } = await loadFixture(deployTransientMock);
+            const innerHash = ethers.keccak256(ethers.toUtf8Bytes('TransientTest.storage.Offset'));
+            const subtracted = BigInt(innerHash) - 1n;
+            const encoded = ethers.AbiCoder.defaultAbiCoder().encode(['uint256'], [subtracted]);
+            const outerHash = ethers.keccak256(encoded);
+            const mask = ~BigInt('0xff');
+            const expected = BigInt(outerHash) & mask;
+            const expectedHex = '0x' + expected.toString(16).padStart(64, '0');
+            expect(await mock.storedOffset()).to.equal(expectedHex);
+        });
+    });
+
+    describe('Gas comparison: TransientLib (with offset) vs TransientUnsafe (without offset)', function () {
+        async function deployBothMocks() {
+            const TransientMock = await ethers.getContractFactory('TransientMock');
+            const safe = await TransientMock.deploy();
+            const TransientUnsafeMock = await ethers.getContractFactory('TransientUnsafeMock');
+            const unsafe = await TransientUnsafeMock.deploy();
+            return { safe, unsafe };
+        }
+
+        before(function () {
+            if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+        });
+
+        it('tstore uint256', async function () {
+            const { safe, unsafe } = await loadFixture(deployBothMocks);
+            const safeGas = await executionGas(ethers.provider, safe.tstoreUint(42));
+            const unsafeGas = await executionGas(ethers.provider, unsafe.tstoreUint(42));
+            console.log(`        tstore uint256 — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
+            expect(safeGas).to.be.gte(unsafeGas);
+        });
+
+        it('inc', async function () {
+            const { safe, unsafe } = await loadFixture(deployBothMocks);
+            const safeGas = await executionGas(ethers.provider, safe.inc());
+            const unsafeGas = await executionGas(ethers.provider, unsafe.inc());
+            console.log(`        inc — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
+            expect(safeGas).to.be.gte(unsafeGas);
+        });
+
+        it('unsafeInc', async function () {
+            const { safe, unsafe } = await loadFixture(deployBothMocks);
+            const safeGas = await executionGas(ethers.provider, safe.unsafeInc());
+            const unsafeGas = await executionGas(ethers.provider, unsafe.unsafeInc());
+            console.log(`        unsafeInc — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
+            expect(safeGas).to.be.gte(unsafeGas);
+        });
+
+        it('unsafeDec', async function () {
+            const { safe, unsafe } = await loadFixture(deployBothMocks);
+            const safeGas = await executionGas(ethers.provider, safe.unsafeDec());
+            const unsafeGas = await executionGas(ethers.provider, unsafe.unsafeDec());
+            console.log(`        unsafeDec — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
+            expect(safeGas).to.be.gte(unsafeGas);
+        });
+
+        it('initAndAdd', async function () {
+            const { safe, unsafe } = await loadFixture(deployBothMocks);
+            const safeGas = await executionGas(ethers.provider, safe.initAndAdd(100, 5));
+            const unsafeGas = await executionGas(ethers.provider, unsafe.initAndAdd(100, 5));
+            console.log(`        initAndAdd — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
+            expect(safeGas).to.be.gte(unsafeGas);
+        });
+
+        it('tstore address', async function () {
+            const { safe, unsafe } = await loadFixture(deployBothMocks);
+            const addr = '0x1234567890123456789012345678901234567890';
+            const safeGas = await executionGas(ethers.provider, safe.tstoreAddress(addr));
+            const unsafeGas = await executionGas(ethers.provider, unsafe.tstoreAddress(addr));
+            console.log(`        tstore address — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
+            expect(safeGas).to.be.gte(unsafeGas);
+        });
+
+        it('tstore bytes32', async function () {
+            const { safe, unsafe } = await loadFixture(deployBothMocks);
+            const val = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+            const safeGas = await executionGas(ethers.provider, safe.tstoreBytes32(val));
+            const unsafeGas = await executionGas(ethers.provider, unsafe.tstoreBytes32(val));
+            console.log(`        tstore bytes32 — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);
+            expect(safeGas).to.be.gte(unsafeGas);
         });
     });
 });

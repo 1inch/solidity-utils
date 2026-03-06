@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import "../../libraries/Transient.sol";
+import "../../libraries/TransientUnsafe.sol";
 
-contract TransientMock {
-    using TransientLib for tuint256;
-    using TransientLib for taddress;
-    using TransientLib for tbytes32;
+contract TransientUnsafeMock {
+    using TransientUnsafe for tuint256;
+    using TransientUnsafe for taddress;
+    using TransientUnsafe for tbytes32;
 
     struct Storage {
         uint256 _padding;
@@ -54,7 +54,6 @@ contract TransientMock {
         return _storage.uintValue.initAndAdd(initialValue, toAdd);
     }
 
-    // Overflow test: store max value then increment
     function incFromMaxValue() external returns (uint256) {
         _storage.uintValue.tstore(type(uint256).max);
         return _storage.uintValue.inc();
@@ -83,14 +82,11 @@ contract TransientMock {
         _storage.bytes32Value.tstore(value);
     }
 
-    // offset verification
     function computedOffset() external pure returns (bytes32) {
         return keccak256(abi.encode(uint256(keccak256("TransientTest.storage.Offset")) - 1)) & ~bytes32(uint256(0xff));
     }
 
-    function storedOffset() external pure returns (bytes32 ret) {
-        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
-            ret := 0xb2e1616e94c4f038b21d9137633825dc3f28ecaa196ae6785bc038208b529200
-        }
+    function storedOffset() external pure returns (bytes32) {
+        return bytes32(0);
     }
 }
