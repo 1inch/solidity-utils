@@ -2,12 +2,14 @@ import { expect } from '../../src/expect';
 import { executionGas } from '../../src/profileEVM';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import hre, { ethers } from 'hardhat';
+import type { TransientMock } from '../../typechain-types/contracts/tests/mocks/TransientMock';
+import type { TransientUnsafeMock } from '../../typechain-types/contracts/tests/mocks/TransientUnsafeMock';
 
 for (const contractName of ['TransientMock', 'TransientUnsafeMock']) {
     describe(contractName, function () {
-        async function deployTransientMock() {
+        async function deployTransientMock(): Promise<{ mock: TransientMock | TransientUnsafeMock }> {
             const TransientMock = await ethers.getContractFactory(contractName);
-            const mock = await TransientMock.deploy();
+            const mock = await TransientMock.deploy() as unknown as TransientMock | TransientUnsafeMock;
             return { mock };
         }
 
