@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../interfaces/IERC20MetadataUppercase.sol";
 import "./SafeERC20.sol";
 import "./StringUtil.sol";
+import "./SafeSendLib.sol";
 
 /**
  * @title UniERC20
@@ -15,6 +16,7 @@ import "./StringUtil.sol";
  */
 library UniERC20 {
     using SafeERC20 for IERC20;
+    using SafeSendLib for address payable;
 
     error InsufficientBalance();
     error ApproveCalledOnETH();
@@ -74,6 +76,29 @@ library UniERC20 {
     }
 
     /**
+     * @dev Transfers a specified amount of the token to a given address.
+     * Note: Does nothing if the amount is zero.
+     * Note 2: Uses the SafeSendLib for safe Ether transfers.
+     * @param token The token to transfer.
+     * @param to The address to transfer the token to.
+     * @param amount The amount of the token to transfer.
+     */
+    function uniSafeTransfer(
+        IERC20 token,
+        address payable to,
+        uint256 amount
+    ) internal {
+        if (amount > 0) {
+            if (isETH(token)) {
+                if (address(this).balance < amount) revert InsufficientBalance();
+                to.safeSend(amount);
+            } else {
+                token.safeTransfer(to, amount);
+            }
+        }
+    }
+
+    /**
      * @dev Transfers a specified amount of the token from one address to another.
      * Note: Does nothing if the amount is zero.
      * @param token The token to transfer.
@@ -98,6 +123,38 @@ library UniERC20 {
                         // solhint-disable-next-line avoid-low-level-calls
                         (bool success, ) = from.call{value: msg.value - amount}("");
                         if (!success) revert ETHTransferFailed();
+                    }
+                }
+            } else {
+                token.safeTransferFrom(from, to, amount);
+            }
+        }
+    }
+
+    /**
+     * @dev Transfers a specified amount of the token from one address to another.
+     * Note: Does nothing if the amount is zero.
+     * Note 2: Uses the SafeSendLib for safe Ether transfers.
+     * @param token The token to transfer.
+     * @param from The address to transfer the token from.
+     * @param to The address to transfer the token to.
+     * @param amount The amount of the token to transfer.
+     */
+    function uniSafeTransferFrom(
+        IERC20 token,
+        address payable from,
+        address to,
+        uint256 amount
+    ) internal {
+        if (amount > 0) {
+            if (isETH(token)) {
+                if (msg.value < amount) revert NotEnoughValue();
+                if (from != msg.sender) revert FromIsNotSender();
+                if (to != address(this)) revert ToIsNotThis();
+                if (msg.value > amount) {
+                    // Return remainder if exist
+                    unchecked {
+                        from.safeSend(msg.value - amount);
                     }
                 }
             } else {
