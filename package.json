@@ -6,7 +6,8 @@
   "exports": {
     ".": "./dist/src/index.js",
     "./hardhat-setup": "./dist/hardhat-setup/index.js",
-    "./docgen": "./dist/docgen/index.js"
+    "./docgen": "./dist/docgen/index.js",
+    "./contracts/libraries/*": "./contracts/libraries/*"
   },
   "repository": {
     "type": "git",
