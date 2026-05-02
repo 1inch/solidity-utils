@@ -1,5 +1,26 @@
 import { PathLike, promises as fs } from 'fs';
-import { JsonRpcProvider } from 'ethers';
+import { ContractTransactionResponse, JsonRpcProvider } from 'ethers';
+
+/**
+ * @category profileEVM
+ * Measures pure execution gas of a transaction using `debug_traceTransaction`.
+ * Unlike `receipt.gasUsed`, this excludes intrinsic gas overhead (21000 base + calldata costs),
+ * giving a cleaner comparison of contract execution costs.
+ * @param provider An Ethereum provider capable of sending custom RPC requests.
+ * @param txPromise A promise that resolves to a sent transaction.
+ * @return The execution gas consumed by the transaction's EVM operations.
+ */
+export async function executionGas(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    provider: JsonRpcProvider | { send: (method: string, params: unknown[]) => Promise<any> },
+    txPromise: Promise<ContractTransactionResponse>,
+): Promise<number> {
+    const tx = await txPromise;
+    await tx.wait();
+    const trace = await provider.send('debug_traceTransaction', [tx.hash]);
+    const logs: { gas: number; gasCost: number }[] = trace.structLogs;
+    return logs[0].gas - logs[logs.length - 1].gas + logs[logs.length - 1].gasCost;
+}
 
 /**
  * @category profileEVM

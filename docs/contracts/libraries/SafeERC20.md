@@ -12,7 +12,7 @@ Compared to the standard ERC20, this implementation offers several enhancements:
 - [safeTransferFromUniversal(token, from, to, amount, permit2) internal](#safetransferfromuniversal)
 - [safeTransferFrom(token, from, to, amount) internal](#safetransferfrom)
 - [safeTransferFromPermit2(token, from, to, amount) internal](#safetransferfrompermit2)
-- [safeTransfer(token, to, value) internal](#safetransfer)
+- [safeTransfer(token, to, amount) internal](#safetransfer)
 - [forceApprove(token, spender, value) internal](#forceapprove)
 - [safeIncreaseAllowance(token, spender, value) internal](#safeincreaseallowance)
 - [safeDecreaseAllowance(token, spender, value) internal](#safedecreaseallowance)
@@ -123,7 +123,7 @@ the caller to make sure that the higher 96 bits of the `from` and `to` parameter
 ### safeTransfer
 
 ```solidity
-function safeTransfer(contract IERC20 token, address to, uint256 value) internal
+function safeTransfer(contract IERC20 token, address to, uint256 amount) internal
 ```
 Attempts to safely transfer tokens to another address.
 
@@ -137,7 +137,7 @@ the caller to make sure that the higher 96 bits of the `to` parameter are clean.
 | ---- | ---- | ----------- |
 | token | contract IERC20 | The IERC20 token contract from which the tokens will be transferred. |
 | to | address | The address to which the tokens will be transferred. |
-| value | uint256 | The amount of tokens to transfer. |
+| amount | uint256 | The amount of tokens to transfer. |
 
 ### forceApprove
 

@@ -20,4 +20,4 @@ Target time in seconds or string format to increase to.
 
 ## Defined in
 
-[src/utils.ts:248](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L248)
+[src/utils.ts:249](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L249)

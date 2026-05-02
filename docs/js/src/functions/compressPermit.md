@@ -22,4 +22,4 @@ A compressed permit string.
 
 ## Defined in
 
-[src/permit.ts:352](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/permit.ts#L352)
+[src/permit.ts:372](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L372)

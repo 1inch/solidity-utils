@@ -12,11 +12,7 @@
 
 ### apiKey
 
-> **apiKey**: `object`
-
-#### Index Signature
-
- \[`key`: `string`\]: `string`
+> **apiKey**: `string` \| `object`
 
 ### customChains
 
@@ -24,7 +20,7 @@
 
 ## Param
 
-Dictionary of API keys for accessing Etherscan, indexed by network name.
+The API key for accessing the Etherscan API v2 (used for all networks).
 
 ## Param
 
@@ -32,4 +28,4 @@ Array of custom blockchain network configurations.
 
 ## Defined in
 
-[hardhat-setup/networks.ts:11](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/hardhat-setup/networks.ts#L11)
+[hardhat-setup/networks.ts:23](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L23)

@@ -18,6 +18,7 @@
 - [defaultDeadlinePermit2](variables/defaultDeadlinePermit2.md)
 - [EIP712Domain](variables/EIP712Domain.md)
 - [Permit](variables/Permit.md)
+- [PERMIT2\_ADDRESS\_ZKSYNC](variables/PERMIT2_ADDRESS_ZKSYNC.md)
 - [TypedDataVersion](variables/TypedDataVersion.md)
 - [buildBySigTraits](functions/buildBySigTraits.md)
 - [hashBySig](functions/hashBySig.md)
@@ -91,6 +92,11 @@ Prepares structured data similar to the Dai permit function, including types, do
 Removes the '0x' prefix from a string. If no '0x' prefix is found, returns the original string.
 
 - [trim0x](functions/trim0x.md)
+
+### permit
+Returns the Permit2 contract address for the specified chain.
+
+- [permit2Address](functions/permit2Address.md)
 
 ### permit
 Trims the method selector from transaction data, removing the first 8 characters (4 bytes of hexable string) after '0x' prefix.
@@ -191,6 +197,17 @@ important part of test.
 Saves the deployment information using the deploy transaction hash.
 
 - [saveContractWithCreate3Deployment](functions/saveContractWithCreate3Deployment.md)
+
+### utils
+Sets custom bytecode for local test accounts and returns them as signers.
+This helper is intended for test environments (e.g., Hardhat) where deploying or modifying contract code
+at known addresses is required. It allows setting the same or different bytecode for multiple accounts.
+
+Primarily useful for ensuring accounts start with empty code. For example, with the introduction of EIP-7702
+on some networks, default accounts (like the first few returned by `ethers.getSigners()`) may already have
+forwarding contracts deployed to them, which can break assumptions in tests.
+
+- [getAccountsWithCode](functions/getAccountsWithCode.md)
 
 ### utils
 Signs a message with a given signer and fixes the signature format.

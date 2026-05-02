@@ -22,4 +22,4 @@ The price of the specified native token in USD, scaled by 1e18 to preserve preci
 
 ## Defined in
 
-[src/utils.ts:404](https://github.com/1inch/solidity-utils/blob/f9426ba6dab1eac9ac07fe3976b8d1cb2d2e5ba1/src/utils.ts#L404)
+[src/utils.ts:405](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L405)

@@ -9,6 +9,7 @@ contract TransientMock {
     using TransientLib for tbytes32;
 
     struct Storage {
+        uint256 _padding;
         tuint256 uintValue;
         taddress addressValue;
         tbytes32 bytes32Value;
@@ -80,5 +81,16 @@ contract TransientMock {
 
     function tstoreBytes32(bytes32 value) external {
         _storage.bytes32Value.tstore(value);
+    }
+
+    // offset verification
+    function computedOffset() external pure returns (bytes32) {
+        return keccak256(abi.encode(uint256(keccak256("TransientTest.storage.Offset")) - 1)) & ~bytes32(uint256(0xff));
+    }
+
+    function storedOffset() external pure returns (bytes32 ret) {
+        assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
+            ret := 0xb2e1616e94c4f038b21d9137633825dc3f28ecaa196ae6785bc038208b529200
+        }
     }
 }

@@ -10,7 +10,7 @@
 
 ### new Networks()
 
-> **new Networks**(`useHardhat`, `forkingNetworkName`?, `saveHardhatDeployments`?, `forkingAccounts`?): [`Networks`](Networks.md)
+> **new Networks**(`useHardhat`, `forkingNetworkName`?, `saveHardhatDeployments`?, `forkingAccounts`?, `autoLoadEnv`?): [`Networks`](Networks.md)
 
 #### Parameters
 
@@ -22,13 +22,15 @@
 
 • **forkingAccounts?**: `HardhatNetworkAccountsUserConfig`
 
+• **autoLoadEnv?**: `boolean` = `true`
+
 #### Returns
 
 [`Networks`](Networks.md)
 
 #### Defined in
 
-[hardhat-setup/networks.ts:75](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L75)
+[hardhat-setup/networks.ts:87](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L87)
 
 ## Properties
 
@@ -38,7 +40,7 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:73](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L73)
+[hardhat-setup/networks.ts:85](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L85)
 
 ***
 
@@ -48,9 +50,41 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:72](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L72)
+[hardhat-setup/networks.ts:84](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L84)
 
 ## Methods
+
+### getEtherscanConfig()
+
+> **getEtherscanConfig**(`network`): [`Etherscan`](../type-aliases/Etherscan.md)
+
+#### Parameters
+
+• **network**: `string`
+
+#### Returns
+
+[`Etherscan`](../type-aliases/Etherscan.md)
+
+#### Defined in
+
+[hardhat-setup/networks.ts:180](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L180)
+
+***
+
+### getNetworksConfig()
+
+> **getNetworksConfig**(): `NetworksUserConfig`
+
+#### Returns
+
+`NetworksUserConfig`
+
+#### Defined in
+
+[hardhat-setup/networks.ts:194](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L194)
+
+***
 
 ### register()
 
@@ -80,7 +114,7 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:99](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L99)
+[hardhat-setup/networks.ts:124](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L124)
 
 ***
 
@@ -102,7 +136,7 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:124](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L124)
+[hardhat-setup/networks.ts:151](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L151)
 
 ***
 
@@ -134,4 +168,4 @@
 
 #### Defined in
 
-[hardhat-setup/networks.ts:117](https://github.com/1inch/solidity-utils/blob/1f96397aedbb993a6d3faaeed4b2f77929d81ef0/hardhat-setup/networks.ts#L117)
+[hardhat-setup/networks.ts:144](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L144)
