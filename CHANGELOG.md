@@ -1,6 +1,6 @@
 # Change Log
 
-## solidity-utils/6.9.10 (2026-03-11)
+## solidity-utils/6.9.8 (2026-03-11)
 
 - added Robinhood chain
 
