@@ -173,7 +173,6 @@ export class Networks {
         this.register('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksynclocal', 'none', 'paris', process.env.ZKSYNC_LOCAL_ETH_NETWORK);
         this.registerCustom('cronos', 25, process.env.CRONOS_RPC_URL, process.env.CRONOS_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://explorer-api.cronos.org/mainnet/api/v2', 'https://explorer.cronos.org/', 'shanghai');
         this.registerCustom('cronosTest', 338, process.env.CRONOS_TEST_RPC_URL, process.env.CRONOS_TEST_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://explorer-api.cronos.org/testnet/api/v2', 'https://explorer.cronos.org/testnet', 'shanghai');
-        this.register('robinhood', 4663, process.env.ROBINHOOD_RPC_URL, process.env.ROBINHOOD_PRIVATE_KEY || privateKey, 'robinhood', etherscanApiKey);
         /* eslint-enable max-len */
         return { networks: this.networks, etherscan: this.etherscan };
     }
