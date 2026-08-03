@@ -171,9 +171,10 @@ export class Networks {
         // For 'zksyncFork' network you should use zksync fork node: https://github.com/matter-labs/era-test-node
         this.register('zksyncFork', 260, process.env.ZKSYNC_FORK_RPC_URL, process.env.ZKSYNC_FORK_PRIVATE_KEY || privateKey, 'zksyncfork', 'none', 'paris', process.env.ZKSYNC_LOCAL_ETH_NETWORK || 'mainnet');
         this.register('zksyncLocal', 270, process.env.ZKSYNC_LOCAL_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksynclocal', 'none', 'paris', process.env.ZKSYNC_LOCAL_ETH_NETWORK);
-        this.registerCustom('cronos', 25, process.env.CRONOS_RPC_URL, process.env.CRONOS_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://explorer-api.cronos.org/mainnet/api/v2', 'https://explorer.cronos.org/', 'shanghai');
+        this.registerCustom('cronos', 25, process.env.CRONOS_RPC_URL, process.env.CRONOS_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://explorer-api.cronos.org/mainnet/api/v2', 'https://explorer.cronos.com/', 'shanghai');
         this.registerCustom('cronosTest', 338, process.env.CRONOS_TEST_RPC_URL, process.env.CRONOS_TEST_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://explorer-api.cronos.org/testnet/api/v2', 'https://explorer.cronos.org/testnet', 'shanghai');
         this.register('robinhood', 4663, process.env.ROBINHOOD_RPC_URL, process.env.ROBINHOOD_PRIVATE_KEY || privateKey, 'robinhood', etherscanApiKey);
+        this.register('monad', 143, process.env.MONAD_RPC_URL, process.env.MONAD_PRIVATE_KEY || privateKey, 'monad', etherscanApiKey);
         /* eslint-enable max-len */
         return { networks: this.networks, etherscan: this.etherscan };
     }
