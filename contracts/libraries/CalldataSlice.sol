@@ -2,11 +2,11 @@
 pragma solidity ^0.8.30;
 
 /**
- * @title Calldata
+ * @title CalldataSlice
  * @dev Library for efficient slicing of calldata byte arrays without memory copying.
  * Provides gas-optimized operations for extracting portions of calldata directly.
  */
-library Calldata {
+library CalldataSlice {
     /**
      * @dev Returns a slice of the calldata bytes from `begin` to `end` index.
      * Warning: Does not perform bounds checking for gas efficiency.
