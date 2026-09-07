@@ -25,6 +25,7 @@ library Calldata {
     /**
      * @dev Returns a slice of the calldata bytes from `begin` to `end` index with bounds checking.
      * Reverts with the provided exception selector if `end` exceeds the calldata length.
+     * Warning: Does not check `begin <= end` for gas efficiency.
      * @param calls The calldata bytes to slice.
      * @param begin The starting index of the slice.
      * @param end The ending index of the slice (exclusive).
