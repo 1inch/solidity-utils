@@ -2,12 +2,12 @@ import { expect } from '../../src/expect';
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { ethers } from 'hardhat';
 
-describe('Calldata', function () {
+describe('CalldataSlice', function () {
     const testData = '0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f';
 
     async function deployCalldataMock() {
-        const CalldataMock = await ethers.getContractFactory('CalldataMock');
-        const mock = await CalldataMock.deploy();
+        const CalldataSliceMock = await ethers.getContractFactory('CalldataSliceMock');
+        const mock = await CalldataSliceMock.deploy();
         return { mock };
     }
 
