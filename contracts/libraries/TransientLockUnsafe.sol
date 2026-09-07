@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.30;
+
+pragma solidity ^0.8.27;
 
 import { TransientUnsafe, tuint256 } from "./TransientUnsafe.sol";
 import { TransientLock } from "./TransientLock.sol";

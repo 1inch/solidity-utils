@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // solhint-disable one-contract-per-file
-pragma solidity ^0.8.30;
+pragma solidity ^0.8.27;
 
 import "../../mixins/ReentrancyGuard.sol";
 
