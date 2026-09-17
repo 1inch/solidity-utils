@@ -78,6 +78,12 @@ describe('Calldata', function () {
             expect(result).to.equal('0x101112131415161718191a1b1c1d1e1f');
         });
 
+        it('should return empty when begin equals length', async function () {
+            const { mock } = await loadFixture(deployCalldataMock);
+            const result = await mock.sliceToEndChecked(testData, 32);
+            expect(result).to.equal('0x');
+        });
+
         it('should revert when begin exceeds length', async function () {
             const { mock } = await loadFixture(deployCalldataMock);
             await expect(mock.sliceToEndChecked(testData, 33))
