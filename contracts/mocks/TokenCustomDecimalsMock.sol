@@ -2,9 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
-
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { ERC20, ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 /**
  * @title TokenCustomDecimalsMock
  * @dev Extends ERC20Permit token with custom number of decimals and only owner access to `mint` and `burn` functionality.

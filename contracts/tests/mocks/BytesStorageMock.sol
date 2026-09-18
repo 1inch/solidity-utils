@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/BytesStorage.sol";
-
+import { BytesStorage } from "../../libraries/BytesStorage.sol";
 contract BytesStorageMock {
     using BytesStorage for bytes;
     using BytesStorage for BytesStorage.Slice;

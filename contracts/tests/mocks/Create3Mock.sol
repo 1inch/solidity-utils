@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "@0xsequence/create3/contracts/Create3.sol";
-
+import { Create3 } from "@0xsequence/create3/contracts/Create3.sol";
 contract Create3Mock {
     function deploy(bytes32 salt, bytes calldata code) external returns (address) {
         return Create3.create3(salt, code);

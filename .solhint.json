@@ -5,7 +5,6 @@
             "error",
             "^0.8.0"
         ],
-        "no-global-import": "off",
         "gas-custom-errors": "off",
         "gas-calldata-parameters": "off",
         "gas-indexed-events": "off",
@@ -15,6 +14,11 @@
         "use-natspec": "off",
         "function-max-lines": "off",
         "private-vars-leading-underscore": "error",
-        "func-visibility": ["error", { "ignoreConstructors": true }]
+        "func-visibility": [
+            "error",
+            {
+                "ignoreConstructors": true
+            }
+        ]
     }
 }
