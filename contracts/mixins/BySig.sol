@@ -44,6 +44,7 @@ abstract contract BySig is Context, EIP712 {
         bytes data;
     }
 
+    // solhint-disable-next-line gas-small-strings
     bytes32 constant public SIGNED_CALL_TYPEHASH = keccak256("SignedCall(uint256 traits,bytes data)");
 
     // Various nonces used for signature verification and replay protection.

@@ -28,7 +28,7 @@ contract AddressSetMock {
         return AddressSet.get(_self);
     }
 
-    function getAndProvideSet(address[] memory providedArr) external view returns (address[] memory, address[] memory) {
+    function getAndProvideSet(address[] calldata providedArr) external view returns (address[] memory, address[] memory) {
         return (AddressSet.get(_self, providedArr), providedArr);
     }
 

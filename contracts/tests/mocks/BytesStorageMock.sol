@@ -9,7 +9,7 @@ contract BytesStorageMock {
 
     bytes private _data;
 
-    function setData(bytes memory data) external {
+    function setData(bytes calldata data) external {
         _data = data;
     }
 

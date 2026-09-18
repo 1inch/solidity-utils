@@ -13,7 +13,7 @@ contract StringUtilTest {
         return StringUtil.toHex(value);
     }
 
-    function toHexBytes(bytes memory data)
+    function toHexBytes(bytes calldata data)
         external
         pure
         returns (string memory)
@@ -29,7 +29,7 @@ contract StringUtilTest {
         return StringUtilNaive.toHex(value);
     }
 
-    function toHexNaiveBytes(bytes memory data)
+    function toHexNaiveBytes(bytes calldata data)
         external
         pure
         returns (string memory)

@@ -26,7 +26,7 @@ contract AddressArrayMock {
         return AddressArray.get(_self);
     }
 
-    function getAndProvideArr(address[] memory providedArr) external view returns (address[] memory, address[] memory) {
+    function getAndProvideArr(address[] calldata providedArr) external view returns (address[] memory, address[] memory) {
         return (AddressArray.get(_self, providedArr), providedArr);
     }
 
