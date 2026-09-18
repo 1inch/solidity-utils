@@ -1,8 +1,9 @@
-import { defineConfig } from 'eslint/config';
+import js from '@eslint/js';
+import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 
-export default defineConfig([
+export default [
     {
         ignores: [
             'dist/**',
@@ -16,6 +17,8 @@ export default defineConfig([
             'docgen/templates/**',
         ],
     },
+    js.configs.recommended,
+    ...tsPlugin.configs['flat/recommended'],
     {
         files: ['**/*.{ts,js,mjs,cjs}'],
         languageOptions: {
@@ -23,31 +26,13 @@ export default defineConfig([
             ecmaVersion: 'latest',
             sourceType: 'module',
             globals: {
-                console: 'readonly',
-                process: 'readonly',
-                Buffer: 'readonly',
-                __dirname: 'readonly',
-                __filename: 'readonly',
-                module: 'readonly',
-                require: 'readonly',
-                exports: 'readonly',
-                describe: 'readonly',
-                it: 'readonly',
-                before: 'readonly',
-                after: 'readonly',
-                beforeEach: 'readonly',
-                afterEach: 'readonly',
-                context: 'readonly',
+                ...globals.node,
+                ...globals.mocha,
             },
         },
-        plugins: {
-            '@typescript-eslint': tsPlugin,
-        },
         rules: {
-            ...tsPlugin.configs.recommended.rules,
-            '@typescript-eslint/no-non-null-assertion': 'off',
+            'no-debugger': 'off',
             '@typescript-eslint/no-unused-expressions': 'off',
-            'no-unused-expressions': 'off',
             indent: ['error', 4],
             quotes: ['error', 'single', { avoidEscape: true }],
             semi: ['error', 'always'],
@@ -57,22 +42,17 @@ export default defineConfig([
             ],
             'one-var-declaration-per-line': ['error', 'always'],
             'object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
-            'no-use-before-define': 0,
             eqeqeq: ['error', 'smart'],
             'dot-notation': ['error', { allowKeywords: true, allowPattern: '' }],
-            'no-redeclare': ['error', { builtinGlobals: true }],
             'no-trailing-spaces': ['error', { skipBlankLines: true }],
-            'eol-last': 1,
+            'eol-last': 'warn',
             'comma-spacing': ['error', { before: false, after: true }],
             camelcase: ['error', { properties: 'always' }],
             'no-mixed-spaces-and-tabs': ['error', 'smart-tabs'],
             'comma-dangle': ['warn', 'always-multiline'],
-            'no-dupe-args': 2,
-            'no-dupe-keys': 2,
-            'no-debugger': 0,
             'object-curly-spacing': ['error', 'always'],
             'max-len': ['error', 200, 2],
             'generator-star-spacing': ['error', 'before'],
         },
     },
-]);
+];

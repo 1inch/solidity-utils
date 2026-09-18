@@ -367,13 +367,11 @@ export async function getEthPrice(nativeTokenSymbol: string = 'ETH'): Promise<bi
         };
     };
     const response = await fetch(`https://api.coinbase.com/v2/prices/${nativeTokenSymbol}-USD/spot`);
-    let amount: bigint = 0n;
     try {
-        amount = BigInt(parseFloat((await response.json() as CoinbaseResponse).data.amount) * 1e18);
+        return BigInt(parseFloat((await response.json() as CoinbaseResponse).data.amount) * 1e18);
     } catch {
         throw new Error('Failed to parse price from Coinbase API');
     }
-    return amount;
 }
 
 /**
