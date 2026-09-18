@@ -2,8 +2,7 @@
 // solhint-disable one-contract-per-file
 pragma solidity ^0.8.0;
 
-import "../../mixins/Simulator.sol";
-
+import { Simulator } from "../../mixins/Simulator.sol";
 contract SimulatorTarget {
     uint256 public value;
 

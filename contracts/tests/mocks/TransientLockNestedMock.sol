@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.27;
 
-import "../../libraries/TransientLock.sol";
-
+import { TransientLock, TransientLockLib } from "../../libraries/TransientLock.sol";
 contract TransientLockNestedMock {
     using TransientLockLib for TransientLock;
 

@@ -7,7 +7,7 @@ pragma solidity ^0.8.24;
  * @dev Struct wrapper for uint256 to enable transient storage operations.
  */
 /// forge-lint: disable-next-line(pascal-case-struct)
-struct tuint256 { // solhint-disable-line contract-name-camelcase
+struct tuint256 { // solhint-disable-line contract-name-capwords
     uint256 _raw;
 }
 
@@ -16,7 +16,7 @@ struct tuint256 { // solhint-disable-line contract-name-camelcase
  * @dev Struct wrapper for address to enable transient storage operations.
  */
 /// forge-lint: disable-next-line(pascal-case-struct)
-struct taddress { // solhint-disable-line contract-name-camelcase
+struct taddress { // solhint-disable-line contract-name-capwords
     address _raw;
 }
 
@@ -25,7 +25,7 @@ struct taddress { // solhint-disable-line contract-name-camelcase
  * @dev Struct wrapper for bytes32 to enable transient storage operations.
  */
 /// forge-lint: disable-next-line(pascal-case-struct)
-struct tbytes32 { // solhint-disable-line contract-name-camelcase
+struct tbytes32 { // solhint-disable-line contract-name-capwords
     bytes32 _raw;
 }
 

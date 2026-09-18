@@ -1,10 +1,12 @@
-import { expect } from '../../src/expect';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { getNetworkConnection } from '../../src/network.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
+
+const { ethers, networkHelpers } = await getNetworkConnection();
+
 
 describe('EthReceiver', function () {
-    let signer1: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
 
     before(async function () {
         [signer1] = await ethers.getSigners();
@@ -20,12 +22,12 @@ describe('EthReceiver', function () {
     }
 
     it('contract transfer', async function () {
-        const { ethReceiverMock, ethSenderMock } = await loadFixture(deployMocks);
+        const { ethReceiverMock, ethSenderMock } = await networkHelpers.loadFixture(deployMocks);
         await ethSenderMock.transfer(ethReceiverMock, { value: 100 });
     });
 
     it('normal transfer', async function () {
-        const { ethReceiverMock } = await loadFixture(deployMocks);
+        const { ethReceiverMock } = await networkHelpers.loadFixture(deployMocks);
 
         await expect(
             signer1.sendTransaction({ to: ethReceiverMock, value: 100 }),

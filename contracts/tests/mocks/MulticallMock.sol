@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../mixins/Multicall.sol";
-
+import { Multicall } from "../../mixins/Multicall.sol";
 contract MulticallMock is Multicall {
     error CustomError(string message);
 
@@ -28,6 +27,6 @@ contract MulticallMock is Multicall {
     }
 
     function revertEmpty() external pure {
-        revert(); // solhint-disable-line reason-string
+        revert(); // solhint-disable-line reason-string, gas-custom-errors
     }
 }

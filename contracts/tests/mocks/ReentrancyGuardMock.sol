@@ -2,8 +2,8 @@
 // solhint-disable one-contract-per-file
 pragma solidity ^0.8.27;
 
-import "../../mixins/ReentrancyGuard.sol";
-
+import { ReentrancyGuard } from "../../mixins/ReentrancyGuard.sol";
+import { TransientLock } from "../../libraries/TransientLock.sol";
 interface IReentrancyAttacker {
     function attack() external;
     function attackCustomLock() external;

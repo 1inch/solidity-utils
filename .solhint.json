@@ -5,9 +5,17 @@
             "error",
             "^0.8.0"
         ],
-        "no-global-import": "off",
-        "gas-custom-errors": "off",
+        "gas-indexed-events": "off",
+        "gas-increment-by-one": "off",
+        "gas-strict-inequalities": "off",
+        "use-natspec": "off",
+        "function-max-lines": "off",
         "private-vars-leading-underscore": "error",
-        "func-visibility": ["error", { "ignoreConstructors": true }]
+        "func-visibility": [
+            "error",
+            {
+                "ignoreConstructors": true
+            }
+        ]
     }
 }

@@ -1,16 +1,20 @@
-import { ether, time, constants } from '../src/prelude';
+import { getNetworkConnection } from '../src/network.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { ether, time, constants } from '../src/prelude.js';
 import {
     timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx,
     countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode,
     getEthPrice, deployAndGetContractWithCreate3, saveContractWithCreate3Deployment,
     getAccountsWithCode,
-} from '../src/utils';
-import { expect } from '../src/expect';
-import hre, { deployments, ethers } from 'hardhat';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+} from '../src/utils.js';
+import { expect } from '../src/expect.js';
+import hre, { artifacts } from 'hardhat';
+import { loadEnvironmentFromHardhat } from 'hardhat-deploy/helpers';
 import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog, ContractTransactionReceipt } from 'ethers';
-import { Create3Mock, TokenMock, WETH } from '../typechain-types';
+import { Create3Mock, TokenMock, WETH } from '../typechain-types/index.js';
+
+const { ethers, networkHelpers } = await getNetworkConnection();
+
 
 describe('timeIncreaseTo', function () {
     const precision = 2;
@@ -61,8 +65,8 @@ describe('fixSignature', function () {
 });
 
 describe('utils', function () {
-    let signer1: SignerWithAddress;
-    let signer2: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
+    let signer2: HardhatEthersSigner;
 
     before(async function () {
         [signer1, signer2] = await ethers.getSigners();
@@ -98,7 +102,7 @@ describe('utils', function () {
 
     describe('trackReceivedTokenAndTx', function () {
         it('should be tracked ERC20 Transfer', async function () {
-            const { usdt } = await loadFixture(deployUSDT);
+            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
 
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2, ether('1')),
@@ -112,7 +116,7 @@ describe('utils', function () {
         });
 
         it('should be tracked ERC20 Approve', async function () {
-            const { usdt } = await loadFixture(deployUSDT);
+            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
 
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
@@ -128,7 +132,7 @@ describe('utils', function () {
 
     describe('trackReceivedToken', function () {
         it('should be tracked ERC20 Transfer', async function () {
-            const { usdt } = await loadFixture(deployUSDT);
+            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
 
             const [received] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2, ether('1')),
@@ -137,7 +141,7 @@ describe('utils', function () {
         });
 
         it('should be tracked ERC20 Approve', async function () {
-            const { usdt } = await loadFixture(deployUSDT);
+            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
 
             const [received] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
@@ -148,12 +152,12 @@ describe('utils', function () {
 
     describe('countInstructions', function () {
         it('should be counted ERC20 Transfer', async function () {
-            const { usdt } = await loadFixture(deployUSDT);
+            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
 
             const tx = (await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2, ether('1')),
             ))[1] as ContractTransactionReceipt;
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (process.env.SOLIDITY_COVERAGE !== 'true') {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 2, 2,
                 ]);
@@ -161,12 +165,12 @@ describe('utils', function () {
         });
 
         it('should be counted ERC20 Approve', async function () {
-            const { usdt } = await loadFixture(deployUSDT);
+            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
 
             const tx = (await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
             ))[1] as ContractTransactionReceipt;
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (process.env.SOLIDITY_COVERAGE !== 'true') {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 0,
                 ]);
@@ -190,14 +194,14 @@ describe('utils', function () {
 
     describe('deployContractFromBytecode', function () {
         it('should deploy new contract instance', async function () {
-            const contractArtifact = await hre.artifacts.readArtifact('TokenMock');
+            const contractArtifact = await artifacts.readArtifact('TokenMock');
             const token = <TokenMock> await deployContractFromBytecode(contractArtifact.abi, contractArtifact.bytecode, ['SomeToken', 'STM']);
             expect(await token.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
             expect(await token.name()).to.be.eq('SomeToken');
         });
 
         it('can be used without arguments', async function () {
-            const contractArtifact = await hre.artifacts.readArtifact('WETH');
+            const contractArtifact = await artifacts.readArtifact('WETH');
             const weth = <WETH> await deployContractFromBytecode(contractArtifact.abi, contractArtifact.bytecode);
             expect(await weth.getAddress()).to.be.not.eq(constants.ZERO_ADDRESS);
             expect(await weth.name()).to.be.eq('Wrapped Ether');
@@ -207,10 +211,11 @@ describe('utils', function () {
     describe('deployAndGetContract', function () {
         it('should deploy new contract instance', async function () {
             const tokenName = 'SomeToken';
+            const env = await loadEnvironmentFromHardhat({ hre });
             const token = await deployAndGetContract({
                 contractName: 'TokenMock',
                 constructorArgs: [tokenName, 'STM'],
-                deployments,
+                env,
                 deployer: signer1.address,
                 skipIfAlreadyDeployed: false,
                 skipVerify: true,
@@ -225,22 +230,23 @@ describe('utils', function () {
             const create3Deployer = await deployContract('Create3Mock') as Create3Mock;
             const salt = ethers.keccak256(ethers.toUtf8Bytes('SOME SALT HERE'));
             const tokenName = 'SomeToken';
+            const env = await loadEnvironmentFromHardhat({ hre });
             const token = await deployAndGetContractWithCreate3({
                 create3Deployer: await create3Deployer.getAddress(),
                 salt,
                 contractName: 'TokenMock',
                 constructorArgs: [tokenName, 'STM'],
-                deployments,
+                env,
                 skipVerify: true,
                 skipIfAlreadyDeployed: false,
             });
             expect(await create3Deployer.addressOf(salt)).to.be.eq(await token.getAddress());
             expect(await token.name()).to.be.eq(tokenName);
-            expect(await deployments.get('TokenMock')).to.deep.include({
+            expect(env.get('TokenMock')).to.deep.include({
                 address: await token.getAddress(),
                 args: [tokenName, 'STM'],
-                abi: (await hre.artifacts.readArtifact('TokenMock')).abi,
-                bytecode: (await hre.artifacts.readArtifact('TokenMock')).bytecode,
+                abi: (await artifacts.readArtifact('TokenMock')).abi,
+                bytecode: (await artifacts.readArtifact('TokenMock')).bytecode,
             });
         }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
 
@@ -248,12 +254,13 @@ describe('utils', function () {
             const create3Deployer = await deployContract('Create3Mock') as Create3Mock;
             const salt = ethers.keccak256(ethers.toUtf8Bytes('SOME SALT HERE'));
             const tokenName = 'SomeToken';
+            const env = await loadEnvironmentFromHardhat({ hre });
             const token1 = await deployAndGetContractWithCreate3({
                 create3Deployer: await create3Deployer.getAddress(),
                 salt,
                 contractName: 'TokenMock',
                 constructorArgs: [tokenName, 'STM'],
-                deployments,
+                env,
                 skipVerify: true,
                 skipIfAlreadyDeployed: false,
             });
@@ -262,7 +269,7 @@ describe('utils', function () {
                 salt,
                 contractName: 'TokenMock',
                 constructorArgs: [tokenName, 'STM'],
-                deployments,
+                env,
                 skipVerify: true,
                 skipIfAlreadyDeployed: true,
             });
@@ -275,27 +282,32 @@ describe('utils', function () {
             const create3Deployer = await deployContract('Create3Mock') as Create3Mock;
             const salt = ethers.keccak256(ethers.toUtf8Bytes('SOME SALT HERE 2'));
             const tokenName = 'SomeToken';
+            const env = await loadEnvironmentFromHardhat({ hre });
             await deployAndGetContractWithCreate3({
                 create3Deployer: await create3Deployer.getAddress(),
                 salt,
                 contractName: 'TokenMock',
                 constructorArgs: [tokenName, 'STM'],
-                deployments,
+                env,
                 skipVerify: true,
                 skipIfAlreadyDeployed: false,
             });
 
             await saveContractWithCreate3Deployment(
                 ethers.provider,
-                deployments,
+                env,
                 'TokenMock',
                 'Test',
                 [tokenName, 'STM'],
                 salt,
                 await create3Deployer.getAddress(),
-                (await deployments.get('TokenMock'))?.transactionHash || '',
+                env.get('TokenMock')?.transactionHash || '',
             );
-            expect({ ...await deployments.get('Test'), numDeployments: 1 }).to.deep.include({ ...await deployments.get('TokenMock'), numDeployments: 1 });
+            const saved = env.get('Test');
+            const tokenDep = env.get('TokenMock');
+            expect(saved.address).to.equal(tokenDep.address);
+            expect(saved.abi).to.deep.equal(tokenDep.abi);
+            expect(saved.bytecode).to.equal(tokenDep.bytecode);
         }); //.timeout(200000);  If this test needs to be run on a test chain, the timeout should be increased
     });
 
@@ -314,6 +326,18 @@ describe('utils', function () {
     });
 
     describe('getAccountsWithCode', function () {
+        // HH3 shares one network across files; restore so later suites can still
+        // send ETH to default signers.
+        let snapshot: Awaited<ReturnType<typeof networkHelpers.takeSnapshot>>;
+
+        before(async function () {
+            snapshot = await networkHelpers.takeSnapshot();
+        });
+
+        after(async function () {
+            await snapshot.restore();
+        });
+
         it('should return accounts without bytecode by default', async function () {
             const accounts = await getAccountsWithCode();
             for (let i = 0; i < 10; i++) {
@@ -330,8 +354,8 @@ describe('utils', function () {
         });
 
         it('should return specific accounts with specific bytecode', async function () {
-            const specificBytecodes = [, '0x1234',, '0x5678']; // eslint-disable-line no-sparse-arrays
-            const accounts = await getAccountsWithCode([, '0x1234',, '0x5678']); // eslint-disable-line no-sparse-arrays
+            const specificBytecodes = [, '0x1234',, '0x5678'];
+            const accounts = await getAccountsWithCode([, '0x1234',, '0x5678']);
             for (let i = 0; i < 10; i++) {
                 expect(await ethers.provider.getCode(accounts[i].address)).to.be.eq(specificBytecodes[i] ? specificBytecodes[i] : '0x');
             }

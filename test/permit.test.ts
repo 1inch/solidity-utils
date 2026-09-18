@@ -1,11 +1,13 @@
-import { expect } from '../src/expect';
-import { defaultDeadline, Permit, DaiLikePermit, trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit';
-import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { getNetworkConnection } from '../src/network.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../src/expect.js';
+import { defaultDeadline, Permit, DaiLikePermit, trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit.js';
+
+const { ethers, networkHelpers } = await getNetworkConnection();
+
 
 describe('Permit library', function () {
-    let signer1: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
 
     before(async function () {
         [signer1] = await ethers.getSigners();
@@ -30,7 +32,7 @@ describe('Permit library', function () {
     });
 
     it('should correctly build data for permit', async function () {
-        const { erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const { erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
 
         const name = await erc20PermitMock.name();
         const data = buildData(name, '1', chainId, await erc20PermitMock.getAddress(), signer1.address, signer1.address, '1', '1');
@@ -55,7 +57,7 @@ describe('Permit library', function () {
     });
 
     it('should correctly build data for dai-like permit', async function () {
-        const { daiLikePermitMock, chainId } = await loadFixture(deployTokens);
+        const { daiLikePermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
 
         const name = await daiLikePermitMock.name();
         const data = buildDataLikeDai(

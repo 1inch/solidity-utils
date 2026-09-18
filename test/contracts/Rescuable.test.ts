@@ -1,14 +1,16 @@
-import { expect } from '../../src/expect';
-import { ether } from '../../src/prelude';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { getNetworkConnection } from '../../src/network.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
+import { ether } from '../../src/prelude.js';
 import type { RescuableMock } from '../../typechain-types/contracts/tests/mocks/RescuableMock';
 import type { NoReceiveOwnerMock } from '../../typechain-types/contracts/tests/mocks/NoReceiveOwnerMock';
 
+const { ethers, networkHelpers } = await getNetworkConnection();
+
+
 describe('Rescuable', function () {
-    let owner: SignerWithAddress;
-    let nonOwner: SignerWithAddress;
+    let owner: HardhatEthersSigner;
+    let nonOwner: HardhatEthersSigner;
 
     before(async function () {
         [owner, nonOwner] = await ethers.getSigners();
@@ -26,7 +28,7 @@ describe('Rescuable', function () {
 
     describe('rescueFunds ERC20', function () {
         it('should rescue ERC20 tokens to owner', async function () {
-            const { mock, token } = await loadFixture(deployRescuableMock);
+            const { mock, token } = await networkHelpers.loadFixture(deployRescuableMock);
             const amount = ether('50');
             await token.mint(mock, amount);
 
@@ -37,7 +39,7 @@ describe('Rescuable', function () {
         });
 
         it('should rescue partial ERC20 balance', async function () {
-            const { mock, token } = await loadFixture(deployRescuableMock);
+            const { mock, token } = await networkHelpers.loadFixture(deployRescuableMock);
             const total = ether('100');
             const rescue = ether('40');
             await token.mint(mock, total);
@@ -47,14 +49,14 @@ describe('Rescuable', function () {
         });
 
         it('should revert when called by non-owner', async function () {
-            const { mock, token } = await loadFixture(deployRescuableMock);
+            const { mock, token } = await networkHelpers.loadFixture(deployRescuableMock);
             await expect(
                 mock.connect(nonOwner).rescueFunds(token, ether('1')),
             ).to.be.revertedWithCustomError(mock, 'OwnableUnauthorizedAccount');
         });
 
         it('should revert when token transfer returns false', async function () {
-            const { mock } = await loadFixture(deployRescuableMock);
+            const { mock } = await networkHelpers.loadFixture(deployRescuableMock);
             const ERC20ReturnFalseMock = await ethers.getContractFactory('ERC20ReturnFalseMock');
             const badToken = await ERC20ReturnFalseMock.deploy();
 
@@ -66,7 +68,7 @@ describe('Rescuable', function () {
 
     describe('rescueFunds ETH', function () {
         it('should rescue native ETH to owner', async function () {
-            const { mock } = await loadFixture(deployRescuableMock);
+            const { mock } = await networkHelpers.loadFixture(deployRescuableMock);
             const amount = ether('1');
             await owner.sendTransaction({ to: mock, value: amount });
 
@@ -82,7 +84,7 @@ describe('Rescuable', function () {
         });
 
         it('should rescue partial ETH balance', async function () {
-            const { mock } = await loadFixture(deployRescuableMock);
+            const { mock } = await networkHelpers.loadFixture(deployRescuableMock);
             const total = ether('2');
             const rescue = ether('1');
             await owner.sendTransaction({ to: mock, value: total });
@@ -92,7 +94,7 @@ describe('Rescuable', function () {
         });
 
         it('should revert when called by non-owner', async function () {
-            const { mock } = await loadFixture(deployRescuableMock);
+            const { mock } = await networkHelpers.loadFixture(deployRescuableMock);
             await owner.sendTransaction({ to: mock, value: ether('1') });
 
             await expect(
@@ -101,7 +103,7 @@ describe('Rescuable', function () {
         });
 
         it('should revert when owner cannot receive ETH', async function () {
-            const { mock } = await loadFixture(deployRescuableMock);
+            const { mock } = await networkHelpers.loadFixture(deployRescuableMock);
             const amount = ether('1');
             await owner.sendTransaction({ to: mock, value: amount });
 

@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.25;
 
-import "../mixins/SelfdestructEthSender.sol";
-
+import { SelfdestructEthSender } from "../mixins/SelfdestructEthSender.sol";
 /**
  * @title SelfdestructEthSenderMock
  * @notice Mock contract extending SelfdestructEthSender for testing purposes, with added functionality to transfer ETH.

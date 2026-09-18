@@ -1,6 +1,8 @@
-import { expect } from '../../src/expect';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { getNetworkConnection } from '../../src/network.js';
+import { expect } from '../../src/expect.js';
+
+const { ethers, networkHelpers } = await getNetworkConnection();
+
 
 describe('Simulator', function () {
     async function deploySimulatorMock() {
@@ -15,7 +17,7 @@ describe('Simulator', function () {
 
     describe('simulate', function () {
         it('should always revert with Simulated error', async function () {
-            const { mock, target } = await loadFixture(deploySimulatorMock);
+            const { mock, target } = await networkHelpers.loadFixture(deploySimulatorMock);
 
             const setValueData = target.interface.encodeFunctionData('setValue', [42]);
 
@@ -24,7 +26,7 @@ describe('Simulator', function () {
         });
 
         it('should return success=true for successful delegatecall', async function () {
-            const { mock, target } = await loadFixture(deploySimulatorMock);
+            const { mock, target } = await networkHelpers.loadFixture(deploySimulatorMock);
 
             const setValueData = target.interface.encodeFunctionData('setValue', [42]);
 
@@ -41,7 +43,7 @@ describe('Simulator', function () {
         });
 
         it('should return success=false for failing delegatecall', async function () {
-            const { mock, target } = await loadFixture(deploySimulatorMock);
+            const { mock, target } = await networkHelpers.loadFixture(deploySimulatorMock);
 
             const revertData = target.interface.encodeFunctionData('revertWithMessage', ['test error']);
 
@@ -58,7 +60,7 @@ describe('Simulator', function () {
         });
 
         it('should not persist state changes', async function () {
-            const { mock } = await loadFixture(deploySimulatorMock);
+            const { mock } = await networkHelpers.loadFixture(deploySimulatorMock);
 
             const setValueData = mock.interface.encodeFunctionData('setValue', [999]);
 
@@ -73,7 +75,7 @@ describe('Simulator', function () {
         });
 
         it('should accept ETH value', async function () {
-            const { mock, target } = await loadFixture(deploySimulatorMock);
+            const { mock, target } = await networkHelpers.loadFixture(deploySimulatorMock);
 
             const getData = target.interface.encodeFunctionData('getValue');
 

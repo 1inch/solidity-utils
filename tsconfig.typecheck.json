@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*",
+    "hardhat-setup/**/*",
+    "hardhat.config.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "artifacts",
+    "cache",
+    "coverage",
+    "typechain-types",
+    "types",
+    "generated",
+    "test",
+    "docgen"
+  ]
+}

@@ -2,14 +2,13 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
-import "../interfaces/IDaiLikePermit.sol";
-import "../interfaces/IPermit2.sol";
-import "../interfaces/IERC7597Permit.sol";
-import "../interfaces/IWETH.sol";
-import "../libraries/RevertReasonForwarder.sol";
-
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
+import { IDaiLikePermit } from "../interfaces/IDaiLikePermit.sol";
+import { IPermit2 } from "../interfaces/IPermit2.sol";
+import { IERC7597Permit } from "../interfaces/IERC7597Permit.sol";
+import { IWETH } from "../interfaces/IWETH.sol";
+import { RevertReasonForwarder } from "../libraries/RevertReasonForwarder.sol";
 /**
  * @title Implements efficient safe methods for ERC20 interface.
  * @notice Compared to the standard ERC20, this implementation offers several enhancements:

@@ -1,8 +1,10 @@
-import { constants } from '../../src/prelude';
-import { expect } from '../../src/expect';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
-import { NonceType, buildBySigTraits } from '../../src/bySig';
+import { getNetworkConnection } from '../../src/network.js';
+import { constants } from '../../src/prelude.js';
+import { expect } from '../../src/expect.js';
+import { NonceType, buildBySigTraits } from '../../src/bySig.js';
+
+const { ethers, networkHelpers } = await getNetworkConnection();
+
 
 describe('BySigTraits', function () {
     async function deployAddressArrayMock() {
@@ -13,25 +15,25 @@ describe('BySigTraits', function () {
 
     describe('nonceType', function () {
         it('should return nonce type for Account', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits({ nonceType: NonceType.Account });
             expect(await bySigTraitsMock.nonceType(value)).to.be.equal(NonceType.Account);
         });
 
         it('should return nonce type for Selector', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits({ nonceType: NonceType.Selector });
             expect(await bySigTraitsMock.nonceType(value)).to.be.equal(NonceType.Selector);
         });
 
         it('should return nonce type for Selector', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits({ nonceType: NonceType.Unique });
             expect(await bySigTraitsMock.nonceType(value)).to.be.equal(NonceType.Unique);
         });
 
         it('should revert with unsupported nonce', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits({ nonceType: 3 as NonceType });
             await expect(bySigTraitsMock.nonceType(value)).to.be.revertedWithCustomError(bySigTraitsMock, 'WrongNonceType');
         });
@@ -39,7 +41,7 @@ describe('BySigTraits', function () {
 
     describe('deadline', function () {
         it('should return correct deadline', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value1 = buildBySigTraits({ deadline: 1 });
             expect(await bySigTraitsMock.deadline(value1)).to.be.equal(1);
             const value2 = buildBySigTraits({ deadline: 100 });
@@ -51,7 +53,7 @@ describe('BySigTraits', function () {
 
     describe('isRelayerAllowed', function () {
         it('should be allowed with non-setted relayer', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits();
             expect(await bySigTraitsMock.isRelayerAllowed(value, bySigTraitsMock)).to.be.equal(true);
             expect(await bySigTraitsMock.isRelayerAllowed(value, constants.EEE_ADDRESS)).to.be.equal(true);
@@ -59,20 +61,20 @@ describe('BySigTraits', function () {
         });
 
         it('should be allowed with setted relayer', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits({ relayer: constants.EEE_ADDRESS });
             expect(await bySigTraitsMock.isRelayerAllowed(value, constants.EEE_ADDRESS)).to.be.equal(true);
         });
 
         it('should be allowed with setted only 80-bits of relayer address', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const relayer = constants.ZERO_ADDRESS.substring(0, 22) + (await bySigTraitsMock.getAddress()).substring(22, 42);
             const value = buildBySigTraits({ relayer });
             expect(await bySigTraitsMock.isRelayerAllowed(value, bySigTraitsMock)).to.be.equal(true);
         });
 
         it('should be denied with setted another relayer', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits({ relayer: constants.EEE_ADDRESS });
             expect(await bySigTraitsMock.isRelayerAllowed(value, bySigTraitsMock)).to.be.equal(false);
         });
@@ -80,7 +82,7 @@ describe('BySigTraits', function () {
 
     describe('nonce', function () {
         it('should return correct nonce', async function () {
-            const { bySigTraitsMock } = await loadFixture(deployAddressArrayMock);
+            const { bySigTraitsMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
             const value = buildBySigTraits({ nonce: 1024 });
             expect(await bySigTraitsMock.nonce(value)).to.be.equal(1024);
         });

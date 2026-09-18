@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/AddressSet.sol";
-
+import { AddressSet } from "../../libraries/AddressSet.sol";
 contract AddressSetMock {
     using AddressSet for AddressSet.Data;
 
@@ -29,7 +28,7 @@ contract AddressSetMock {
         return AddressSet.get(_self);
     }
 
-    function getAndProvideSet(address[] memory providedArr) external view returns (address[] memory, address[] memory) {
+    function getAndProvideSet(address[] calldata providedArr) external view returns (address[] memory, address[] memory) {
         return (AddressSet.get(_self, providedArr), providedArr);
     }
 
