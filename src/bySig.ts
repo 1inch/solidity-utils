@@ -1,7 +1,6 @@
-import { ethers } from 'hardhat';
-import { constants } from './prelude';
-import { Wallet } from 'ethers';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { constants } from './prelude.js';
+import { TypedDataEncoder, Wallet } from 'ethers';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 
 /**
  * Enum defining types of nonces.
@@ -70,7 +69,7 @@ export function hashBySig(name: string, version: string, chainId: bigint, verify
             { name: 'data', type: 'bytes' },
         ],
     };
-    return ethers.TypedDataEncoder.hash(domain, types, sig);
+    return TypedDataEncoder.hash(domain, types, sig);
 }
 
 /**
@@ -88,12 +87,12 @@ export function signSignedCall(
     version: string,
     chainId: bigint | string,
     verifyingContract: string,
-    signer: Wallet | SignerWithAddress,
+    signer: Wallet | HardhatEthersSigner,
     signedCall: SignedCallStruct,
 ): Promise<string> {
     return signer.signTypedData(
         { name, version, chainId, verifyingContract },
         { SignedCall: [{ name: 'traits', type: 'uint256' }, { name: 'data', type: 'bytes' }] },
-        signedCall
+        signedCall,
     );
 }

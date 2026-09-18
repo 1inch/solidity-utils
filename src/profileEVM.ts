@@ -47,30 +47,40 @@ type Op = {
     memory: string[];
 };
 
+
+/** Normalize EDR/geth stack words to 64-char lowercase hex without 0x prefix. */
+function stackWord(value: string | undefined): string {
+    const hex = (value || '').replace(/^0x/i, '').toLowerCase();
+    return hex.padStart(64, '0');
+}
+
 /** @internal */
 function _normalizeOp(ops: Op[], i: number): void {
+    const stack = ops[i].stack;
+    const nextStack = ops[i + 1]?.stack;
+
     if (ops[i].op === 'STATICCALL') {
         ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
 
         if (
-            ops[i].stack.length > 8 &&
-            ops[i].stack[ops[i].stack.length - 8] === '0000000000000000000000000000000000000000000000000000000000000001'
+            stack.length > 8 &&
+            stackWord(stack[stack.length - 8]) === '0000000000000000000000000000000000000000000000000000000000000001'
         ) {
             ops[i].op = 'STATICCALL-ECRECOVER';
         } else if (
-            ops[i].stack.length > 8 &&
-            ops[i].stack[ops[i].stack.length - 8] <= '00000000000000000000000000000000000000000000000000000000000000FF'
+            stack.length > 8 &&
+            stackWord(stack[stack.length - 8]) <= '00000000000000000000000000000000000000000000000000000000000000FF'
         ) {
-            ops[i].op = 'STATICCALL-' + ops[i].stack[ops[i].stack.length - 8].substr(62, 2);
+            ops[i].op = 'STATICCALL-' + stackWord(stack[stack.length - 8]).substr(62, 2);
         } else {
             ops[i].args = [
-                '0x' + ops[i].stack[ops[i].stack.length - 2].substring(24),
+                '0x' + stackWord(stack[stack.length - 2]).substring(24),
                 '0x' +
                     (ops[i].memory || [])
                         .join('')
                         .substr(
-                            2 * Number(ops[i].stack[ops[i].stack.length - 3]),
-                            2 * Number(ops[i].stack[ops[i].stack.length - 4]),
+                            2 * Number('0x' + stackWord(stack[stack.length - 3])),
+                            2 * Number('0x' + stackWord(stack[stack.length - 4])),
                         ),
             ];
             if (ops[i].gasCost === 100) {
@@ -80,17 +90,17 @@ function _normalizeOp(ops: Op[], i: number): void {
     }
     if (['CALL', 'DELEGATECALL', 'CALLCODE'].indexOf(ops[i].op) !== -1) {
         ops[i].args = [
-            '0x' + ops[i].stack[ops[i].stack.length - 2].substring(24),
+            '0x' + stackWord(stack[stack.length - 2]).substring(24),
             '0x' +
                 (ops[i].memory || [])
                     .join('')
                     .substr(
-                        2 * Number(ops[i].stack[ops[i].stack.length - 4]),
-                        2 * Number(ops[i].stack[ops[i].stack.length - 5]),
+                        2 * Number('0x' + stackWord(stack[stack.length - 4])),
+                        2 * Number('0x' + stackWord(stack[stack.length - 5])),
                     ),
         ];
         ops[i].gasCost = ops[i].gasCost - ops[i + 1].gas;
-        ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+        ops[i].res = stackWord(nextStack[nextStack.length - 1]);
 
         if (ops[i].gasCost === 100) {
             ops[i].op += '_R';
@@ -100,9 +110,9 @@ function _normalizeOp(ops: Op[], i: number): void {
         ops[i].gasCost = 3;
     }
     if (['SSTORE', 'SLOAD'].indexOf(ops[i].op) !== -1) {
-        ops[i].args = ['0x' + ops[i].stack[ops[i].stack.length - 1]];
+        ops[i].args = ['0x' + stackWord(stack[stack.length - 1])];
         if (ops[i].op === 'SSTORE') {
-            ops[i].args!.push('0x' + ops[i].stack[ops[i].stack.length - 2]);
+            ops[i].args!.push('0x' + stackWord(stack[stack.length - 2]));
         }
         if (ops[i].gasCost === 100) {
             ops[i].op += '_R';
@@ -112,12 +122,12 @@ function _normalizeOp(ops: Op[], i: number): void {
         }
 
         if (ops[i].op.startsWith('SLOAD')) {
-            ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+            ops[i].res = stackWord(nextStack[nextStack.length - 1]);
         }
     }
     if (ops[i].op === 'EXTCODESIZE') {
-        ops[i].args = ['0x' + ops[i].stack[ops[i].stack.length - 1].substring(24)];
-        ops[i].res = ops[i + 1].stack[ops[i + 1].stack.length - 1];
+        ops[i].args = ['0x' + stackWord(stack[stack.length - 1]).substring(24)];
+        ops[i].res = stackWord(nextStack[nextStack.length - 1]);
     }
 }
 
@@ -134,7 +144,7 @@ export async function profileEVM(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     provider: JsonRpcProvider | { send: (method: string, params: unknown[]) => Promise<any> },
     txHash: string, instruction: string[],
-    optionalTraceFile?: PathLike | fs.FileHandle
+    optionalTraceFile?: PathLike | fs.FileHandle,
 ): Promise<number[]> {
     const trace = await provider.send('debug_traceTransaction', [txHash]);
 
@@ -164,7 +174,7 @@ export async function gasspectEVM(
     provider: JsonRpcProvider | { send: (method: string, params: unknown[]) => Promise<any> },
     txHash: string,
     gasspectOptions: Record<string, unknown> = {},
-    optionalTraceFile?: PathLike | fs.FileHandle
+    optionalTraceFile?: PathLike | fs.FileHandle,
 ): Promise<string[]> {
     const options = { ...gasspectOptionsDefault, ...gasspectOptions };
 

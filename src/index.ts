@@ -1,8 +1,9 @@
 // created from 'create-ts-index'
 
-export * from './bySig';
-export * from './expect';
-export * from './permit';
-export * from './prelude';
-export * from './profileEVM';
-export * from './utils';
+export * from './bySig.js';
+export * from './expect.js';
+export * from './permit.js';
+export * from './prelude.js';
+export * from './profileEVM.js';
+export * from './utils.js';
+export * from './network.js';

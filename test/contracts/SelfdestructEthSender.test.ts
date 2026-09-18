@@ -1,13 +1,15 @@
-import { expect } from '../../src/expect';
-import { ether } from '../../src/prelude';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
-import { SelfdestructEthSenderMock } from '../../typechain-types';
+import { getNetworkConnection } from '../../src/network.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
+import { ether } from '../../src/prelude.js';
+import { SelfdestructEthSenderMock } from '../../typechain-types/index.js';
+
+const { ethers, networkHelpers } = await getNetworkConnection();
+
 
 describe('SelfdestructEthSender', function () {
-    let signer0: SignerWithAddress;
-    let signer1: SignerWithAddress;
+    let signer0: HardhatEthersSigner;
+    let signer1: HardhatEthersSigner;
 
     before(async function () {
         [signer0, signer1] = await ethers.getSigners();
@@ -21,7 +23,7 @@ describe('SelfdestructEthSender', function () {
     }
 
     it('should send Ethers with selfdestruct', async function () {
-        const { ethSender } = await loadFixture(deployMocks);
+        const { ethSender } = await networkHelpers.loadFixture(deployMocks);
         const ethSenderAddress = await ethSender.getAddress();
 
         await signer0.sendTransaction({ to: ethSenderAddress, value: ether('1') });

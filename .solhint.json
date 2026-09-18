@@ -7,6 +7,13 @@
         ],
         "no-global-import": "off",
         "gas-custom-errors": "off",
+        "gas-calldata-parameters": "off",
+        "gas-indexed-events": "off",
+        "gas-increment-by-one": "off",
+        "gas-strict-inequalities": "off",
+        "gas-small-strings": "off",
+        "use-natspec": "off",
+        "function-max-lines": "off",
         "private-vars-leading-underscore": "error",
         "func-visibility": ["error", { "ignoreConstructors": true }]
     }

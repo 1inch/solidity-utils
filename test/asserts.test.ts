@@ -1,4 +1,4 @@
-import { expect, assertRoughlyEqualValues } from '../src/expect';
+import { expect, assertRoughlyEqualValues } from '../src/expect.js';
 
 describe('assertRoughlyEqualValues', function () {
     it('should be work with expected = actual, any relativeDiff', async function () {

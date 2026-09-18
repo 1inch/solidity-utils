@@ -173,6 +173,10 @@ contract ERC20PermitNoRevertMock is
         super.permit(owner, spender, value, deadline, v, r, s);
     }
 
+    // Touch storage in the catch path so viaIR + high optimizer runs do not
+    // dead-code-eliminate the try external call (solc 0.8.37).
+    uint256 private _permitNoRevertCatchProbe;
+
     function permit(
         address owner,
         address spender,
@@ -183,7 +187,9 @@ contract ERC20PermitNoRevertMock is
         bytes32 s
     ) public virtual override {
         // solhint-disable-next-line no-empty-blocks
-        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {} catch {}
+        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {} catch {
+            _permitNoRevertCatchProbe = 1;
+        }
     }
 }
 

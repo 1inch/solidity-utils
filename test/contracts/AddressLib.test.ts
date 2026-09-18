@@ -1,12 +1,14 @@
-import { expect } from '../../src/expect';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { getNetworkConnection } from '../../src/network.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
 
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+const { ethers, networkHelpers } = await getNetworkConnection();
+
+
+ 
 
 describe('AddressLib', function () {
-    let signer: SignerWithAddress;
+    let signer: HardhatEthersSigner;
 
     before(async function () {
         [signer] = await ethers.getSigners();
@@ -21,7 +23,7 @@ describe('AddressLib', function () {
 
     describe('get', function () {
         it('should return correct address not depending on flags', async function () {
-            const { addressLibMock, flags } = await loadFixture(deployAddressLibMock);
+            const { addressLibMock, flags } = await networkHelpers.loadFixture(deployAddressLibMock);
             expect(await addressLibMock.get(signer.address)).to.be.equal(signer.address);
             for (const flag of flags) {
                 expect(await addressLibMock.get(BigInt(signer.address) | flag)).to.be.equal(signer.address);
@@ -31,7 +33,7 @@ describe('AddressLib', function () {
 
     describe('getFlag', function () {
         it('should return true when flag in Address', async function () {
-            const { addressLibMock, flags } = await loadFixture(deployAddressLibMock);
+            const { addressLibMock, flags } = await networkHelpers.loadFixture(deployAddressLibMock);
             for (const flag of flags) {
                 expect(await addressLibMock.getFlag(BigInt(signer.address) | flag, flag)).to.be.true;
                 expect(await addressLibMock.getFlag(BigInt(signer.address) | flag, 1n << 161n)).to.be.false;
@@ -41,7 +43,7 @@ describe('AddressLib', function () {
 
     describe('getUint32', function () {
         it('should return uint32 from Address with offset', async function () {
-            const { addressLibMock } = await loadFixture(deployAddressLibMock);
+            const { addressLibMock } = await networkHelpers.loadFixture(deployAddressLibMock);
             const flag = (1n << 160n) + (1n << 193n);
             expect(await addressLibMock.getUint32(BigInt(signer.address) | flag, 160)).to.be.equal(1);
             expect(await addressLibMock.getUint32(BigInt(signer.address) | flag, 193)).to.be.equal(1);
@@ -50,7 +52,7 @@ describe('AddressLib', function () {
 
     describe('getUint64', function () {
         it('should return uint64 from Address with offset', async function () {
-            const { addressLibMock } = await loadFixture(deployAddressLibMock);
+            const { addressLibMock } = await networkHelpers.loadFixture(deployAddressLibMock);
             const flag = (1n << 160n) + (1n << 225n);
             expect(await addressLibMock.getUint64(BigInt(signer.address) | flag, 160)).to.be.equal(1);
             expect(await addressLibMock.getUint64(BigInt(signer.address) | flag, 225)).to.be.equal(1);

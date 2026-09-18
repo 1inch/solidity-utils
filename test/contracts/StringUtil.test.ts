@@ -1,12 +1,14 @@
-import { expect } from '../../src/expect';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { getNetworkConnection } from '../../src/network.js';
+import { expect } from '../../src/expect.js';
 import { BigNumberish, BytesLike } from 'ethers';
-import hre, { ethers } from 'hardhat';
-import chai from 'chai';
+import { use } from 'chai';
 import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
 
-if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-    chai.use(jestSnapshotPlugin());
+const { ethers, networkHelpers } = await getNetworkConnection();
+
+
+if (process.env.SOLIDITY_COVERAGE !== 'true') {
+    use(jestSnapshotPlugin());
 }
 
 describe('StringUtil', function () {
@@ -46,7 +48,7 @@ describe('StringUtil', function () {
         it('Same bytes long', () => testBytes(sameBytesLong));
 
         async function test(value: string) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const { stringUtilTest } = await networkHelpers.loadFixture(deployStringUtilTest);
             const result = await stringUtilTest.toHex(value);
             const naiveResult = await stringUtilTest.toHexNaive(value);
             expect(result).to.be.equal(value);
@@ -54,7 +56,7 @@ describe('StringUtil', function () {
         }
 
         async function testBytes(value: string) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const { stringUtilTest } = await networkHelpers.loadFixture(deployStringUtilTest);
             const result = await stringUtilTest.toHexBytes(value);
             const naiveResult = await stringUtilTest.toHexNaiveBytes(value);
             expect(result).to.be.equal(value);
@@ -64,7 +66,7 @@ describe('StringUtil', function () {
 
     describe('Gas usage', function () {
         before(function () {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+            if (process.env.SOLIDITY_COVERAGE === 'true') { this.skip(); }
         });
 
         it('Uint 256', () => testGasUint256(uint256TestValue));
@@ -110,38 +112,38 @@ describe('StringUtil', function () {
         it('Compare gas usage single byte', () => compareGasBytes(singleByte));
 
         async function testGasUint256(value: BigNumberish) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const { stringUtilTest } = await networkHelpers.loadFixture(deployStringUtilTest);
             const tx = await (await stringUtilTest.toHex.send(value)).wait();
             expect(tx!.gasUsed).toMatchSnapshot();
         }
 
         async function testGasBytes(value: BytesLike) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const { stringUtilTest } = await networkHelpers.loadFixture(deployStringUtilTest);
             const tx = await (await stringUtilTest.toHexBytes.send(value)).wait();
             expect(tx!.gasUsed).toMatchSnapshot();
         }
 
         async function testGasNaiveUint256(value: BigNumberish) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const { stringUtilTest } = await networkHelpers.loadFixture(deployStringUtilTest);
             const tx = await (await stringUtilTest.toHexNaive.send(value)).wait();
             expect(tx!.gasUsed).toMatchSnapshot();
         }
 
         async function testGasNaiveBytes(value: BytesLike) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const { stringUtilTest } = await networkHelpers.loadFixture(deployStringUtilTest);
             const tx = await (await stringUtilTest.toHexNaiveBytes.send(value)).wait();
             expect(tx!.gasUsed).toMatchSnapshot();
         }
 
         async function compareGasUint256(value: BigNumberish) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const { stringUtilTest } = await networkHelpers.loadFixture(deployStringUtilTest);
             const tx = await (await stringUtilTest.toHex.send(value)).wait();
             const naiveTx = await (await stringUtilTest.toHexNaive.send(value)).wait();
             expect(tx!.gasUsed).to.be.lessThan(naiveTx!.gasUsed);
         }
 
         async function compareGasBytes(value: BytesLike) {
-            const { stringUtilTest } = await loadFixture(deployStringUtilTest);
+            const { stringUtilTest } = await networkHelpers.loadFixture(deployStringUtilTest);
             const tx = await (await stringUtilTest.toHexBytes.send(value)).wait();
             const naiveTx = await (await stringUtilTest.toHexNaiveBytes.send(value)).wait();
             expect(tx!.gasUsed).to.be.lessThan(naiveTx!.gasUsed);

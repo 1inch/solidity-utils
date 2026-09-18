@@ -1,15 +1,17 @@
-import { expect } from '../../src/expect';
-import { getPermit, trim0x } from '../../src/permit';
-import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { PermitAndCallMock } from '../../typechain-types';
+import { getNetworkConnection } from '../../src/network.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
+import { getPermit, trim0x } from '../../src/permit.js';
+import { PermitAndCallMock } from '../../typechain-types/index.js';
+
+const { ethers, networkHelpers } = await getNetworkConnection();
+
 
 const value = 42n;
 
 describe('Permitable', function () {
-    let signer1: SignerWithAddress;
-    let signer2: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
+    let signer2: HardhatEthersSigner;
 
     before(async function () {
         [signer1, signer2] = await ethers.getSigners();
@@ -26,7 +28,7 @@ describe('Permitable', function () {
     }
 
     it('should work with valid permit', async function () {
-        const { permitAndCallMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const { permitAndCallMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
         const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), true);
         const tx = await permitAndCallMock.permitAndCall(erc20PermitMock.target + trim0x(permit), (await permitAndCallMock.foo.populateTransaction()).data);
         await expect(tx).to.emit(permitAndCallMock, 'FooCalled');
@@ -34,7 +36,7 @@ describe('Permitable', function () {
     });
 
     it('should work with invalid permit', async function () {
-        const { permitAndCallMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const { permitAndCallMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
         const badPermit = await getPermit(signer1, erc20PermitMock, '2', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), true);
         const tx = await permitAndCallMock.permitAndCall(erc20PermitMock.target + trim0x(badPermit), (await permitAndCallMock.foo.populateTransaction()).data);
         await expect(tx).to.emit(permitAndCallMock, 'FooCalled');
@@ -42,7 +44,7 @@ describe('Permitable', function () {
     });
 
     it('should work with nested permit', async function () {
-        const { permitAndCallMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const { permitAndCallMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
         const permit1 = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), true);
         const permit2 = await getPermit(signer2, erc20PermitMock, '1', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), false);
         const fooCall = (await permitAndCallMock.foo.populateTransaction()).data;
@@ -54,7 +56,7 @@ describe('Permitable', function () {
     });
 
     it('should work with payable function', async function () {
-        const { permitAndCallMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const { permitAndCallMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
         const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), true);
         const tx = await permitAndCallMock.permitAndCall(erc20PermitMock.target + trim0x(permit), (await permitAndCallMock.payableFoo.populateTransaction()).data, { value: 1n });
         await expect(tx).to.emit(permitAndCallMock, 'MsgValue').withArgs(1n);
@@ -62,7 +64,7 @@ describe('Permitable', function () {
     });
 
     it('should work with payable function and nested permit', async function () {
-        const { permitAndCallMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const { permitAndCallMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
         const permit1 = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), true);
         const permit2 = await getPermit(signer2, erc20PermitMock, '1', chainId, await permitAndCallMock.getAddress(), value.toString(), 0x8fffffff.toString(), false);
         const fooCall = (await permitAndCallMock.payableFoo.populateTransaction()).data;

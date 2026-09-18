@@ -1,12 +1,13 @@
 import { SignTypedDataVersion, TypedDataUtils } from '@metamask/eth-sig-util';
-import { constants } from './prelude';
-import { Signature, TypedDataDomain, Wallet } from 'ethers';
-import '@nomicfoundation/hardhat-ethers';  // required to populate the HardhatRuntimeEnvironment with ethers
-import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { constants } from './prelude.js';
+import { AbiCoder, Signature, solidityPacked, TypedDataDomain, Wallet } from 'ethers';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
-import { bytecode as permit2Bytecode } from './permit2.json';
-import { DaiLikePermitMock, ERC20Permit, USDCLikePermitMock } from '../typechain-types';
+import permit2Json from './permit2.json' with { type: 'json' };
+import { DaiLikePermitMock, ERC20PermitMock, USDCLikePermitMock } from '../typechain-types/index.js';
+import { getNetworkConnection } from './network.js';
+
+const permit2Bytecode: string = permit2Json.bytecode;
 
 export const TypedDataVersion = SignTypedDataVersion.V4;
 export const defaultDeadline = constants.MAX_UINT256;
@@ -169,9 +170,10 @@ export function permit2Address(chainId?: number): string {
  * @return The contract instance of IPermit2.
  */
 export async function permit2Contract(chainId?: number) {
+    const { ethers, networkHelpers } = await getNetworkConnection();
     const permit2addr = permit2Address(chainId);
     if ((await ethers.provider.getCode(permit2addr)) === '0x') {
-        await ethers.provider.send('hardhat_setCode', [permit2addr, permit2Bytecode]);
+        await networkHelpers.setCode(permit2addr, permit2Bytecode);
     }
     return ethers.getContractAt('IPermit2', permit2addr);
 }
@@ -190,8 +192,8 @@ export async function permit2Contract(chainId?: number) {
  * @return A signed permit string.
  */
 export async function getPermit(
-    owner: Wallet | SignerWithAddress,
-    permitContract: ERC20Permit,
+    owner: Wallet | HardhatEthersSigner,
+    permitContract: ERC20PermitMock,
     tokenVersion: string,
     chainId: number,
     spender: string,
@@ -232,7 +234,7 @@ export async function getPermit(
  * @return A signed permit string specific to Permit2 contracts.
  */
 export async function getPermit2(
-    owner: Wallet | SignerWithAddress,
+    owner: Wallet | HardhatEthersSigner,
     token: string,
     chainId: number,
     spender: string,
@@ -274,7 +276,7 @@ export async function getPermit2(
  * @return A signed permit string in Dai-like format.
  */
 export async function getPermitLikeDai(
-    holder: Wallet | SignerWithAddress,
+    holder: Wallet | HardhatEthersSigner,
     permitContract: DaiLikePermitMock,
     tokenVersion: string,
     chainId: number,
@@ -320,7 +322,7 @@ export async function getPermitLikeDai(
  */
 export async function getPermitLikeUSDC(
     owner: string,
-    signer: Wallet | SignerWithAddress,
+    signer: Wallet | HardhatEthersSigner,
     permitContract: USDCLikePermitMock,
     tokenVersion: string,
     chainId: number,
@@ -344,7 +346,7 @@ export async function getPermitLikeUSDC(
 
     const signature = await signer.signTypedData(data.domain, data.types, data.message);
     const { v, r, s } = Signature.from(signature);
-    const signatureBytes = ethers.solidityPacked(['bytes32', 'bytes32', 'uint8'], [r, s, v]);
+    const signatureBytes = solidityPacked(['bytes32', 'bytes32', 'uint8'], [r, s, v]);
 
     return cutSelector(permitContract.interface.encodeFunctionData('permit(address,address,uint256,uint256,bytes)', [owner, spender, value, deadline, signatureBytes]));
 }
@@ -370,7 +372,7 @@ export function withTarget(target: bigint | string, data: bigint | string): stri
  * @return A compressed permit string.
  */
 export function compressPermit(permit: string): string {
-    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+    const abiCoder = AbiCoder.defaultAbiCoder();
     switch (permit.length) {
     case 450: {
         // IERC20Permit.permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s)
@@ -419,7 +421,7 @@ export function compressPermit(permit: string): string {
  * @return The decompressed permit function call string.
  */
 export function decompressPermit(permit: string, token: string, owner: string, spender: string): string {
-    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+    const abiCoder = AbiCoder.defaultAbiCoder();
     switch (permit.length) {
     case 202: {
         // Compact IERC20Permit.permit(uint256 value, uint32 deadline, uint256 r, uint256 vs)
