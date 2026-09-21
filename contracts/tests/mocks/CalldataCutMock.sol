@@ -2,24 +2,24 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/CalldataSlice.sol";
+import "../../libraries/CalldataCut.sol";
 
-contract CalldataSliceMock {
+contract CalldataCutMock {
     error TestError();
 
     function sliceWithBounds(bytes calldata data, uint256 begin, uint256 end) external pure returns (bytes calldata) {
-        return CalldataSlice.slice(data, begin, end);
+        return CalldataCut.slice(data, begin, end);
     }
 
     function sliceWithBoundsChecked(bytes calldata data, uint256 begin, uint256 end) external pure returns (bytes calldata) {
-        return CalldataSlice.slice(data, begin, end, TestError.selector);
+        return CalldataCut.slice(data, begin, end, TestError.selector);
     }
 
     function sliceToEnd(bytes calldata data, uint256 begin) external pure returns (bytes calldata) {
-        return CalldataSlice.slice(data, begin);
+        return CalldataCut.slice(data, begin);
     }
 
     function sliceToEndChecked(bytes calldata data, uint256 begin) external pure returns (bytes calldata) {
-        return CalldataSlice.slice(data, begin, TestError.selector);
+        return CalldataCut.slice(data, begin, TestError.selector);
     }
 }

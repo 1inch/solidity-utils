@@ -8,6 +8,7 @@ pragma solidity ^0.8.0;
  * The upper 128 bits store the offset, and the lower 128 bits store the length.
  */
 type CalldataPtr is uint256;
+using CalldataPtrLib for CalldataPtr global;
 
 /**
  * @title CalldataPtrLib
@@ -15,8 +16,6 @@ type CalldataPtr is uint256;
  * between calldata bytes and the packed pointer representation.
  */
 library CalldataPtrLib {
-    using CalldataPtrLib for CalldataPtr;
-
     /**
      * @dev Creates a CalldataPtr from calldata bytes by packing offset and length.
      * @param data The calldata bytes to create a pointer from.
