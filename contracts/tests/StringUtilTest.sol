@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import { StringUtil } from "../libraries/StringUtil.sol";
 import { StringUtilNaive } from "./libraries/StringUtilNaive.sol";
+
 contract StringUtilTest {
     function toHex(uint256 value)
         external

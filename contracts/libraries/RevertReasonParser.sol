@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { StringUtil } from "./StringUtil.sol";
+
 /**
  * @title RevertReasonParser
  * @notice Library that allows to parse unsuccessful arbitrary calls revert reasons.

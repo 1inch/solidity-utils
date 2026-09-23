@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { AddressArray } from "./AddressArray.sol";
+
 /**
  * @title AddressSet
  * @notice Library for managing sets of addresses, allowing operations such as add, remove, and contains.

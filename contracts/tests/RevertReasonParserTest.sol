@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { RevertReasonParser } from "../libraries/RevertReasonParser.sol";
+
 // solhint-disable gas-custom-errors
 contract RevertReasonParserTest {
     error TestDidNotThrow();

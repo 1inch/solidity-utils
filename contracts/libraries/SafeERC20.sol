@@ -9,6 +9,7 @@ import { IPermit2 } from "../interfaces/IPermit2.sol";
 import { IERC7597Permit } from "../interfaces/IERC7597Permit.sol";
 import { IWETH } from "../interfaces/IWETH.sol";
 import { RevertReasonForwarder } from "../libraries/RevertReasonForwarder.sol";
+
 /**
  * @title Implements efficient safe methods for ERC20 interface.
  * @notice Compared to the standard ERC20, this implementation offers several enhancements:

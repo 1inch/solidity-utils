@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { Multicall } from "../../mixins/Multicall.sol";
+
 contract MulticallMock is Multicall {
     error CustomError(string message);
 

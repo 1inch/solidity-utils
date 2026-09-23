@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { AddressArray } from "../../libraries/AddressArray.sol";
+
 contract AddressArrayMock {
     using AddressArray for AddressArray.Data;
 

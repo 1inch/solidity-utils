@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { IERC1271 } from "@openzeppelin/contracts/interfaces/IERC1271.sol";
+
 /**
  * @title ECDSA signature operations
  * @notice Provides functions for recovering addresses from signatures and verifying signatures, including support for EIP-2098 compact signatures.

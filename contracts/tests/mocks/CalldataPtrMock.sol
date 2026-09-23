@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { CalldataPtr, CalldataPtrLib } from "../../libraries/CalldataPtr.sol";
+
 contract CalldataPtrMock {
     using CalldataPtrLib for CalldataPtr;
 

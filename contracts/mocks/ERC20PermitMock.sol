@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import { TokenMock } from "./TokenMock.sol";
+
 /**
  * @title ERC20PermitMock
  * @dev Extends ERC20Permit and TokenMock for testing purposes, incorporating permit functionality.

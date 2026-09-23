@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { BytesMemory } from "../../libraries/BytesMemory.sol";
+
 contract BytesMemoryMock {
     using BytesMemory for BytesMemory.Slice;
 

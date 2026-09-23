@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { EthReceiver } from "./EthReceiver.sol";
+
 /**
  * @title OnlyWethReceiver
  * @dev Abstract contract extending EthReceiver to accept only ETH deposits from a specified WETH contract.

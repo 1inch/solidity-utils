@@ -3,6 +3,7 @@
 pragma solidity ^0.8.0;
 
 import { PermitAndCall } from "../../mixins/PermitAndCall.sol";
+
 contract PermitAndCallMock is PermitAndCall {
     event FooCalled();
     event MsgValue(uint256 value);
