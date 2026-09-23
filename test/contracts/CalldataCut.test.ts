@@ -90,4 +90,50 @@ describe('CalldataCut', function () {
                 .to.be.revertedWithCustomError(mock, 'TestError');
         });
     });
+
+    describe('trim', function () {
+        it('should return a prefix of the requested length', async function () {
+            const { mock } = await loadFixture(deployCalldataMock);
+            const result = await mock.trim(testData, 10);
+            expect(result).to.equal('0x00010203040506070809');
+        });
+
+        it('should return the entire data when length equals data length', async function () {
+            const { mock } = await loadFixture(deployCalldataMock);
+            const result = await mock.trim(testData, 32);
+            expect(result).to.equal(testData);
+        });
+
+        it('should return empty data for zero length', async function () {
+            const { mock } = await loadFixture(deployCalldataMock);
+            const result = await mock.trim(testData, 0);
+            expect(result).to.equal('0x');
+        });
+    });
+
+    describe('trim with bounds checking', function () {
+        it('should return a prefix within bounds', async function () {
+            const { mock } = await loadFixture(deployCalldataMock);
+            const result = await mock.trimChecked(testData, 10);
+            expect(result).to.equal('0x00010203040506070809');
+        });
+
+        it('should return the entire data when length equals data length', async function () {
+            const { mock } = await loadFixture(deployCalldataMock);
+            const result = await mock.trimChecked(testData, 32);
+            expect(result).to.equal(testData);
+        });
+
+        it('should return empty data for zero length', async function () {
+            const { mock } = await loadFixture(deployCalldataMock);
+            const result = await mock.trimChecked(testData, 0);
+            expect(result).to.equal('0x');
+        });
+
+        it('should revert when length exceeds data length', async function () {
+            const { mock } = await loadFixture(deployCalldataMock);
+            await expect(mock.trimChecked(testData, 33))
+                .to.be.revertedWithCustomError(mock, 'TestError');
+        });
+    });
 });

@@ -22,4 +22,12 @@ contract CalldataCutMock {
     function sliceToEndChecked(bytes calldata data, uint256 begin) external pure returns (bytes calldata) {
         return CalldataCut.slice(data, begin, TestError.selector);
     }
+
+    function trim(bytes calldata data, uint256 length) external pure returns (bytes calldata) {
+        return CalldataCut.trim(data, length);
+    }
+
+    function trimChecked(bytes calldata data, uint256 length) external pure returns (bytes calldata) {
+        return CalldataCut.trim(data, length, TestError.selector);
+    }
 }
