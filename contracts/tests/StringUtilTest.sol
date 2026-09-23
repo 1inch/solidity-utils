@@ -13,7 +13,8 @@ contract StringUtilTest {
         return StringUtil.toHex(value);
     }
 
-    function toHexBytes(bytes calldata data)
+    // solhint-disable-next-line gas-calldata-parameters
+    function toHexBytes(bytes memory data)
         external
         pure
         returns (string memory)
@@ -29,7 +30,8 @@ contract StringUtilTest {
         return StringUtilNaive.toHex(value);
     }
 
-    function toHexNaiveBytes(bytes calldata data)
+    // solhint-disable-next-line gas-calldata-parameters
+    function toHexNaiveBytes(bytes memory data)
         external
         pure
         returns (string memory)

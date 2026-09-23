@@ -26,7 +26,8 @@ contract AddressArrayMock {
         return AddressArray.get(_self);
     }
 
-    function getAndProvideArr(address[] calldata providedArr) external view returns (address[] memory, address[] memory) {
+    // solhint-disable-next-line gas-calldata-parameters
+    function getAndProvideArr(address[] memory providedArr) external view returns (address[] memory, address[] memory) {
         return (AddressArray.get(_self, providedArr), providedArr);
     }
 

@@ -27,7 +27,7 @@ jobs:
           cache: "yarn"
       - run: yarn
       - run: yarn typechain
-      - run: yarn test:ci
+      - run: yarn test
 
   # Check disabled meanwhile we figure out how to handle codecov as company asset.
   # https://1inch.atlassian.net/browse/ITSM-1394

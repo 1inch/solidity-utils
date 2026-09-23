@@ -32,10 +32,9 @@
     "lint:ts:fix": "eslint . --fix",
     "lint:sol": "solhint --max-warnings 0 \"contracts/**/*.sol\"",
     "lint:sol:fix": "solhint --max-warnings 0 \"contracts/**/*.sol\" --fix",
-    "test": "hardhat test --parallel",
-    "test:ci": "hardhat test",
-    "test:update-snapshots": "UPDATE_SNAPSHOT=1 yarn test:ci",
-    "test:us": "UPDATE_SNAPSHOT=1 yarn test:ci",
+    "test": "hardhat test",
+    "test:update-snapshots": "UPDATE_SNAPSHOT=1 yarn test",
+    "test:us": "UPDATE_SNAPSHOT=1 yarn test",
     "typecheck": "tsc -p tsconfig.typecheck.json --noEmit --skipLibCheck",
     "typechain": "hardhat compile",
     "changelog": "npx auto-changelog"

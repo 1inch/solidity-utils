@@ -28,7 +28,8 @@ contract AddressSetMock {
         return AddressSet.get(_self);
     }
 
-    function getAndProvideSet(address[] calldata providedArr) external view returns (address[] memory, address[] memory) {
+    // solhint-disable-next-line gas-calldata-parameters
+    function getAndProvideSet(address[] memory providedArr) external view returns (address[] memory, address[] memory) {
         return (AddressSet.get(_self, providedArr), providedArr);
     }
 
