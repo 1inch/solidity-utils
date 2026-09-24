@@ -353,8 +353,8 @@ describe('utils', function () {
         });
 
         it('should return specific accounts with specific bytecode', async function () {
-            const specificBytecodes = [, '0x1234',, '0x5678'];
-            const accounts = await getAccountsWithCode([, '0x1234',, '0x5678']);
+            const specificBytecodes = [undefined, '0x1234', undefined, '0x5678'];
+            const accounts = await getAccountsWithCode([undefined, '0x1234', undefined, '0x5678']);
             for (let i = 0; i < 10; i++) {
                 expect(await ethers.provider.getCode(accounts[i].address)).to.be.eq(specificBytecodes[i] ? specificBytecodes[i] : '0x');
             }
