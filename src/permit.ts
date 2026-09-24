@@ -5,7 +5,7 @@ import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types'
 import { AllowanceTransfer, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
 import permit2Json from './permit2.json' with { type: 'json' };
 import { DaiLikePermitMock, ERC20PermitMock, USDCLikePermitMock } from '../typechain-types/index.js';
-import { getNetworkConnection } from './network.js';
+import { ethers, setCode } from './hardhatHelpers.js';
 
 const permit2Bytecode: string = permit2Json.bytecode;
 
@@ -170,10 +170,9 @@ export function permit2Address(chainId?: number): string {
  * @return The contract instance of IPermit2.
  */
 export async function permit2Contract(chainId?: number) {
-    const { ethers, networkHelpers } = await getNetworkConnection();
     const permit2addr = permit2Address(chainId);
     if ((await ethers.provider.getCode(permit2addr)) === '0x') {
-        await networkHelpers.setCode(permit2addr, permit2Bytecode);
+        await setCode(permit2addr, permit2Bytecode);
     }
     return ethers.getContractAt('IPermit2', permit2addr);
 }

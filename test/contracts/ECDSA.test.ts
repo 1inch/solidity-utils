@@ -1,10 +1,9 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { constants } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 import { getBytes, concat, Signature, hashMessage, HDNodeWallet, keccak256, toUtf8Bytes } from 'ethers';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
  
@@ -74,12 +73,12 @@ describe('ECDSA', function () {
     describe('recover', function () {
         describe('with invalid signature', function () {
             it('with short signature', async function () {
-                const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa } = await loadFixture(deployContracts);
                 expect(await ecdsa.recover(HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(constants.ZERO_ADDRESS);
             });
 
             it('with long signature', async function () {
-                const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa } = await loadFixture(deployContracts);
                 expect(await ecdsa.recover(HASHED_TEST_MESSAGE, longSignature)).to.be.equals(constants.ZERO_ADDRESS);
             });
         });
@@ -87,25 +86,25 @@ describe('ECDSA', function () {
         describe('with valid signature', function () {
             describe('using account.signMessage', function () {
                 it('returns signer address with correct signature', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(account.address);
                 });
 
                 it('returns signer address with correct signature for arbitrary length message', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(await ecdsa.recover(hashMessage(NON_HASH_MESSAGE), signature)).to.be.equals(account.address);
                 });
 
                 it('returns a different address', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(await ecdsa.recover(WRONG_MESSAGE, signature)).to.be.not.equals(account.address);
                 });
 
                 it('returns zero address with invalid signature', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, invalidSignature)).to.be.equals(
                         constants.ZERO_ADDRESS,
                     );
@@ -114,7 +113,7 @@ describe('ECDSA', function () {
 
             describe('with v0 signature', function () {
                 it('returns zero address with 00 as version value', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const version = '00';
                     const signature = signatureWithoutVersionV0 + version;
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
@@ -125,7 +124,7 @@ describe('ECDSA', function () {
                 });
 
                 it('works with 27 as version value', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const version = '1b'; // 27 = 1b.
                     const signature = signatureWithoutVersionV0 + version;
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(signerV0);
@@ -136,7 +135,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns zero address when wrong version', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     // The last two hex digits are the signature version.
                     // The only valid values are 0, 1, 27 and 28.
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, signatureWithoutVersionV0 + '02')).to.be.equals(
@@ -149,7 +148,7 @@ describe('ECDSA', function () {
                 });
 
                 it('works with short EIP2098 format', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const version = '1b'; // 27 = 1b.
                     const signature = signatureWithoutVersionV0 + version;
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(signerV0);
@@ -161,7 +160,7 @@ describe('ECDSA', function () {
 
             describe('with v1 signature', function () {
                 it('returns zero address with 01 as version value', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const version = '01';
                     const signature = signatureWithoutVersionV1 + version;
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(constants.ZERO_ADDRESS);
@@ -172,7 +171,7 @@ describe('ECDSA', function () {
                 });
 
                 it('works with 28 as version value', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const version = '1c'; // 28 = 1c.
                     const signature = signatureWithoutVersionV1 + version;
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, signature)).to.be.equals(signerV1);
@@ -183,7 +182,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns zero address when wrong version', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     // The last two hex digits are the signature version.
                     // The only valid values are 0, 1, 27 and 28.
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, signatureWithoutVersionV1 + '02')).to.be.equals(
@@ -196,7 +195,7 @@ describe('ECDSA', function () {
                 });
 
                 it('works with short EIP2098 format', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const version = '1c'; // 27 = 1b.
                     const signature = signatureWithoutVersionV1 + version;
                     expect(await ecdsa.recover(HASHED_TEST_MESSAGE, to2098Format(signature))).to.be.equals(signerV1);
@@ -211,14 +210,14 @@ describe('ECDSA', function () {
     describe('isValidSignature', function () {
         describe('with invalid signature', function () {
             it('with short signature', async function () {
-                const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(await ecdsa.isValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, '0x1234')).to.be.equals(
                     false,
                 );
             });
 
             it('with long signature', async function () {
-                const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
                     await ecdsa.isValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, longSignature),
                 ).to.be.false;
@@ -228,7 +227,7 @@ describe('ECDSA', function () {
         describe('with valid signature', function () {
             describe('using account.signMesage', function () {
                 it('returns true with correct signature and only correct signer', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.isValidSignature(erc1271wallet, HASHED_TEST_MESSAGE, signature),
@@ -239,7 +238,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with correct signature and only correct signer for arbitrary length message', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(
                         await ecdsa.isValidSignature(erc1271wallet, hashMessage(NON_HASH_MESSAGE), signature),
@@ -250,7 +249,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns false with invalid signature', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     expect(
                         await ecdsa.isValidSignature(
                             erc1271wallet,
@@ -263,7 +262,7 @@ describe('ECDSA', function () {
 
             describe('with v0 signature', function () {
                 it('returns false with 00 as version value', async function () {
-                    const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                     const version = '00';
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
@@ -276,7 +275,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with 27 as version value, and only for signer', async function () {
-                    const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                     const version = '1b'; // 27 = 1b.
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
@@ -312,7 +311,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns false when wrong version', async function () {
-                    const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                     // The last two hex digits are the signature version.
                     // The only valid values are 0, 1, 27 and 28.
                     expect(
@@ -329,7 +328,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with short EIP2098 format, and only for signer', async function () {
-                    const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                     const version = '1b'; // 27 = 1b.
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
@@ -361,7 +360,7 @@ describe('ECDSA', function () {
 
             describe('with v1 signature', function () {
                 it('returns false with 01 as version value', async function () {
-                    const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     expect(
                         await ecdsa.isValidSignature(
                             erc1271walletV1,
@@ -376,7 +375,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with 28 as version value, and only for signer', async function () {
-                    const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     const version = '1c'; // 28 = 1c.
                     const signature = signatureWithoutVersionV1 + version;
                     expect(
@@ -412,7 +411,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns false when wrong version', async function () {
-                    const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     // The last two hex digits are the signature version.
                     // The only valid values are 0, 1, 27 and 28.
                     expect(
@@ -429,7 +428,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with short EIP2098 format, and only for signer', async function () {
-                    const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     const version = '1c'; // 27 = 1b.
                     const signature = signatureWithoutVersionV1 + version;
                     expect(
@@ -461,7 +460,7 @@ describe('ECDSA', function () {
 
             describe('isValidSignature65', function () {
                 it('with matching signer and signature', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.isValidSignature65(
@@ -473,7 +472,7 @@ describe('ECDSA', function () {
                 });
 
                 it('with invalid signer', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.isValidSignature65(
@@ -485,7 +484,7 @@ describe('ECDSA', function () {
                 });
 
                 it('with invalid signature', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     const HASHED_WRONG_MESSAGE = hashMessage(WRONG_MESSAGE);
                     expect(
@@ -503,7 +502,7 @@ describe('ECDSA', function () {
     describe('recoverOrIsValidSignature', function () {
         describe('with invalid signature', function () {
             it('with short signature', async function () {
-                const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
                     await ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, '0x1234'),
                 ).to.be.false;
@@ -513,7 +512,7 @@ describe('ECDSA', function () {
             });
 
             it('with long signature', async function () {
-                const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 expect(
                     await ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, longSignature),
                 ).to.be.false;
@@ -526,7 +525,7 @@ describe('ECDSA', function () {
         describe('with valid signature', function () {
             describe('using account.signMessage', function () {
                 it('returns true with correct signature and only correct signer', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(account, HASHED_TEST_MESSAGE, signature),
@@ -540,7 +539,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with correct signature and only correct signer for arbitrary length message', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(NON_HASH_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
@@ -566,7 +565,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns false with invalid signature', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     expect(
                         await ecdsa.recoverOrIsValidSignature(
                             account,
@@ -586,7 +585,7 @@ describe('ECDSA', function () {
 
             describe('with v0 signature', function () {
                 it('returns false with 00 as version value', async function () {
-                    const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                     const version = '00';
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
@@ -611,7 +610,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with 27 as version value, and only for signer', async function () {
-                    const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                     const version = '1b'; // 27 = 1b.
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
@@ -668,7 +667,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns false when wrong version', async function () {
-                    const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                     // The last two hex digits are the signature version.
                     // The only valid values are 0, 1, 27 and 28.
                     expect(
@@ -701,7 +700,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with short EIP2098 format, and only for signer', async function () {
-                    const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                     const version = '1b'; // 27 = 1b.
                     const signature = signatureWithoutVersionV0 + version;
                     expect(
@@ -747,7 +746,7 @@ describe('ECDSA', function () {
 
             describe('with v1 signature', function () {
                 it('returns false with 01 as version value', async function () {
-                    const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     const version = '01';
                     const signature = signatureWithoutVersionV1 + version;
                     expect(
@@ -772,7 +771,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with 28 as version value, and only for signer', async function () {
-                    const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     const version = '1c'; // 28 = 1c.
                     const signature = signatureWithoutVersionV1 + version;
                     expect(
@@ -829,7 +828,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns false when wrong version', async function () {
-                    const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     // The last two hex digits are the signature version.
                     // The only valid values are 0, 1, 27 and 28.
                     expect(
@@ -862,7 +861,7 @@ describe('ECDSA', function () {
                 });
 
                 it('returns true with short EIP2098 format, and only for signer', async function () {
-                    const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                     const version = '1c'; // 27 = 1b.
                     const signature = signatureWithoutVersionV1 + version;
                     expect(
@@ -908,7 +907,7 @@ describe('ECDSA', function () {
 
             describe('recoverOrIsValidSignature65', function () {
                 it('with matching signer and signature', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature65(
@@ -927,7 +926,7 @@ describe('ECDSA', function () {
                 });
 
                 it('with invalid signer', async function () {
-                    const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     expect(
                         await ecdsa.recoverOrIsValidSignature65(
@@ -939,7 +938,7 @@ describe('ECDSA', function () {
                 });
 
                 it('with invalid signature', async function () {
-                    const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                    const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                     const signature = await account.signMessage(TEST_MESSAGE);
                     const HASHED_WRONG_MESSAGE = hashMessage(WRONG_MESSAGE);
                     expect(
@@ -963,7 +962,7 @@ describe('ECDSA', function () {
 
     describe('toEthSignedMessageHash', function () {
         it('correct hash', async function () {
-            const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+            const { ecdsa } = await loadFixture(deployContracts);
             const hashedTestMessageWithoutPrefix = HASHED_TEST_MESSAGE.substring(2);
             const msg = concat([
                 toUtf8Bytes('\x19Ethereum Signed Message:\n'),
@@ -977,7 +976,7 @@ describe('ECDSA', function () {
 
     describe('toTypedDataHash', function () {
         it('correct hash', async function () {
-            const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+            const { ecdsa } = await loadFixture(deployContracts);
             const domainSeparator = HASHED_TEST_MESSAGE;
             const structHash = HASHED_TEST_MESSAGE;
             const typedDataHash = keccak256(
@@ -994,13 +993,13 @@ describe('ECDSA', function () {
     describe('gas price', function () {
         describe('recover', function () {
             it('with signature', async function () {
-                const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(await ecdsa.recover.populateTransaction(HASHED_TEST_MESSAGE, signature));
             });
 
             it('with v0 signature', async function () {
-                const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(await ecdsa.recover.populateTransaction(HASHED_TEST_MESSAGE, signature));
@@ -1016,7 +1015,7 @@ describe('ECDSA', function () {
             });
 
             it('with v1 signature', async function () {
-                const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa } = await loadFixture(deployContracts);
                 const version = '1c'; // 28 = 1c.
                 const signature = signatureWithoutVersionV1 + version;
                 await account.sendTransaction(await ecdsa.recover.populateTransaction(HASHED_TEST_MESSAGE, signature));
@@ -1034,7 +1033,7 @@ describe('ECDSA', function () {
 
         describe('recoverOrIsValidSignature', function () {
             it('with signature', async function () {
-                const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
                     await ecdsa.recoverOrIsValidSignature.populateTransaction(
@@ -1053,7 +1052,7 @@ describe('ECDSA', function () {
             });
 
             it('with v0 signature', async function () {
-                const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(
@@ -1097,7 +1096,7 @@ describe('ECDSA', function () {
             });
 
             it('with v1 signature', async function () {
-                const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(
@@ -1141,7 +1140,7 @@ describe('ECDSA', function () {
             });
 
             it('recoverOrIsValidSignature65', async function () {
-                const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
                     await ecdsa.recoverOrIsValidSignature65.populateTransaction(
@@ -1162,7 +1161,7 @@ describe('ECDSA', function () {
 
         describe('isValidSignature', function () {
             it('with signature', async function () {
-                const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
                     await ecdsa.isValidSignature.populateTransaction(
@@ -1174,7 +1173,7 @@ describe('ECDSA', function () {
             });
 
             it('with v0 signature', async function () {
-                const { ecdsa, erc1271walletV0 } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271walletV0 } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(
@@ -1201,7 +1200,7 @@ describe('ECDSA', function () {
             });
 
             it('with v1 signature', async function () {
-                const { ecdsa, erc1271walletV1 } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271walletV1 } = await loadFixture(deployContracts);
                 const version = '1b'; // 27 = 1b.
                 const signature = signatureWithoutVersionV0 + version;
                 await account.sendTransaction(
@@ -1228,7 +1227,7 @@ describe('ECDSA', function () {
             });
 
             it('isValidSignature65', async function () {
-                const { ecdsa, erc1271wallet } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa, erc1271wallet } = await loadFixture(deployContracts);
                 const signature = await account.signMessage(TEST_MESSAGE);
                 await account.sendTransaction(
                     await ecdsa.isValidSignature65.populateTransaction(
@@ -1242,14 +1241,14 @@ describe('ECDSA', function () {
 
         describe('Additional methods', function () {
             it('toEthSignedMessageHash', async function () {
-                const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa } = await loadFixture(deployContracts);
                 await account.sendTransaction(
                     await ecdsa.toEthSignedMessageHash.populateTransaction(HASHED_TEST_MESSAGE),
                 );
             });
 
             it('toTypedDataHash', async function () {
-                const { ecdsa } = await networkHelpers.loadFixture(deployContracts);
+                const { ecdsa } = await loadFixture(deployContracts);
                 await account.sendTransaction(
                     await ecdsa.toTypedDataHash.populateTransaction(HASHED_TEST_MESSAGE, HASHED_TEST_MESSAGE),
                 );

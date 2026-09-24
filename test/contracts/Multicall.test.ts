@@ -1,7 +1,6 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 describe('Multicall', function () {
@@ -13,7 +12,7 @@ describe('Multicall', function () {
 
     describe('multicall', function () {
         it('should execute single call', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployMulticallMock);
+            const { mock } = await loadFixture(deployMulticallMock);
 
             const setValueData = mock.interface.encodeFunctionData('setValue', [42]);
             await mock.multicall([setValueData]);
@@ -22,7 +21,7 @@ describe('Multicall', function () {
         });
 
         it('should execute multiple calls', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployMulticallMock);
+            const { mock } = await loadFixture(deployMulticallMock);
 
             const setValueData = mock.interface.encodeFunctionData('setValue', [10]);
             const incrementData = mock.interface.encodeFunctionData('increment');
@@ -33,13 +32,13 @@ describe('Multicall', function () {
         });
 
         it('should execute empty array', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployMulticallMock);
+            const { mock } = await loadFixture(deployMulticallMock);
             await mock.multicall([]);
             expect(await mock.value()).to.equal(0n);
         });
 
         it('should preserve msg.sender in delegatecall', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployMulticallMock);
+            const { mock } = await loadFixture(deployMulticallMock);
             const [signer] = await ethers.getSigners();
 
             const setValueData = mock.interface.encodeFunctionData('setValue', [100]);
@@ -49,7 +48,7 @@ describe('Multicall', function () {
         });
 
         it('should revert on failed call and forward error', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployMulticallMock);
+            const { mock } = await loadFixture(deployMulticallMock);
 
             const revertData = mock.interface.encodeFunctionData('revertWithMessage', ['test error']);
 
@@ -59,7 +58,7 @@ describe('Multicall', function () {
         });
 
         it('should revert on failed call in middle of batch', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployMulticallMock);
+            const { mock } = await loadFixture(deployMulticallMock);
 
             const setValueData = mock.interface.encodeFunctionData('setValue', [10]);
             const revertData = mock.interface.encodeFunctionData('revertWithMessage', ['middle error']);
@@ -71,7 +70,7 @@ describe('Multicall', function () {
         });
 
         it('should forward empty revert', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployMulticallMock);
+            const { mock } = await loadFixture(deployMulticallMock);
 
             const revertData = mock.interface.encodeFunctionData('revertEmpty');
 

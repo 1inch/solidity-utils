@@ -1,4 +1,4 @@
-import { getNetworkConnection } from '../src/network.js';
+import { ethers, loadFixture } from '../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { ether, time, constants } from '../src/prelude.js';
 import {
@@ -8,12 +8,11 @@ import {
     getAccountsWithCode,
 } from '../src/utils.js';
 import { expect } from '../src/expect.js';
-import hre, { artifacts } from 'hardhat';
+import hre, { artifacts, network } from 'hardhat';
 import { loadEnvironmentFromHardhat } from 'hardhat-deploy/helpers';
 import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog, ContractTransactionReceipt } from 'ethers';
 import { Create3Mock, TokenMock, WETH } from '../typechain-types/index.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 describe('timeIncreaseTo', function () {
@@ -102,7 +101,7 @@ describe('utils', function () {
 
     describe('trackReceivedTokenAndTx', function () {
         it('should be tracked ERC20 Transfer', async function () {
-            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
+            const { usdt } = await loadFixture(deployUSDT);
 
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2, ether('1')),
@@ -116,7 +115,7 @@ describe('utils', function () {
         });
 
         it('should be tracked ERC20 Approve', async function () {
-            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
+            const { usdt } = await loadFixture(deployUSDT);
 
             const [received, tx] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
@@ -132,7 +131,7 @@ describe('utils', function () {
 
     describe('trackReceivedToken', function () {
         it('should be tracked ERC20 Transfer', async function () {
-            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
+            const { usdt } = await loadFixture(deployUSDT);
 
             const [received] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2, ether('1')),
@@ -141,7 +140,7 @@ describe('utils', function () {
         });
 
         it('should be tracked ERC20 Approve', async function () {
-            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
+            const { usdt } = await loadFixture(deployUSDT);
 
             const [received] = await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
@@ -152,12 +151,12 @@ describe('utils', function () {
 
     describe('countInstructions', function () {
         it('should be counted ERC20 Transfer', async function () {
-            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
+            const { usdt } = await loadFixture(deployUSDT);
 
             const tx = (await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.transfer(signer2, ether('1')),
             ))[1] as ContractTransactionReceipt;
-            if (process.env.SOLIDITY_COVERAGE !== 'true') {
+            if (!hre.globalOptions.coverage) {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 2, 2,
                 ]);
@@ -165,12 +164,12 @@ describe('utils', function () {
         });
 
         it('should be counted ERC20 Approve', async function () {
-            const { usdt } = await networkHelpers.loadFixture(deployUSDT);
+            const { usdt } = await loadFixture(deployUSDT);
 
             const tx = (await trackReceivedTokenAndTx(ethers.provider, usdt, signer2.address, () =>
                 usdt.approve(signer2, ether('1')),
             ))[1] as ContractTransactionReceipt;
-            if (process.env.SOLIDITY_COVERAGE !== 'true') {
+            if (!hre.globalOptions.coverage) {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 0,
                 ]);
@@ -328,10 +327,10 @@ describe('utils', function () {
     describe('getAccountsWithCode', function () {
         // HH3 shares one network across files; restore so later suites can still
         // send ETH to default signers.
-        let snapshot: Awaited<ReturnType<typeof networkHelpers.takeSnapshot>>;
+        let snapshot: { restore: () => Promise<void> };
 
         before(async function () {
-            snapshot = await networkHelpers.takeSnapshot();
+            snapshot = await (await network.getOrCreate()).networkHelpers.takeSnapshot();
         });
 
         after(async function () {

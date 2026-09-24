@@ -1,7 +1,6 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 describe('RevertReasonParser', function () {
@@ -13,37 +12,37 @@ describe('RevertReasonParser', function () {
 
 
     it('should be parsed as Unknown (Invalid revert reason)', async function () {
-        const { revertReasonParserTest } = await networkHelpers.loadFixture(deployRevertReasonParserTest);
+        const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
         await revertReasonParserTest.testParseWithThrow();
     });
 
     it('should be parsed as empty Error', async function () {
-        const { revertReasonParserTest } = await networkHelpers.loadFixture(deployRevertReasonParserTest);
+        const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
         await revertReasonParserTest.testEmptyStringRevert();
     });
 
     it('should be parsed as Error', async function () {
-        const { revertReasonParserTest } = await networkHelpers.loadFixture(deployRevertReasonParserTest);
+        const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
         await revertReasonParserTest.testNonEmptyRevert();
     });
 
     it('should be parsed as Unknown', async function () {
-        const { revertReasonParserTest } = await networkHelpers.loadFixture(deployRevertReasonParserTest);
+        const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
         await revertReasonParserTest.testEmptyRevert();
     });
 
     it('should be parsed as Panic', async function () {
-        const { revertReasonParserTest } = await networkHelpers.loadFixture(deployRevertReasonParserTest);
+        const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
         await revertReasonParserTest.testAssertion();
     });
 
     it('should be parsed as Error with long string', async function () {
-        const { revertReasonParserTest } = await networkHelpers.loadFixture(deployRevertReasonParserTest);
+        const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
         await revertReasonParserTest.testLongStringRevert();
     });
 
     it('should be reverted in _test()', async function () {
-        const { revertReasonParserTest } = await networkHelpers.loadFixture(deployRevertReasonParserTest);
+        const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);
         await expect(revertReasonParserTest.testWithThrow()).to.be.revertedWithCustomError(
             revertReasonParserTest,
             'TestDidNotThrow',

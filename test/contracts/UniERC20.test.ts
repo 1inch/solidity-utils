@@ -1,10 +1,9 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { constants, ether } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 import { encodeBytes32String, getAddress } from 'ethers';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
  
@@ -29,19 +28,19 @@ describe('UniERC20', function () {
         }
 
         it('is ETH', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.isETH()).to.be.false;
         });
 
         it('uni transfer', async function () {
-            const { wrapper, token } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper, token } = await loadFixture(deployMocks);
             await token.transfer(wrapper, 100);
             await wrapper.transfer(signer2, 100);
             expect(await wrapper.balanceOf(signer2)).to.be.equal(100);
         });
 
         it('uni transfer from', async function () {
-            const { wrapper, token } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper, token } = await loadFixture(deployMocks);
             await token.transfer(signer2, 100);
             await token.connect(signer2).approve(wrapper, 100);
             await wrapper.transferFrom(signer2, signer3, 100);
@@ -49,7 +48,7 @@ describe('UniERC20', function () {
         });
 
         it('uni approve', async function () {
-            const { wrapper, token } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper, token } = await loadFixture(deployMocks);
             await token.transfer(wrapper, 100);
             await wrapper.approve(signer1, 100);
             await token.transferFrom(wrapper, signer2, 100);
@@ -58,12 +57,12 @@ describe('UniERC20', function () {
 
         describe('ERC20 NAME/SYMBOL', function () {
             it('uni name', async function () {
-                const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+                const { wrapper } = await loadFixture(deployMocks);
                 expect(await wrapper.name()).to.equal('Token');
             });
 
             it('uni symbol', async function () {
-                const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+                const { wrapper } = await loadFixture(deployMocks);
                 expect(await wrapper.symbol()).to.equal('TKN');
             });
         });
@@ -79,12 +78,12 @@ describe('UniERC20', function () {
         }
 
         it('uni name', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.name()).to.equal('');
         });
 
         it('uni symbol', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.symbol()).to.equal('');
         });
     });
@@ -99,12 +98,12 @@ describe('UniERC20', function () {
         }
 
         it('uni name', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.name()).to.equal('Token');
         });
 
         it('uni symbol', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.symbol()).to.equal('TKN');
         });
     });
@@ -119,12 +118,12 @@ describe('UniERC20', function () {
         }
 
         it('uni name', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.name()).to.equal('Token');
         });
 
         it('uni symbol', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.symbol()).to.equal('TKN');
         });
     });
@@ -137,12 +136,12 @@ describe('UniERC20', function () {
         }
 
         it('uni name', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(getAddress(await wrapper.name())).to.equal(signer1.address);
         });
 
         it('uni symbol', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(getAddress(await wrapper.symbol())).to.equal(signer1.address);
         });
     });
@@ -155,12 +154,12 @@ describe('UniERC20', function () {
         }
 
         it('is ETH', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.isETH()).to.be.true;
         });
 
         it('uni transfer', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             const balBefore = await wrapper.balanceOf(signer2);
             await wrapper.transfer(signer2, 100, { value: 100 });
             const balAfter = await wrapper.balanceOf(signer2);
@@ -168,7 +167,7 @@ describe('UniERC20', function () {
         });
 
         it('uni transfer, msg.value > amount', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             const balBefore = await wrapper.balanceOf(signer2);
             await wrapper.transfer(signer2, 100, { value: 101 });
             const balAfter = await wrapper.balanceOf(signer2);
@@ -176,21 +175,21 @@ describe('UniERC20', function () {
         });
 
         it('uni transfer, insufficient balance', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             await expect(wrapper.transfer(signer2, 100, { value: 99 })).to.be.rejectedWith(
                 'InsufficientBalance',
             );
         });
 
         it('uni approve must fail', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             await expect(wrapper.connect(signer2).approve(signer1, 100)).to.be.rejectedWith(
                 'ApproveCalledOnETH',
             );
         });
 
         it('uni transfer from, success', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             const balBefore = await wrapper.balanceOf(wrapper);
             await wrapper.transferFrom(signer1, wrapper, 100, { value: 100 });
             const balAfter = await wrapper.balanceOf(wrapper);
@@ -198,14 +197,14 @@ describe('UniERC20', function () {
         });
 
         it('uni transfer from, fail, not sender', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             await expect(
                 wrapper.connect(signer2).transferFrom(signer1, wrapper, 100, { value: 100 }),
             ).to.be.rejectedWith('FromIsNotSender');
         });
 
         it('uni transfer from, fail, receiver is not contract', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             await expect(
                 wrapper.transferFrom(signer1, signer2, 100, {
                     value: 100,
@@ -214,12 +213,12 @@ describe('UniERC20', function () {
         });
 
         it('uni name', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.name()).to.equal('ETH');
         });
 
         it('uni symbol', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.symbol()).to.equal('ETH');
         });
     });
@@ -234,7 +233,7 @@ describe('UniERC20', function () {
         }
 
         it('uni failed transfer', async function () {
-            const { wrapper, receiver } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper, receiver } = await loadFixture(deployMocks);
             await expect(
                 wrapper.transfer(receiver, 100, {
                     value: 100,
@@ -243,7 +242,7 @@ describe('UniERC20', function () {
         });
 
         it('uni failed transferFrom', async function () {
-            const { wrapper, receiver } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper, receiver } = await loadFixture(deployMocks);
             await expect(
                 receiver.transfer(wrapper, 100, {
                     value: 101n,
@@ -260,7 +259,7 @@ describe('UniERC20', function () {
         }
 
         it('is ETH', async function () {
-            const { wrapper } = await networkHelpers.loadFixture(deployMocks);
+            const { wrapper } = await loadFixture(deployMocks);
             expect(await wrapper.isETH()).to.be.true;
         });
     });

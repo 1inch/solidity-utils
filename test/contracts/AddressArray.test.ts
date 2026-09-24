@@ -1,10 +1,9 @@
 import { Interface } from 'ethers';
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { constants } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 const addressLibErrors = { interface: new Interface(['error OutputArrayTooSmall()', 'error IndexOutOfBounds()']) };
 
@@ -26,13 +25,13 @@ describe('AddressArray', function () {
 
     describe('length', function () {
         it('should calculate length 0', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await signer1.sendTransaction(await addressArrayMock.length.populateTransaction());
             expect(await addressArrayMock.length()).to.be.equal('0');
         });
 
         it('should calculate length 1', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await signer1.sendTransaction(await addressArrayMock.length.populateTransaction());
             expect(await addressArrayMock.length()).to.be.equal('1');
@@ -41,25 +40,25 @@ describe('AddressArray', function () {
 
     describe('at', function () {
         it('should not get from empty array', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await expect(addressArrayMock.at(0)).to.be.revertedWithCustomError(addressLibErrors, 'IndexOutOfBounds');
         });
 
         it('should not get index out of array length', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await expect(addressArrayMock.at(await addressArrayMock.length())).to.be.revertedWithCustomError(addressLibErrors, 'IndexOutOfBounds');
         });
 
         it('should get from array with 1 element', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             expect(await addressArrayMock.at(0)).to.be.equal(signer1.address);
             await expect(addressArrayMock.at(1)).to.be.revertedWithCustomError(addressLibErrors, 'IndexOutOfBounds');
         });
 
         it('should get from array with several elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             expect(await addressArrayMock.at(0)).to.be.equal(signer1.address);
@@ -69,20 +68,20 @@ describe('AddressArray', function () {
 
     describe('unsafeAt', function () {
         it('should get from empty array', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             expect(await addressArrayMock.unsafeAt(0)).to.be.equal(constants.ZERO_ADDRESS);
             expect(await addressArrayMock.unsafeAt(1)).to.be.equal(constants.ZERO_ADDRESS);
         });
 
         it('should get from array with 1 element', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             expect(await addressArrayMock.unsafeAt(0)).to.be.equal(signer1.address);
             expect(await addressArrayMock.unsafeAt(1)).to.be.equal(constants.ZERO_ADDRESS);
         });
 
         it('should get from array with several elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             expect(await addressArrayMock.unsafeAt(0)).to.be.equal(signer1.address);
@@ -92,20 +91,20 @@ describe('AddressArray', function () {
 
     describe('get', function () {
         it('should get empty array', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([]);
         });
 
         it('should get array with 1 element', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address]);
         });
 
         it('should get array with 2 elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
@@ -113,7 +112,7 @@ describe('AddressArray', function () {
         });
 
         it('should get from array with 3 elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.push(signer3);
@@ -122,7 +121,7 @@ describe('AddressArray', function () {
         });
 
         it('should get array with 2 elements and copies the addresses into the provided input array', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await signer1.sendTransaction(await addressArrayMock.getAndProvideArr.populateTransaction([constants.ZERO_ADDRESS, constants.ZERO_ADDRESS]));
@@ -133,7 +132,7 @@ describe('AddressArray', function () {
         });
 
         it('should reverted because provided input array size is too small', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await expect(addressArrayMock.getAndProvideArr([])).to.be.revertedWithCustomError(addressLibErrors, 'OutputArrayTooSmall');
@@ -142,14 +141,14 @@ describe('AddressArray', function () {
 
     describe('push', function () {
         it('should push to empty array', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             const pushedIndex = await addressArrayMock.push.staticCall(signer1);
             await addressArrayMock.push(signer1);
             expect(await addressArrayMock.at(pushedIndex - 1n)).to.be.equal(signer1.address);
         });
 
         it('should push to array with 1 element', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             const pushedIndex = await addressArrayMock.push.staticCall(signer2);
             await addressArrayMock.push(signer2);
@@ -157,7 +156,7 @@ describe('AddressArray', function () {
         });
 
         it('should push to array with 2 elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             const pushedIndex = await addressArrayMock.push.staticCall(signer3);
@@ -168,12 +167,12 @@ describe('AddressArray', function () {
 
     describe('pop', function () {
         it('should throw when array is empty', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await expect(addressArrayMock.pop()).to.be.revertedWithCustomError(addressArrayMock, 'PopFromEmptyArray');
         });
 
         it('should pop from array with 1 element', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.pop();
             await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
@@ -181,7 +180,7 @@ describe('AddressArray', function () {
         });
 
         it('should pop from array with 2 elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.pop();
@@ -190,7 +189,7 @@ describe('AddressArray', function () {
         });
 
         it('should pop from array with 3 elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.push(signer3);
@@ -200,7 +199,7 @@ describe('AddressArray', function () {
         });
 
         it('should throw when pops more than there are elements in array', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.pop();
             await expect(addressArrayMock.pop()).to.be.revertedWithCustomError(addressArrayMock, 'PopFromEmptyArray');
@@ -209,7 +208,7 @@ describe('AddressArray', function () {
 
     describe('set', function () {
         it('should throw when sets index out of bounds', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await expect(addressArrayMock.set(0, signer1)).to.be.revertedWithCustomError(
                 addressArrayMock,
                 'IndexOutOfBounds',
@@ -217,7 +216,7 @@ describe('AddressArray', function () {
         });
 
         it('should set index 0 in array with 1 element', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.set(0, signer2);
             await signer1.sendTransaction(await addressArrayMock.get.populateTransaction());
@@ -225,7 +224,7 @@ describe('AddressArray', function () {
         });
 
         it('should set index 0 in array with several elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.set(0, signer3);
@@ -234,7 +233,7 @@ describe('AddressArray', function () {
         });
 
         it('should set index 1 in array with several elements', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.set(1, signer3);
@@ -245,7 +244,7 @@ describe('AddressArray', function () {
 
     describe('multiple add/remove', function () {
         it('should add and remove multiple times', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             await addressArrayMock.pop();
@@ -259,14 +258,14 @@ describe('AddressArray', function () {
 
     describe('erase', function () {
         it('should not change empty array', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             const arrayBefore = await addressArrayMock.get();
             await addressArrayMock.erase();
             expect(await addressArrayMock.get()).to.be.deep.equal(arrayBefore);
         });
 
         it('should reset non-zero array length', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             expect(await addressArrayMock.length()).to.be.not.equal('0');
             await addressArrayMock.erase();
@@ -274,7 +273,7 @@ describe('AddressArray', function () {
         });
 
         it('should reset non-zero array', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             expect(await addressArrayMock.get()).to.be.not.deep.equal([]);
             await addressArrayMock.erase();
@@ -282,7 +281,7 @@ describe('AddressArray', function () {
         });
 
         it('should not return item from array after reset', async function () {
-            const { addressArrayMock } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addressArrayMock } = await loadFixture(deployAddressArrayMock);
             await addressArrayMock.push(signer1);
             await addressArrayMock.push(signer2);
             expect(await addressArrayMock.get()).to.be.deep.equal([signer1.address, signer2.address]);

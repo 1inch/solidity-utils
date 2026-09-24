@@ -1,7 +1,6 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 describe('CalldataPtr', function () {
@@ -15,13 +14,13 @@ describe('CalldataPtr', function () {
 
     describe('from', function () {
         it('should create CalldataPtr from bytes', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployCalldataPtrMock);
+            const { mock } = await loadFixture(deployCalldataPtrMock);
             const ptr = await mock.from(testData);
             expect(ptr).to.not.equal(0n);
         });
 
         it('should create CalldataPtr from empty bytes', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployCalldataPtrMock);
+            const { mock } = await loadFixture(deployCalldataPtrMock);
             const ptr = await mock.from('0x');
             // Length should be 0, so lower 128 bits should be 0
             const length = ptr & ((1n << 128n) - 1n);
@@ -31,21 +30,21 @@ describe('CalldataPtr', function () {
 
     describe('getOffsetAndLength', function () {
         it('should return correct length for data', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployCalldataPtrMock);
+            const { mock } = await loadFixture(deployCalldataPtrMock);
             const result = await mock.getOffsetAndLength(testData);
             const length = result[1];
             expect(length).to.equal(32n);
         });
 
         it('should return correct length for empty data', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployCalldataPtrMock);
+            const { mock } = await loadFixture(deployCalldataPtrMock);
             const result = await mock.getOffsetAndLength('0x');
             const length = result[1];
             expect(length).to.equal(0n);
         });
 
         it('should return non-zero offset', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployCalldataPtrMock);
+            const { mock } = await loadFixture(deployCalldataPtrMock);
             const result = await mock.getOffsetAndLength(testData);
             const offset = result[0];
             expect(offset).to.be.gt(0n);
@@ -54,19 +53,19 @@ describe('CalldataPtr', function () {
 
     describe('roundTrip', function () {
         it('should return same data after from and toBytes', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployCalldataPtrMock);
+            const { mock } = await loadFixture(deployCalldataPtrMock);
             const result = await mock.roundTrip(testData);
             expect(result).to.equal(testData);
         });
 
         it('should return empty for empty input', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployCalldataPtrMock);
+            const { mock } = await loadFixture(deployCalldataPtrMock);
             const result = await mock.roundTrip('0x');
             expect(result).to.equal('0x');
         });
 
         it('should preserve arbitrary data', async function () {
-            const { mock } = await networkHelpers.loadFixture(deployCalldataPtrMock);
+            const { mock } = await loadFixture(deployCalldataPtrMock);
             const data = '0xdeadbeef';
             const result = await mock.roundTrip(data);
             expect(result).to.equal(data);

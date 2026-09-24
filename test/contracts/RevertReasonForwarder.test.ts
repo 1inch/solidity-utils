@@ -1,11 +1,10 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 import {
     RevertReasonForwarderHelper__factory as RevertReasonForwarderHelper,
     RevertReasonForwarderMock__factory as RevertReasonForwarderMock,
 } from '../../typechain-types/index.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 describe('RevertReasonForwarder', function () {
@@ -21,12 +20,12 @@ describe('RevertReasonForwarder', function () {
     }
 
     it('should forward custom error from the helper contract using reRevert', async function () {
-        const { helper, mock } = await networkHelpers.loadFixture(deployRevertReasonForwarderMock);
+        const { helper, mock } = await loadFixture(deployRevertReasonForwarderMock);
         await expect(mock.reRevert()).to.be.revertedWithCustomError(helper, 'RevertReason');
     });
 
     it('should return custom error from the helper contract using reReason', async function () {
-        const { mock } = await networkHelpers.loadFixture(deployRevertReasonForwarderMock);
+        const { mock } = await loadFixture(deployRevertReasonForwarderMock);
         expect(await mock.reReason.staticCall()).to.be.equal(ethers.id('RevertReason()').substring(0, 10));
     });
 });

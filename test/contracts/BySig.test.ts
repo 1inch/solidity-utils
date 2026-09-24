@@ -1,9 +1,8 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { constants } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 import { NonceType, buildBySigTraits, hashBySig, signSignedCall } from '../../src/bySig.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 describe('BySig', function () {
@@ -21,7 +20,7 @@ describe('BySig', function () {
 
     describe('bySigAccountNonces and useBySigAccountNonce', function () {
         it('should return current nonce and correct change it', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             expect(await token.bySigAccountNonces(alice)).to.be.equal(0);
             await token.useBySigAccountNonce(10);
             expect(await token.bySigAccountNonces(alice)).to.be.equal(10);
@@ -32,7 +31,7 @@ describe('BySig', function () {
 
     describe('bySigSelectorNonces and useBySigSelectorNonce', function () {
         it('should return current nonce and correct change it', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             const selector = token.interface.getFunction('transfer').selector;
             expect(await token.bySigSelectorNonces(alice, selector)).to.be.equal(0);
             await token.useBySigSelectorNonce(selector, 20);
@@ -44,7 +43,7 @@ describe('BySig', function () {
 
     describe('bySigUniqueNonces and useBySigUniqueNonce and bySigUniqueNoncesSlot', function () {
         it('should return true if nonce equals to setted nonce, false in another case and correct change it', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             expect(await token.bySigUniqueNoncesSlot(alice, 0)).to.be.equal(0);
             expect(await token.bySigUniqueNonces(alice, 0)).to.be.equal(false);
 
@@ -70,7 +69,7 @@ describe('BySig', function () {
 
     describe('hashBySig', function () {
         it('should return correct hash', async function () {
-            const { token, eip712: { name, version } } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
             const sig = {
                 traits: buildBySigTraits(),
                 data: '0x',
@@ -81,7 +80,7 @@ describe('BySig', function () {
 
     describe('bySig', function () {
         it('should return false for an invalid nonce type', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             const sig = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Invalid, nonce: 0 }),
                 data: '0x',
@@ -90,7 +89,7 @@ describe('BySig', function () {
         });
 
         it('should revert after traits deadline', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             const sig = {
                 traits: buildBySigTraits({ deadline: (await ethers.provider.getBlock('latest'))!.timestamp }),
                 data: '0x',
@@ -99,7 +98,7 @@ describe('BySig', function () {
         });
 
         it('should revert if relayer denied', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             const sig = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, relayer: constants.EEE_ADDRESS }),
                 data: '0x',
@@ -108,7 +107,7 @@ describe('BySig', function () {
         });
 
         it('should revert with wrong Account nonce', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             await token.useBySigAccountNonce(100);
             const sig = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Account, nonce: 99 }),
@@ -118,7 +117,7 @@ describe('BySig', function () {
         });
 
         it('should revert with wrong Selector nonce', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             const selector = token.interface.getFunction('transfer').selector;
             await token.useBySigSelectorNonce(selector, 100);
             const sig = {
@@ -129,7 +128,7 @@ describe('BySig', function () {
         });
 
         it('should revert with wrong Unique nonce', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             await token.useBySigUniqueNonce(100);
             const sig = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Unique, nonce: 100 }),
@@ -139,7 +138,7 @@ describe('BySig', function () {
         });
 
         it('should revert with wrong signature when no data', async function () {
-            const { addrs: { alice }, token } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice }, token } = await loadFixture(deployAddressArrayMock);
             const sig = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Unique, nonce: 0 }),
                 data: '0x',
@@ -148,7 +147,7 @@ describe('BySig', function () {
         });
 
         it('should revert with wrong signature', async function () {
-            const { addrs: { alice, bob }, token, eip712: { name, version } } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
             const signedCall = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('transfer', [alice.address, 100]),
@@ -158,7 +157,7 @@ describe('BySig', function () {
         });
 
         it('should work for transfer method', async function () {
-            const { addrs: { alice, bob }, token, eip712: { name, version } } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
             const signedCall = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
                 data: token.interface.encodeFunctionData('transfer', [alice.address, 100]),
@@ -172,7 +171,7 @@ describe('BySig', function () {
         });
 
         it('should make approve for sponsored call', async function () {
-            const { addrs: { alice, bob }, token, eip712: { name, version } } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
             const approveData = token.interface.encodeFunctionData('approve', [alice.address, 100]);
             const signedCall = {
                 traits: buildBySigTraits({ deadline: 0xffffffffff, nonceType: NonceType.Selector, nonce: 0 }),
@@ -187,7 +186,7 @@ describe('BySig', function () {
         });
 
         it('should work recursively', async function () {
-            const { addrs: { alice, bob, carol }, token, eip712: { name, version } } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob, carol }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
 
             // Bob sign for Carol
             const bobSignedCall = {
@@ -211,7 +210,7 @@ describe('BySig', function () {
         });
 
         it('should work recursively for sponsored call', async function () {
-            const { addrs: { alice, bob, carol }, token, eip712: { name, version } } = await networkHelpers.loadFixture(deployAddressArrayMock);
+            const { addrs: { alice, bob, carol }, token, eip712: { name, version } } = await loadFixture(deployAddressArrayMock);
 
             // Bob sign for Carol
             const approveData = token.interface.encodeFunctionData('approve', [carol.address, 100]);

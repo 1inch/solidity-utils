@@ -1,4 +1,4 @@
-import hre, { artifacts } from 'hardhat';
+import hre, { artifacts, network } from 'hardhat';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import type { Environment } from 'rocketh/types';
 import {
@@ -17,7 +17,7 @@ import {
 } from 'ethers';
 
 import { constants } from './prelude.js';
-import { getEthers, getNetworkConnection } from './network.js';
+import { ethers, setCode, time } from './hardhatHelpers.js';
 import { ICreate3Deployer } from '../typechain-types/index.js';
 
 /**
@@ -89,7 +89,7 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
         log = true,
     } = options;
     const env = resolveEnv(options);
-    const { ethers, networkName } = await getNetworkConnection();
+    const networkName = (await network.getOrCreate()).networkName;
     const waitConfirmations = options.waitConfirmations ?? (constants.DEV_CHAINS.includes(networkName) ? 1 : 6);
 
     if (skipIfAlreadyDeployed && env) {
@@ -161,9 +161,8 @@ export async function deployAndGetContractWithCreate3(
         waitConfirmations = 1,
     } = options;
     const env = resolveEnv(options);
-    const ethers = await getEthers();
     const signer = txSigner ?? (await ethers.getSigners())[0];
-    const networkName = (await getNetworkConnection()).networkName;
+    const networkName = (await network.getOrCreate()).networkName;
 
     const artifact = await artifacts.readArtifact(contractName);
     if (skipIfAlreadyDeployed && env) {
@@ -212,7 +211,6 @@ export async function saveContractWithCreate3Deployment(
     deployTxHash: string,
     skipVerify: boolean = false,
 ): Promise<Contract> {
-    const ethers = await getEthers();
     const deployer = await ethers.getContractAt('ICreate3Deployer', create3Deployer);
     const contract = await deployer.addressOf(salt);
     const receipt = await provider.getTransactionReceipt(deployTxHash);
@@ -230,7 +228,7 @@ export async function saveContractWithCreate3Deployment(
         } as any, { considerItAsFreshDeployment: true }); // eslint-disable-line @typescript-eslint/no-explicit-any
     }
 
-    const networkName = (await getNetworkConnection()).networkName;
+    const networkName = (await network.getOrCreate()).networkName;
     if (!(skipVerify || constants.DEV_CHAINS.includes(networkName))) {
         await hre.tasks.getTask('verify').run({
             address: contract,
@@ -250,8 +248,7 @@ export async function saveContractWithCreate3Deployment(
 export async function timeIncreaseTo(seconds: number | string): Promise<void> {
     const delay = 1000 - new Date().getMilliseconds();
     await new Promise((resolve) => setTimeout(resolve, delay));
-    const { networkHelpers } = await getNetworkConnection();
-    await networkHelpers.time.increaseTo(seconds);
+    await time.increaseTo(seconds);
 }
 
 /**
@@ -259,7 +256,6 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
  * Deploys a contract given a name and optional constructor parameters.
  */
 export async function deployContract(name: string, parameters: Array<BigNumberish> = []) : Promise<BaseContract> {
-    const ethers = await getEthers();
     const ContractFactory = await ethers.getContractFactory(name);
     const instance = await ContractFactory.deploy(...parameters);
     await instance.waitForDeployment();
@@ -272,7 +268,6 @@ export async function deployContract(name: string, parameters: Array<BigNumberis
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function deployContractFromBytecode(abi: any[], bytecode: BytesLike, parameters: Array<BigNumberish> = [], signer?: Signer) : Promise<BaseContract> {
-    const ethers = await getEthers();
     const ContractFactory = await ethers.getContractFactory(abi, bytecode, signer);
     const instance = await ContractFactory.deploy(...parameters);
     await instance.waitForDeployment();
@@ -379,13 +374,12 @@ export async function getEthPrice(nativeTokenSymbol: string = 'ETH'): Promise<bi
  * Sets custom bytecode for local test accounts and returns them as signers.
  */
 export async function getAccountsWithCode(code: BytesLike|Array<BytesLike|undefined> = '0x'): Promise<HardhatEthersSigner[]> {
-    const { ethers, networkHelpers } = await getNetworkConnection();
     const accounts = await ethers.getSigners();
     for (let i = 0; i < accounts.length; i++) {
         const newAccountCode = isBytesLike(code)
             ? code
             : (code[i] ?? '0x');
-        await networkHelpers.setCode(
+        await setCode(
             accounts[i].address,
             typeof newAccountCode === 'string' ? newAccountCode : hexlify(newAccountCode),
         );

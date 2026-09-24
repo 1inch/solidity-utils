@@ -1,9 +1,8 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 import { trim0x } from '../../src/permit.js';
 import { BytesStorageMock } from '../../typechain-types/index.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 type Slice = {
@@ -54,7 +53,7 @@ describe('BytesStorageMock', function () {
     function shouldWork(fixtures: { [dataType: string]: () => Promise<{ bytesStorageMock: BytesStorageMock, data: Slice | null }> }) {
         describe('wrap', function () {
             it('should return correct wrapped data with short data', async function () {
-                const { bytesStorageMock } = await networkHelpers.loadFixture(fixtures.shortData);
+                const { bytesStorageMock } = await loadFixture(fixtures.shortData);
                 const [slot, offset, length]: Array<bigint> = await bytesStorageMock.wrap();
                 expect(slot).to.be.equal(0n);
                 expect(offset).to.be.equal(0n);
@@ -62,7 +61,7 @@ describe('BytesStorageMock', function () {
             });
 
             it('should return correct wrapped data with long data', async function () {
-                const { bytesStorageMock } = await networkHelpers.loadFixture(fixtures.longData);
+                const { bytesStorageMock } = await loadFixture(fixtures.longData);
                 const [slot, offset, length]: Array<bigint> = await bytesStorageMock.wrap();
                 expect(slot).to.be.gt(0n);
                 expect(offset).to.be.equal(0n);
@@ -73,44 +72,44 @@ describe('BytesStorageMock', function () {
         describe('slice', function () {
             describe('short data', function () {
                 it('should revert with incorrect offset', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.shortDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
                     await expect(bytesStorageMock.wrapAndSlice(data!.offset + data!.length + 1n, 0)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should revert with incorrect size', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.shortDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
                     await expect(bytesStorageMock.wrapAndSlice(data!.offset, data!.length + 1n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should revert with incorrect offset + size', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.shortDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
                     await expect(bytesStorageMock.wrapAndSlice(data!.offset + data!.length / 2n, data!.length / 2n + 10n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should slice data', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.shortDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
                     expect(await bytesStorageMock.wrapAndSlice(data!.offset + 2n, 4n)).to.be.deep.eq([data!.slot, data!.offset + 2n, 4n]);
                 });
             });
 
             describe('long data', function () {
                 it('should revert with incorrect offset with long data', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.longDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
                     await expect(bytesStorageMock.wrapAndSlice(data!.offset + data!.length + 1n, 0)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should revert with incorrect size with long data', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.longDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
                     await expect(bytesStorageMock.wrapAndSlice(data!.offset, data!.length + 1n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should revert with incorrect offset + size with long data', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.longDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
                     await expect(bytesStorageMock.wrapAndSlice(data!.offset + data!.length / 2n, data!.length / 2n + 10n)).to.be.revertedWithCustomError(bytesStorageMock, 'OutOfBounds');
                 });
 
                 it('should slice data', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.longDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
                     expect(await bytesStorageMock.wrapAndSlice(data!.offset + 20n, 10n)).to.be.deep.eq([data!.slot, data!.offset + 20n, 10n]);
                 });
             });
@@ -119,29 +118,29 @@ describe('BytesStorageMock', function () {
         describe('copy', function () {
             describe('short data', function () {
                 it('should return the same bytes after copy', async function () {
-                    const { bytesStorageMock } = await networkHelpers.loadFixture(fixtures.shortData);
+                    const { bytesStorageMock } = await loadFixture(fixtures.shortData);
                     expect(await bytesStorageMock.wrapAndCopy()).to.be.equal(shortBytes);
                 });
 
                 it('should return correct bytes after slice and copy', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.shortDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.shortDataAndWrap);
                     expect(await bytesStorageMock.wrapWithSliceAndCopy(data!.offset + 2n, 4n)).to.be.equal('0x' + trim0x(shortBytes).substring(2*2, 2*2 + 4*2));
                 });
             });
 
             describe('long data', function () {
                 it('should return the same bytes after copy', async function () {
-                    const { bytesStorageMock } = await networkHelpers.loadFixture(fixtures.longData);
+                    const { bytesStorageMock } = await loadFixture(fixtures.longData);
                     expect(await bytesStorageMock.wrapAndCopy()).to.be.equal(longBytes);
                 });
 
                 it('should return correct bytes after slice and copy', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.longDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
                     expect(await bytesStorageMock.wrapWithSliceAndCopy(data!.offset + 20n, 10n)).to.be.equal('0x' + trim0x(longBytes).substring(20*2, 20*2 + 10*2));
                 });
 
                 it('should return correct bytes after slice and copy more than 50 bytes', async function () {
-                    const { bytesStorageMock, data } = await networkHelpers.loadFixture(fixtures.longDataAndWrap);
+                    const { bytesStorageMock, data } = await loadFixture(fixtures.longDataAndWrap);
                     expect(await bytesStorageMock.wrapWithSliceAndCopy(data!.offset + 2n, 56n)).to.be.equal('0x' + trim0x(longBytes).substring(2*2, 2*2 + 56*2));
                 });
             });

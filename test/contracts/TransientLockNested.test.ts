@@ -1,8 +1,8 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 import { executionGas } from '../../src/profileEVM.js';
+import hre from 'hardhat';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 const MAKER = '0x1111111111111111111111111111111111111111';
@@ -17,23 +17,23 @@ describe('TransientLock nested mapping', function () {
 
     describe('TransientLockLib (with offset)', function () {
         it('should lock successfully', async function () {
-            const { safe } = await networkHelpers.loadFixture(deployNestedMocks);
+            const { safe } = await loadFixture(deployNestedMocks);
             await expect(safe.lock(MAKER, STRATEGY)).not.to.revert(ethers);
         });
 
         it('should return false initially', async function () {
-            const { safe } = await networkHelpers.loadFixture(deployNestedMocks);
+            const { safe } = await loadFixture(deployNestedMocks);
             expect(await safe.isLocked(MAKER, STRATEGY)).to.equal(false);
         });
 
         it('should reset between transactions', async function () {
-            const { safe } = await networkHelpers.loadFixture(deployNestedMocks);
+            const { safe } = await loadFixture(deployNestedMocks);
             await safe.lock(MAKER, STRATEGY);
             expect(await safe.isLocked(MAKER, STRATEGY)).to.equal(false);
         });
 
         it('should isolate different maker/strategy pairs', async function () {
-            const { safe } = await networkHelpers.loadFixture(deployNestedMocks);
+            const { safe } = await loadFixture(deployNestedMocks);
             const otherMaker = '0x2222222222222222222222222222222222222222';
             const otherStrategy = ethers.id('strategy-2');
             await safe.lock(MAKER, STRATEGY);
@@ -44,18 +44,18 @@ describe('TransientLock nested mapping', function () {
 
     describe('TransientLockUnsafeLib (without offset)', function () {
         it('should lock successfully', async function () {
-            const { unsafe } = await networkHelpers.loadFixture(deployNestedMocks);
+            const { unsafe } = await loadFixture(deployNestedMocks);
             await expect(unsafe.lock(MAKER, STRATEGY)).not.to.revert(ethers);
         });
     });
 
     describe('Gas comparison: TransientLockLib vs TransientLockUnsafeLib (nested mapping)', function () {
         before(function () {
-            if (process.env.SOLIDITY_COVERAGE === 'true') { this.skip(); }
+            if (hre.globalOptions.coverage) { this.skip(); }
         });
 
         it('lock', async function () {
-            const { safe, unsafe } = await networkHelpers.loadFixture(deployNestedMocks);
+            const { safe, unsafe } = await loadFixture(deployNestedMocks);
             const safeGas = await executionGas(ethers.provider, safe.lock(MAKER, STRATEGY));
             const unsafeGas = await executionGas(ethers.provider, unsafe.lock(MAKER, STRATEGY));
             console.log(`        lock — safe: ${safeGas}, unsafe: ${unsafeGas}, delta: ${safeGas - unsafeGas}`);

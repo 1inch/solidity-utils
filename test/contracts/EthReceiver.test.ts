@@ -1,8 +1,7 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { expect } from '../../src/expect.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 describe('EthReceiver', function () {
@@ -22,12 +21,12 @@ describe('EthReceiver', function () {
     }
 
     it('contract transfer', async function () {
-        const { ethReceiverMock, ethSenderMock } = await networkHelpers.loadFixture(deployMocks);
+        const { ethReceiverMock, ethSenderMock } = await loadFixture(deployMocks);
         await ethSenderMock.transfer(ethReceiverMock, { value: 100 });
     });
 
     it('normal transfer', async function () {
-        const { ethReceiverMock } = await networkHelpers.loadFixture(deployMocks);
+        const { ethReceiverMock } = await loadFixture(deployMocks);
 
         await expect(
             signer1.sendTransaction({ to: ethReceiverMock, value: 100 }),

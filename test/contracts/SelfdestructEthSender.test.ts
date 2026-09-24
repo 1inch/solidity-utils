@@ -1,10 +1,9 @@
-import { getNetworkConnection } from '../../src/network.js';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { expect } from '../../src/expect.js';
 import { ether } from '../../src/prelude.js';
 import { SelfdestructEthSenderMock } from '../../typechain-types/index.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 describe('SelfdestructEthSender', function () {
@@ -23,7 +22,7 @@ describe('SelfdestructEthSender', function () {
     }
 
     it('should send Ethers with selfdestruct', async function () {
-        const { ethSender } = await networkHelpers.loadFixture(deployMocks);
+        const { ethSender } = await loadFixture(deployMocks);
         const ethSenderAddress = await ethSender.getAddress();
 
         await signer0.sendTransaction({ to: ethSenderAddress, value: ether('1') });

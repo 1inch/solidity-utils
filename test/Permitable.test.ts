@@ -1,10 +1,9 @@
-import { getNetworkConnection } from '../src/network.js';
+import { ethers, loadFixture } from '../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { expect } from '../src/expect.js';
 import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermit2, getPermitLikeDai, getPermitLikeUSDC, permit2Contract, cutSelector } from '../src/permit.js';
 import { constants } from '../src/prelude.js';
 
-const { ethers, networkHelpers } = await getNetworkConnection();
 
 
 const value = 42n;
@@ -36,7 +35,7 @@ describe('Permitable', function () {
     }
 
     it('should be permitted for IERC20Permit', async function () {
-        const { permitableMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
 
         const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitableMock.getAddress(), value.toString());
         await permitableMock.mockPermit(erc20PermitMock, permit);
@@ -45,7 +44,7 @@ describe('Permitable', function () {
     });
 
     it('should be permitted for IERC20Permit (compact)', async function () {
-        const { permitableMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
 
         const permit = await getPermit(signer1, erc20PermitMock, '1', chainId, await permitableMock.getAddress(), value.toString(), constants.MAX_UINT256.toString(), true);
         await permitableMock.mockPermitCompact(erc20PermitMock, permit);
@@ -54,7 +53,7 @@ describe('Permitable', function () {
     });
 
     it('should be permitted for IERC20Permit with deadline less than max int', async function () {
-        const { permitableMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
         const blockNumber = await ethers.provider.getBlockNumber();
         const block = await ethers.provider.getBlock(blockNumber);
         const deadline  = block ? block.timestamp + 1000 : 6421990892; // 03 Jul 2173 00:00:00 GMT+0000
@@ -66,7 +65,7 @@ describe('Permitable', function () {
     });
 
     it('should be not permitted for IERC20Permit with deadline less than current block', async function () {
-        const { permitableMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
         const blockNumber = await ethers.provider.getBlockNumber();
         const block = await ethers.provider.getBlock(blockNumber);
         const deadline  = block ? block.timestamp - 1000 : 1000;
@@ -76,7 +75,7 @@ describe('Permitable', function () {
     });
 
     it('should not be permitted for IERC20Permit', async function () {
-        const { permitableMock, erc20PermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
 
         const name = await erc20PermitMock.name();
         const nonce = await erc20PermitMock.nonces(signer1);
@@ -108,7 +107,7 @@ describe('Permitable', function () {
     });
 
     it('should be permitted for IDaiLikePermit', async function () {
-        const { permitableMock, daiLikePermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
 
         const permit = await getPermitLikeDai(signer1, daiLikePermitMock, '1', chainId, await permitableMock.getAddress(), true);
         await permitableMock.mockPermit(daiLikePermitMock, permit);
@@ -118,7 +117,7 @@ describe('Permitable', function () {
     });
 
     it('should be permitted for IPermit2', async function () {
-        const { permitableMock, daiLikePermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
         const permitContract = await permit2Contract();
         const permit = await getPermit2(signer1, await daiLikePermitMock.getAddress(), chainId, signer2.address, constants.MAX_UINT128);
         await permitableMock.mockPermit(daiLikePermitMock, permit);
@@ -129,7 +128,7 @@ describe('Permitable', function () {
     });
 
     it('should be permitted for IPermit2, compact', async function () {
-        const { permitableMock, daiLikePermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
         const permitContract = await permit2Contract();
         const permit = await getPermit2(signer1, await daiLikePermitMock.getAddress(), chainId, await permitableMock.getAddress(), constants.MAX_UINT128, true);
         await permitableMock.mockPermitCompact(daiLikePermitMock, permit);
@@ -140,7 +139,7 @@ describe('Permitable', function () {
     });
 
     it('should be permitted for IDaiLikePermit (compact)', async function () {
-        const { permitableMock, daiLikePermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
 
         const permit = await getPermitLikeDai(signer1, daiLikePermitMock, '1', chainId, await permitableMock.getAddress(), true, constants.MAX_UINT256.toString(), true);
         await permitableMock.mockPermitCompact(daiLikePermitMock, permit);
@@ -150,7 +149,7 @@ describe('Permitable', function () {
     });
 
     it('should not be permitted for IDaiLikePermit', async function () {
-        const { permitableMock, daiLikePermitMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, daiLikePermitMock, chainId } = await loadFixture(deployTokens);
 
         const name = await daiLikePermitMock.name();
         const nonce = await daiLikePermitMock.nonces(signer1);
@@ -181,7 +180,7 @@ describe('Permitable', function () {
     });
 
     it('should be permitted for IERC7597Permit', async function () {
-        const { permitableMock, usdcLikePermitMock, isValidSignatureMock, chainId } = await networkHelpers.loadFixture(deployTokens);
+        const { permitableMock, usdcLikePermitMock, isValidSignatureMock, chainId } = await loadFixture(deployTokens);
 
         const owner = await isValidSignatureMock.getAddress();
 
