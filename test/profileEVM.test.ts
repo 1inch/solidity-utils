@@ -1,13 +1,15 @@
-import { ether } from '../src/prelude';
-import { expect } from '../src/expect';
-import { profileEVM, gasspectEVM } from '../src/profileEVM';
-import hre, { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ethers, loadFixture } from '../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { ether } from '../src/prelude.js';
+import { expect } from '../src/expect.js';
+import { profileEVM, gasspectEVM } from '../src/profileEVM.js';
+import hre from 'hardhat';
+
+
 
 describe('trace inspection', function () {
-    let signer1: SignerWithAddress;
-    let signer2: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
+    let signer2: HardhatEthersSigner;
 
     before(async function () {
         [signer1, signer2] = await ethers.getSigners();
@@ -26,7 +28,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.transfer(signer2, ether('1'));
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 expect(await profileEVM(ethers.provider, txn.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 2, 2,
                 ]);
@@ -37,7 +39,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.approve(signer2, ether('1'));
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 expect(await profileEVM(ethers.provider, txn.hash, ['STATICCALL', 'CALL', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 0, 1, 0,
                 ]);
@@ -63,7 +65,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.approve(signer2, ether('1'));
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 expect(await gasspectEVM(ethers.provider, txn.hash)).to.be.deep.equal(['0-0-SSTORE_I = 22100', '0-0-LOG3 = 1756']);
             }
         });
@@ -84,7 +86,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.transfer(signer2, ether('1'));
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 expect(await gasspectEVM(ethers.provider, txn.hash, { args: true })).to.be.deep.equal([
                     '0-0-SLOAD(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722) = 2100',
                     '0-0-SSTORE(0x723077b8a1b173adc35e5f0e7e3662fd1208212cb629f9c128551ea7168da722,0x00000000000000000000000000000000000000000000003627e8f712373c0000) = 2900',
@@ -99,7 +101,7 @@ describe('trace inspection', function () {
             const { usdt } = await loadFixture(deployUSDT);
 
             const txn = await usdt.transfer(signer2, ether('1'));
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 expect(await gasspectEVM(ethers.provider, txn.hash, { res: true })).to.be.deep.equal([
                     '0-0-SLOAD:0x00000000000000000000000000000000000000000000003635c9adc5dea00000 = 2100',
                     '0-0-SSTORE = 2900',

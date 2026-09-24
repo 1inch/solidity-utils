@@ -1,12 +1,14 @@
-import { expect } from '../../src/expect';
-import { trim0x } from '../../src/permit';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import hre, { ethers } from 'hardhat';
-import chai from 'chai';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import { expect } from '../../src/expect.js';
+import { trim0x } from '../../src/permit.js';
+import { use } from 'chai';
 import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
+import hre from 'hardhat';
 
-if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-    chai.use(jestSnapshotPlugin());
+
+
+if (!hre.globalOptions.coverage) {
+    use(jestSnapshotPlugin());
 }
 
 describe('BytesMemoryMock', function () {
@@ -83,7 +85,7 @@ describe('BytesMemoryMock', function () {
 
     describe('Gas usage', function () {
         before(function () {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+            if (hre.globalOptions.coverage) { this.skip(); }
         });
 
         it('unwrap 32 bytes', async function () {

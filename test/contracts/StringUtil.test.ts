@@ -1,12 +1,14 @@
-import { expect } from '../../src/expect';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import { expect } from '../../src/expect.js';
 import { BigNumberish, BytesLike } from 'ethers';
-import hre, { ethers } from 'hardhat';
-import chai from 'chai';
+import { use } from 'chai';
 import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
+import hre from 'hardhat';
 
-if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
-    chai.use(jestSnapshotPlugin());
+
+
+if (!hre.globalOptions.coverage) {
+    use(jestSnapshotPlugin());
 }
 
 describe('StringUtil', function () {
@@ -64,7 +66,7 @@ describe('StringUtil', function () {
 
     describe('Gas usage', function () {
         before(function () {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+            if (hre.globalOptions.coverage) { this.skip(); }
         });
 
         it('Uint 256', () => testGasUint256(uint256TestValue));

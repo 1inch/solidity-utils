@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.24;
 
-import "../../libraries/Transient.sol";
+import { tuint256, taddress, tbytes32, TransientLib } from "../../libraries/Transient.sol";
 
 contract TransientMock {
     using TransientLib for tuint256;

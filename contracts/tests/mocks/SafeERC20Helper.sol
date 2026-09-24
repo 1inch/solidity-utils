@@ -3,9 +3,10 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
-import "../../libraries/SafeERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ERC20, ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import { SafeERC20 } from "../../libraries/SafeERC20.sol";
+import { IWETH } from "../../interfaces/IWETH.sol";
 
 contract ERC20ReturnFalseMock {
     uint256 private _allowance;
@@ -173,6 +174,10 @@ contract ERC20PermitNoRevertMock is
         super.permit(owner, spender, value, deadline, v, r, s);
     }
 
+    // Touch storage in the catch path so viaIR + high optimizer runs do not
+    // dead-code-eliminate the try external call (solc 0.8.37).
+    uint256 private _permitNoRevertCatchProbe;
+
     function permit(
         address owner,
         address spender,
@@ -183,7 +188,9 @@ contract ERC20PermitNoRevertMock is
         bytes32 s
     ) public virtual override {
         // solhint-disable-next-line no-empty-blocks
-        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {} catch {}
+        try this.permitThatMayRevert(owner, spender, value, deadline, v, r, s) {} catch {
+            _permitNoRevertCatchProbe = 1;
+        }
     }
 }
 

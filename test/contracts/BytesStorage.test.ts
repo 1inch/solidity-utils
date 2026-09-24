@@ -1,8 +1,9 @@
-import { expect } from '../../src/expect';
-import { trim0x } from '../../src/permit';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
-import { BytesStorageMock } from '../../typechain-types';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import { expect } from '../../src/expect.js';
+import { trim0x } from '../../src/permit.js';
+import { BytesStorageMock } from '../../typechain-types/index.js';
+
+
 
 type Slice = {
     slot: bigint,

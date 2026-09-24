@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/AddressArray.sol";
+import { AddressArray } from "../../libraries/AddressArray.sol";
 
 contract AddressArrayMock {
     using AddressArray for AddressArray.Data;
@@ -27,6 +27,7 @@ contract AddressArrayMock {
         return AddressArray.get(_self);
     }
 
+    // solhint-disable-next-line gas-calldata-parameters
     function getAndProvideArr(address[] memory providedArr) external view returns (address[] memory, address[] memory) {
         return (AddressArray.get(_self, providedArr), providedArr);
     }

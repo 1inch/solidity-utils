@@ -1,10 +1,11 @@
-import { expect } from '../../src/expect';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
+
+
 
 describe('WethReceiver', function () {
-    let signer1: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
 
     before(async function () {
         [signer1] = await ethers.getSigners();

@@ -4,7 +4,7 @@ exports[`StringUtil Gas usage Empty bytes 1`] = `22188n`;
 
 exports[`StringUtil Gas usage Empty bytes naive 1`] = `22498n`;
 
-exports[`StringUtil Gas usage Extremely long byte array gas 1`] = `55723n`;
+exports[`StringUtil Gas usage Extremely long byte array gas 1`] = `62130n`;
 
 exports[`StringUtil Gas usage Extremely long byte array gas naive 1`] = `514608n`;
 

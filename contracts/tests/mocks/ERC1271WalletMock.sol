@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/interfaces/IERC1271.sol";
-import "../../libraries/ECDSA.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { IERC1271 } from "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import { ECDSA } from "../../libraries/ECDSA.sol";
 
 contract ERC1271WalletMock is Ownable, IERC1271 {
     constructor(address originalOwner) Ownable(originalOwner) {} // solhint-disable-line no-empty-blocks

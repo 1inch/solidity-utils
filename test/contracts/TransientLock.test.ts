@@ -1,6 +1,7 @@
-import { expect } from '../../src/expect';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import { expect } from '../../src/expect.js';
+
+
 
 for (const contractName of ['TransientLockMock', 'TransientLockUnsafeMock']) {
     describe(contractName, function () {
@@ -12,7 +13,7 @@ for (const contractName of ['TransientLockMock', 'TransientLockUnsafeMock']) {
         describe('lock', function () {
             it('should lock successfully when unlocked', async function () {
                 const { mock } = await loadFixture(deployMock);
-                await expect(mock.lock()).not.to.be.reverted;
+                await expect(mock.lock()).not.to.revert(ethers);
             });
 
             it('should be locked after lock() call within same transaction', async function () {
@@ -24,7 +25,7 @@ for (const contractName of ['TransientLockMock', 'TransientLockUnsafeMock']) {
         describe('unlock', function () {
             it('should revert when unlocking without lock', async function () {
                 const { mock } = await loadFixture(deployMock);
-                await expect(mock.unlockWithoutLock()).to.be.reverted;
+                await expect(mock.unlockWithoutLock()).to.revert(ethers);
             });
         });
 

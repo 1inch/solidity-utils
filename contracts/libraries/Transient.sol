@@ -7,7 +7,7 @@ pragma solidity ^0.8.24;
  * @dev Struct wrapper for uint256 to enable transient storage operations.
  */
 /// forge-lint: disable-next-line(pascal-case-struct)
-struct tuint256 { // solhint-disable-line contract-name-camelcase
+struct tuint256 { // solhint-disable-line contract-name-capwords
     uint256 _raw;
 }
 
@@ -16,7 +16,7 @@ struct tuint256 { // solhint-disable-line contract-name-camelcase
  * @dev Struct wrapper for address to enable transient storage operations.
  */
 /// forge-lint: disable-next-line(pascal-case-struct)
-struct taddress { // solhint-disable-line contract-name-camelcase
+struct taddress { // solhint-disable-line contract-name-capwords
     address _raw;
 }
 
@@ -25,7 +25,7 @@ struct taddress { // solhint-disable-line contract-name-camelcase
  * @dev Struct wrapper for bytes32 to enable transient storage operations.
  */
 /// forge-lint: disable-next-line(pascal-case-struct)
-struct tbytes32 { // solhint-disable-line contract-name-camelcase
+struct tbytes32 { // solhint-disable-line contract-name-capwords
     bytes32 _raw;
 }
 
@@ -73,10 +73,12 @@ library TransientLib {
      */
     error MathUnderflow();
 
-    // bytes32 private constant offset = keccak256(abi.encode(uint256(keccak256("TransientTest.storage.Offset")) - 1)) & ~bytes32(uint256(0xff));
-    // @dev: this is the offset for the transient storage slot
-    // @dev: it is required because tload uses storage slot index and it may be a collision with transient storage slots
-    bytes32 private constant OFFSET = 0xb2e1616e94c4f038b21d9137633825dc3f28ecaa196ae6785bc038208b529200;
+    /**
+     * @dev This is the offset for the transient storage slot.
+     *   It is required because tload uses storage slot index and it may be a collision with transient storage slots.
+     * @dev keccak256(abi.encode(uint256(keccak256("1inch.transient.TransientLib")) - 1)) & ~bytes32(uint256(0xff));
+     */
+    bytes32 private constant OFFSET = 0x1a13954c2572cec45a9d92caded783b3fb4cc57e763a0b45ca60104fe73a5800;
 
     // ===================== Functions for tuint256 =====================
 

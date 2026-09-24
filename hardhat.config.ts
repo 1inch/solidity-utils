@@ -1,52 +1,64 @@
-import '@typechain/hardhat';
-import '@nomicfoundation/hardhat-ethers';
-import '@nomicfoundation/hardhat-chai-matchers';
-import 'hardhat-gas-reporter';
-import 'hardhat-deploy';
-import '@nomicfoundation/hardhat-verify';
-import 'solidity-docgen';
-import 'solidity-coverage';
-import dotenv from 'dotenv';
-import { HardhatUserConfig } from 'hardhat/config';
-import { HardhatNetworkUserConfig } from 'hardhat/types';
-import { Networks, getNetwork } from './hardhat-setup';
-
-dotenv.config();
-
-declare module 'hardhat/types/runtime' {
-    interface HardhatRuntimeEnvironment {
-        __SOLIDITY_COVERAGE_RUNNING?: boolean | undefined;
-    }
-}
+import hardhatToolboxMochaEthers from '@nomicfoundation/hardhat-toolbox-mocha-ethers';
+import HardhatDeploy from 'hardhat-deploy';
+import { defineConfig } from 'hardhat/config';
+import { Networks, getNetwork } from './hardhat-setup/networks.js';
 
 const { networks, etherscan } = new Networks();
 
-const config: HardhatUserConfig = {
+const hardhatNetwork = networks.hardhat;
+const evmVersion =
+    hardhatNetwork?.type === 'edr-simulated'
+        ? hardhatNetwork.hardfork || 'cancun'
+        : 'cancun';
+
+const etherscanApiKey =
+    typeof etherscan.apiKey === 'string'
+        ? etherscan.apiKey
+        : Object.values(etherscan.apiKey)[0] || '';
+
+export default defineConfig({
+    plugins: [hardhatToolboxMochaEthers, HardhatDeploy],
     solidity: {
-        version: '0.8.30',
+        version: '0.8.37',
         settings: {
             optimizer: {
                 enabled: true,
                 runs: 1000000,
             },
-            evmVersion: (networks[getNetwork()] as HardhatNetworkUserConfig)?.hardfork || 'cancun',
+            evmVersion,
             viaIR: true,
         },
     },
-    etherscan,
-    networks,
-    gasReporter: {
-        enabled: true,
-    },
     typechain: {
-        target: 'ethers-v6',
+        outDir: 'typechain-types',
     },
-    docgen: {
-        outputDir: 'docs/contracts',
-        templates: 'docgen/templates',
-        pages: 'files',
-        exclude: ['tests'],
+    verify: {
+        etherscan: {
+            apiKey: etherscanApiKey,
+            enabled: Boolean(etherscanApiKey),
+        },
     },
-};
+    chainDescriptors: Object.fromEntries(
+        etherscan.customChains.map((chain) => [
+            chain.chainId,
+            {
+                name: chain.network,
+                blockExplorers: {
+                    etherscan: {
+                        url: chain.urls.browserURL,
+                        apiUrl: chain.urls.apiURL,
+                    },
+                },
+            },
+        ]),
+    ),
+    networks,
+    paths: {
+        tests: {
+            mocha: './test',
+        },
+    },
+});
 
-export default config;
+// Keep getNetwork import used (CLI network detection helpers rely on argv parsing).
+void getNetwork;

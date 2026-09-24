@@ -1,9 +1,11 @@
-import { expect } from '../../src/expect';
-import { executionGas } from '../../src/profileEVM';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import hre, { ethers } from 'hardhat';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import { expect } from '../../src/expect.js';
+import { executionGas } from '../../src/profileEVM.js';
 import type { TransientMock } from '../../typechain-types/contracts/tests/mocks/TransientMock';
 import type { TransientUnsafeMock } from '../../typechain-types/contracts/tests/mocks/TransientUnsafeMock';
+import hre from 'hardhat';
+
+
 
 for (const contractName of ['TransientMock', 'TransientUnsafeMock']) {
     describe(contractName, function () {
@@ -49,26 +51,26 @@ for (const contractName of ['TransientMock', 'TransientUnsafeMock']) {
 
                 it('should revert on overflow (when incremented == 0)', async function () {
                     const { mock } = await loadFixture(deployTransientMock);
-                    await expect(mock.incFromMaxValue()).to.be.reverted;
+                    await expect(mock.incFromMaxValue()).to.revert(ethers);
                 });
 
                 it('should revert with custom exception on overflow', async function () {
                     const { mock } = await loadFixture(deployTransientMock);
                     const customSelector = '0xdeadbeef';
-                    await expect(mock.incFromMaxValueWithException(customSelector)).to.be.reverted;
+                    await expect(mock.incFromMaxValueWithException(customSelector)).to.revert(ethers);
                 });
             });
 
             describe('dec', function () {
                 it('should revert on underflow from 0', async function () {
                     const { mock } = await loadFixture(deployTransientMock);
-                    await expect(mock.dec()).to.be.reverted;
+                    await expect(mock.dec()).to.revert(ethers);
                 });
 
                 it('should revert with custom exception on underflow', async function () {
                     const { mock } = await loadFixture(deployTransientMock);
                     const customSelector = '0x12345678';
-                    await expect(mock.decWithException(customSelector)).to.be.reverted;
+                    await expect(mock.decWithException(customSelector)).to.revert(ethers);
                 });
             });
 
@@ -168,7 +170,7 @@ describe('Gas comparison: TransientLib (with offset) vs TransientUnsafe (without
     }
 
     before(function () {
-        if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+        if (hre.globalOptions.coverage) { this.skip(); }
     });
 
     it('tstore uint256', async function () {

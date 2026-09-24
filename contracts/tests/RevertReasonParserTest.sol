@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "../libraries/RevertReasonParser.sol";
+import { RevertReasonParser } from "../libraries/RevertReasonParser.sol";
 
-// solhint-disable custom-errors
+// solhint-disable gas-custom-errors
 contract RevertReasonParserTest {
     error TestDidNotThrow();
 
@@ -25,7 +25,7 @@ contract RevertReasonParserTest {
     }
 
     function longStringRevert() external pure {
-        // solhint-disable-next-line reason-string
+        // solhint-disable-next-line reason-string, gas-small-strings
         revert("Very long text to test for reverts that return string of more than 32 bytes length");
     }
 
@@ -46,10 +46,12 @@ contract RevertReasonParserTest {
     }
 
     function testAssertion() external view {
+        // solhint-disable-next-line gas-small-strings
         _test(this.assertion, "Panic(0x0000000000000000000000000000000000000000000000000000000000000001)");
     }
 
     function testLongStringRevert() external view {
+        // solhint-disable-next-line gas-small-strings
         _test(
             this.longStringRevert,
             "Error(Very long text to test for reverts that return string of more than 32 bytes length)"

@@ -1,13 +1,14 @@
-import { expect } from '../../src/expect';
-import { ether } from '../../src/prelude';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
-import { SelfdestructEthSenderMock } from '../../typechain-types';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
+import { ether } from '../../src/prelude.js';
+import { SelfdestructEthSenderMock } from '../../typechain-types/index.js';
+
+
 
 describe('SelfdestructEthSender', function () {
-    let signer0: SignerWithAddress;
-    let signer1: SignerWithAddress;
+    let signer0: HardhatEthersSigner;
+    let signer1: HardhatEthersSigner;
 
     before(async function () {
         [signer0, signer1] = await ethers.getSigners();

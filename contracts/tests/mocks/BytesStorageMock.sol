@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/BytesStorage.sol";
+import { BytesStorage } from "../../libraries/BytesStorage.sol";
 
 contract BytesStorageMock {
     using BytesStorage for bytes;
@@ -10,7 +10,7 @@ contract BytesStorageMock {
 
     bytes private _data;
 
-    function setData(bytes memory data) external {
+    function setData(bytes calldata data) external {
         _data = data;
     }
 

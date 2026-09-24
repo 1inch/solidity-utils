@@ -1,14 +1,15 @@
-import { constants } from '../../src/prelude';
-import { expect } from '../../src/expect';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { ethers } from 'hardhat';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { constants } from '../../src/prelude.js';
+import { expect } from '../../src/expect.js';
 import { getBytes, concat, Signature, hashMessage, HDNodeWallet, keccak256, toUtf8Bytes } from 'ethers';
 
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+
+
+ 
 
 describe('ECDSA', function () {
-    let account: SignerWithAddress;
+    let account: HardhatEthersSigner;
     let randomAccount: HDNodeWallet;
 
     before(async function () {
@@ -52,20 +53,20 @@ describe('ECDSA', function () {
         return ret;
     }
 
-    // eslint-disable-next-line max-len
+     
     const longSignature =
         '0x01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789';
 
     // Signature generated outside ganache
     const signerV0 = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
-    // eslint-disable-next-line max-len
+     
     const signatureWithoutVersionV0 =
         '0x064d3d0f049cc3b971476ba4bdbd5d0ccb5ac0ee7a03c2f063908ac2bdb59f944c7c5bf43804a7ff717f8c0a8749e0e5cb26ef96408313558acd130210604d9c';
     const signerV1 = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
-    // eslint-disable-next-line max-len
+     
     const signatureWithoutVersionV1 =
         '0x7bf43cd41b0fe2edad48ab66d2bc8e78d4aad37d0cf77e9fa4668560e1eac68277c325f777b8ee2f9d522c635c252bfdba6ba261edbf53c46c64d47824f2a009';
-    // eslint-disable-next-line max-len
+     
     const invalidSignature =
         '0x332ce75a821c982f9127538858900d87d3ec1f9f737338ad67cad133fa48feff48e6fa0c18abc62e42820f05943e47af3e9fbe306ce74d64094bdf1691ee53e01c';
 

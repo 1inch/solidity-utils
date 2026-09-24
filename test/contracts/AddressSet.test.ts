@@ -1,15 +1,19 @@
-import { constants } from '../../src/prelude';
-import { expect } from '../../src/expect';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { Interface } from 'ethers';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { constants } from '../../src/prelude.js';
+import { expect } from '../../src/expect.js';
 
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+
+const addressLibErrors = { interface: new Interface(['error OutputArrayTooSmall()', 'error IndexOutOfBounds()']) };
+
+
+ 
 
 describe('AddressSet', function () {
-    let signer1: SignerWithAddress;
-    let signer2: SignerWithAddress;
-    let signer3: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
+    let signer2: HardhatEthersSigner;
+    let signer3: HardhatEthersSigner;
 
     before(async function () {
         [signer1, signer2, signer3] = await ethers.getSigners();
@@ -37,21 +41,21 @@ describe('AddressSet', function () {
     describe('at', function () {
         it('should not get from empty set', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
-            await expect(addressSetMock.at(0)).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
-            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
+            await expect(addressSetMock.at(0)).to.be.revertedWithCustomError(addressLibErrors, 'IndexOutOfBounds');
+            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(addressLibErrors, 'IndexOutOfBounds');
         });
 
         it('should not get index out of array length', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             await addressSetMock.add(signer1);
-            await expect(addressSetMock.at(await addressSetMock.length())).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
+            await expect(addressSetMock.at(await addressSetMock.length())).to.be.revertedWithCustomError(addressLibErrors, 'IndexOutOfBounds');
         });
 
         it('should get from set with 1 element', async function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             await addressSetMock.add(signer1);
             expect(await addressSetMock.at(0)).to.be.equal(signer1.address);
-            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(addressSetMock, 'IndexOutOfBounds');
+            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(addressLibErrors, 'IndexOutOfBounds');
         });
 
         it('should get from set with several elements', async function () {
@@ -127,7 +131,7 @@ describe('AddressSet', function () {
             const { addressSetMock } = await loadFixture(deployAddressSetMock);
             await addressSetMock.add(signer1);
             await addressSetMock.add(signer2);
-            await expect(addressSetMock.getAndProvideSet([])).to.be.revertedWithCustomError(await ethers.getContractFactory('AddressArray'), 'OutputArrayTooSmall');
+            await expect(addressSetMock.getAndProvideSet([])).to.be.revertedWithCustomError(addressLibErrors, 'OutputArrayTooSmall');
         });
     });
 
@@ -266,7 +270,7 @@ describe('AddressSet', function () {
             await addressSetMock.add(signer2);
             expect(await addressSetMock.get()).to.be.deep.equal([signer1.address, signer2.address]);
             await addressSetMock.erase();
-            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(await ethers.getContractFactory('AddressArray'), 'IndexOutOfBounds');
+            await expect(addressSetMock.at(1)).to.be.revertedWithCustomError(addressLibErrors, 'IndexOutOfBounds');
         });
     });
 });

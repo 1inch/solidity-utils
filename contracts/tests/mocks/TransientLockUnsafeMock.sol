@@ -2,7 +2,8 @@
 
 pragma solidity ^0.8.27;
 
-import "../../libraries/TransientLockUnsafe.sol";
+import { TransientLockUnsafeLib } from "../../libraries/TransientLockUnsafe.sol";
+import { TransientLock } from "../../libraries/TransientLock.sol";
 
 contract TransientLockUnsafeMock {
     using TransientLockUnsafeLib for TransientLock;

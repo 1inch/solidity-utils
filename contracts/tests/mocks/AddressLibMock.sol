@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/AddressLib.sol";
+import { Address, AddressLib } from "../../libraries/AddressLib.sol";
 
 contract AddressLibMock {
     using AddressLib for Address;

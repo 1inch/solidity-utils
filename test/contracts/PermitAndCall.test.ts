@@ -1,15 +1,16 @@
-import { expect } from '../../src/expect';
-import { getPermit, trim0x } from '../../src/permit';
-import { ethers } from 'hardhat';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { PermitAndCallMock } from '../../typechain-types';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
+import { getPermit, trim0x } from '../../src/permit.js';
+import { PermitAndCallMock } from '../../typechain-types/index.js';
+
+
 
 const value = 42n;
 
 describe('Permitable', function () {
-    let signer1: SignerWithAddress;
-    let signer2: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
+    let signer2: HardhatEthersSigner;
 
     before(async function () {
         [signer1, signer2] = await ethers.getSigners();

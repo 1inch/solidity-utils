@@ -1,16 +1,17 @@
-import { constants, ether } from '../../src/prelude';
-import { expect } from '../../src/expect';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { constants, ether } from '../../src/prelude.js';
+import { expect } from '../../src/expect.js';
 import { encodeBytes32String, getAddress } from 'ethers';
 
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+
+
+ 
 
 describe('UniERC20', function () {
-    let signer1: SignerWithAddress;
-    let signer2: SignerWithAddress;
-    let signer3: SignerWithAddress;
+    let signer1: HardhatEthersSigner;
+    let signer2: HardhatEthersSigner;
+    let signer3: HardhatEthersSigner;
 
     before(async function () {
         [signer1, signer2, signer3] = await ethers.getSigners();

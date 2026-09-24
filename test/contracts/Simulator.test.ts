@@ -1,6 +1,7 @@
-import { expect } from '../../src/expect';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import { expect } from '../../src/expect.js';
+
+
 
 describe('Simulator', function () {
     async function deploySimulatorMock() {

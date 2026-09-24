@@ -1,16 +1,18 @@
-import { constants, ether } from '../../src/prelude';
-import { expect } from '../../src/expect';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import hre, { ethers } from 'hardhat';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { constants, ether } from '../../src/prelude.js';
+import { expect } from '../../src/expect.js';
 import { Signature, TypedDataDomain, ContractTransactionReceipt } from 'ethers';
 import { PERMIT2_ADDRESS } from '@uniswap/permit2-sdk';
-import { countInstructions, trackReceivedTokenAndTx } from '../../src/utils';
+import { countInstructions, trackReceivedTokenAndTx } from '../../src/utils.js';
+import hre from 'hardhat';
 import {
     SafeERC20Wrapper,
     SafeERC20Wrapper__factory as SafeERC20WrapperFactory,
     SafeWETHWrapper__factory as SafeWETHWrapperFactory,
-} from '../../typechain-types';
+} from '../../typechain-types/index.js';
+
+
 
 const Permit = [
     { name: 'owner', type: 'address' },
@@ -21,8 +23,8 @@ const Permit = [
 ];
 
 describe('SafeERC20', function () {
-    let owner: SignerWithAddress;
-    let spender: SignerWithAddress;
+    let owner: HardhatEthersSigner;
+    let spender: HardhatEthersSigner;
     let SafeERC20Wrapper: SafeERC20WrapperFactory;
     let SafeWETHWrapper: SafeWETHWrapperFactory;
 
@@ -206,7 +208,7 @@ describe('SafeERC20', function () {
         });
 
         it('should be cheaper than balanceOf', async function () {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 const { wrapper } = await loadFixture(deployERC20WithSafeBalance);
 
                 const tx = await wrapper.balanceOf.populateTransaction(owner);
@@ -320,7 +322,7 @@ describe('SafeERC20', function () {
                 wrapper.deposit({ value: ether('1') }),
             ) as [bigint, ContractTransactionReceipt];
             expect(received).to.be.equal(ether('1'));
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 expect(await countInstructions(ethers.provider, tx.logs[0].transactionHash, ['STATICCALL', 'CALL', 'MSTORE', 'MLOAD', 'SSTORE', 'SLOAD'])).to.be.deep.equal([
                     0, 1, 6, 1, 1, 2,
                 ]);
@@ -343,7 +345,7 @@ describe('SafeERC20', function () {
             ) as [bigint, ContractTransactionReceipt];
             expect(received).to.be.equal(-ether('0.5'));
             expect(await ethers.provider.getBalance(spender)).to.be.equal(spenderBalanceBefore + ether('0.5'));
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
                     0, 3,
                 ]);
@@ -355,7 +357,7 @@ describe('SafeERC20', function () {
             const tx = (await trackReceivedTokenAndTx(ethers.provider, weth, await wrapper.getAddress(), () =>
                 wrapper.withdrawTo(ether('0.5'), wrapper),
             ))[1] as ContractTransactionReceipt;
-            if (hre.__SOLIDITY_COVERAGE_RUNNING === undefined) {
+            if (!hre.globalOptions.coverage) {
                 expect(await countInstructions(ethers.provider, tx.hash, ['STATICCALL', 'CALL'])).to.be.deep.equal([
                     0, 2,
                 ]);
@@ -382,7 +384,7 @@ describe('SafeERC20', function () {
         it('reverts on increaseAllowance', async function () {
             const { wrapper } = await loadFixture(fixture);
             if (reasons.changeAllowance === '') {
-                await expect(wrapper.increaseAllowance(0)).to.be.reverted;
+                await expect(wrapper.increaseAllowance(0)).to.revert(ethers);
             } else {
                 await expect(wrapper.increaseAllowance(0)).to.be.revertedWithCustomError(wrapper, reasons.approve);
             }
@@ -391,7 +393,7 @@ describe('SafeERC20', function () {
         it('reverts on decreaseAllowance', async function () {
             const { wrapper } = await loadFixture(fixture);
             if (reasons.changeAllowance === '') {
-                await expect(wrapper.decreaseAllowance(0)).to.be.reverted;
+                await expect(wrapper.decreaseAllowance(0)).to.revert(ethers);
             } else {
                 await expect(wrapper.decreaseAllowance(0)).to.be.revertedWithCustomError(wrapper, reasons.approve);
             }

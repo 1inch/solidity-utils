@@ -1,7 +1,9 @@
-import { expect } from '../../src/expect';
-import { executionGas } from '../../src/profileEVM';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import hre, { ethers } from 'hardhat';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import { expect } from '../../src/expect.js';
+import { executionGas } from '../../src/profileEVM.js';
+import hre from 'hardhat';
+
+
 
 const MAKER = '0x1111111111111111111111111111111111111111';
 const STRATEGY = ethers.id('strategy-1');
@@ -16,7 +18,7 @@ describe('TransientLock nested mapping', function () {
     describe('TransientLockLib (with offset)', function () {
         it('should lock successfully', async function () {
             const { safe } = await loadFixture(deployNestedMocks);
-            await expect(safe.lock(MAKER, STRATEGY)).not.to.be.reverted;
+            await expect(safe.lock(MAKER, STRATEGY)).not.to.revert(ethers);
         });
 
         it('should return false initially', async function () {
@@ -43,13 +45,13 @@ describe('TransientLock nested mapping', function () {
     describe('TransientLockUnsafeLib (without offset)', function () {
         it('should lock successfully', async function () {
             const { unsafe } = await loadFixture(deployNestedMocks);
-            await expect(unsafe.lock(MAKER, STRATEGY)).not.to.be.reverted;
+            await expect(unsafe.lock(MAKER, STRATEGY)).not.to.revert(ethers);
         });
     });
 
     describe('Gas comparison: TransientLockLib vs TransientLockUnsafeLib (nested mapping)', function () {
         before(function () {
-            if (hre.__SOLIDITY_COVERAGE_RUNNING) { this.skip(); }
+            if (hre.globalOptions.coverage) { this.skip(); }
         });
 
         it('lock', async function () {
