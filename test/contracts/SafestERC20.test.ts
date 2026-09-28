@@ -224,7 +224,7 @@ describe('SafeERC20', function () {
         });
     });
 
-    describe("with token that doesn't revert on invalid permit", function () {
+    describe('with token that does not revert on invalid permit', function () {
         it('accepts owner signature', async function () {
             const { token, wrapper, data, signature } = await loadFixture(deployPermitNoRevertAndSign);
             expect(await token.nonces(owner)).to.equal('0');
@@ -401,17 +401,17 @@ describe('SafeERC20', function () {
     }
 
     function shouldOnlyRevertOnErrors(fixture: () => Promise<{ wrapper: SafeERC20Wrapper }>) {
-        it("doesn't revert on transfer", async function () {
+        it('does not revert on transfer', async function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transfer();
         });
 
-        it("doesn't revert on transferFrom", async function () {
+        it('does not revert on transferFrom', async function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transferFrom();
         });
 
-        it("doesn't revert on transferFromUniversal, permit2", async function () {
+        it('does not revert on transferFromUniversal, permit2', async function () {
             const { wrapper } = await loadFixture(fixture);
             const { permit2Mock } = await deployPermit2Mock();
             const code = await ethers.provider.getCode(permit2Mock);
@@ -419,24 +419,24 @@ describe('SafeERC20', function () {
             await wrapper.transferFromUniversal(true);
         });
 
-        it("doesn't revert on transferFromUniversal, no permit2", async function () {
+        it('does not revert on transferFromUniversal, no permit2', async function () {
             const { wrapper } = await loadFixture(fixture);
             await wrapper.transferFromUniversal(false);
         });
 
         describe('approvals', function () {
             describe('with zero allowance', function () {
-                it("doesn't revert when approving a non-zero allowance", async function () {
+                it('does not revert when approving a non-zero allowance', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.approve(100);
                 });
 
-                it("doesn't revert when approving a zero allowance", async function () {
+                it('does not revert when approving a zero allowance', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.approve(0);
                 });
 
-                it("doesn't revert when increasing the allowance", async function () {
+                it('does not revert when increasing the allowance', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.increaseAllowance(10);
                 });
@@ -451,25 +451,25 @@ describe('SafeERC20', function () {
             });
 
             describe('with non-zero allowance', function () {
-                it("doesn't revert when approving a non-zero allowance", async function () {
+                it('does not revert when approving a non-zero allowance', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await wrapper.approve(20);
                 });
 
-                it("doesn't revert when approving a zero allowance", async function () {
+                it('does not revert when approving a zero allowance', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await wrapper.approve(0);
                 });
 
-                it("doesn't revert when increasing the allowance", async function () {
+                it('does not revert when increasing the allowance', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await wrapper.increaseAllowance(10);
                 });
 
-                it("doesn't revert when decreasing the allowance to a positive value", async function () {
+                it('does not revert when decreasing the allowance to a positive value', async function () {
                     const { wrapper } = await loadFixture(fixture);
                     await wrapper.setAllowance(100);
                     await wrapper.decreaseAllowance(50);
