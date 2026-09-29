@@ -27,6 +27,7 @@ jobs:
           node-version: 22
           cache: "yarn"
       - run: yarn
+      - run: yarn typechain
       - run: yarn typecheck
 
   test:
