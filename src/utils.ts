@@ -22,7 +22,16 @@ import { ethers, setCode, time } from './hardhatHelpers.js';
 import { ICreate3Deployer } from '../typechain-types/index.js';
 
 /**
- * Minimal deployment record compatible with rocketh Environment.save/get.
+ * Minimal deployment data persisted by the deployment helpers.
+ * @category utils
+ * @param address Deployed contract address.
+ * @param abi Contract ABI.
+ * @param bytecode Contract creation bytecode.
+ * @param deployedBytecode Runtime bytecode.
+ * @param args Constructor arguments.
+ * @param transactionHash Deployment transaction hash.
+ * @param receipt Deployment transaction receipt.
+ * @param numDeployments Number of deployments recorded under this name.
  */
 export type DeploymentRecord = {
     address: string;
@@ -38,14 +47,25 @@ export type DeploymentRecord = {
 /**
  * @category utils
  * Options for deployment methods.
+ * @param contractName Name of the Hardhat contract artifact to deploy.
+ * @param constructorArgs Constructor arguments. Defaults to an empty array.
+ * @param env Rocketh environment used to persist deployment records.
+ * @param deployments Deprecated alias for `env`, retained for hardhat-deploy v1 migration.
+ * @param deployer Address of the signer that deploys the contract.
+ * @param deploymentName Name used to store the deployment. Defaults to `contractName`.
+ * @param skipVerify Whether to skip block explorer verification. Defaults to `false`.
+ * @param skipIfAlreadyDeployed Whether to reuse an existing deployment from `env`. Defaults to `true`.
+ * @param gasPrice Legacy gas price for the deployment transaction.
+ * @param maxPriorityFeePerGas EIP-1559 priority fee for the deployment transaction.
+ * @param maxFeePerGas EIP-1559 maximum fee for the deployment transaction.
+ * @param log Whether to log deployment and verification status. Defaults to `true`.
+ * @param waitConfirmations Confirmations to await. Defaults to 1 on development chains and 6 otherwise.
  */
 export interface DeployContractOptions {
     contractName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     constructorArgs?: any[];
-    /** Rocketh environment used to persist deployment records (hardhat-deploy v2). */
     env?: Environment;
-    /** @deprecated Use `env`. Kept for gradual migration from hardhat-deploy v1. */
     deployments?: Environment;
     deployer: string;
     deploymentName?: string;
@@ -61,6 +81,9 @@ export interface DeployContractOptions {
 /**
  * @category utils
  * Options for create3 deployment methods.
+ * @param txSigner Signer that sends the CREATE3 deployment transaction. Defaults to the first Hardhat signer.
+ * @param create3Deployer Address of the `ICreate3Deployer` contract.
+ * @param salt CREATE3 salt used to derive the deployed contract address.
  */
 export interface DeployContractOptionsWithCreate3 extends Omit<DeployContractOptions, 'deployer'> {
     txSigner?: Wallet | HardhatEthersSigner,
@@ -74,7 +97,10 @@ function resolveEnv(options: { env?: Environment, deployments?: Environment }): 
 
 /**
  * @category utils
- * Deploys a contract with optional Etherscan verification and rocketh save.
+ * Deploys a contract, optionally persists it in Rocketh, and verifies it on a block explorer.
+ * Existing records are reused when `skipIfAlreadyDeployed` is enabled.
+ * @param options Deployment and verification options.
+ * @returns The deployed or previously persisted contract instance.
  */
 export async function deployAndGetContract(options: DeployContractOptions): Promise<Contract> {
     const {
@@ -142,7 +168,9 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
 
 /**
  * @category utils
- * Deploys a contract using create3 and saves the deployment information.
+ * Deploys a contract through CREATE3 and optionally persists the deployment in Rocketh.
+ * @param options CREATE3 deployment and verification options. Confirmations default to 1.
+ * @returns The deployed or previously persisted contract instance.
  */
 export async function deployAndGetContractWithCreate3(
     options: DeployContractOptionsWithCreate3,
@@ -200,6 +228,17 @@ export async function deployAndGetContractWithCreate3(
 /**
  * @category utils
  * Saves the deployment information using the deploy transaction hash.
+ * The contract address is derived from the CREATE3 deployer and salt.
+ * @param provider Provider used to retrieve the deployment transaction receipt.
+ * @param env Optional Rocketh environment in which to save the deployment.
+ * @param contractName Name of the Hardhat contract artifact.
+ * @param deploymentName Name used to store the deployment.
+ * @param constructorArgs Constructor arguments used for deployment and verification.
+ * @param salt CREATE3 salt used to derive the deployed address.
+ * @param create3Deployer Address of the `ICreate3Deployer` contract.
+ * @param deployTxHash Hash of the CREATE3 deployment transaction.
+ * @param skipVerify Whether to skip block explorer verification.
+ * @returns A contract instance connected to the derived address.
  */
 export async function saveContractWithCreate3Deployment(
     provider: JsonRpcProvider | { getTransactionReceipt: (hash: string) => Promise<TransactionReceipt | null> },
@@ -245,6 +284,7 @@ export async function saveContractWithCreate3Deployment(
 /**
  * @category utils
  * Advances the blockchain time to a specific timestamp for testing purposes.
+ * @param seconds Target timestamp accepted by Hardhat's `time.increaseTo`.
  */
 export async function timeIncreaseTo(seconds: number | string): Promise<void> {
     const delay = 1000 - new Date().getMilliseconds();
@@ -255,6 +295,9 @@ export async function timeIncreaseTo(seconds: number | string): Promise<void> {
 /**
  * @category utils
  * Deploys a contract given a name and optional constructor parameters.
+ * @param name Name of the Hardhat contract artifact.
+ * @param parameters Constructor arguments. Defaults to an empty array.
+ * @returns The deployed contract instance.
  */
 export async function deployContract(name: string, parameters: Array<BigNumberish> = []) : Promise<BaseContract> {
     const ContractFactory = await ethers.getContractFactory(name);
@@ -265,7 +308,13 @@ export async function deployContract(name: string, parameters: Array<BigNumberis
 
 /**
  * @category utils
- * Deploys a contract from bytecode.
+ * Deploys a contract directly from its ABI and bytecode.
+ * This is useful for tests and for bytecode without a named Hardhat artifact.
+ * @param abi Contract ABI.
+ * @param bytecode Contract creation bytecode.
+ * @param parameters Constructor arguments. Defaults to an empty array.
+ * @param signer Optional signer used to deploy the contract.
+ * @returns The deployed contract instance.
  */
 export async function deployContractFromBytecode(abi: Abi, bytecode: BytesLike, parameters: Array<BigNumberish> = [], signer?: Signer) : Promise<BaseContract> {
     const ContractFactory = await ethers.getContractFactory(abi, bytecode, signer);
@@ -277,17 +326,33 @@ export async function deployContractFromBytecode(abi: Abi, bytecode: BytesLike, 
 /**
  * @category utils
  * Token interface for trackReceivedTokenAndTx.
+ * @param balanceOf Returns the token balance of an account.
+ * @param getAddress Returns the token contract address.
  */
 export type Token = {
     balanceOf: (address: string) => Promise<bigint>;
     getAddress: () => Promise<string>;
 }
 
+/**
+ * Result returned by `trackReceivedTokenAndTx`.
+ * The first item is the received amount. The second item is either the transaction
+ * receipt or a nested result returned by another `trackReceivedTokenAndTx` call.
+ * @category utils
+ */
 export type TrackReceivedTokenAndTxResult = [bigint, ContractTransactionReceipt | TrackReceivedTokenAndTxResult];
 
 /**
  * @category utils
- * Tracks token balance changes and transaction receipts.
+ * Tracks the amount of ERC-20 tokens or native currency received while executing a transaction.
+ * Calls can be nested by returning another `TrackReceivedTokenAndTxResult` from `txPromise`.
+ * Native-currency transaction fees are added back when the tracked wallet sends the transaction.
+ * @param provider Provider used to read native-currency balances.
+ * @param token Token contract, `ZERO_ADDRESS`, or `EEE_ADDRESS` for native currency.
+ * @param wallet Address whose balance change is measured.
+ * @param txPromise Function that sends a transaction or returns a nested tracking result.
+ * @param args Arguments forwarded to `txPromise`.
+ * @returns The received amount and transaction receipt or nested tracking result.
  */
 export async function trackReceivedTokenAndTx<T extends unknown[]>(
     provider: JsonRpcProvider | { getBalance: (address: string) => Promise<bigint> },
@@ -313,6 +378,11 @@ export async function trackReceivedTokenAndTx<T extends unknown[]>(
 /**
  * @category utils
  * Corrects the ECDSA signature 'v' value according to Ethereum's standard.
+ * Geth returns 27 or 28, while some clients return 0 or 1. Values below 27 are
+ * shifted to prevent signature malleability caused by mixed representations.
+ * @param signature Hex-encoded 65-byte ECDSA signature.
+ * @returns The signature with a normalized `v` value.
+ * @see https://github.com/ethereum/go-ethereum/blob/v1.8.23/internal/ethapi/api.go#L465
  */
 export function fixSignature(signature: string): string {
     let v = parseInt(signature.slice(130, 132), 16);
@@ -326,6 +396,9 @@ export function fixSignature(signature: string): string {
 /**
  * @category utils
  * Signs a message with a given signer and fixes the signature format.
+ * @param signer Wallet or compatible message signer.
+ * @param messageHex Message bytes or hex string. Defaults to `0x`.
+ * @returns The signature with a normalized `v` value.
  */
 export async function signMessage(
     signer: Wallet | { signMessage: (messageHex: string | Uint8Array) => Promise<string> },
@@ -337,6 +410,10 @@ export async function signMessage(
 /**
  * @category utils
  * Counts occurrences of EVM instructions in a transaction trace.
+ * @param provider Provider that supports `debug_traceTransaction`.
+ * @param txHash Transaction hash to trace.
+ * @param instructions Opcode names to count, case-insensitively.
+ * @returns Counts in the same order as `instructions`.
  */
 export async function countInstructions(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -353,7 +430,11 @@ export async function countInstructions(
 
 /**
  * @category utils
- * Retrieves the current USD price of a native token from Coinbase.
+ * Retrieves the current USD spot price of a native token from Coinbase.
+ * Intended for tests that need a current reference price while preserving bigint precision.
+ * @param nativeTokenSymbol Native token symbol. Defaults to `ETH`.
+ * @returns The USD price multiplied by 1e18.
+ * @throws If the Coinbase response does not contain a parseable amount.
  */
 export async function getEthPrice(nativeTokenSymbol: string = 'ETH'): Promise<bigint> {
     type CoinbaseResponse = {
@@ -372,6 +453,10 @@ export async function getEthPrice(nativeTokenSymbol: string = 'ETH'): Promise<bi
 /**
  * @category utils
  * Sets custom bytecode for local test accounts and returns them as signers.
+ * This is useful when EIP-7702 or another fixture leaves code on default accounts
+ * and a test requires empty or explicitly controlled account bytecode.
+ * @param code One bytecode value for every account, or one optional value per account. Defaults to `0x`.
+ * @returns Hardhat signers whose account code has been updated.
  */
 export async function getAccountsWithCode(code: BytesLike|Array<BytesLike|undefined> = '0x'): Promise<HardhatEthersSigner[]> {
     const accounts = await ethers.getSigners();
