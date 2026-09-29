@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,52 +6,68 @@
 
 # Function: saveContractWithCreate3Deployment()
 
-> **saveContractWithCreate3Deployment**(`provider`, `deployments`, `contractName`, `deploymentName`, `constructorArgs`, `salt`, `create3Deployer`, `deployTxHash`, `skipVerify`): `Promise`\<`Contract`\>
+> **saveContractWithCreate3Deployment**(`provider`, `env`, `contractName`, `deploymentName`, `constructorArgs`, `salt`, `create3Deployer`, `deployTxHash`, `skipVerify?`): `Promise`\<`Contract`\>
+
+Defined in: [src/utils.ts:243](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L243)
 
 ## Parameters
 
-• **provider**: `HardhatEthersProvider` \| `JsonRpcProvider`
+### provider
 
-JSON RPC provider or Hardhat Ethers Provider.
+`JsonRpcProvider` \| \{ `getTransactionReceipt`: (`hash`) => `Promise`\<`TransactionReceipt` \| `null`\>; \}
 
-• **deployments**: `DeploymentsExtension`
+Provider used to retrieve the deployment transaction receipt.
 
-Deployment facilitator object from Hardhat.
+### env
 
-• **contractName**: `string`
+`Environment`\<`UnresolvedUnknownNamedAccounts`, `UnresolvedNetworkSpecificData`, `UnknownDeployments`, `Record`\<`string`, `unknown`\>\> \| `undefined`
 
-Name of the contract to deploy.
+Optional Rocketh environment in which to save the deployment.
 
-• **deploymentName**: `string`
+### contractName
 
-Optional custom name for deployment.
+`string`
 
-• **constructorArgs**: `any`[]
+Name of the Hardhat contract artifact.
 
-Arguments for the contract's constructor.
+### deploymentName
 
-• **salt**: `string`
+`string`
 
-Salt value for create3 deployment.
+Name used to store the deployment.
 
-• **create3Deployer**: `string`
+### constructorArgs
 
-Address of the create3 deployer contract.
+`any`[]
 
-• **deployTxHash**: `string`
+Constructor arguments used for deployment and verification.
 
-Transaction hash of the create3 deployment.
+### salt
 
-• **skipVerify**: `boolean` = `false`
+`string`
 
-Skips Etherscan verification if true.
+CREATE3 salt used to derive the deployed address.
+
+### create3Deployer
+
+`string`
+
+Address of the `ICreate3Deployer` contract.
+
+### deployTxHash
+
+`string`
+
+Hash of the CREATE3 deployment transaction.
+
+### skipVerify?
+
+`boolean` = `false`
+
+Whether to skip block explorer verification.
 
 ## Returns
 
 `Promise`\<`Contract`\>
 
-The deployed contract instance.
-
-## Defined in
-
-[src/utils.ts:199](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L199)
+A contract instance connected to the derived address.

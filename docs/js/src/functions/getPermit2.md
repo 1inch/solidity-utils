@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,39 +6,57 @@
 
 # Function: getPermit2()
 
-> **getPermit2**(`owner`, `token`, `chainId`, `spender`, `amount`, `compact`, `expiration`, `sigDeadline`): `Promise`\<`string`\>
+> **getPermit2**(`owner`, `token`, `chainId`, `spender`, `amount`, `compact?`, `expiration?`, `sigDeadline?`): `Promise`\<`string`\>
+
+Defined in: [src/permit.ts:235](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L235)
 
 ## Parameters
 
-• **owner**: `Wallet` \| `HardhatEthersSigner`
+### owner
+
+`Wallet` \| `HardhatEthersSigner`
 
 The wallet or signer issuing the permit.
 
-• **token**: `string`
+### token
+
+`string`
 
 The address of the token for which the permit is creates.
 
-• **chainId**: `number`
+### chainId
+
+`number`
 
 The unique identifier for the blockchain network.
 
-• **spender**: `string`
+### spender
+
+`string`
 
 The address allowed to spend the tokens.
 
-• **amount**: `bigint`
+### amount
+
+`bigint`
 
 The amount of tokens the spender is allowed to use.
 
-• **compact**: `boolean` = `false`
+### compact?
+
+`boolean` = `false`
 
 Indicates if the permit should be compressed.
 
-• **expiration**: `bigint` = `defaultDeadlinePermit2`
+### expiration?
+
+`bigint` = `defaultDeadlinePermit2`
 
 The time until when the permit is valid for Permit2.
 
-• **sigDeadline**: `bigint` = `defaultDeadlinePermit2`
+### sigDeadline?
+
+`bigint` = `defaultDeadlinePermit2`
 
 Deadline for the signature to be considered valid.
 
@@ -47,7 +65,3 @@ Deadline for the signature to be considered valid.
 `Promise`\<`string`\>
 
 A signed permit string specific to Permit2 contracts.
-
-## Defined in
-
-[src/permit.ts:234](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L234)

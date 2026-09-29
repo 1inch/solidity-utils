@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,27 +8,39 @@
 
 > **hashBySig**(`name`, `version`, `chainId`, `verifyingContract`, `sig`): `string`
 
+Defined in: [src/bySig.ts:64](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L64)
+
 Computes the EIP-712 hash for a given bySig call.
 
 ## Parameters
 
-• **name**: `string`
+### name
+
+`string`
 
 The user readable name of EIP-712 domain.
 
-• **version**: `string`
+### version
+
+`string`
 
 The version of the EIP-712 domain.
 
-• **chainId**: `bigint`
+### chainId
+
+`bigint`
 
 The unique identifier for the blockchain network.
 
-• **verifyingContract**: `string`
+### verifyingContract
+
+`string`
 
 The Ethereum address of the contract that will verify the signature. This ties the signature to a specific contract.
 
-• **sig**: [`SignedCallStruct`](../interfaces/SignedCallStruct.md)
+### sig
+
+[`SignedCallStruct`](../interfaces/SignedCallStruct.md)
 
 The data to be signed.
 
@@ -37,7 +49,3 @@ The data to be signed.
 `string`
 
 The EIP-712 hash of the fully encoded data.
-
-## Defined in
-
-[src/bySig.ts:65](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L65)

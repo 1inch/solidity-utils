@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../README.md) • **Docs**
+[**@1inch/solidity-utils**](../README.md)
 
 ***
 
@@ -6,37 +6,40 @@
 
 # hardhat-setup
 
-## Index
+## Hardhat-Setup
 
-### Hardhat-Setup
+- [~~HardhatNetworkAccountsUserConfig~~](type-aliases/HardhatNetworkAccountsUserConfig.md)
+
+## Hardhat-Setup
 A helper method to get the network name from the command line arguments.
 
 - [getNetwork](functions/getNetwork.md)
 
-### Hardhat-Setup
-A helper method to parse RPC configuration strings. Checks that the string is in the expected format.
-
-- [parseRpcEnv](functions/parseRpcEnv.md)
-
-### Hardhat-Setup
-A helper method to reset the Hardhat network to the local network or to a fork.
-
-- [resetHardhatNetworkFork](functions/resetHardhatNetworkFork.md)
-
-### Hardhat-Setup
+## Hardhat-Setup
 Configuration type for managing Etherscan integration in Hardhat setups.
 
 - [Etherscan](type-aliases/Etherscan.md)
 
-### Hardhat-Setup
+## Hardhat-Setup
+Helper class to register networks and Etherscan API keys for Hardhat 3.
+See the hardhat-setup README for environment variable formats and usage.
+
+- [Networks](classes/Networks.md)
+
+## Hardhat-Setup
 Loads environment variables into process.env using the dotenv package.
-By default, loads variables from a `.env` file in the project root.
-You can provide custom options (e.g. a different path or encoding) via the `options` parameter.
+By default, variables are loaded from a `.env` file in the project root.
 
 - [loadEnv](functions/loadEnv.md)
 
-### Hardhat-Setup
-The Network class is a helper class to register networks and Etherscan API keys.
-See the [README](https://github.com/1inch/solidity-utils/tree/master/hardhat-setup/README.md) for usage.
+## Hardhat-Setup
+Parses an RPC configuration in `<RPC_URL>` or `<RPC_URL>|<AUTH_KEY_HTTP_HEADER>` format.
 
-- [Networks](classes/Networks.md)
+- [parseRpcEnv](functions/parseRpcEnv.md)
+
+## Hardhat-Setup
+Reset a Hardhat/EDR network to local state or to a fork.
+Local network names (`hardhat`, `default`, and `hardhatMainnet`) are reset
+without forking. Other names use `<NETWORK_NAME>_RPC_URL`.
+
+- [resetHardhatNetworkFork](functions/resetHardhatNetworkFork.md)

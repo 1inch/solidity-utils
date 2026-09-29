@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,11 +6,15 @@
 
 # Function: permit2Contract()
 
-> **permit2Contract**(`chainId`?): `Promise`\<`IPermit2`\>
+> **permit2Contract**(`chainId?`): `Promise`\<`IPermit2`\>
+
+Defined in: [src/permit.ts:172](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L172)
 
 ## Parameters
 
-• **chainId?**: `number`
+### chainId?
+
+`number`
 
 The ID of the blockchain network (optional).
 
@@ -19,7 +23,3 @@ The ID of the blockchain network (optional).
 `Promise`\<`IPermit2`\>
 
 The contract instance of IPermit2.
-
-## Defined in
-
-[src/permit.ts:171](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L171)

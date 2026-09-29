@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,9 +8,13 @@
 
 > **compressPermit**(`permit`): `string`
 
+Defined in: [src/permit.ts:373](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L373)
+
 ## Parameters
 
-• **permit**: `string`
+### permit
+
+`string`
 
 The full permit function call string.
 
@@ -19,7 +23,3 @@ The full permit function call string.
 `string`
 
 A compressed permit string.
-
-## Defined in
-
-[src/permit.ts:372](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L372)

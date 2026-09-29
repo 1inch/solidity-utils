@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,17 +6,25 @@
 
 # Interface: DeployContractOptionsWithCreate3
 
-## Param
-
-Signer object to sign the deployment transaction.
+Defined in: [src/utils.ts:88](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L88)
 
 ## Param
 
-Address of the create3 deployer contract, which related to `contracts/interfaces/ICreate3Deployer.sol`.
+**txSigner**
+
+Signer that sends the CREATE3 deployment transaction. Defaults to the first Hardhat signer.
 
 ## Param
 
-Salt value for create3 deployment.
+**create3Deployer**
+
+Address of the `ICreate3Deployer` contract.
+
+## Param
+
+**salt**
+
+CREATE3 salt used to derive the deployed contract address.
 
 ## Extends
 
@@ -26,15 +34,13 @@ Salt value for create3 deployment.
 
 ### constructorArgs?
 
-> `optional` **constructorArgs**: `any`[]
+> `optional` **constructorArgs?**: `any`[]
+
+Defined in: [src/utils.ts:67](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L67)
 
 #### Inherited from
 
-`Omit.constructorArgs`
-
-#### Defined in
-
-[src/utils.ts:32](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L32)
+[`DeployContractOptions`](DeployContractOptions.md).[`constructorArgs`](DeployContractOptions.md#constructorargs)
 
 ***
 
@@ -42,13 +48,11 @@ Salt value for create3 deployment.
 
 > **contractName**: `string`
 
+Defined in: [src/utils.ts:65](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L65)
+
 #### Inherited from
 
-`Omit.contractName`
-
-#### Defined in
-
-[src/utils.ts:30](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L30)
+[`DeployContractOptions`](DeployContractOptions.md).[`contractName`](DeployContractOptions.md#contractname)
 
 ***
 
@@ -56,93 +60,91 @@ Salt value for create3 deployment.
 
 > **create3Deployer**: `string`
 
-#### Defined in
-
-[src/utils.ts:54](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L54)
+Defined in: [src/utils.ts:90](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L90)
 
 ***
 
 ### deploymentName?
 
-> `optional` **deploymentName**: `string`
+> `optional` **deploymentName?**: `string`
+
+Defined in: [src/utils.ts:71](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L71)
 
 #### Inherited from
 
-`Omit.deploymentName`
-
-#### Defined in
-
-[src/utils.ts:35](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L35)
+[`DeployContractOptions`](DeployContractOptions.md).[`deploymentName`](DeployContractOptions.md#deploymentname)
 
 ***
 
-### deployments
+### deployments?
 
-> **deployments**: `DeploymentsExtension`
+> `optional` **deployments?**: `Environment`\<`UnresolvedUnknownNamedAccounts`, `UnresolvedNetworkSpecificData`, `UnknownDeployments`, `Record`\<`string`, `unknown`\>\>
+
+Defined in: [src/utils.ts:69](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L69)
 
 #### Inherited from
 
-`Omit.deployments`
+[`DeployContractOptions`](DeployContractOptions.md).[`deployments`](DeployContractOptions.md#deployments)
 
-#### Defined in
+***
 
-[src/utils.ts:33](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L33)
+### env?
+
+> `optional` **env?**: `Environment`\<`UnresolvedUnknownNamedAccounts`, `UnresolvedNetworkSpecificData`, `UnknownDeployments`, `Record`\<`string`, `unknown`\>\>
+
+Defined in: [src/utils.ts:68](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L68)
+
+#### Inherited from
+
+[`DeployContractOptions`](DeployContractOptions.md).[`env`](DeployContractOptions.md#env)
 
 ***
 
 ### gasPrice?
 
-> `optional` **gasPrice**: `bigint`
+> `optional` **gasPrice?**: `bigint`
+
+Defined in: [src/utils.ts:74](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L74)
 
 #### Inherited from
 
-`Omit.gasPrice`
-
-#### Defined in
-
-[src/utils.ts:38](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L38)
+[`DeployContractOptions`](DeployContractOptions.md).[`gasPrice`](DeployContractOptions.md#gasprice)
 
 ***
 
 ### log?
 
-> `optional` **log**: `boolean`
+> `optional` **log?**: `boolean`
+
+Defined in: [src/utils.ts:77](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L77)
 
 #### Inherited from
 
-`Omit.log`
-
-#### Defined in
-
-[src/utils.ts:41](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L41)
+[`DeployContractOptions`](DeployContractOptions.md).[`log`](DeployContractOptions.md#log)
 
 ***
 
 ### maxFeePerGas?
 
-> `optional` **maxFeePerGas**: `bigint`
+> `optional` **maxFeePerGas?**: `bigint`
+
+Defined in: [src/utils.ts:76](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L76)
 
 #### Inherited from
 
-`Omit.maxFeePerGas`
-
-#### Defined in
-
-[src/utils.ts:40](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L40)
+[`DeployContractOptions`](DeployContractOptions.md).[`maxFeePerGas`](DeployContractOptions.md#maxfeepergas)
 
 ***
 
 ### maxPriorityFeePerGas?
 
-> `optional` **maxPriorityFeePerGas**: `bigint`
+> `optional` **maxPriorityFeePerGas?**: `bigint`
+
+Defined in: [src/utils.ts:75](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L75)
 
 #### Inherited from
 
-`Omit.maxPriorityFeePerGas`
-
-#### Defined in
-
-[src/utils.ts:39](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L39)
+[`DeployContractOptions`](DeployContractOptions.md).[`maxPriorityFeePerGas`](DeployContractOptions.md#maxpriorityfeepergas)
 
 ***
 
@@ -150,58 +152,48 @@ Salt value for create3 deployment.
 
 > **salt**: `string`
 
-#### Defined in
-
-[src/utils.ts:55](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L55)
+Defined in: [src/utils.ts:91](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L91)
 
 ***
 
 ### skipIfAlreadyDeployed?
 
-> `optional` **skipIfAlreadyDeployed**: `boolean`
+> `optional` **skipIfAlreadyDeployed?**: `boolean`
+
+Defined in: [src/utils.ts:73](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L73)
 
 #### Inherited from
 
-`Omit.skipIfAlreadyDeployed`
-
-#### Defined in
-
-[src/utils.ts:37](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L37)
+[`DeployContractOptions`](DeployContractOptions.md).[`skipIfAlreadyDeployed`](DeployContractOptions.md#skipifalreadydeployed)
 
 ***
 
 ### skipVerify?
 
-> `optional` **skipVerify**: `boolean`
+> `optional` **skipVerify?**: `boolean`
+
+Defined in: [src/utils.ts:72](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L72)
 
 #### Inherited from
 
-`Omit.skipVerify`
-
-#### Defined in
-
-[src/utils.ts:36](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L36)
+[`DeployContractOptions`](DeployContractOptions.md).[`skipVerify`](DeployContractOptions.md#skipverify)
 
 ***
 
 ### txSigner?
 
-> `optional` **txSigner**: `Wallet` \| `HardhatEthersSigner`
+> `optional` **txSigner?**: `Wallet` \| `HardhatEthersSigner`
 
-#### Defined in
-
-[src/utils.ts:53](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L53)
+Defined in: [src/utils.ts:89](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L89)
 
 ***
 
 ### waitConfirmations?
 
-> `optional` **waitConfirmations**: `number`
+> `optional` **waitConfirmations?**: `number`
+
+Defined in: [src/utils.ts:78](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L78)
 
 #### Inherited from
 
-`Omit.waitConfirmations`
-
-#### Defined in
-
-[src/utils.ts:42](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L42)
+[`DeployContractOptions`](DeployContractOptions.md).[`waitConfirmations`](DeployContractOptions.md#waitconfirmations)

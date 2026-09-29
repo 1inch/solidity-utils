@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,20 +6,20 @@
 
 # Function: getAccountsWithCode()
 
-> **getAccountsWithCode**(`code`): `Promise`\<`SignerWithAddress`[]\>
+> **getAccountsWithCode**(`code?`): `Promise`\<`HardhatEthersSigner`[]\>
+
+Defined in: [src/utils.ts:461](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L461)
 
 ## Parameters
 
-• **code**: `BytesLike` \| BytesLike \| undefined[] = `'0x'`
+### code?
 
-A single bytecode (applied to all accounts) or an array of bytecodes (one per account). Defaults to '0x'.
+`BytesLike` \| BytesLike \| undefined[]
+
+One bytecode value for every account, or one optional value per account. Defaults to `0x`.
 
 ## Returns
 
-`Promise`\<`SignerWithAddress`[]\>
+`Promise`\<`HardhatEthersSigner`[]\>
 
-A list of signers (accounts) with the specified code applied.
-
-## Defined in
-
-[src/utils.ts:434](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L434)
+Hardhat signers whose account code has been updated.
