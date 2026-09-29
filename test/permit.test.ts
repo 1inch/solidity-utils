@@ -3,8 +3,6 @@ import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types'
 import { expect } from '../src/expect.js';
 import { defaultDeadline, Permit, DaiLikePermit, trim0x, buildData, buildDataLikeDai, withTarget } from '../src/permit.js';
 
-
-
 describe('Permit library', function () {
     let signer1: HardhatEthersSigner;
 

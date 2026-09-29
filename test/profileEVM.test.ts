@@ -5,8 +5,6 @@ import { expect } from '../src/expect.js';
 import { profileEVM, gasspectEVM } from '../src/profileEVM.js';
 import hre from 'hardhat';
 
-
-
 describe('trace inspection', function () {
     let signer1: HardhatEthersSigner;
     let signer2: HardhatEthersSigner;

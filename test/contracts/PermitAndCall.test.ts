@@ -4,8 +4,6 @@ import { expect } from '../../src/expect.js';
 import { getPermit, trim0x } from '../../src/permit.js';
 import { PermitAndCallMock } from '../../typechain-types/index.js';
 
-
-
 const value = 42n;
 
 describe('Permitable', function () {

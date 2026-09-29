@@ -4,10 +4,6 @@ import { constants } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 import { getBytes, concat, Signature, hashMessage, HDNodeWallet, keccak256, toUtf8Bytes } from 'ethers';
 
-
-
-
-
 describe('ECDSA', function () {
     let account: HardhatEthersSigner;
     let randomAccount: HDNodeWallet;
@@ -52,7 +48,6 @@ describe('ECDSA', function () {
         const ret = concat([r, s, getBytes('0x' + v.toString(16))]);
         return ret;
     }
-
 
     const longSignature =
         '0x01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789';

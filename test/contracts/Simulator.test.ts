@@ -1,8 +1,6 @@
 import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-
-
 describe('Simulator', function () {
     async function deploySimulatorMock() {
         const SimulatorMock = await ethers.getContractFactory('SimulatorMock');

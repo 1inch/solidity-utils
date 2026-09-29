@@ -5,8 +5,6 @@ import { ether } from '../../src/prelude.js';
 import type { RescuableMock } from '../../typechain-types/contracts/tests/mocks/RescuableMock';
 import type { NoReceiveOwnerMock } from '../../typechain-types/contracts/tests/mocks/NoReceiveOwnerMock';
 
-
-
 describe('Rescuable', function () {
     let owner: HardhatEthersSigner;
     let nonOwner: HardhatEthersSigner;

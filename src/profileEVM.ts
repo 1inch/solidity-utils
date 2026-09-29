@@ -47,7 +47,6 @@ type Op = {
     memory: string[];
 };
 
-
 /** Normalize EDR/geth stack words to 64-char lowercase hex without 0x prefix. */
 function stackWord(value: string | undefined): string {
     const hex = (value || '').replace(/^0x/i, '').toLowerCase();

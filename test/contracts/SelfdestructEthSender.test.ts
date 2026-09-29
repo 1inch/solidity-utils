@@ -4,8 +4,6 @@ import { expect } from '../../src/expect.js';
 import { ether } from '../../src/prelude.js';
 import { SelfdestructEthSenderMock } from '../../typechain-types/index.js';
 
-
-
 describe('SelfdestructEthSender', function () {
     let signer0: HardhatEthersSigner;
     let signer1: HardhatEthersSigner;

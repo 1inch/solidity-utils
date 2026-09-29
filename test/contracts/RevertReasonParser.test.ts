@@ -1,15 +1,12 @@
 import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-
-
 describe('RevertReasonParser', function () {
     async function deployRevertReasonParserTest() {
         const RevertReasonParserTest = await ethers.getContractFactory('RevertReasonParserTest');
         const revertReasonParserTest = await RevertReasonParserTest.deploy();
         return { revertReasonParserTest };
     }
-
 
     it('should be parsed as Unknown (Invalid revert reason)', async function () {
         const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);

@@ -1,8 +1,6 @@
 import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-
-
 const MAKER = '0x1111111111111111111111111111111111111111';
 const STRATEGY = ethers.id('strategy-1');
 const OTHER_MAKER = '0x2222222222222222222222222222222222222222';
