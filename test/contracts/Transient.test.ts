@@ -58,7 +58,7 @@ describe('TransientMock', function () {
 
             it('should use the supplied exception on overflow', async function () {
                 const { mock } = await loadFixture(deployTransientMock);
-                const exception = mock.interface.getError('CustomError').selector;
+                const exception = mock.interface.getError('CustomError')!.selector;
                 await expect(
                     mock.multicall([
                         mock.interface.encodeFunctionData('tstoreUint', [ethers.MaxUint256]),
@@ -91,7 +91,7 @@ describe('TransientMock', function () {
 
             it('should use the supplied exception on underflow', async function () {
                 const { mock } = await loadFixture(deployTransientMock);
-                const exception = mock.interface.getError('CustomError').selector;
+                const exception = mock.interface.getError('CustomError')!.selector;
                 await expect(
                     mock.multicall([mock.interface.encodeFunctionData('decWithException', [exception])]),
                 ).to.be.revertedWithCustomError(mock, 'CustomError');

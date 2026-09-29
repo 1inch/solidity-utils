@@ -1,5 +1,6 @@
 import hre, { artifacts, network } from 'hardhat';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import type { Abi } from 'hardhat/types/artifacts';
 import type { Environment } from 'rocketh/types';
 import {
     BaseContract,
@@ -266,8 +267,7 @@ export async function deployContract(name: string, parameters: Array<BigNumberis
  * @category utils
  * Deploys a contract from bytecode.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function deployContractFromBytecode(abi: any[], bytecode: BytesLike, parameters: Array<BigNumberish> = [], signer?: Signer) : Promise<BaseContract> {
+export async function deployContractFromBytecode(abi: Abi, bytecode: BytesLike, parameters: Array<BigNumberish> = [], signer?: Signer) : Promise<BaseContract> {
     const ContractFactory = await ethers.getContractFactory(abi, bytecode, signer);
     const instance = await ContractFactory.deploy(...parameters);
     await instance.waitForDeployment();

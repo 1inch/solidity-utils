@@ -2,6 +2,7 @@ import hardhatToolboxMochaEthers from '@nomicfoundation/hardhat-toolbox-mocha-et
 import HardhatDeploy from 'hardhat-deploy';
 import { defineConfig } from 'hardhat/config';
 import { Networks, getNetwork } from './hardhat-setup/networks.js';
+import type {} from './typechain-types/hardhat.js';
 
 const { networks, etherscan } = new Networks();
 

@@ -1,4 +1,6 @@
 import { network } from 'hardhat';
+import type {} from '@nomicfoundation/hardhat-ethers';
+import type {} from '@nomicfoundation/hardhat-network-helpers';
 
 const { ethers: hhEthers, networkHelpers } = await network.getOrCreate();
 

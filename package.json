@@ -21,7 +21,7 @@
     "prepack": "yarn clean && yarn build",
     "coverage": "hardhat test --coverage",
     "docgen": "yarn docgen:sol && yarn docgen:ts",
-    "docgen:ts": "npx typedoc --options typedoc.json 2>&1 | grep -v \"typechain-types\"",
+    "docgen:ts": "typedoc --options typedoc.json",
     "docgen:sol": "echo \"solidity-docgen is not compatible with Hardhat 3; use Hardhat 3 docgen when available\"",
     "format": "yarn format-ts && yarn format-sol",
     "format-ts": "prettier '**/*.ts' --write",
