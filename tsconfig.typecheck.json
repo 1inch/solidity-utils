@@ -1,7 +1,8 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig",
   "include": [
     "src/**/*",
+    "test/**/*",
     "hardhat-setup/**/*",
     "hardhat.config.ts"
   ],
@@ -14,7 +15,6 @@
     "typechain-types",
     "types",
     "generated",
-    "test",
     "docgen"
   ]
 }

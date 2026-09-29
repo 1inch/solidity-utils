@@ -5,6 +5,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -16,6 +17,17 @@ jobs:
           cache: "yarn"
       - run: yarn
       - run: yarn lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: "yarn"
+      - run: yarn
+      - run: yarn typecheck
 
   test:
     runs-on: ubuntu-latest
