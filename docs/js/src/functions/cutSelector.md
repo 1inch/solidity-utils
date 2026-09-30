@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,9 +8,13 @@
 
 > **cutSelector**(`data`): `string`
 
+Defined in: [src/permit.ts:60](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L60)
+
 ## Parameters
 
-• **data**: `string`
+### data
+
+`string`
 
 The transaction data string from which to trim the selector.
 
@@ -19,7 +23,3 @@ The transaction data string from which to trim the selector.
 `string`
 
 The trimmed selector string.
-
-## Defined in
-
-[src/permit.ts:59](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L59)

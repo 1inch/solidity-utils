@@ -3,8 +3,6 @@ import { expect } from '../../src/expect.js';
 import { trim0x } from '../../src/permit.js';
 import { BytesStorageMock } from '../../typechain-types/index.js';
 
-
-
 type Slice = {
     slot: bigint,
     offset: bigint,

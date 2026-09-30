@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,26 +8,30 @@
 
 > **parseRpcEnv**(`envRpc`): `object`
 
+Defined in: [hardhat-setup/networks.ts:61](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/hardhat-setup/networks.ts#L61)
+
 ## Parameters
 
-• **envRpc**: `string`
+### envRpc
 
-The RPC configuration string to parse.
+`string`
+
+RPC configuration string to parse.
 
 ## Returns
 
 `object`
 
-An object containing the RPC URL and optional auth key HTTP header.
+The RPC URL and, when supplied, the value for the `auth-key` HTTP header.
 
 ### authKeyHttpHeader?
 
-> `optional` **authKeyHttpHeader**: `string`
+> `optional` **authKeyHttpHeader?**: `string`
 
 ### url
 
 > **url**: `string`
 
-## Defined in
+## Throws
 
-[hardhat-setup/networks.ts:44](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L44)
+If the URL is empty or the configuration contains more than one separator.

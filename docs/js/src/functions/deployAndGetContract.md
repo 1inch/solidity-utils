@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,24 +8,18 @@
 
 > **deployAndGetContract**(`options`): `Promise`\<`Contract`\>
 
+Defined in: [src/utils.ts:105](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L105)
+
 ## Parameters
 
-• **options**: [`DeployContractOptions`](../interfaces/DeployContractOptions.md)
+### options
 
-Deployment options. Default values:
-   - constructorArgs: []
-   - deploymentName: contractName
-   - skipVerify: false
-   - skipIfAlreadyDeployed: true
-   - log: true
-   - waitConfirmations: 1 on dev chains, 6 on others
+[`DeployContractOptions`](../interfaces/DeployContractOptions.md)
+
+Deployment and verification options.
 
 ## Returns
 
 `Promise`\<`Contract`\>
 
-The deployed contract instance.
-
-## Defined in
-
-[src/utils.ts:70](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L70)
+The deployed or previously persisted contract instance.

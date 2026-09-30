@@ -1,8 +1,6 @@
 import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-
-
 describe('ReentrancyGuard', function () {
     async function deployReentrancyGuardMock() {
         const ReentrancyGuardMock = await ethers.getContractFactory('ReentrancyGuardMock');

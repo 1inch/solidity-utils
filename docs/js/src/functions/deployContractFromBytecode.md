@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,32 +6,38 @@
 
 # Function: deployContractFromBytecode()
 
-> **deployContractFromBytecode**(`abi`, `bytecode`, `parameters`, `signer`?): `Promise`\<`BaseContract`\>
+> **deployContractFromBytecode**(`abi`, `bytecode`, `parameters?`, `signer?`): `Promise`\<`BaseContract`\>
+
+Defined in: [src/utils.ts:319](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L319)
 
 ## Parameters
 
-• **abi**: `any`[]
+### abi
+
+`Abi`
 
 Contract ABI.
 
-• **bytecode**: `BytesLike`
+### bytecode
 
-Contract bytecode.
+`BytesLike`
 
-• **parameters**: `BigNumberish`[] = `[]`
+Contract creation bytecode.
 
-Constructor parameters.
+### parameters?
 
-• **signer?**: `Signer`
+`BigNumberish`[] = `[]`
 
-Optional signer object.
+Constructor arguments. Defaults to an empty array.
+
+### signer?
+
+`Signer`
+
+Optional signer used to deploy the contract.
 
 ## Returns
 
 `Promise`\<`BaseContract`\>
 
 The deployed contract instance.
-
-## Defined in
-
-[src/utils.ts:279](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L279)

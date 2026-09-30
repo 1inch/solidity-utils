@@ -1,4 +1,4 @@
-**@1inch/solidity-utils** • **Docs**
+**@1inch/solidity-utils**
 
 ***
 

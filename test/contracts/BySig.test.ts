@@ -3,8 +3,6 @@ import { constants } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 import { NonceType, buildBySigTraits, hashBySig, signSignedCall } from '../../src/bySig.js';
 
-
-
 describe('BySig', function () {
     async function deployAddressArrayMock() {
         const [alice, bob, carol] = await ethers.getSigners();

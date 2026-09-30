@@ -17,11 +17,11 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf artifacts cache coverage contracts/hardhat-dependency-compiler dist typechain-types types generated",
-    "build": "yarn typechain && cti src hardhat-setup docgen -b && tsc -p tsconfig.publish.json",
+    "build": "yarn typechain && tsc -p tsconfig.publish.json",
     "prepack": "yarn clean && yarn build",
     "coverage": "hardhat test --coverage",
     "docgen": "yarn docgen:sol && yarn docgen:ts",
-    "docgen:ts": "npx typedoc --options typedoc.json 2>&1 | grep -v \"typechain-types\"",
+    "docgen:ts": "typedoc --options typedoc.json",
     "docgen:sol": "echo \"solidity-docgen is not compatible with Hardhat 3; use Hardhat 3 docgen when available\"",
     "format": "yarn format-ts && yarn format-sol",
     "format-ts": "prettier '**/*.ts' --write",
@@ -35,7 +35,7 @@
     "test": "hardhat test",
     "test:update-snapshots": "UPDATE_SNAPSHOT=1 yarn test",
     "test:us": "UPDATE_SNAPSHOT=1 yarn test",
-    "typecheck": "tsc -p tsconfig.typecheck.json --noEmit --skipLibCheck",
+    "typecheck": "tsc -p tsconfig.typecheck.json --noEmit && tsc -p tsconfig.publish.json --noEmit",
     "typechain": "hardhat compile",
     "changelog": "npx auto-changelog"
   },

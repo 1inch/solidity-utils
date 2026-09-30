@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,6 +8,4 @@
 
 > `const` **defaultDeadlinePermit2**: `bigint` = `constants.MAX_UINT48`
 
-## Defined in
-
-[src/permit.ts:13](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L13)
+Defined in: [src/permit.ts:14](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L14)

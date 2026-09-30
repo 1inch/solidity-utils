@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,39 +6,57 @@
 
 # Function: getPermit()
 
-> **getPermit**(`owner`, `permitContract`, `tokenVersion`, `chainId`, `spender`, `value`, `deadline`, `compact`): `Promise`\<`string`\>
+> **getPermit**(`owner`, `permitContract`, `tokenVersion`, `chainId`, `spender`, `value`, `deadline?`, `compact?`): `Promise`\<`string`\>
+
+Defined in: [src/permit.ts:193](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L193)
 
 ## Parameters
 
-• **owner**: `Wallet` \| `HardhatEthersSigner`
+### owner
+
+`Wallet` \| `HardhatEthersSigner`
 
 The wallet or signer issuing the permit.
 
-• **permitContract**: `ERC20Permit`
+### permitContract
+
+`ERC20PermitMock`
 
 The contract object with ERC20Permit type and token address for which the permit creating.
 
-• **tokenVersion**: `string`
+### tokenVersion
+
+`string`
 
 The version of the token's EIP-712 domain.
 
-• **chainId**: `number`
+### chainId
+
+`number`
 
 The unique identifier for the blockchain network.
 
-• **spender**: `string`
+### spender
+
+`string`
 
 The address allowed to spend the tokens.
 
-• **value**: `string`
+### value
+
+`string`
 
 The amount of tokens the spender is allowed to use.
 
-• **deadline**: `string` = `...`
+### deadline?
+
+`string` = `...`
 
 Time until when the permit is valid.
 
-• **compact**: `boolean` = `false`
+### compact?
+
+`boolean` = `false`
 
 Indicates if the permit should be compressed.
 
@@ -47,7 +65,3 @@ Indicates if the permit should be compressed.
 `Promise`\<`string`\>
 
 A signed permit string.
-
-## Defined in
-
-[src/permit.ts:192](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L192)

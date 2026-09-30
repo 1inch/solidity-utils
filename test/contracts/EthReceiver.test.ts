@@ -2,8 +2,6 @@ import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
 import { expect } from '../../src/expect.js';
 
-
-
 describe('EthReceiver', function () {
     let signer1: HardhatEthersSigner;
 

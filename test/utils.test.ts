@@ -13,8 +13,6 @@ import { loadEnvironmentFromHardhat } from 'hardhat-deploy/helpers';
 import { getBytes, hexlify, randomBytes, toUtf8Bytes, EventLog, ContractTransactionReceipt } from 'ethers';
 import { Create3Mock, TokenMock, WETH } from '../typechain-types/index.js';
 
-
-
 describe('timeIncreaseTo', function () {
     const precision = 2;
 
@@ -291,6 +289,10 @@ describe('utils', function () {
                 skipVerify: true,
                 skipIfAlreadyDeployed: false,
             });
+            const transactionHash = env.get('TokenMock').transactionHash;
+            if (typeof transactionHash !== 'string') {
+                throw new Error('TokenMock deployment is missing its transaction hash');
+            }
 
             await saveContractWithCreate3Deployment(
                 ethers.provider,
@@ -300,7 +302,7 @@ describe('utils', function () {
                 [tokenName, 'STM'],
                 salt,
                 await create3Deployer.getAddress(),
-                env.get('TokenMock')?.transactionHash || '',
+                transactionHash,
             );
             const saved = env.get('Test');
             const tokenDep = env.get('TokenMock');

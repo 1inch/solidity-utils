@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,39 +6,57 @@
 
 # Function: getPermitLikeUSDC()
 
-> **getPermitLikeUSDC**(`owner`, `signer`, `permitContract`, `tokenVersion`, `chainId`, `spender`, `value`, `deadline`): `Promise`\<`string`\>
+> **getPermitLikeUSDC**(`owner`, `signer`, `permitContract`, `tokenVersion`, `chainId`, `spender`, `value`, `deadline?`): `Promise`\<`string`\>
+
+Defined in: [src/permit.ts:322](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L322)
 
 ## Parameters
 
-• **owner**: `string`
+### owner
+
+`string`
 
 Contract with isValidSignature function.
 
-• **signer**: `Wallet` \| `HardhatEthersSigner`
+### signer
+
+`Wallet` \| `HardhatEthersSigner`
 
 The wallet or signer issuing the permit.
 
-• **permitContract**: `USDCLikePermitMock`
+### permitContract
+
+`USDCLikePermitMock`
 
 The contract object with ERC7597Permit type and token address for which the permit creating.
 
-• **tokenVersion**: `string`
+### tokenVersion
+
+`string`
 
 The version of the token's EIP-712 domain.
 
-• **chainId**: `number`
+### chainId
+
+`number`
 
 The unique identifier for the blockchain network.
 
-• **spender**: `string`
+### spender
+
+`string`
 
 The address allowed to spend the tokens.
 
-• **value**: `string`
+### value
+
+`string`
 
 The amount of tokens the spender is allowed to use.
 
-• **deadline**: `string` = `...`
+### deadline?
+
+`string` = `...`
 
 Time until when the permit is valid.
 
@@ -47,7 +65,3 @@ Time until when the permit is valid.
 `Promise`\<`string`\>
 
 A signed permit string in ERC7597Permit format.
-
-## Defined in
-
-[src/permit.ts:321](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L321)

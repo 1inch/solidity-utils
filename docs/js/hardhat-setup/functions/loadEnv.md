@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,13 +6,17 @@
 
 # Function: loadEnv()
 
-> **loadEnv**(`options`?): `void`
+> **loadEnv**(`options?`): `void`
+
+Defined in: [hardhat-setup/networks.ts:22](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/hardhat-setup/networks.ts#L22)
 
 ## Parameters
 
-• **options?**: `DotenvConfigOptions`
+### options?
 
-Optional configuration object for dotenv (e.g. `{ path: '.env.local' }`).
+`DotenvConfigOptions`
+
+Optional dotenv configuration, such as a custom path or encoding.
 
 ## Returns
 
@@ -21,7 +25,3 @@ Optional configuration object for dotenv (e.g. `{ path: '.env.local' }`).
 ## See
 
 https://github.com/motdotla/dotenv#config
-
-## Defined in
-
-[hardhat-setup/networks.ts:13](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L13)

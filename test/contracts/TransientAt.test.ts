@@ -1,8 +1,6 @@
 import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-
-
 describe('TransientAtMock', function () {
     async function deployMock() {
         const mock = await (await ethers.getContractFactory('TransientAtMock')).deploy();

@@ -5,8 +5,6 @@ import {
     RevertReasonForwarderMock__factory as RevertReasonForwarderMock,
 } from '../../typechain-types/index.js';
 
-
-
 describe('RevertReasonForwarder', function () {
     let Helper: RevertReasonForwarderHelper;
     let RevertReasonForwarderMock: RevertReasonForwarderMock;

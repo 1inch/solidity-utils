@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,8 +6,10 @@
 
 # Type Alias: TrackReceivedTokenAndTxResult
 
-> **TrackReceivedTokenAndTxResult**: [`bigint`, `ContractTransactionReceipt` \| [`TrackReceivedTokenAndTxResult`](TrackReceivedTokenAndTxResult.md)]
+> **TrackReceivedTokenAndTxResult** = \[`bigint`, `ContractTransactionReceipt` \| `TrackReceivedTokenAndTxResult`\]
 
-## Defined in
+Defined in: [src/utils.ts:343](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L343)
 
-[src/utils.ts:306](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L306)
+Result returned by `trackReceivedTokenAndTx`.
+The first item is the received amount. The second item is either the transaction
+receipt or a nested result returned by another `trackReceivedTokenAndTx` call.

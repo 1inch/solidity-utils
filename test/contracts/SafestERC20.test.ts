@@ -12,8 +12,6 @@ import {
     SafeWETHWrapper__factory as SafeWETHWrapperFactory,
 } from '../../typechain-types/index.js';
 
-
-
 const Permit = [
     { name: 'owner', type: 'address' },
     { name: 'spender', type: 'address' },

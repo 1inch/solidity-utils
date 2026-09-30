@@ -5,12 +5,19 @@ import type {
 } from 'hardhat/types/config';
 import type { EthereumProvider } from 'hardhat/types/providers';
 
-/** @deprecated Use EdrNetworkAccountsUserConfig. Kept for consumer compatibility. */
+/**
+ * Account configuration for a Hardhat EDR simulated network.
+ * @category Hardhat-Setup
+ * @deprecated Use `EdrNetworkAccountsUserConfig`. This alias is retained for consumer compatibility.
+ */
 export type HardhatNetworkAccountsUserConfig = EdrNetworkAccountsUserConfig;
 
 /**
  * @category Hardhat-Setup
  * Loads environment variables into process.env using the dotenv package.
+ * By default, variables are loaded from a `.env` file in the project root.
+ * @param options Optional dotenv configuration, such as a custom path or encoding.
+ * @see https://github.com/motdotla/dotenv#config
  */
 export function loadEnv(options?: dotenv.DotenvConfigOptions): void {
     dotenv.config(options);
@@ -19,19 +26,25 @@ export function loadEnv(options?: dotenv.DotenvConfigOptions): void {
 /**
  * @category Hardhat-Setup
  * Configuration type for managing Etherscan integration in Hardhat setups.
+ * @param apiKey API key used for every network, or API keys indexed by network name.
+ * @param customChains Custom explorer entries containing the network name, chain ID, API URL, and browser URL.
  */
 export type Etherscan = {
     apiKey: string | { [network: string]: string },
     customChains: Array<{
         network: string,
         chainId: number,
-        urls: { apiURL: string, browserURL: string },
+        urls: {
+            apiURL: string,
+            browserURL: string,
+        },
     }>,
 };
 
 /**
  * @category Hardhat-Setup
  * A helper method to get the network name from the command line arguments.
+ * @returns The value after `--network`, or `"default"` when the option is absent.
  */
 export function getNetwork(): string {
     const index = process.argv.findIndex((arg) => arg === '--network') + 1;
@@ -40,7 +53,10 @@ export function getNetwork(): string {
 
 /**
  * @category Hardhat-Setup
- * A helper method to parse RPC configuration strings.
+ * Parses an RPC configuration in `<RPC_URL>` or `<RPC_URL>|<AUTH_KEY_HTTP_HEADER>` format.
+ * @param envRpc RPC configuration string to parse.
+ * @returns The RPC URL and, when supplied, the value for the `auth-key` HTTP header.
+ * @throws If the URL is empty or the configuration contains more than one separator.
  */
 export function parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: string } {
     const [url, authKeyHttpHeader, overflow] = envRpc.split('|');
@@ -53,6 +69,10 @@ export function parseRpcEnv(envRpc: string): { url: string, authKeyHttpHeader?: 
 /**
  * @category Hardhat-Setup
  * Reset a Hardhat/EDR network to local state or to a fork.
+ * Local network names (`hardhat`, `default`, and `hardhatMainnet`) are reset
+ * without forking. Other names use `<NETWORK_NAME>_RPC_URL`.
+ * @param provider Ethereum provider that handles the `hardhat_reset` request.
+ * @param networkName Local network or fork target name.
  */
 export async function resetHardhatNetworkFork(
     provider: EthereumProvider,
@@ -80,11 +100,21 @@ export async function resetHardhatNetworkFork(
 /**
  * @category Hardhat-Setup
  * Helper class to register networks and Etherscan API keys for Hardhat 3.
+ * See the hardhat-setup README for environment variable formats and usage.
  */
 export class Networks {
     networks: Record<string, NetworkUserConfig> = {};
     etherscan: Etherscan = { apiKey: '', customChains: [] };
 
+    /**
+     * Creates the network configuration accumulator.
+     * @param useHardhat Whether to add the default in-process Hardhat network.
+     * @param forkingNetworkName Optional network to fork into the Hardhat network.
+     * @param _saveHardhatDeployments Reserved compatibility argument from hardhat-deploy v1; currently ignored.
+     * @param forkingAccounts Optional accounts for the Hardhat EDR network.
+     * @param autoLoadEnv Whether to load `.env` before reading network configuration.
+     * @throws If `forkingNetworkName` is set but its RPC environment variable is missing.
+     */
     constructor(
         useHardhat: boolean = true,
         forkingNetworkName?: string,
@@ -126,6 +156,17 @@ export class Networks {
         }
     }
 
+    /**
+     * Registers an HTTP network when all required connection and explorer values are present.
+     * @param name Hardhat network name.
+     * @param chainId EIP-155 chain ID.
+     * @param rpc RPC configuration accepted by `parseRpcEnv`.
+     * @param privateKey Private key used by the network account.
+     * @param etherscanNetworkName Explorer network identifier. Required for registration.
+     * @param etherscanKey Explorer API key.
+     * @param hardfork Hardfork metadata retained on the network configuration.
+     * @param l1Network Optional L1 network name used by zkSync-compatible configurations.
+     */
     register(
         name: string,
         chainId: number,
@@ -158,6 +199,17 @@ export class Networks {
         }
     }
 
+    /**
+     * Registers an HTTP network and its custom block explorer.
+     * @param name Hardhat and explorer network name.
+     * @param chainId EIP-155 chain ID.
+     * @param url RPC URL.
+     * @param privateKey Private key used by the network account.
+     * @param etherscanKey Explorer API key.
+     * @param apiURL Block explorer API endpoint.
+     * @param browserURL Public block explorer URL.
+     * @param hardfork Hardfork metadata retained on the network configuration.
+     */
     registerCustom(
         name: string,
         chainId: number,
@@ -174,6 +226,11 @@ export class Networks {
         }
     }
 
+    /**
+     * Registers all networks supported by this package from environment variables.
+     * Networks without complete RPC, key, and explorer configuration are skipped.
+     * @returns The accumulated Hardhat network and Etherscan configurations.
+     */
     registerAll(): { networks: Record<string, NetworkUserConfig>, etherscan: Etherscan } {
         const privateKey = process.env.PRIVATE_KEY;
         const etherscanApiKey = process.env.ETHERSCAN_API_KEY;
@@ -206,6 +263,12 @@ export class Networks {
         return { networks: this.networks, etherscan: this.etherscan };
     }
 
+    /**
+     * Returns the explorer configuration for a network.
+     * Cronos networks use the keyed API format required by their Etherscan v1-compatible API.
+     * @param network Hardhat network name.
+     * @returns Explorer API keys and custom chain configuration.
+     */
     getEtherscanConfig(network: string): Etherscan {
         const keys: { [network: string]: string } = {};
         switch (network) {
@@ -218,6 +281,10 @@ export class Networks {
         }
     }
 
+    /**
+     * Returns all registered Hardhat network configurations.
+     * @returns Network configurations indexed by network name.
+     */
     getNetworksConfig() {
         return this.networks;
     }
