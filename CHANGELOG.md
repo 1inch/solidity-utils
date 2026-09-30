@@ -1,6 +1,45 @@
 Change Log
 ==========
 
+solidity-utils/6.9.16 (2026-09-02)
+---------------------------------
+
+- Update package.json ([5b597e4](https://github.com/1inch/solidity-utils/commit/5b597e43870850a37998ecb87d249ee499ae94f0)).
+- Update networks.ts ([fc4a774](https://github.com/1inch/solidity-utils/commit/fc4a77487bcb2a5a89eac759977d5192c8f22133)).
+
+solidity-utils/6.9.15 (2026-09-02)
+---------------------------------
+
+- add arc chain ([#272](https://github.com/1inch/solidity-utils/pull/272); [51b241e](https://github.com/1inch/solidity-utils/commit/51b241ecf3c947e5fd8bc769419dfd0ddbd2423d)).
+
+solidity-utils/6.9.14 (2026-08-22)
+---------------------------------
+
+- fix monad hardfork: cancun -&gt; shanghai ([#271](https://github.com/1inch/solidity-utils/pull/271); [b8e7fd4](https://github.com/1inch/solidity-utils/commit/b8e7fd4299d5d6c63ce6be07e6a44b55c68bc7ff)).
+
+solidity-utils/6.9.13 (2026-08-05)
+---------------------------------
+
+- Bump/v6 9 13 ([#270](https://github.com/1inch/solidity-utils/pull/270); [f49fe7c](https://github.com/1inch/solidity-utils/commit/f49fe7c953c9b4a4b756b9559498e519b42bd6e0)).
+- Add hyperEVM network, switch monad to registerCustom ([#269](https://github.com/1inch/solidity-utils/pull/269); [82d7804](https://github.com/1inch/solidity-utils/commit/82d780423083b9333452449c1f374b9dfae9b431)).
+- Revert accidental direct push to master ([#268](https://github.com/1inch/solidity-utils/pull/268); [02eadf8](https://github.com/1inch/solidity-utils/commit/02eadf8397b0792908c48a4a5d9495c996f32f11)).
+
+solidity-utils/6.9.12 (2026-08-04)
+---------------------------------
+
+- add hyperevm ([786dbb9](https://github.com/1inch/solidity-utils/commit/786dbb9cb311b91d122faea026af24e87d545898)).
+- bump version ([85a1f06](https://github.com/1inch/solidity-utils/commit/85a1f06ecbf4b7a7f65d13fdc1692f9af7341ae2)).
+
+solidity-utils/6.9.11 (2026-08-03)
+---------------------------------
+
+- Chains/monad+cronos ([#267](https://github.com/1inch/solidity-utils/pull/267); [d15f6fc](https://github.com/1inch/solidity-utils/commit/d15f6fceafcee23d77579fa6fb01642f20a7fd80)).
+
+solidity-utils/6.9.10 (2026-06-10)
+---------------------------------
+
+- added robinhood ([#265](https://github.com/1inch/solidity-utils/pull/265); [209b231](https://github.com/1inch/solidity-utils/commit/209b231bf218f9b4d8a672a8d23c4567093df025)).
+
 solidity-utils/6.9.8 (2026-06-10)
 ---------------------------------
 
@@ -56,10 +95,6 @@ solidity-utils/6.8.2 (2026-01-02)
 
 - upgrade package version ([#219](https://github.com/1inch/solidity-utils/pull/219); [8eee225](https://github.com/1inch/solidity-utils/commit/8eee225b143935aeccfe6d9931fdb50585077012)).
 - Patch npm publish ([#218](https://github.com/1inch/solidity-utils/pull/218); [2196892](https://github.com/1inch/solidity-utils/commit/2196892a5a26000d6ffe346126fe31a50e5841c6)).
-
-solidity-utils/6.8.1 (2026-01-02)
----------------------------------
-
 - fixed minimatch ([#217](https://github.com/1inch/solidity-utils/pull/217); [14ca632](https://github.com/1inch/solidity-utils/commit/14ca63241fc90285703b6e0ffeeac0d8a54346af)).
 - Update publish.yml ([#215](https://github.com/1inch/solidity-utils/pull/215); [58622f8](https://github.com/1inch/solidity-utils/commit/58622f88b431c2863025d93a27725ce21c01d98d)).
 - fixed files ([#216](https://github.com/1inch/solidity-utils/pull/216); [fd0a8a8](https://github.com/1inch/solidity-utils/commit/fd0a8a811e1765df139a410d55c6805810574cd2)).
@@ -178,11 +213,11 @@ solidity-utils/5.2.1 (2024-08-05)
 
 - [SC-1220] Fix dependabot issues ([#150](https://github.com/1inch/solidity-utils/pull/150); [b4d9f4e](https://github.com/1inch/solidity-utils/commit/b4d9f4e04b6570f7e42a1077e7b3335f8a755734)).
 - Fix comment in ECDSA.sol ([#149](https://github.com/1inch/solidity-utils/pull/149); [1d237c3](https://github.com/1inch/solidity-utils/commit/1d237c3882909d003119a21df7ec7daf8aad5f9a)).
+- Fix/types for build ([#148](https://github.com/1inch/solidity-utils/pull/148); [3f9eb9b](https://github.com/1inch/solidity-utils/commit/3f9eb9bdec4b440e63ef8fcdd03898f360d406fe)).
 
-solidity-utils/5.2.0 (2024-07-04)
+solidity-utils/5.2.0 (2024-07-03)
 ---------------------------------
 
-- Fix/types for build ([#148](https://github.com/1inch/solidity-utils/pull/148); [3f9eb9b](https://github.com/1inch/solidity-utils/commit/3f9eb9bdec4b440e63ef8fcdd03898f360d406fe)).
 - [SC-1177] Deploy with create3 and save deployment ([#147](https://github.com/1inch/solidity-utils/pull/147); [2e247c2](https://github.com/1inch/solidity-utils/commit/2e247c223b313ddf2757a98e8fcbd707102a4995)).
 
 solidity-utils/5.1.0 (2024-06-06)
@@ -331,7 +366,7 @@ solidity-utils/3.0.1 (2023-07-26)
 
 - Fixed package building ([#92](https://github.com/1inch/solidity-utils/pull/92); [34886f1](https://github.com/1inch/solidity-utils/commit/34886f19209ca922b09668ccd7f7f78068f8e9a0)).
 
-solidity-utils/3.0.0 (2023-07-13)
+solidity-utils/3.0.0 (2023-07-12)
 ---------------------------------
 
 - Migrate to new hardhat-ethers ([#89](https://github.com/1inch/solidity-utils/pull/89); [a6fc5ee](https://github.com/1inch/solidity-utils/commit/a6fc5eedc8f837e71533263458f35d3770a79180)).
