@@ -4,8 +4,6 @@ import { expect } from '../src/expect.js';
 import { defaultDeadline, buildData, buildDataLikeDai, getPermit, getPermit2, getPermitLikeDai, getPermitLikeUSDC, permit2Contract, cutSelector } from '../src/permit.js';
 import { constants } from '../src/prelude.js';
 
-
-
 const value = 42n;
 
 describe('Permitable', function () {

@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,38 +8,48 @@
 
 > **trackReceivedTokenAndTx**\<`T`\>(`provider`, `token`, `wallet`, `txPromise`, ...`args`): `Promise`\<[`TrackReceivedTokenAndTxResult`](../type-aliases/TrackReceivedTokenAndTxResult.md)\>
 
+Defined in: [src/utils.ts:357](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L357)
+
 ## Type Parameters
 
-• **T** *extends* `unknown`[]
+### T
+
+`T` *extends* `unknown`[]
 
 ## Parameters
 
-• **provider**: `JsonRpcProvider` \| `object`
+### provider
 
-JSON RPC provider or custom provider object.
+`JsonRpcProvider` \| \{ `getBalance`: (`address`) => `Promise`\<`bigint`\>; \}
 
-• **token**: [`Token`](../type-aliases/Token.md) \| `object` \| `object`
+Provider used to read native-currency balances.
 
-Token contract instance or ETH address constants.
+### token
 
-• **wallet**: `string`
+[`Token`](../type-aliases/Token.md) \| \{ `address`: `"0x0000000000000000000000000000000000000000"`; \} \| \{ `address`: `"0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"`; \}
 
-Wallet address to track.
+Token contract, `ZERO_ADDRESS`, or `EEE_ADDRESS` for native currency.
 
-• **txPromise**
+### wallet
 
-Function returning a transaction promise.
+`string`
 
-• ...**args**: `T`
+Address whose balance change is measured.
 
-Arguments for the transaction promise function.
+### txPromise
+
+(...`args`) => `Promise`\<`ContractTransactionResponse` \| [`TrackReceivedTokenAndTxResult`](../type-aliases/TrackReceivedTokenAndTxResult.md)\>
+
+Function that sends a transaction or returns a nested tracking result.
+
+### args
+
+...`T`
+
+Arguments forwarded to `txPromise`.
 
 ## Returns
 
 `Promise`\<[`TrackReceivedTokenAndTxResult`](../type-aliases/TrackReceivedTokenAndTxResult.md)\>
 
-Tuple of balance change and transaction receipt.
-
-## Defined in
-
-[src/utils.ts:319](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L319)
+The received amount and transaction receipt or nested tracking result.

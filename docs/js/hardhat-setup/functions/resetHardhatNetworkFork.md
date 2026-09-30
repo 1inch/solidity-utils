@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,22 +6,24 @@
 
 # Function: resetHardhatNetworkFork()
 
-> **resetHardhatNetworkFork**(`network`, `networkName`): `Promise`\<`void`\>
+> **resetHardhatNetworkFork**(`provider`, `networkName`): `Promise`\<`void`\>
+
+Defined in: [hardhat-setup/networks.ts:77](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/hardhat-setup/networks.ts#L77)
 
 ## Parameters
 
-• **network**: `Network`
+### provider
 
-The Hardhat network object.
+`EthereumProvider`
 
-• **networkName**: `string`
+Ethereum provider that handles the `hardhat_reset` request.
 
-The name of the network to reset to.
+### networkName
+
+`string`
+
+Local network or fork target name.
 
 ## Returns
 
 `Promise`\<`void`\>
-
-## Defined in
-
-[hardhat-setup/networks.ts:58](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/hardhat-setup/networks.ts#L58)

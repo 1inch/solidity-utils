@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,13 +6,15 @@
 
 # Function: buildBySigTraits()
 
-> **buildBySigTraits**(`params`): `bigint`
+> **buildBySigTraits**(`params?`): `bigint`
+
+Defined in: [src/bySig.ts:25](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L25)
 
 Builds traits for {bySig} contract by combining params.
 
 ## Parameters
 
-• **params** = `{}`
+### params?
 
 An object containing the following properties:
 - `nonceType` The type of nonce to use. Default is `NonceType.Account`.
@@ -20,13 +22,21 @@ An object containing the following properties:
 - `relayer` The relayer address. Default is the zero address.
 - `nonce` The nonce. Default is `0`.
 
-• **params.deadline**: `undefined` \| `number` = `0`
+#### deadline?
 
-• **params.nonce**: `undefined` \| `number` = `0`
+`number` = `0`
 
-• **params.nonceType**: `undefined` \| [`NonceType`](../enumerations/NonceType.md) = `NonceType.Account`
+#### nonce?
 
-• **params.relayer**: `undefined` \| `string` = `...`
+`number` = `0`
+
+#### nonceType?
+
+[`NonceType`](../enumerations/NonceType.md) = `NonceType.Account`
+
+#### relayer?
+
+`string` = `...`
 
 ## Returns
 
@@ -37,7 +47,3 @@ A bigint representing the combined traits.
 ## Throws
 
 Error if provided with invalid parameters.
-
-## Defined in
-
-[src/bySig.ts:26](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L26)

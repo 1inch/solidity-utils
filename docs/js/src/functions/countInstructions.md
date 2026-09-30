@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,26 +8,30 @@
 
 > **countInstructions**(`provider`, `txHash`, `instructions`): `Promise`\<`number`[]\>
 
+Defined in: [src/utils.ts:418](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L418)
+
 ## Parameters
 
-• **provider**: `JsonRpcProvider` \| `object`
+### provider
 
-JSON RPC provider or custom provider object.
+`JsonRpcProvider` \| \{ `send`: (`method`, `params`) => `Promise`\<`any`\>; \}
 
-• **txHash**: `string`
+Provider that supports `debug_traceTransaction`.
 
-Transaction hash to analyze.
+### txHash
 
-• **instructions**: `string`[]
+`string`
 
-Array of EVM instructions (opcodes) to count.
+Transaction hash to trace.
+
+### instructions
+
+`string`[]
+
+Opcode names to count, case-insensitively.
 
 ## Returns
 
 `Promise`\<`number`[]\>
 
-Array of instruction counts.
-
-## Defined in
-
-[src/utils.ts:380](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L380)
+Counts in the same order as `instructions`.

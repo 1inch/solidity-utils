@@ -5,8 +5,6 @@ import { use } from 'chai';
 import { jestSnapshotPlugin } from 'mocha-chai-jest-snapshot';
 import hre from 'hardhat';
 
-
-
 if (!hre.globalOptions.coverage) {
     use(jestSnapshotPlugin());
 }

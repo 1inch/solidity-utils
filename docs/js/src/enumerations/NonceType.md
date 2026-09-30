@@ -1,10 +1,12 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
 [@1inch/solidity-utils](../../README.md) / [src](../README.md) / NonceType
 
 # Enumeration: NonceType
+
+Defined in: [src/bySig.ts:8](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L8)
 
 Enum defining types of nonces.
 
@@ -14,9 +16,7 @@ Enum defining types of nonces.
 
 > **Account**: `0`
 
-#### Defined in
-
-[src/bySig.ts:10](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L10)
+Defined in: [src/bySig.ts:9](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L9)
 
 ***
 
@@ -24,9 +24,7 @@ Enum defining types of nonces.
 
 > **Invalid**: `3`
 
-#### Defined in
-
-[src/bySig.ts:13](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L13)
+Defined in: [src/bySig.ts:12](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L12)
 
 ***
 
@@ -34,9 +32,7 @@ Enum defining types of nonces.
 
 > **Selector**: `1`
 
-#### Defined in
-
-[src/bySig.ts:11](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L11)
+Defined in: [src/bySig.ts:10](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L10)
 
 ***
 
@@ -44,6 +40,4 @@ Enum defining types of nonces.
 
 > **Unique**: `2`
 
-#### Defined in
-
-[src/bySig.ts:12](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L12)
+Defined in: [src/bySig.ts:11](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L11)

@@ -4,11 +4,7 @@ import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types'
 import { constants } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 
-
 const addressLibErrors = { interface: new Interface(['error OutputArrayTooSmall()', 'error IndexOutOfBounds()']) };
-
-
- 
 
 describe('AddressSet', function () {
     let signer1: HardhatEthersSigner;

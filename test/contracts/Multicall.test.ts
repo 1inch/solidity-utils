@@ -1,8 +1,6 @@
 import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
 import { expect } from '../../src/expect.js';
 
-
-
 describe('Multicall', function () {
     async function deployMulticallMock() {
         const MulticallMock = await ethers.getContractFactory('MulticallMock');

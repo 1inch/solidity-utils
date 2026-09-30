@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,18 +8,22 @@
 
 > **fixSignature**(`signature`): `string`
 
+Defined in: [src/utils.ts:387](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L387)
+
 ## Parameters
 
-• **signature**: `string`
+### signature
 
-The original signature string.
+`string`
+
+Hex-encoded 65-byte ECDSA signature.
 
 ## Returns
 
 `string`
 
-The corrected signature string.
+The signature with a normalized `v` value.
 
-## Defined in
+## See
 
-[src/utils.ts:346](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L346)
+https://github.com/ethereum/go-ethereum/blob/v1.8.23/internal/ethapi/api.go#L465

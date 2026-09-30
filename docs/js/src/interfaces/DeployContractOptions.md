@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,63 +6,93 @@
 
 # Interface: DeployContractOptions
 
-## Param
-
-Name of the contract to deploy.
+Defined in: [src/utils.ts:64](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L64)
 
 ## Param
 
-Arguments for the contract's constructor.
+**contractName**
+
+Name of the Hardhat contract artifact to deploy.
 
 ## Param
 
-Deployment facilitator object from Hardhat.
+**constructorArgs**
+
+Constructor arguments. Defaults to an empty array.
 
 ## Param
 
-Wallet deploying the contract.
+**env**
+
+Rocketh environment used to persist deployment records.
 
 ## Param
 
-Optional custom name for deployment.
+**deployments**
+
+Deprecated alias for `env`, retained for hardhat-deploy v1 migration.
 
 ## Param
 
-Skips Etherscan verification if true.
+**deployer**
+
+Address of the signer that deploys the contract.
 
 ## Param
 
-Avoids redeployment if contract already deployed.
+**deploymentName**
+
+Name used to store the deployment. Defaults to `contractName`.
 
 ## Param
 
-Gas strategy option.
+**skipVerify**
+
+Whether to skip block explorer verification. Defaults to `false`.
 
 ## Param
 
-Gas strategy option.
+**skipIfAlreadyDeployed**
+
+Whether to reuse an existing deployment from `env`. Defaults to `true`.
 
 ## Param
 
-Gas strategy option.
+**gasPrice**
+
+Legacy gas price for the deployment transaction.
 
 ## Param
 
-Toggles deployment logging.
+**maxPriorityFeePerGas**
+
+EIP-1559 priority fee for the deployment transaction.
 
 ## Param
 
-Number of confirmations to wait based on network. Usually it's need for waiting before Etherscan verification.
+**maxFeePerGas**
+
+EIP-1559 maximum fee for the deployment transaction.
+
+## Param
+
+**log**
+
+Whether to log deployment and verification status. Defaults to `true`.
+
+## Param
+
+**waitConfirmations**
+
+Confirmations to await. Defaults to 1 on development chains and 6 otherwise.
 
 ## Properties
 
 ### constructorArgs?
 
-> `optional` **constructorArgs**: `any`[]
+> `optional` **constructorArgs?**: `any`[]
 
-#### Defined in
-
-[src/utils.ts:32](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L32)
+Defined in: [src/utils.ts:67](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L67)
 
 ***
 
@@ -70,9 +100,7 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 > **contractName**: `string`
 
-#### Defined in
-
-[src/utils.ts:30](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L30)
+Defined in: [src/utils.ts:65](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L65)
 
 ***
 
@@ -80,96 +108,84 @@ Number of confirmations to wait based on network. Usually it's need for waiting 
 
 > **deployer**: `string`
 
-#### Defined in
-
-[src/utils.ts:34](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L34)
+Defined in: [src/utils.ts:70](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L70)
 
 ***
 
 ### deploymentName?
 
-> `optional` **deploymentName**: `string`
+> `optional` **deploymentName?**: `string`
 
-#### Defined in
-
-[src/utils.ts:35](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L35)
+Defined in: [src/utils.ts:71](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L71)
 
 ***
 
-### deployments
+### deployments?
 
-> **deployments**: `DeploymentsExtension`
+> `optional` **deployments?**: `Environment`\<`UnresolvedUnknownNamedAccounts`, `UnresolvedNetworkSpecificData`, `UnknownDeployments`, `Record`\<`string`, `unknown`\>\>
 
-#### Defined in
+Defined in: [src/utils.ts:69](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L69)
 
-[src/utils.ts:33](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L33)
+***
+
+### env?
+
+> `optional` **env?**: `Environment`\<`UnresolvedUnknownNamedAccounts`, `UnresolvedNetworkSpecificData`, `UnknownDeployments`, `Record`\<`string`, `unknown`\>\>
+
+Defined in: [src/utils.ts:68](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L68)
 
 ***
 
 ### gasPrice?
 
-> `optional` **gasPrice**: `bigint`
+> `optional` **gasPrice?**: `bigint`
 
-#### Defined in
-
-[src/utils.ts:38](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L38)
+Defined in: [src/utils.ts:74](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L74)
 
 ***
 
 ### log?
 
-> `optional` **log**: `boolean`
+> `optional` **log?**: `boolean`
 
-#### Defined in
-
-[src/utils.ts:41](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L41)
+Defined in: [src/utils.ts:77](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L77)
 
 ***
 
 ### maxFeePerGas?
 
-> `optional` **maxFeePerGas**: `bigint`
+> `optional` **maxFeePerGas?**: `bigint`
 
-#### Defined in
-
-[src/utils.ts:40](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L40)
+Defined in: [src/utils.ts:76](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L76)
 
 ***
 
 ### maxPriorityFeePerGas?
 
-> `optional` **maxPriorityFeePerGas**: `bigint`
+> `optional` **maxPriorityFeePerGas?**: `bigint`
 
-#### Defined in
-
-[src/utils.ts:39](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L39)
+Defined in: [src/utils.ts:75](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L75)
 
 ***
 
 ### skipIfAlreadyDeployed?
 
-> `optional` **skipIfAlreadyDeployed**: `boolean`
+> `optional` **skipIfAlreadyDeployed?**: `boolean`
 
-#### Defined in
-
-[src/utils.ts:37](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L37)
+Defined in: [src/utils.ts:73](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L73)
 
 ***
 
 ### skipVerify?
 
-> `optional` **skipVerify**: `boolean`
+> `optional` **skipVerify?**: `boolean`
 
-#### Defined in
-
-[src/utils.ts:36](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L36)
+Defined in: [src/utils.ts:72](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L72)
 
 ***
 
 ### waitConfirmations?
 
-> `optional` **waitConfirmations**: `number`
+> `optional` **waitConfirmations?**: `number`
 
-#### Defined in
-
-[src/utils.ts:42](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L42)
+Defined in: [src/utils.ts:78](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L78)

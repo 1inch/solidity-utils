@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,11 +6,15 @@
 
 # Function: permit2Address()
 
-> **permit2Address**(`chainId`?): `string`
+> **permit2Address**(`chainId?`): `string`
+
+Defined in: [src/permit.ts:155](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L155)
 
 ## Parameters
 
-• **chainId?**: `number`
+### chainId?
+
+`number`
 
 The ID of the blockchain network (optional).
 
@@ -19,7 +23,3 @@ The ID of the blockchain network (optional).
 `string`
 
 The corresponding Permit2 address.
-
-## Defined in
-
-[src/permit.ts:154](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L154)

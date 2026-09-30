@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,7 +8,9 @@
 
 > `const` **constants**: `object`
 
-## Type declaration
+Defined in: [src/prelude.ts:5](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/prelude.ts#L5)
+
+## Type Declaration
 
 ### DEV\_CHAINS
 
@@ -49,7 +51,3 @@
 ### ZERO\_BYTES32
 
 > `readonly` **ZERO\_BYTES32**: `"0x0000000000000000000000000000000000000000000000000000000000000000"` = `'0x0000000000000000000000000000000000000000000000000000000000000000'`
-
-## Defined in
-
-[src/prelude.ts:4](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/prelude.ts#L4)

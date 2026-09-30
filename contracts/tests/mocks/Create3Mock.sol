@@ -13,5 +13,3 @@ contract Create3Mock {
         return Create3.addressOf(salt);
     }
 }
-
-

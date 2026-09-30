@@ -4,10 +4,6 @@ import { constants, ether } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 import { encodeBytes32String, getAddress } from 'ethers';
 
-
-
- 
-
 describe('UniERC20', function () {
     let signer1: HardhatEthersSigner;
     let signer2: HardhatEthersSigner;

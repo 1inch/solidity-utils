@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,21 +8,31 @@
 
 > **domainSeparator**(`name`, `version`, `chainId`, `verifyingContract`): `string`
 
+Defined in: [src/permit.ts:74](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L74)
+
 ## Parameters
 
-• **name**: `string`
+### name
+
+`string`
 
 The user readable name of EIP-712 domain.
 
-• **version**: `string`
+### version
+
+`string`
 
 The version of the EIP-712 domain.
 
-• **chainId**: `string`
+### chainId
+
+`string`
 
 The unique identifier for the blockchain network.
 
-• **verifyingContract**: `string`
+### verifyingContract
+
+`string`
 
 The Ethereum address of the contract that will verify the signature. This ties the signature to a specific contract.
 
@@ -31,7 +41,3 @@ The Ethereum address of the contract that will verify the signature. This ties t
 `string`
 
 The domain separator as a hex string.
-
-## Defined in
-
-[src/permit.ts:73](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L73)

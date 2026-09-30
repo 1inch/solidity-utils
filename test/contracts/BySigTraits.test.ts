@@ -3,8 +3,6 @@ import { constants } from '../../src/prelude.js';
 import { expect } from '../../src/expect.js';
 import { NonceType, buildBySigTraits } from '../../src/bySig.js';
 
-
-
 describe('BySigTraits', function () {
     async function deployAddressArrayMock() {
         const BySigTraits = await ethers.getContractFactory('BySigTraitsMock');
