@@ -5,7 +5,7 @@ import { Networks, getNetwork } from './hardhat-setup/networks.js';
 
 const { networks, etherscan } = new Networks();
 
-const hardhatNetwork = networks.hardhat;
+const hardhatNetwork = networks.default;
 const evmVersion =
     hardhatNetwork?.type === 'edr-simulated'
         ? hardhatNetwork.hardfork || 'cancun'

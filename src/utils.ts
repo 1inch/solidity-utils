@@ -175,6 +175,7 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
 export async function deployAndGetContractWithCreate3(
     options: DeployContractOptionsWithCreate3,
 ): Promise<Contract> {
+    const networkName = (await network.getOrCreate()).networkName;
     const {
         create3Deployer,
         salt,
@@ -187,11 +188,10 @@ export async function deployAndGetContractWithCreate3(
         gasPrice,
         maxPriorityFeePerGas,
         maxFeePerGas,
-        waitConfirmations = 1,
+        waitConfirmations = constants.DEV_CHAINS.includes(networkName) ? 1 : 6,
     } = options;
     const env = resolveEnv(options);
     const signer = txSigner ?? (await ethers.getSigners())[0];
-    const networkName = (await network.getOrCreate()).networkName;
 
     const artifact = await artifacts.readArtifact(contractName);
     if (skipIfAlreadyDeployed && env) {

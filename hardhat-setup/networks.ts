@@ -128,27 +128,24 @@ export class Networks {
         }
 
         if (useHardhat || forkingNetworkName) {
-            this.networks.hardhat = {
+            this.networks.default = {
                 type: 'edr-simulated',
                 chainType: 'l1',
                 chainId: Number(process.env.FORK_CHAIN_ID) || 31337,
                 hardfork: 'cancun',
             };
             if (forkingAccounts) {
-                this.networks.hardhat.accounts = forkingAccounts;
+                this.networks.default.accounts = forkingAccounts;
             }
-        }
 
-        if (forkingNetworkName) {
-            const forkRpcKey = `${forkingNetworkName.toUpperCase()}_RPC_URL`;
-            const forkRpcEnv = process.env[forkRpcKey];
-            if (!forkRpcEnv) {
-                throw new Error(`Missing required environment variable '${forkRpcKey}'. Did you forget to call loadEnv() or set autoLoadEnv to true?`);
-            }
-            const { url, authKeyHttpHeader } = parseRpcEnv(forkRpcEnv);
-            const hardhatNet = this.networks.hardhat;
-            if (hardhatNet?.type === 'edr-simulated') {
-                hardhatNet.forking = {
+            if (forkingNetworkName) {
+                const forkRpcKey = `${forkingNetworkName.toUpperCase()}_RPC_URL`;
+                const forkRpcEnv = process.env[forkRpcKey];
+                if (!forkRpcEnv) {
+                    throw new Error(`Missing required environment variable '${forkRpcKey}'. Did you forget to call loadEnv() or set autoLoadEnv to true?`);
+                }
+                const { url, authKeyHttpHeader } = parseRpcEnv(forkRpcEnv);
+                this.networks.default.forking = {
                     url,
                     httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
                 };
