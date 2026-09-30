@@ -9,12 +9,12 @@ As a contributor, you are expected to fork this repository, work on your own for
 
 ## A typical workflow
 
-1) Before contributing any changes it is a good practice to open an issue and provide the reasoning for the changes   
+1) Before contributing any changes it is a good practice to open an issue and provide the reasoning for the changes
 1) Make sure your fork is up to date with the main repository
 2) Update all dependencies to the latest version
 	```
 	yarn
-	``` 
+	```
 3) Branch out from `master` into `fix/some-bug-#123`
 (Postfixing #123 will associate your PR with the issue #123)
 4) Make your changes, add your files, commit and push to your fork.

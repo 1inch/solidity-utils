@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./AddressArray.sol";
+import { AddressArray } from "./AddressArray.sol";
 
 /**
  * @title AddressSet

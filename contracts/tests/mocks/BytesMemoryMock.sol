@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/BytesMemory.sol";
+import { BytesMemory } from "../../libraries/BytesMemory.sol";
 
 contract BytesMemoryMock {
     using BytesMemory for BytesMemory.Slice;
@@ -20,7 +20,7 @@ contract BytesMemoryMock {
         return data.slice(offset, size);
     }
 
-    function wrapAndUnwrap(bytes memory data) external view returns (bytes memory ret) {
+    function wrapAndUnwrap(bytes calldata data) external view returns (bytes memory ret) {
         return wrap(data).unwrap();
     }
 

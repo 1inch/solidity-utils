@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/CalldataParse.sol";
+import { CalldataParse, CalldataWord } from "../../libraries/CalldataParse.sol";
 
 contract CalldataParseMock {
     using CalldataParse for bytes;

@@ -5,6 +5,7 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -17,6 +18,18 @@ jobs:
       - run: yarn
       - run: yarn lint
 
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: "yarn"
+      - run: yarn
+      - run: yarn typechain
+      - run: yarn typecheck
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +40,7 @@ jobs:
           cache: "yarn"
       - run: yarn
       - run: yarn typechain
-      - run: yarn test:ci
+      - run: yarn test
 
   # Check disabled meanwhile we figure out how to handle codecov as company asset.
   # https://1inch.atlassian.net/browse/ITSM-1394

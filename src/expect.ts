@@ -1,4 +1,7 @@
-import { Assertion, assert, expect, config, should } from 'chai';
+import { Assertion, assert, expect, config, should, use } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+
+use(chaiAsPromised as never);
 
 /**
  * @category expect

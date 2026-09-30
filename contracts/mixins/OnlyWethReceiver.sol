@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "./EthReceiver.sol";
+import { EthReceiver } from "./EthReceiver.sol";
 
 /**
  * @title OnlyWethReceiver

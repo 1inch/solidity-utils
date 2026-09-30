@@ -3,8 +3,8 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../libraries/UniERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { UniERC20 } from "../../libraries/UniERC20.sol";
 
 interface IUniERC20Wrapper {
     function transferFrom(

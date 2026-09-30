@@ -31,6 +31,7 @@ contract USDCLikePermitMock is ERC20Permit {
      * @param deadline    The time at which the signature expires (unix time), or max uint256 value to signal no expiration
      * @param signature   Signature bytes signed by an EOA wallet or a contract wallet
      */
+    // solhint-disable-next-line gas-calldata-parameters
     function permit(
         address owner,
         address spender,

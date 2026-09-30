@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,20 +6,24 @@
 
 # Function: getEthPrice()
 
-> **getEthPrice**(`nativeTokenSymbol`): `Promise`\<`bigint`\>
+> **getEthPrice**(`nativeTokenSymbol?`): `Promise`\<`bigint`\>
+
+Defined in: [src/utils.ts:439](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L439)
 
 ## Parameters
 
-• **nativeTokenSymbol**: `string` = `'ETH'`
+### nativeTokenSymbol?
 
-The symbol of the native token for which the price is being fetched, defaults to 'ETH'.
+`string` = `'ETH'`
+
+Native token symbol. Defaults to `ETH`.
 
 ## Returns
 
 `Promise`\<`bigint`\>
 
-The price of the specified native token in USD, scaled by 1e18 to preserve precision.
+The USD price multiplied by 1e18.
 
-## Defined in
+## Throws
 
-[src/utils.ts:405](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L405)
+If the Coinbase response does not contain a parseable amount.

@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,6 +8,14 @@
 
 > `const` **Permit**: `object`[]
 
-## Defined in
+Defined in: [src/permit.ts:24](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L24)
 
-[src/permit.ts:23](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L23)
+## Type Declaration
+
+### name
+
+> **name**: `string` = `'owner'`
+
+### type
+
+> **type**: `string` = `'address'`

@@ -5,6 +5,8 @@ coverage
 coverage.json
 dist
 typechain-types
+types
+generated
 .coverage_contracts
 .coverage_artifacts
 .env*

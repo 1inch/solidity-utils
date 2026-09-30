@@ -1,14 +1,11 @@
-import { expect } from '../../src/expect';
-import { ether } from '../../src/prelude';
-import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
-import type { RescuableMock } from '../../typechain-types/contracts/tests/mocks/RescuableMock';
-import type { NoReceiveOwnerMock } from '../../typechain-types/contracts/tests/mocks/NoReceiveOwnerMock';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
+import { expect } from '../../src/expect.js';
+import { ether } from '../../src/prelude.js';
 
 describe('Rescuable', function () {
-    let owner: SignerWithAddress;
-    let nonOwner: SignerWithAddress;
+    let owner: HardhatEthersSigner;
+    let nonOwner: HardhatEthersSigner;
 
     before(async function () {
         [owner, nonOwner] = await ethers.getSigners();
@@ -16,7 +13,7 @@ describe('Rescuable', function () {
 
     async function deployRescuableMock() {
         const RescuableMockFactory = await ethers.getContractFactory('RescuableMock');
-        const mock = await RescuableMockFactory.deploy(owner.address) as unknown as RescuableMock;
+        const mock = await RescuableMockFactory.deploy(owner.address);
 
         const TokenMock = await ethers.getContractFactory('TokenMock');
         const token = await TokenMock.deploy('Test Token', 'TT');
@@ -106,7 +103,7 @@ describe('Rescuable', function () {
             await owner.sendTransaction({ to: mock, value: amount });
 
             const NoReceiveOwnerMockFactory = await ethers.getContractFactory('NoReceiveOwnerMock');
-            const noReceiveOwner = await NoReceiveOwnerMockFactory.deploy(mock) as unknown as NoReceiveOwnerMock;
+            const noReceiveOwner = await NoReceiveOwnerMockFactory.deploy(mock);
 
             await mock.transferOwnership(noReceiveOwner);
 

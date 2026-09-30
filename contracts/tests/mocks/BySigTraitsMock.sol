@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/BySigTraits.sol";
+import { BySigTraits } from "../../libraries/BySigTraits.sol";
 
 contract BySigTraitsMock {
     using BySigTraits for BySigTraits.Value;

@@ -46,7 +46,6 @@ jobs:
           } >> "$GITHUB_OUTPUT"
         shell: bash
 
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:

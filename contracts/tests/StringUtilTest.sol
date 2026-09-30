@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.0;
 
-import "../libraries/StringUtil.sol";
-import "./libraries/StringUtilNaive.sol";
+import { StringUtil } from "../libraries/StringUtil.sol";
+import { StringUtilNaive } from "./libraries/StringUtilNaive.sol";
 
 contract StringUtilTest {
     function toHex(uint256 value)
@@ -14,6 +14,7 @@ contract StringUtilTest {
         return StringUtil.toHex(value);
     }
 
+    // solhint-disable-next-line gas-calldata-parameters
     function toHexBytes(bytes memory data)
         external
         pure
@@ -30,6 +31,7 @@ contract StringUtilTest {
         return StringUtilNaive.toHex(value);
     }
 
+    // solhint-disable-next-line gas-calldata-parameters
     function toHexNaiveBytes(bytes memory data)
         external
         pure

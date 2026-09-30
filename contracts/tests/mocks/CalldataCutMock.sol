@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "../../libraries/CalldataCut.sol";
+import { CalldataCut } from "../../libraries/CalldataCut.sol";
 
 contract CalldataCutMock {
     error TestError();

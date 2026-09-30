@@ -1,3 +1,5 @@
+> **Note:** `solidity-docgen` DOES NOT WORK WITH Hardhat 3. Tracking: [OpenZeppelin/solidity-docgen#471](https://github.com/OpenZeppelin/solidity-docgen/issues/471).
+
 # Setting Up Documentation Generation with Docgen
 
 To generate documentation using **solidity-docgen**, follow these steps:

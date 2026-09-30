@@ -1,6 +1,5 @@
-import { expect } from '../../src/expect';
-import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
-import { ethers } from 'hardhat';
+import { ethers, loadFixture } from '../../src/hardhatHelpers.js';
+import { expect } from '../../src/expect.js';
 
 describe('RevertReasonParser', function () {
     async function deployRevertReasonParserTest() {
@@ -8,7 +7,6 @@ describe('RevertReasonParser', function () {
         const revertReasonParserTest = await RevertReasonParserTest.deploy();
         return { revertReasonParserTest };
     }
-
 
     it('should be parsed as Unknown (Invalid revert reason)', async function () {
         const { revertReasonParserTest } = await loadFixture(deployRevertReasonParserTest);

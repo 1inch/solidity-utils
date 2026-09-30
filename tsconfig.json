@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
+    "target": "es2023",
+    "module": "node20",
+    "lib": ["es2023"],
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
@@ -16,8 +17,18 @@
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "strictNullChecks": true,
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["es2020", "dom", "esnext"],
     "skipLibCheck": true,
-  }
+    "types": ["node", "mocha"],
+    "allowImportingTsExtensions": false
+  },
+  "exclude": [
+    "dist",
+    "node_modules",
+    "artifacts",
+    "cache",
+    "coverage",
+    "typechain-types",
+    "types",
+    "generated"
+  ]
 }
