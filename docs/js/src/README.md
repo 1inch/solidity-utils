@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../README.md) • **Docs**
+[**@1inch/solidity-utils**](../README.md)
 
 ***
 
@@ -6,9 +6,13 @@
 
 # src
 
-## Index
+## expect
+Asserts that two values are roughly equal within a specified relative difference.
+This function is useful for cases where precision issues might cause direct comparisons to fail.
 
-### Other
+- [assertRoughlyEqualValues](functions/assertRoughlyEqualValues.md)
+
+## Other
 
 - [NonceType](enumerations/NonceType.md)
 - [SignedCallStruct](interfaces/SignedCallStruct.md)
@@ -17,20 +21,18 @@
 - [defaultDeadline](variables/defaultDeadline.md)
 - [defaultDeadlinePermit2](variables/defaultDeadlinePermit2.md)
 - [EIP712Domain](variables/EIP712Domain.md)
+- [ethers](variables/ethers.md)
+- [loadFixture](variables/loadFixture.md)
 - [Permit](variables/Permit.md)
 - [PERMIT2\_ADDRESS\_ZKSYNC](variables/PERMIT2_ADDRESS_ZKSYNC.md)
+- [setCode](variables/setCode.md)
+- [time](variables/time.md)
 - [TypedDataVersion](variables/TypedDataVersion.md)
 - [buildBySigTraits](functions/buildBySigTraits.md)
 - [hashBySig](functions/hashBySig.md)
 - [signSignedCall](functions/signSignedCall.md)
 
-### expect
-Asserts that two values are roughly equal within a specified relative difference.
-This function is useful for cases where precision issues might cause direct comparisons to fail.
-
-- [assertRoughlyEqualValues](functions/assertRoughlyEqualValues.md)
-
-### permit
+## permit
 Compresses a permit function call to a shorter format based on its type.
   Type         | EIP-2612 | DAI | Permit2
   Uncompressed |    224   | 256 | 352
@@ -38,184 +40,185 @@ Compresses a permit function call to a shorter format based on its type.
 
 - [compressPermit](functions/compressPermit.md)
 
-### permit
+## permit
 Concatenates a target address with data, trimming the '0x' prefix from the data.
 
 - [withTarget](functions/withTarget.md)
 
-### permit
+## permit
 Constructs structured data for EIP-2612 permit function, including types, domain, and message with details about the permit.
 
 - [buildData](functions/buildData.md)
 
-### permit
+## permit
 Creates a permit for spending tokens on Permit2 standard contracts.
 
 - [getPermit2](functions/getPermit2.md)
 
-### permit
+## permit
 Decompresses a compressed permit function call back to its original full format.
 
 - [decompressPermit](functions/decompressPermit.md)
 
-### permit
+## permit
 Ensures contract code is set for a given address and returns a contract instance.
 
 - [permit2Contract](functions/permit2Contract.md)
 
-### permit
+## permit
 Generates a Dai-like permit signature for tokens.
 
 - [getPermitLikeDai](functions/getPermitLikeDai.md)
 
-### permit
-Generates a ERC-7597 permit signature for tokens.
-
-- [getPermitLikeUSDC](functions/getPermitLikeUSDC.md)
-
-### permit
+## permit
 Generates a domain separator for EIP-712 structured data using the provided parameters.
 
 - [domainSeparator](functions/domainSeparator.md)
 
-### permit
+## permit
+Generates a ERC-7597 permit signature for tokens.
+
+- [getPermitLikeUSDC](functions/getPermitLikeUSDC.md)
+
+## permit
 Generates a permit signature for ERC20 tokens with EIP-2612 standard.
 
 - [getPermit](functions/getPermit.md)
 
-### permit
+## permit
 Prepares structured data similar to the Dai permit function, including types, domain, and message with permit details.
 
 - [buildDataLikeDai](functions/buildDataLikeDai.md)
 
-### permit
+## permit
 Removes the '0x' prefix from a string. If no '0x' prefix is found, returns the original string.
 
 - [trim0x](functions/trim0x.md)
 
-### permit
+## permit
 Returns the Permit2 contract address for the specified chain.
 
 - [permit2Address](functions/permit2Address.md)
 
-### permit
+## permit
 Trims the method selector from transaction data, removing the first 8 characters (4 bytes of hexable string) after '0x' prefix.
 
 - [cutSelector](functions/cutSelector.md)
 
-### prelude
+## prelude
 Converts an Ether amount represented as a string into its Wei equivalent as a bigint.
 
 - [ether](functions/ether.md)
 
-### profileEVM
+## profileEVM
 Default configuration options for the `gasspectEVM` function to analyze gas usage in EVM transactions.
 
 - [gasspectOptionsDefault](variables/gasspectOptionsDefault.md)
 
-### profileEVM
+## profileEVM
+Measures pure execution gas of a transaction using `debug_traceTransaction`.
+Unlike `receipt.gasUsed`, this excludes intrinsic gas overhead (21000 base + calldata costs),
+giving a cleaner comparison of contract execution costs.
+
+- [executionGas](functions/executionGas.md)
+
+## profileEVM
 Performs gas analysis on EVM transactions, highlighting operations that exceed a specified gas cost.
 Analyzes gas usage by operations within a transaction, applying filters and formatting based on options.
 
 - [gasspectEVM](functions/gasspectEVM.md)
 
-### profileEVM
+## profileEVM
 Profiles EVM execution by counting occurrences of specified instructions in a transaction's execution trace.
 
 - [profileEVM](functions/profileEVM.md)
 
-### utils
+## utils
+
+- [DeploymentRecord](type-aliases/DeploymentRecord.md)
+- [TrackReceivedTokenAndTxResult](type-aliases/TrackReceivedTokenAndTxResult.md)
+
+## utils
 Advances the blockchain time to a specific timestamp for testing purposes.
 
 - [timeIncreaseTo](functions/timeIncreaseTo.md)
 
-### utils
+## utils
 Corrects the ECDSA signature 'v' value according to Ethereum's standard.
+Geth returns 27 or 28, while some clients return 0 or 1. Values below 27 are
+shifted to prevent signature malleability caused by mixed representations.
 
 - [fixSignature](functions/fixSignature.md)
 
-### utils
-Counts the occurrences of specified EVM instructions in a transaction's execution trace.
+## utils
+Counts occurrences of EVM instructions in a transaction trace.
 
 - [countInstructions](functions/countInstructions.md)
 
-### utils
-Deploys a contract from bytecode, useful for testing and deployment of minimal proxies.
+## utils
+Deploys a contract directly from its ABI and bytecode.
+This is useful for tests and for bytecode without a named Hardhat artifact.
 
 - [deployContractFromBytecode](functions/deployContractFromBytecode.md)
 
-### utils
+## utils
 Deploys a contract given a name and optional constructor parameters.
 
 - [deployContract](functions/deployContract.md)
 
-### utils
-Deploys a contract using create3 and saves the deployment information.
+## utils
+Deploys a contract through CREATE3 and optionally persists the deployment in Rocketh.
 
 - [deployAndGetContractWithCreate3](functions/deployAndGetContractWithCreate3.md)
 
-### utils
-Deploys a contract with optional Etherscan verification.
+## utils
+Deploys a contract, optionally persists it in Rocketh, and verifies it on a block explorer.
+Existing records are reused when `skipIfAlreadyDeployed` is enabled.
 
 - [deployAndGetContract](functions/deployAndGetContract.md)
 
-### utils
-Options for deployment methods with create3. This is an extension of DeployContractOptions without `deployer` and `skipIfAlreadyDeployed`.
+## utils
+Options for create3 deployment methods.
 
 - [DeployContractOptionsWithCreate3](interfaces/DeployContractOptionsWithCreate3.md)
 
-### utils
+## utils
 Options for deployment methods.
 
 - [DeployContractOptions](interfaces/DeployContractOptions.md)
 
-### utils
-Represents a tuple containing a token quantity and either a transaction receipt or a recursive instance of the same tuple type.
-This type is used in `trackReceivedTokenAndTx` method to track token transfers and their transaction receipts in a nested structure,
-allowing for handling of complex scenarios like chained or batched transactions and tracking several tokens.
- - `result[0]`: The amount of the token received.
- - `result[1]`: The transaction receipt or another nested token tracking result.
-
-- [TrackReceivedTokenAndTxResult](type-aliases/TrackReceivedTokenAndTxResult.md)
-
-### utils
-Represents the interface for a token, providing methods to fetch its balance and address.
-This type is used in `trackReceivedTokenAndTx` method.
-
-- [Token](type-aliases/Token.md)
-
-### utils
-Retrieves the current USD price of ETH or another specified native token.
-This helper function is designed for use in test environments to maintain stability against market fluctuations.
-It fetches the current price of ETH (or a specified native token for side chains) in USD from the Coinbase API to
-ensure that tests remain stable and unaffected by significant market price fluctuations when token price is
-important part of test.
+## utils
+Retrieves the current USD spot price of a native token from Coinbase.
+Intended for tests that need a current reference price while preserving bigint precision.
 
 - [getEthPrice](functions/getEthPrice.md)
 
-### utils
+## utils
 Saves the deployment information using the deploy transaction hash.
+The contract address is derived from the CREATE3 deployer and salt.
 
 - [saveContractWithCreate3Deployment](functions/saveContractWithCreate3Deployment.md)
 
-### utils
+## utils
 Sets custom bytecode for local test accounts and returns them as signers.
-This helper is intended for test environments (e.g., Hardhat) where deploying or modifying contract code
-at known addresses is required. It allows setting the same or different bytecode for multiple accounts.
-
-Primarily useful for ensuring accounts start with empty code. For example, with the introduction of EIP-7702
-on some networks, default accounts (like the first few returned by `ethers.getSigners()`) may already have
-forwarding contracts deployed to them, which can break assumptions in tests.
+This is useful when EIP-7702 or another fixture leaves code on default accounts
+and a test requires empty or explicitly controlled account bytecode.
 
 - [getAccountsWithCode](functions/getAccountsWithCode.md)
 
-### utils
+## utils
 Signs a message with a given signer and fixes the signature format.
 
 - [signMessage](functions/signMessage.md)
 
-### utils
-Tracks token balance changes and transaction receipts for specified wallet addresses during test scenarios.
-It could be used recursively for multiple tokens via specific `txPromise` function.
+## utils
+Token interface for trackReceivedTokenAndTx.
+
+- [Token](type-aliases/Token.md)
+
+## utils
+Tracks the amount of ERC-20 tokens or native currency received while executing a transaction.
+Calls can be nested by returning another `TrackReceivedTokenAndTxResult` from `txPromise`.
+Native-currency transaction fees are added back when the tracked wallet sends the transaction.
 
 - [trackReceivedTokenAndTx](functions/trackReceivedTokenAndTx.md)

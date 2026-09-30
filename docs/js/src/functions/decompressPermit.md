@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,21 +8,31 @@
 
 > **decompressPermit**(`permit`, `token`, `owner`, `spender`): `string`
 
+Defined in: [src/permit.ts:422](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/permit.ts#L422)
+
 ## Parameters
 
-• **permit**: `string`
+### permit
+
+`string`
 
 The compressed permit function call string.
 
-• **token**: `string`
+### token
+
+`string`
 
 The token address involved in the permit (for Permit2 type).
 
-• **owner**: `string`
+### owner
+
+`string`
 
 The owner address involved in the permit.
 
-• **spender**: `string`
+### spender
+
+`string`
 
 The spender address involved in the permit.
 
@@ -31,7 +41,3 @@ The spender address involved in the permit.
 `string`
 
 The decompressed permit function call string.
-
-## Defined in
-
-[src/permit.ts:421](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/permit.ts#L421)

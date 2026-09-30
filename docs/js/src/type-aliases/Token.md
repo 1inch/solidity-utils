@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,38 +6,48 @@
 
 # Type Alias: Token
 
-> **Token**: `object`
+> **Token** = `object`
 
-## Type declaration
+Defined in: [src/utils.ts:332](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L332)
 
-### balanceOf()
+## Param
+
+**balanceOf**
+
+Returns the token balance of an account.
+
+## Param
+
+**getAddress**
+
+Returns the token contract address.
+
+## Properties
+
+### balanceOf
 
 > **balanceOf**: (`address`) => `Promise`\<`bigint`\>
 
+Defined in: [src/utils.ts:333](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L333)
+
 #### Parameters
 
-• **address**: `string`
+##### address
+
+`string`
 
 #### Returns
 
 `Promise`\<`bigint`\>
 
-### getAddress()
+***
+
+### getAddress
 
 > **getAddress**: () => `Promise`\<`string`\>
+
+Defined in: [src/utils.ts:334](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/utils.ts#L334)
 
 #### Returns
 
 `Promise`\<`string`\>
-
-## Param
-
-Method which retrieves the balance of the specified address.
-
-## Param
-
-Method which retrieves the token contract's address.
-
-## Defined in
-
-[src/utils.ts:293](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/utils.ts#L293)

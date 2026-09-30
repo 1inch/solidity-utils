@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -6,15 +6,15 @@
 
 # Interface: SignedCallStruct
 
+Defined in: [src/bySig.ts:50](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L50)
+
 ## Properties
 
 ### data
 
 > **data**: `string`
 
-#### Defined in
-
-[src/bySig.ts:53](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L53)
+Defined in: [src/bySig.ts:52](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L52)
 
 ***
 
@@ -22,6 +22,4 @@
 
 > **traits**: `bigint`
 
-#### Defined in
-
-[src/bySig.ts:52](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L52)
+Defined in: [src/bySig.ts:51](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L51)

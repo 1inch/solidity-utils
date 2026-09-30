@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,31 +8,45 @@
 
 > **signSignedCall**(`name`, `version`, `chainId`, `verifyingContract`, `signer`, `signedCall`): `Promise`\<`string`\>
 
+Defined in: [src/bySig.ts:85](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/bySig.ts#L85)
+
 Signs a given data for {bySig} contract call using EIP-712 standard.
 
 ## Parameters
 
-• **name**: `string`
+### name
+
+`string`
 
 The user readable name of EIP-712 domain.
 
-• **version**: `string`
+### version
+
+`string`
 
 The version of the EIP-712 domain.
 
-• **chainId**: `string` \| `bigint`
+### chainId
+
+`string` \| `bigint`
 
 The unique identifier for the blockchain network.
 
-• **verifyingContract**: `string`
+### verifyingContract
+
+`string`
 
 The Ethereum address of the contract that will verify the signature. This ties the signature to a specific contract.
 
-• **signer**: `Wallet` \| `HardhatEthersSigner`
+### signer
+
+`Wallet` \| `HardhatEthersSigner`
 
 The wallet or signer to sign the data.
 
-• **signedCall**: [`SignedCallStruct`](../interfaces/SignedCallStruct.md)
+### signedCall
+
+[`SignedCallStruct`](../interfaces/SignedCallStruct.md)
 
 The call data to be signed, consisting of traits and data.
 
@@ -41,7 +55,3 @@ The call data to be signed, consisting of traits and data.
 `Promise`\<`string`\>
 
 A Promise that resolves to the signature.
-
-## Defined in
-
-[src/bySig.ts:86](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/bySig.ts#L86)

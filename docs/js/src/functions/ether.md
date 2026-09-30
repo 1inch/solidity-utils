@@ -1,4 +1,4 @@
-[**@1inch/solidity-utils**](../../README.md) • **Docs**
+[**@1inch/solidity-utils**](../../README.md)
 
 ***
 
@@ -8,9 +8,13 @@
 
 > **ether**(`n`): `bigint`
 
+Defined in: [src/prelude.ts:24](https://github.com/1inch/solidity-utils/blob/59968ee28ebe64663c124f86940195eaff18d672/src/prelude.ts#L24)
+
 ## Parameters
 
-• **n**: `string`
+### n
+
+`string`
 
 The amount of Ether to convert, specified as a string.
 
@@ -19,7 +23,3 @@ The amount of Ether to convert, specified as a string.
 `bigint`
 
 The equivalent amount in Wei as a bigint.
-
-## Defined in
-
-[src/prelude.ts:26](https://github.com/1inch/solidity-utils/blob/e55abfe68c10404192d68f588ca6478bef617d94/src/prelude.ts#L26)
