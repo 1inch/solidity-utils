@@ -1,7 +1,5 @@
 import { parseUnits } from 'ethers';
 
-export { time } from './hardhatHelpers.js';
-
 export const constants = {
     ZERO_ADDRESS: '0x0000000000000000000000000000000000000000',
     EEE_ADDRESS: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',

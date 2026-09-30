@@ -1,6 +1,6 @@
-import { ethers, loadFixture } from '../src/hardhatHelpers.js';
+import { ethers, loadFixture, time } from '../src/hardhatHelpers.js';
 import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/types';
-import { ether, time, constants } from '../src/prelude.js';
+import { ether, constants } from '../src/prelude.js';
 import {
     timeIncreaseTo, fixSignature, signMessage, trackReceivedTokenAndTx,
     countInstructions, deployContract, deployAndGetContract, deployContractFromBytecode,

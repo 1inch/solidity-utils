@@ -195,7 +195,7 @@ export async function deployAndGetContractWithCreate3(
 
     const artifact = await artifacts.readArtifact(contractName);
     if (skipIfAlreadyDeployed && env) {
-        const contractDeployment = env.getOrNull(contractName);
+        const contractDeployment = env.getOrNull(deploymentName);
         if (contractDeployment != null && artifact.deployedBytecode === contractDeployment.deployedBytecode) {
             console.log(`Contract ${contractName} is already deployed at ${contractDeployment.address}`);
             return await ethers.getContractAt(contractName, contractDeployment.address);
