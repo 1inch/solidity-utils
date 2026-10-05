@@ -10,30 +10,7 @@ permissions:
 
 jobs:
   publish-npmjs:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: 'yarn'
-          registry-url: 'https://registry.npmjs.org'
-      - run: yarn
-      - run: npm publish
+    uses: 1inch/ci-workflow-protocol/.github/workflows/publish.yml@v1
 
   publish-github:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: 'yarn'
-      - run: yarn
-      - name: Auth in GitHub private registry npm
-        run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
-          echo "@1inch:registry=https://npm.pkg.github.com" >> .npmrc
-      - run: yarn publish
+    uses: 1inch/ci-workflow-protocol/.github/workflows/publish-github-packages.yml@v1

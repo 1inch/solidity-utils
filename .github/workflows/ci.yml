@@ -1,60 +1,48 @@
 name: CI
-
 on:
+  pull_request:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: "yarn"
-      - run: yarn
-      - run: yarn lint
+  ci:
+    uses: 1inch/ci-workflow-protocol/.github/workflows/hardhat-ci.yml@v1
+    with:
+      profile: default
+      sources: contracts
+      snapshot: false
+      lint: true
+      coverage: true
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   typecheck:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: "yarn"
-      - run: yarn
-      - run: yarn typechain
-      - run: yarn typecheck
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: "yarn"
-      - run: yarn
-      - run: yarn typechain
-      - run: yarn test
+          node-version: 24
+          cache: yarn
 
-  # Check disabled meanwhile we figure out how to handle codecov as company asset.
-  # https://1inch.atlassian.net/browse/ITSM-1394
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: 'yarn'
-      - run: yarn
-      - run: yarn typechain
-      - run: yarn coverage
-      - uses: codecov/codecov-action@v7
-        with:
-            token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Install node modules
+        run: yarn install --frozen-lockfile
+
+      - name: Generate types
+        run: yarn typechain
+
+      - name: Run typecheck
+        run: yarn typecheck
