@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   ci:
-    uses: 1inch/ci-workflow-protocol/.github/workflows/hardhat-ci.yml@v1
+    uses: 1inch/ci-workflow-protocol/.github/workflows/hardhat-ci.yml@master
     with:
       profile: default
       sources: contracts

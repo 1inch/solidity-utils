@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   publish-npmjs:
-    uses: 1inch/ci-workflow-protocol/.github/workflows/publish.yml@v1
+    uses: 1inch/ci-workflow-protocol/.github/workflows/publish.yml@master
 
   publish-github:
-    uses: 1inch/ci-workflow-protocol/.github/workflows/publish-github-packages.yml@v1
+    uses: 1inch/ci-workflow-protocol/.github/workflows/publish-github-packages.yml@master

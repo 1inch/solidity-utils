@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   create-release:
-    uses: 1inch/ci-workflow-protocol/.github/workflows/release.yml@v1
+    uses: 1inch/ci-workflow-protocol/.github/workflows/release.yml@master
     with:
       tag-prefix: ''
       changelog: true
