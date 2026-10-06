@@ -2,7 +2,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [master, 'release/**']
+    branches: [main, 'release/**']
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   ci:
-    uses: 1inch/ci-workflow-protocol/.github/workflows/hardhat-ci.yml@master
+    uses: 1inch/ci-workflow-protocol/.github/workflows/hardhat-ci.yml@v1.0.0
     with:
       profile: default
       sources: contracts
