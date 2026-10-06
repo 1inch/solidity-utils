@@ -2,7 +2,7 @@ name: CHECK_PACKAGE_VERSION
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ 'release/**' ]
 
 permissions:
   contents: read
