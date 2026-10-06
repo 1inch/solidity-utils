@@ -9,7 +9,6 @@ import { IPermit2 } from "../interfaces/IPermit2.sol";
 import { IERC7597Permit } from "../interfaces/IERC7597Permit.sol";
 import { IWETH } from "../interfaces/IWETH.sol";
 import { RevertReasonForwarder } from "../libraries/RevertReasonForwarder.sol";
-// import { CalldataParse } from "../libraries/CalldataParse.sol";
 
 /**
  * @title Implements efficient safe methods for ERC20 interface.
@@ -27,8 +26,6 @@ library SafeERC20 {
     error SafeDecreaseAllowanceFailed();
     error SafePermitBadLength();
     error Permit2TransferAmountTooHigh();
-
-    // using CalldataParse for bytes;
 
     // Uniswap Permit2 address
     address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
@@ -310,9 +307,7 @@ library SafeERC20 {
         bytes4 erc7597PermitSelector = IERC7597Permit.permit.selector;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
-// IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
-// (address owner) 32 + (address spender) 32 + (uint256 value) 32 + (uint256 deadline) 32 + (sig.offset) 32 + (sig.length) 32 + length
-// ERC7597Permit.permit size: const 192 + length
+
             // Switch case for different permit lengths, indicating different permit standards
             switch permit.length
             // Compact IERC20Permit
