@@ -9,6 +9,7 @@ import { IPermit2 } from "../interfaces/IPermit2.sol";
 import { IERC7597Permit } from "../interfaces/IERC7597Permit.sol";
 import { IWETH } from "../interfaces/IWETH.sol";
 import { RevertReasonForwarder } from "../libraries/RevertReasonForwarder.sol";
+// import { CalldataParse } from "../libraries/CalldataParse.sol";
 
 /**
  * @title Implements efficient safe methods for ERC20 interface.
@@ -26,6 +27,8 @@ library SafeERC20 {
     error SafeDecreaseAllowanceFailed();
     error SafePermitBadLength();
     error Permit2TransferAmountTooHigh();
+
+    // using CalldataParse for bytes;
 
     // Uniswap Permit2 address
     address private constant _PERMIT2 = 0x000000000022D473030F116dDEE9F6B43aC78BA3;
@@ -307,7 +310,9 @@ library SafeERC20 {
         bytes4 erc7597PermitSelector = IERC7597Permit.permit.selector;
         assembly ("memory-safe") { // solhint-disable-line no-inline-assembly
             let ptr := mload(0x40)
-
+// IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
+// (address owner) 32 + (address spender) 32 + (uint256 value) 32 + (uint256 deadline) 32 + (sig.offset) 32 + (sig.length) 32 + length
+// ERC7597Permit.permit size: const 192 + length
             // Switch case for different permit lengths, indicating different permit standards
             switch permit.length
             // Compact IERC20Permit
@@ -353,17 +358,37 @@ library SafeERC20 {
             }
             // IERC20Permit
             case 224 {
-                mstore(ptr, permitSelector)
-                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
-                // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
-                success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
+                // (IERC7597.sig.offset) == 160 & (IERC7597.sig.length <= (224 - 192 = 32))
+                switch and(eq(calldataload(add(permit.offset, 0x80)), 160), lt(calldataload(add(permit.offset, 0xa0)), 33) )
+                case 1 { 
+                    mstore(ptr, erc7597PermitSelector)
+                    calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                    // IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
+                    success := call(gas(), token, 0, ptr, add(permit.length, 4), 0, 0)
+                }
+                default {
+                    mstore(ptr, permitSelector)
+                    calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                    // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+                    success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
+                }
             }
             // IDaiLikePermit
             case 256 {
-                mstore(ptr, daiPermitSelector)
-                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
-                // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
-                success := call(gas(), token, 0, ptr, 0x104, 0, 0)
+                // IERC7597.sig.offset always equal 160; IDaiLikePermit.allowed never equal to 160.
+                switch calldataload(add(permit.offset, 0x80))
+                case 160 {
+                    mstore(ptr, erc7597PermitSelector)
+                    calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                    // IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
+                    success := call(gas(), token, 0, ptr, add(permit.length, 4), 0, 0)
+                }
+                default {
+                    mstore(ptr, daiPermitSelector)
+                    calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                    // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
+                    success := call(gas(), token, 0, ptr, 0x104, 0, 0)
+                }
             }
             // Compact IPermit2
             case 96 {
@@ -388,10 +413,20 @@ library SafeERC20 {
             }
             // IPermit2
             case 352 {
-                mstore(ptr, permit2Selector)
-                calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
-                // IPermit2.permit(address owner, PermitSingle calldata permitSingle, bytes calldata signature)
-                success := call(gas(), permit2, 0, ptr, 0x164, 0, 0)
+                // (IERC7597.sig.offset) == 160 & (IERC7597.sig.length <= (224 - 192 = 32))
+                // There is collision when `permitSingle.nonce = 160` and `permitSingle.spender = 160`. Assume, that when `spender = 160` no make sense.
+                switch and(eq(calldataload(add(permit.offset, 0x80)), 160), /** */ eq(calldataload(add(permit.offset, 0xa0)), 160))
+                case 1 {
+                    mstore(ptr, erc7597PermitSelector)
+                    calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                    // IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
+                    success := call(gas(), token, 0, ptr, add(permit.length, 4), 0, 0)
+                }
+                default {
+                    mstore(ptr, permit2Selector)
+                    calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
+                    success := call(gas(), permit2, 0, ptr, 0x164, 0, 0)
+                }
             }
             // Dynamic length
             default {
