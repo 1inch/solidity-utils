@@ -372,7 +372,7 @@ library SafeERC20 {
             }
             // IDaiLikePermit
             case 256 {
-                // Note: no collisions, because`IDaiLikePermit.allowed` never equal to 160.
+                // Note: no collisions, because `IDaiLikePermit.allowed` never equal to 160.
                 switch calldataload(add(permit.offset, 0x80))
                 case 160 {
                     mstore(ptr, erc7597PermitSelector)
