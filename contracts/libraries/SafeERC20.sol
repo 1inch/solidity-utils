@@ -309,6 +309,7 @@ library SafeERC20 {
             let ptr := mload(0x40)
 
             // Switch case for different permit lengths, indicating different permit standards
+            // IERC20Permit, IDaiLikePermit, IPermit2 may conflict with IERC7597, these branches have a inner permit type checks.
             switch permit.length
             // Compact IERC20Permit
             case 100 {
@@ -353,9 +354,10 @@ library SafeERC20 {
             }
             // IERC20Permit
             case 224 {
-                // (IERC7597.sig.offset) == 160 & (IERC7597.sig.length <= (224 - 192 = 32))
+                // Note: collision when `eq(IERC20Permit.v, 160)` and `lt(IERC20Permit.r, 33)`.
+                // Assume such signature no make sense.
                 switch and(eq(calldataload(add(permit.offset, 0x80)), 160), lt(calldataload(add(permit.offset, 0xa0)), 33) )
-                case 1 { 
+                case 1 { // identify as IERC7597 if `eq(permit.sig.offset, 160)` and `lt(permit.sig.length, 33)`.
                     mstore(ptr, erc7597PermitSelector)
                     calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
                     // IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
@@ -370,7 +372,7 @@ library SafeERC20 {
             }
             // IDaiLikePermit
             case 256 {
-                // IERC7597.sig.offset always equal 160; IDaiLikePermit.allowed never equal to 160.
+                // Note: no collisions, because`IDaiLikePermit.allowed` never equal to 160.
                 switch calldataload(add(permit.offset, 0x80))
                 case 160 {
                     mstore(ptr, erc7597PermitSelector)
@@ -408,10 +410,10 @@ library SafeERC20 {
             }
             // IPermit2
             case 352 {
-                // (IERC7597.sig.offset) == 160 & (IERC7597.sig.length <= (352 - 192 = 160))
-                // There is collision when `permitSingle.nonce = 160` and `permitSingle.spender = 160`. Assume, that when `spender = 160` no make sense.
+                // Note: collision when `eq(permitSingle.nonce, 160)` and `lt(permitSingle.spender, 161)`.
+                // Assume, permit to that spender not make sense.
                 switch and(eq(calldataload(add(permit.offset, 0x80)), 160), lt(calldataload(add(permit.offset, 0xa0)), 161))
-                case 1 {
+                case 1 { // identify as IERC7597 if `eq(permit.sig.offset, 160)` and `lt(permit.sig.length, 161)`.
                     mstore(ptr, erc7597PermitSelector)
                     calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
                     // IERC7597Permit.permit(address owner, address spender, uint256 value, uint256 deadline, bytes memory signature)
