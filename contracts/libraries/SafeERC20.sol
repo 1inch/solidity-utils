@@ -408,9 +408,9 @@ library SafeERC20 {
             }
             // IPermit2
             case 352 {
-                // (IERC7597.sig.offset) == 160 & (IERC7597.sig.length <= (224 - 192 = 32))
+                // (IERC7597.sig.offset) == 160 & (IERC7597.sig.length <= (352 - 192 = 160))
                 // There is collision when `permitSingle.nonce = 160` and `permitSingle.spender = 160`. Assume, that when `spender = 160` no make sense.
-                switch and(eq(calldataload(add(permit.offset, 0x80)), 160), /** */ eq(calldataload(add(permit.offset, 0xa0)), 160))
+                switch and(eq(calldataload(add(permit.offset, 0x80)), 160), lt(calldataload(add(permit.offset, 0xa0)), 161))
                 case 1 {
                     mstore(ptr, erc7597PermitSelector)
                     calldatacopy(add(ptr, 0x04), permit.offset, permit.length) // copy permit calldata
