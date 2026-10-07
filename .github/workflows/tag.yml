@@ -8,4 +8,4 @@ permissions:
 
 jobs:
   tag:
-    uses: 1inch/ci-workflow-protocol/.github/workflows/tag.yml@v1.0.0
+    uses: 1inch/ci-workflow-protocol/.github/workflows/tag.yml@v1.1.0
