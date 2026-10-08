@@ -372,7 +372,7 @@ library SafeERC20 {
                 mstore(add(ptr, 0x04), owner) // store owner
                 mstore(add(ptr, 0x24), token) // store token
 
-                calldatacopy(add(ptr, 0x50), permit.offset, 0x14)             // store amount = copy permit.offset 0x00..0x13
+                mstore(add(ptr, 0x44), shr(96, calldataload(permit.offset))) // store amount = copy permit.offset 0x00..0x13
                 // and(0xffffffffffff, ...) - conversion to uint48
                 mstore(add(ptr, 0x64), and(0xffffffffffff, sub(shr(224, calldataload(add(permit.offset, 0x14))), 1))) // store expiration = ((permit.offset 0x14..0x17 - 1) & 0xffffffffffff)
                 mstore(add(ptr, 0x84), shr(224, calldataload(add(permit.offset, 0x18)))) // store nonce = copy permit.offset 0x18..0x1b
