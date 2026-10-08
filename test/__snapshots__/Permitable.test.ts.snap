@@ -1,35 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Permitable tryPermit branches permits IDaiLikePermit 1`] = `81246n`;
+exports[`Permitable tryPermit branches permits IDaiLikePermit 1`] = `81285n`;
 
-exports[`Permitable tryPermit branches permits IDaiLikePermit compact 1`] = `79808n`;
+exports[`Permitable tryPermit branches permits IDaiLikePermit compact 1`] = `79873n`;
 
-exports[`Permitable tryPermit branches permits IERC20Permit 1`] = `78485n`;
+exports[`Permitable tryPermit branches permits IERC20Permit 1`] = `78525n`;
 
-exports[`Permitable tryPermit branches permits IERC20Permit compact 1`] = `77273n`;
+exports[`Permitable tryPermit branches permits IERC20Permit compact 1`] = `77349n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 0-byte signature 1`] = `78057n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 0-byte signature 1`] = `78072n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 1-byte signature 1`] = `78225n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 1-byte signature 1`] = `78295n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 32-byte signature 1`] = `78597n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 32-byte signature 1`] = `78667n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 33-byte signature 1`] = `78751n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 33-byte signature 1`] = `78808n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 64-byte signature 1`] = `79123n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 64-byte signature 1`] = `79180n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 65-byte signature 1`] = `79300n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 65-byte signature 1`] = `79315n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 128-byte signature 1`] = `80202n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 128-byte signature 1`] = `80217n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 129-byte signature 1`] = `80425n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 129-byte signature 1`] = `80428n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 142-byte signature 1`] = `80581n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 142-byte signature 1`] = `80584n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 160-byte signature 1`] = `80797n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 160-byte signature 1`] = `80800n`;
 
-exports[`Permitable tryPermit branches permits IERC7597Permit with a 161-byte signature 1`] = `80891n`;
+exports[`Permitable tryPermit branches permits IERC7597Permit with a 161-byte signature 1`] = `80906n`;
 
-exports[`Permitable tryPermit branches permits IPermit2 1`] = `59457n`;
+exports[`Permitable tryPermit branches permits IPermit2 1`] = `59471n`;
 
-exports[`Permitable tryPermit branches permits IPermit2 compact 1`] = `57672n`;
+exports[`Permitable tryPermit branches permits IPermit2 compact 1`] = `57709n`;

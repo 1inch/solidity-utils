@@ -356,24 +356,28 @@ library SafeERC20 {
                 }
 
                 // IERC20Permit. identify as IERC7597 if `eq(permit.sig.offset, 160)` and `lt(permit.sig.length, 33)`
-                if and(eq(permitLength, 224), iszero(and(eq(calldataload(add(permit.offset, 0x80)), 160), lt(calldataload(add(permit.offset, 0xa0)), 33)))) {
+                if eq(permitLength, 224) {
                     // Note: collision when `eq(IERC20Permit.v, 160)` and `lt(IERC20Permit.r, 33)`.
                     // Assume such signature no make sense.
-                    mstore(ptr, permitSelector)
-                    calldatacopy(add(ptr, 0x04), permit.offset, permitLength) // copy permit calldata
-                    // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
-                    success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
-                    break
+                    if iszero(and(eq(calldataload(add(permit.offset, 0x80)), 160), lt(calldataload(add(permit.offset, 0xa0)), 33))) {
+                        mstore(ptr, permitSelector)
+                        calldatacopy(add(ptr, 0x04), permit.offset, permitLength) // copy permit calldata
+                        // IERC20Permit.permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)
+                        success := call(gas(), token, 0, ptr, 0xe4, 0, 0)
+                        break
+                    }
                 }
 
                 // IDaiLikePermit
-                if and(eq(permitLength, 256), iszero(eq(calldataload(add(permit.offset, 0x80)), 160))) {
-                    // Note: no collisions, because `IDaiLikePermit.allowed` never equal to 160.
-                    mstore(ptr, daiPermitSelector)
-                    calldatacopy(add(ptr, 0x04), permit.offset, permitLength) // copy permit calldata
-                    // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
-                    success := call(gas(), token, 0, ptr, 0x104, 0, 0)
-                    break
+                if eq(permitLength, 256) {
+                    if iszero(eq(calldataload(add(permit.offset, 0x80)), 160)) {
+                        // Note: no collisions, because `IDaiLikePermit.allowed` never equal to 160.
+                        mstore(ptr, daiPermitSelector)
+                        calldatacopy(add(ptr, 0x04), permit.offset, permitLength) // copy permit calldata
+                        // IDaiLikePermit.permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s)
+                        success := call(gas(), token, 0, ptr, 0x104, 0, 0)
+                        break
+                    }
                 }
 
                 // Compact IPermit2
@@ -400,13 +404,15 @@ library SafeERC20 {
                 }
 
                 // IPermit2
-                if and(eq(permitLength, 352), iszero(and(eq(calldataload(add(permit.offset, 0x80)), 160), lt(calldataload(add(permit.offset, 0xa0)), 161)))) {
-                    // Note: collision when `eq(permitSingle.nonce, 160)` and `lt(permitSingle.spender, 161)`.
-                    // Assume, permit to that spender not make sense.
-                    mstore(ptr, permit2Selector)
-                    calldatacopy(add(ptr, 0x04), permit.offset, permitLength) // copy permit calldata
-                    success := call(gas(), permit2, 0, ptr, 0x164, 0, 0)
-                    break
+                if eq(permitLength, 352) { 
+                    if iszero(and(eq(calldataload(add(permit.offset, 0x80)), 160), lt(calldataload(add(permit.offset, 0xa0)), 161))) {
+                        // Note: collision when `eq(permitSingle.nonce, 160)` and `lt(permitSingle.spender, 161)`.
+                        // Assume, permit to that spender not make sense.
+                        mstore(ptr, permit2Selector)
+                        calldatacopy(add(ptr, 0x04), permit.offset, permitLength) // copy permit calldata
+                        success := call(gas(), permit2, 0, ptr, 0x164, 0, 0)
+                        break
+                    }
                 }
 
                 // Dynamic length - IERC7597Permit
