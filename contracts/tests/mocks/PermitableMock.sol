@@ -15,4 +15,8 @@ contract PermitableMock {
     function mockPermitCompact(IERC20 token, bytes calldata permit) external {
         token.safePermit(msg.sender, address(this), permit);
     }
+
+    function mockTryPermit(IERC20 token, bytes calldata permit) external returns (bool) {
+        return token.tryPermit(permit);
+    }
 }
