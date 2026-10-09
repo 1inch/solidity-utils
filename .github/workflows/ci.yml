@@ -1,60 +1,25 @@
 name: CI
-
 on:
-  push:
-    branches: [master]
   pull_request:
-    branches: [master]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: "yarn"
-      - run: yarn
-      - run: yarn lint
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: "yarn"
-      - run: yarn
-      - run: yarn typechain
-      - run: yarn typecheck
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: "yarn"
-      - run: yarn
-      - run: yarn typechain
-      - run: yarn test
-
-  # Check disabled meanwhile we figure out how to handle codecov as company asset.
-  # https://1inch.atlassian.net/browse/ITSM-1394
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: 'yarn'
-      - run: yarn
-      - run: yarn typechain
-      - run: yarn coverage
-      - uses: codecov/codecov-action@v7
-        with:
-            token: ${{ secrets.CODECOV_TOKEN }}
+  ci:
+    uses: 1inch/ci-workflow-protocol/.github/workflows/hardhat-ci.yml@v2.0.1
+    with:
+      profile: default
+      sources: contracts
+      snapshot: false
+      lint: true
+      typecheck: true
+      coverage: true
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

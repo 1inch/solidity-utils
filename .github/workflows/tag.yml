@@ -1,0 +1,12 @@
+name: TAG
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  tag:
+    uses: 1inch/ci-workflow-protocol/.github/workflows/tag.yml@v2.0.1
