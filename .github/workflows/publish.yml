@@ -5,16 +5,8 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish-npmjs:
-    permissions:
-      contents: read
-      id-token: write
     uses: 1inch/ci-workflow-protocol/.github/workflows/publish.yml@v1.1.0
-
-  publish-github:
-    permissions:
-      contents: read
-      packages: write
-    uses: 1inch/ci-workflow-protocol/.github/workflows/publish-github-packages.yml@v1.1.0
