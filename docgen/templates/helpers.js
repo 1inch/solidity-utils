@@ -1,10 +1,3 @@
-exports.lower = lower;
-exports.isContract = isContract;
-exports.getFunctionsToDisplay = getFunctionsToDisplay;
-exports.findContractById = findContractById;
-exports.arrayHasDescriptions = arrayHasDescriptions;
-// exports
-
 function lower (text) {
     if (typeof text === 'string') {
         return text.toLowerCase();
@@ -25,7 +18,7 @@ function arrayHasDescriptions(items){
 function getFunctionsToDisplay (baseContractIds, allContracts){
     const resultMap = [];
     if (baseContractIds.length > 0){
-        primaryContractFns = getContractFunctions(baseContractIds[0], allContracts);
+        const primaryContractFns = getContractFunctions(baseContractIds[0], allContracts);
         primaryContractFns.map(fn => resultMap.push({id: baseContractIds[0], fnId: fn.id, selector: fn.functionSelector, name: fn.name}));
 
         for(let i=1; i < baseContractIds.length; i++) {
@@ -44,7 +37,7 @@ function getFunctionsToDisplay (baseContractIds, allContracts){
         }
     }
 
-    resultArray = Object.values(resultMap.reduce((acc, item) => {
+    const resultArray = Object.values(resultMap.reduce((acc, item) => {
         if (!acc[item.id]) {
             acc[item.id] = {
                 id: item.id,
@@ -68,9 +61,15 @@ function findContractById (id, allContracts) {
     return allContracts.find(contract => contract.id === id);
 }
 
-// helpers
-
-getContractFunctions = (id, allContracts) => {
+function getContractFunctions(id, allContracts) {
     const contract = findContractById(id, allContracts);
     return contract ? contract.functions : [];
 }
+
+export {
+    lower,
+    isContract,
+    getFunctionsToDisplay,
+    findContractById,
+    arrayHasDescriptions,
+};
