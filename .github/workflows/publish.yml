@@ -10,3 +10,5 @@ permissions:
 jobs:
   publish-npmjs:
     uses: 1inch/ci-workflow-protocol/.github/workflows/publish.yml@v2.0.1
+    with:
+      tag-prefix: ''
