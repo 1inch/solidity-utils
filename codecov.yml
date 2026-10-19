@@ -4,3 +4,7 @@ coverage:
     patch:
       default:
         target: 100%
+
+ignore:
+  - "contracts/mocks"
+  - "contracts/tests"
