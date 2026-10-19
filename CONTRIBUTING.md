@@ -15,7 +15,7 @@ As a contributor, you are expected to fork this repository, work on your own for
 	```
 	yarn
 	```
-3) Branch out from `master` into `fix/some-bug-#123`
+3) Branch out from `main` into `fix/some-bug-#123`
 (Postfixing #123 will associate your PR with the issue #123)
 4) Make your changes, add your files, commit and push to your fork.
 Before pushing the branch ensure that:

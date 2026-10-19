@@ -3,6 +3,7 @@ import type {
     EdrNetworkAccountsUserConfig,
     NetworkUserConfig,
 } from 'hardhat/types/config';
+import type { ChainType } from 'hardhat/types/network';
 import type { EthereumProvider } from 'hardhat/types/providers';
 
 /**
@@ -163,6 +164,7 @@ export class Networks {
      * @param etherscanKey Explorer API key.
      * @param hardfork Hardfork metadata retained on the network configuration.
      * @param l1Network Optional L1 network name used by zkSync-compatible configurations.
+     * @param chainType Hardhat chain type used for network-specific behavior.
      */
     register(
         name: string,
@@ -173,12 +175,13 @@ export class Networks {
         etherscanKey?: string,
         hardfork: string = 'shanghai',
         l1Network?: string,
+        chainType: ChainType = 'l1',
     ) {
         if (rpc && privateKey && etherscanNetworkName && etherscanKey) {
             const { url, authKeyHttpHeader } = parseRpcEnv(rpc);
             this.networks[name] = {
                 type: 'http',
-                chainType: 'l1',
+                chainType,
                 url,
                 httpHeaders: authKeyHttpHeader ? { 'auth-key': authKeyHttpHeader } : undefined,
                 chainId,
@@ -206,6 +209,7 @@ export class Networks {
      * @param apiURL Block explorer API endpoint.
      * @param browserURL Public block explorer URL.
      * @param hardfork Hardfork metadata retained on the network configuration.
+     * @param chainType Hardhat chain type used for network-specific behavior.
      */
     registerCustom(
         name: string,
@@ -216,9 +220,10 @@ export class Networks {
         apiURL: string = '',
         browserURL: string = '',
         hardfork = 'paris',
+        chainType: ChainType = 'l1',
     ) {
         if (url && privateKey && etherscanKey) {
-            this.register(name, chainId, url, privateKey, name, etherscanKey, hardfork);
+            this.register(name, chainId, url, privateKey, name, etherscanKey, hardfork, undefined, chainType);
             this.etherscan.customChains.push({ network: name, chainId, urls: { apiURL, browserURL } });
         }
     }
@@ -235,16 +240,16 @@ export class Networks {
         this.register('mainnet', 1, process.env.MAINNET_RPC_URL, process.env.MAINNET_PRIVATE_KEY || privateKey, 'mainnet', etherscanApiKey);
         this.register('bsc', 56, process.env.BSC_RPC_URL, process.env.BSC_PRIVATE_KEY || privateKey, 'bsc', etherscanApiKey);
         this.register('sepolia', 11155111, process.env.SEPOLIA_RPC_URL, process.env.SEPOLIA_PRIVATE_KEY || privateKey, 'sepolia', etherscanApiKey);
-        this.register('optimistic', 10, process.env.OPTIMISTIC_RPC_URL, process.env.OPTIMISTIC_PRIVATE_KEY || privateKey, 'optimisticEthereum', etherscanApiKey);
+        this.register('optimistic', 10, process.env.OPTIMISTIC_RPC_URL, process.env.OPTIMISTIC_PRIVATE_KEY || privateKey, 'optimisticEthereum', etherscanApiKey, 'shanghai', undefined, 'op');
         this.register('matic', 137, process.env.MATIC_RPC_URL, process.env.MATIC_PRIVATE_KEY || privateKey, 'polygon', etherscanApiKey);
         this.register('arbitrum', 42161, process.env.ARBITRUM_RPC_URL, process.env.ARBITRUM_PRIVATE_KEY || privateKey, 'arbitrumOne', etherscanApiKey);
         this.register('xdai', 100, process.env.XDAI_RPC_URL, process.env.XDAI_PRIVATE_KEY || privateKey, 'xdai', etherscanApiKey);
         this.register('avax', 43114, process.env.AVAX_RPC_URL, process.env.AVAX_PRIVATE_KEY || privateKey, 'avalanche', etherscanApiKey, 'paris');
-        this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', etherscanApiKey);
-        this.register('baseSepolia', 84532, process.env.BASESEPOLIA_RPC_URL, process.env.BASESEPOLIA_PRIVATE_KEY || privateKey, 'baseSepolia', etherscanApiKey);
+        this.register('base', 8453, process.env.BASE_RPC_URL, process.env.BASE_PRIVATE_KEY || privateKey, 'base', etherscanApiKey, 'shanghai', undefined, 'op');
+        this.register('baseSepolia', 84532, process.env.BASESEPOLIA_RPC_URL, process.env.BASESEPOLIA_PRIVATE_KEY || privateKey, 'baseSepolia', etherscanApiKey, 'shanghai', undefined, 'op');
         this.registerCustom('linea', 59144, process.env.LINEA_RPC_URL, process.env.LINEA_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.lineascan.build/api', 'https://lineascan.build/', 'london');
         this.registerCustom('sonic', 146, process.env.SONIC_RPC_URL, process.env.SONIC_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.sonicscan.org/api', 'https://sonicscan.org/', 'shanghai');
-        this.registerCustom('unichain', 130, process.env.UNICHAIN_RPC_URL, process.env.UNICHAIN_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.uniscan.xyz/api', 'https://uniscan.xyz/', 'shanghai');
+        this.registerCustom('unichain', 130, process.env.UNICHAIN_RPC_URL, process.env.UNICHAIN_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.uniscan.xyz/api', 'https://uniscan.xyz/', 'shanghai', 'op');
         this.registerCustom('zksync', 324, process.env.ZKSYNC_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, etherscanApiKey, 'https://api.zksync.network/api', 'https://era.zksync.network/', 'paris');
         this.register('zksync-zkevm', 324, process.env.ZKSYNC_RPC_URL, process.env.ZKSYNC_PRIVATE_KEY || privateKey, 'zksyncmainnet', etherscanApiKey, 'paris', 'mainnet');
         this.register('zksyncTest', 300, process.env.ZKSYNC_TEST_RPC_URL, process.env.ZKSYNC_TEST_PRIVATE_KEY || privateKey, 'zksyncsepolia', etherscanApiKey, 'paris', 'sepolia');

@@ -157,7 +157,7 @@ export async function deployAndGetContract(options: DeployContractOptions): Prom
     if (!(skipVerify || constants.DEV_CHAINS.includes(networkName))) {
         await hre.tasks.getTask('verify').run({
             address,
-            constructorArgsParams: constructorArgs,
+            constructorArgs,
         });
     } else if (log) {
         console.log('Skipping verification');
@@ -272,7 +272,7 @@ export async function saveContractWithCreate3Deployment(
     if (!(skipVerify || constants.DEV_CHAINS.includes(networkName))) {
         await hre.tasks.getTask('verify').run({
             address: contract,
-            constructorArgsParams: constructorArgs,
+            constructorArgs,
         });
     } else {
         console.log('Skipping verification');
