@@ -292,6 +292,7 @@ library SafeERC20 {
      * before invocation for optimized performance.
      * Note that the implementation does not perform dirty bits cleaning, so it is the responsibility of
      * the caller to make sure that the higher 96 bits of the `owner` and `spender` parameters are clean.
+     * To avoid collision for ERC-7597 permit with static ones extend `permit` with additional zero-bytes.
      * @param token The address of the ERC20 token on which to call the permit function.
      * @param owner The owner of the tokens. This address should have signed the off-chain permit.
      * @param spender The address which will be approved for transfer of tokens.
