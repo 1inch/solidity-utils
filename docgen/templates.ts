@@ -1,4 +1,7 @@
 import path from 'path';
+import { fileURLToPath } from 'node:url';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * @category Docgen
@@ -6,5 +9,5 @@ import path from 'path';
  * @returns The path to templates folder.
  */
 export function oneInchTemplates(): string {
-    return path.normalize(path.join(__dirname, '../../docgen/templates'));
+    return path.normalize(path.join(dirname, '../../docgen/templates'));
 }
