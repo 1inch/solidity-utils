@@ -191,4 +191,34 @@ describe('Permitable', function () {
         expect(await usdcLikePermitMock.nonces(owner)).to.be.equal(1);
         expect(await usdcLikePermitMock.allowance(owner, permitableMock)).to.be.equal(value);
     });
+
+    it('pass clean uint160 amount to compact Permit2 after another tryPermit', async function () {
+        const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
+        const permitContract = await permit2Contract();
+        // `MAX_UINT256` fills the slot; the uint160 below must overwrite it.
+        const dirtyValue = constants.MAX_UINT256;
+        const cleanAmount = 0xeeee_eeee_eeee_eeee_eeee_eeee_eeee_eeee_eeee_eeeen;
+
+        const permit = await getPermit(
+            signer1,
+            erc20PermitMock,
+            '1',
+            chainId,
+            await permitableMock.getAddress(),
+            dirtyValue.toString(),
+        );
+        const compactPermit = await getPermit2(
+            signer1,
+            await erc20PermitMock.getAddress(),
+            chainId,
+            await permitableMock.getAddress(),
+            cleanAmount,
+            true,
+        );
+
+        await permitableMock.mockPermitThenCompact(erc20PermitMock, permit, compactPermit);
+
+        const allowance = await permitContract.allowance(signer1, erc20PermitMock, permitableMock);
+        expect(allowance.amount).to.equal(cleanAmount);
+    });
 });
