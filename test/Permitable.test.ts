@@ -195,8 +195,9 @@ describe('Permitable', function () {
     it('pass clean uint160 amount to compact Permit2 after another tryPermit', async function () {
         const { permitableMock, erc20PermitMock, chainId } = await loadFixture(deployTokens);
         const permitContract = await permit2Contract();
-        // Top byte of the uint160 is non-zero, so a dirty prefix or a short write cannot pass as this value.
-        const amount = (0xabn << 152n) | 0x123456789n;
+        // `MAX_UINT256` fills the slot; the uint160 below must overwrite it.
+        const dirtyValue = constants.MAX_UINT256;
+        const cleanAmount = 0xeeee_eeee_eeee_eeee_eeee_eeee_eeee_eeee_eeee_eeeen;
 
         const permit = await getPermit(
             signer1,
@@ -204,20 +205,20 @@ describe('Permitable', function () {
             '1',
             chainId,
             await permitableMock.getAddress(),
-            constants.MAX_UINT256.toString(),
+            dirtyValue.toString(),
         );
         const compactPermit = await getPermit2(
             signer1,
             await erc20PermitMock.getAddress(),
             chainId,
             await permitableMock.getAddress(),
-            amount,
+            cleanAmount,
             true,
         );
 
         await permitableMock.mockPermitThenCompact(erc20PermitMock, permit, compactPermit);
 
         const allowance = await permitContract.allowance(signer1, erc20PermitMock, permitableMock);
-        expect(allowance.amount).to.equal(amount);
+        expect(allowance.amount).to.equal(cleanAmount);
     });
 });
