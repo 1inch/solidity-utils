@@ -10,6 +10,10 @@
 [![Build Status](https://github.com/1inch/solidity-utils/workflows/CI/badge.svg)](https://github.com/1inch/solidity-utils/actions)
 [![Coverage Status](https://codecov.io/gh/1inch/solidity-utils/branch/main/graph/badge.svg?token=HJWBIVXQQA)](https://codecov.io/gh/1inch/solidity-utils)
 [![NPM Package](https://img.shields.io/npm/v/@1inch/solidity-utils.svg)](https://www.npmjs.org/package/@1inch/solidity-utils)
+[![Github Release](https://img.shields.io/github/v/tag/1inch/solidity-utils?sort=semver&label=github)](https://github.com/1inch/solidity-utils/releases/latest)
+[![Tests](https://img.shields.io/github/actions/workflow/status/1inch/solidity-utils/ci.yml?branch=main&label=tests)](https://github.com/1inch/solidity-utils/actions)
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE.md)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.37-blue)](https://docs.soliditylang.org/en/v0.8.37/)
 
 This repository is a comprehensive toolkit designed to streamline and optimize the development, tests and management of smart contracts. This repository serves as a one-stop resource for developers working on Ethereum and EVM-compatible blockchain projects, offering a blend of Solidity contracts with various utilities and optimizations, alongside JavaScript tools for testing, documentation, and project management.
 
