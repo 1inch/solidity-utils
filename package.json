@@ -124,6 +124,6 @@
   },
   "resolutions": {
     "elliptic": "^6.5.7",
-    "handlebars": "^4.7.9"
+    "handlebars": "^4.7.10"
   }
 }
