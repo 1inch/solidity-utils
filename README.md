@@ -23,6 +23,26 @@ This repository is a comprehensive toolkit designed to streamline and optimize t
 
 - **[Documentation Templates](https://github.com/1inch/solidity-utils/blob/main/docgen/README.md)**: Templates for Documentation Generator docgen.
 
+## Build and test
+
+Requires Node.js 24 and Yarn 1. The contracts build and test with Hardhat 3 and solc 0.8.37, pinned in `hardhat.config.ts`.
+
+```bash
+# Install dependencies
+yarn install
+
+# Build contracts and the TypeScript package
+yarn build
+
+# Run tests
+yarn test
+
+# Lint TypeScript and Solidity
+yarn lint
+```
+
+The tests check gas usage against snapshots in `test/contracts/__snapshots__/`. When a change moves gas on purpose, update them with `yarn test:update-snapshots`.
+
 ## Contributing
 
 Contributions are welcome! If you have a suggestion that would make this repository better, or if you have any questions, please feel free to fork the repo and create a pull request. You can also simply open an issue with your suggestion or question.
