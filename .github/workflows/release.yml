@@ -10,5 +10,4 @@ jobs:
   create-release:
     uses: 1inch/ci-workflow-protocol/.github/workflows/release.yml@v2.3.0
     with:
-      tag-prefix: ''
       changelog: true

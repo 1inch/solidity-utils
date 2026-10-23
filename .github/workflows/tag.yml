@@ -10,5 +10,3 @@ permissions:
 jobs:
   tag:
     uses: 1inch/ci-workflow-protocol/.github/workflows/tag.yml@v2.3.0
-    with:
-      tag-prefix: ''
