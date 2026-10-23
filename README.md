@@ -10,6 +10,10 @@
 [![Build Status](https://github.com/1inch/solidity-utils/workflows/CI/badge.svg)](https://github.com/1inch/solidity-utils/actions)
 [![Coverage Status](https://codecov.io/gh/1inch/solidity-utils/branch/main/graph/badge.svg?token=HJWBIVXQQA)](https://codecov.io/gh/1inch/solidity-utils)
 [![NPM Package](https://img.shields.io/npm/v/@1inch/solidity-utils.svg)](https://www.npmjs.org/package/@1inch/solidity-utils)
+[![Github Release](https://img.shields.io/github/v/tag/1inch/solidity-utils?sort=semver&label=github)](https://github.com/1inch/solidity-utils/releases/latest)
+[![Tests](https://img.shields.io/github/actions/workflow/status/1inch/solidity-utils/ci.yml?branch=main&label=tests)](https://github.com/1inch/solidity-utils/actions)
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE.md)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.37-blue)](https://docs.soliditylang.org/en/v0.8.37/)
 
 This repository is a comprehensive toolkit designed to streamline and optimize the development, tests and management of smart contracts. This repository serves as a one-stop resource for developers working on Ethereum and EVM-compatible blockchain projects, offering a blend of Solidity contracts with various utilities and optimizations, alongside JavaScript tools for testing, documentation, and project management.
 
@@ -22,6 +26,26 @@ This repository is a comprehensive toolkit designed to streamline and optimize t
 - **[Solidity Contracts and Libraries](https://github.com/1inch/solidity-utils/blob/main/docs/SUMMARY.md)**: Frequently used smart contracts, libraries, and interfaces aimed at providing reusable code for common use cases, alongside optimizations to improve contract efficiency.
 
 - **[Documentation Templates](https://github.com/1inch/solidity-utils/blob/main/docgen/README.md)**: Templates for Documentation Generator docgen.
+
+## Build and test
+
+Requires Node.js 24 and Yarn 1. The contracts build and test with Hardhat 3 and solc 0.8.37, pinned in `hardhat.config.ts`.
+
+```bash
+# Install dependencies
+yarn install
+
+# Build contracts and the TypeScript package
+yarn build
+
+# Run tests
+yarn test
+
+# Lint TypeScript and Solidity
+yarn lint
+```
+
+The tests check gas usage against snapshots in `test/contracts/__snapshots__/`. When a change moves gas on purpose, update them with `yarn test:update-snapshots`.
 
 ## Contributing
 
